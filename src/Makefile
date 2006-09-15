@@ -57,18 +57,10 @@ OBJECTS = \
 	dran3.o \
 	idl_dpeaks.o
 
-all : $(LIB)/libdimage.$(SO_EXT) ${BIN}/fits2xy
-
-#fits2xy.o:
-#	$(CC) -c $(CCCHK) $(CFLAGS) $(X_CFLAGS) fits2xy.c # -o fits2xy.o -I../../src/cfitsio
-
-${BIN}/fits2xy: fits2xy.c ${LIB}/libdimage.${SO_EXT}  
-	$(CC) -o ${BIN}/fits2xy fits2xy.c -ldimage -lcfitsio -I../../src/cfitsio -L../../src/cfitsio -L${LIB}
+all : $(LIB)/libdimage.$(SO_EXT) 
 
 $(LIB)/libdimage.$(SO_EXT): $(OBJECTS)  dimage.h
 	$(LD) $(X_LD_FLAGS) -o $(LIB)/libdimage.$(SO_EXT) $(OBJECTS) -lm
-#	$(LD) $(X_LD_FLAGS) -o $(LIB)/libdimage.$(SO_EXT) $(OBJECTS) $(MAKE_FTNLIB)
-#	nm -s ../lib/libimage.$(SO_EXT)
 
 #
 # Install things in their proper places in $(DIMAGE_DIR)
