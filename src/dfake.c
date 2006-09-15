@@ -78,15 +78,15 @@ int dfake(float *image,
 					float ba,
 					float phi0) 
 {
-  float oldim,amp,r0,sinph0,cosph0,ab2,d2r,maxr2,r2;
-  int i,j,k,inner,iinner0,iinner1,jinner0,jinner1,cont;
+  float oldim,amp,r0,sinph0,cosph0,ab2,d2r,r2;
+  int i,j,k,inner,cont;
 
   inner=ceil(r50);
   if(inner<1) inner=1;
   if(inner>8) inner=8;
 
   /* translate r50,n,f=1 to r0,n,amp */
-  sersic_params(1.,n,r50,&amp,&r0);
+  dsersic_params(1.,n,r50,&amp,&r0);
   amp/=ba;
   fg_amp=amp;
   fg_r0=r0;

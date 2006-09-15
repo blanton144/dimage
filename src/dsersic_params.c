@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "fake_galaxy.h"
+#include "dimage.h"
 
 /*
  * dsersic_params.c
@@ -35,11 +35,11 @@ float sersic_diff(float r0)
   if(sp_r0<sp_r50) {
     inner=dqromo(sersic_int,0.,sp_r0,dmidpnt)+
       dqromo(sersic_int,sp_r0,sp_r50,dmidpnt);
-    outer=dqromo(sersic_int,sp_r50,1.e+30,f_midinf);
+    outer=dqromo(sersic_int,sp_r50,1.e+30,dmidinf);
   } else {
     inner=dqromo(sersic_int,0.,sp_r50,dmidpnt);
-    outer=dqromo(sersic_int,sp_r50,sp_r0,f_midpnt)+
-      dqromo(sersic_int,sp_r0,1.e+30,f_midinf);
+    outer=dqromo(sersic_int,sp_r50,sp_r0,dmidpnt)+
+      dqromo(sersic_int,sp_r0,1.e+30,dmidinf);
   }
   return(outer-inner);
 }
@@ -55,10 +55,10 @@ int dsersic_params(float flux,
   sp_invn=1./n;
   sp_r50=r50;
   
-  (*r0)=f_zbrent(sersic_diff,1.e-10*r50,1.e+1*r50,1.e-7);
+  (*r0)=dzbrent(sersic_diff,1.e-10*r50,1.e+1*r50,1.e-7);
   sp_r0=(*r0);
   flux1=dqromo(sersic_int,0.,r50,dmidpnt)+
-    dqromo(sersic_int,r50,1.e+30,f_midinf);
+    dqromo(sersic_int,r50,1.e+30,dmidinf);
   (*amp)=flux/flux1;
 
   return 1;

@@ -1,10 +1,10 @@
 ;+
 ; NAME:
-;   fake_galaxy_new
+;   dfakegal
 ; PURPOSE:
 ;   get parameters associated with sersic settings
 ; CALLING SEQUENCE:
-;   fake_galaxy_new, flux, n, r50, amp=amp, r0=r0
+;   dfakegal, flux, n, r50, amp=amp, r0=r0
 ; INPUTS:
 ;   flux - flux
 ;   n - Sersic index
@@ -23,9 +23,9 @@
 ; REVISION HISTORY:
 ;   2003-09-21  Written MRB (NYU)
 ;-
-function fake_galaxy_new, sersicn=sersicn, r50=r50, flux=flux, nx=nx, ny=ny, $
-                          xcen=xcen, ycen=ycen, ba=ba, phi0=phi0, $
-                          spars=sersic
+function dfakegal, sersicn=sersicn, r50=r50, flux=flux, nx=nx, ny=ny, $
+                   xcen=xcen, ycen=ycen, ba=ba, phi0=phi0, $
+                   spars=sersic
 
 if(n_elements(sersicn) eq 0) then sersicn=1.
 if(n_elements(r50) eq 0) then r50=1.
@@ -48,9 +48,9 @@ if(n_elements(sersic) gt 0) then begin
 endif
 
 image=fltarr(nx,ny)
-soname=filepath('libfgal.'+idlutils_so_ext(), $
-                root_dir=getenv('FAKEOBS_DIR'), subdirectory='lib')
-retval=call_external(soname, 'idl_fake_galaxy', float(image), long(nx), $
+soname=filepath('libdimage.'+idlutils_so_ext(), $
+                root_dir=getenv('DIMAGE_DIR'), subdirectory='lib')
+retval=call_external(soname, 'idl_dfake', float(image), long(nx), $
                      long(ny), float(xcen), float(ycen), float(sersicn), $
                      float(r50),float(ba),float(phi0))
 image=image*flux

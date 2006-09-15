@@ -1,10 +1,10 @@
 ;+
 ; NAME:
-;   simple_fit
+;   dsersic
 ; PURPOSE:
 ;   run 2d sersic fitting on an image
 ; CALLING SEQUENCE:
-;   simple_fit,image [,invvar,xcen=,ycen=,psf=,sersicfit=, $
+;   dsersic,image [,invvar,xcen=,ycen=,psf=,sersicfit=, $
 ;      model=, /reinit, fixsky, /fixcen]
 ; INPUTS:
 ;   image - [nx,ny] input image
@@ -25,13 +25,13 @@
 ;   function source (pixel- and seeing-convolved)
 ; EXAMPLES:
 ; BUGS:
-;   sersic fitting by simple_fit currently fails fake data tests
+;   sersic fitting by dsersic currently fails fake data tests
 ; PROCEDURES CALLED:
 ; REVISION HISTORY:
 ;   10-Sep-2003  Written by Mike Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function simple_fit_model, fitparam
+function dsersic_model, fitparam
 
 common com_simple, image, invvar, nx, ny, psf, xcen, ycen, oldfitparam, $
   parinfo, oldmodel, addtemplate, step
@@ -46,10 +46,10 @@ for i=0L, n_elements(fitparam)-1L do $
   use_fitparam[i]=use_fitparam[i] < parinfo[i].limits[1]
 
 ; get profile
-model=fake_galaxy_new(nx=nx,ny=ny,xcen=use_fitparam[2],ycen=use_fitparam[3], $
-                      ba=use_fitparam[6],phi0=use_fitparam[7], $
-                      r50=exp(use_fitparam[4]), sersicn=use_fitparam[5], $
-                      flux=1.)
+model=dfakegal(nx=nx,ny=ny,xcen=use_fitparam[2],ycen=use_fitparam[3], $
+               ba=use_fitparam[6],phi0=use_fitparam[7], $
+               r50=exp(use_fitparam[4]), sersicn=use_fitparam[5], $
+               flux=1.)
 
 ; convolve with seeing
 if(n_elements(psf) gt 1) then model=convolve(model,psf)
@@ -107,26 +107,26 @@ return, model
 
 end
 ;
-function simple_fit_func, fitparam
+function dsersic_func, fitparam
 
 common com_simple
 
 ; calculate model
-model=simple_fit_model(fitparam)
+model=dsersic_model(fitparam)
 
 ; return residuals
 return, reform(((model-image)*sqrt(invvar)),n_elements(model))
 
 end
 ;
-pro simple_fit,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
-               sersicfit=sersicfit,model=model, reinit=reinit, $
-               fixcenter=fixcenter,fixsky=fixsky, addtemplate=in_addtemplate, $
-               nofit=nofit
+pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
+            sersicfit=sersicfit,model=model, reinit=reinit, $
+            fixcenter=fixcenter,fixsky=fixsky, addtemplate=in_addtemplate, $
+            nofit=nofit
 
 
 if(n_params() lt 1) then begin
-    print, 'Syntax - simple_fit, image [, invvar, xcen=, ycen=, psf=, sersicfit=, model= '
+    print, 'Syntax - dsersic, image [, invvar, xcen=, ycen=, psf=, sersicfit=, model= '
     print, '                addtemplate=, /reinit, /fixcenter, /fixsky '
     return
 endif
@@ -198,45 +198,25 @@ parinfo.value=      [sersicfit.sersicflux, $
 if(NOT keyword_set(nofit)) then begin 
 
 ; search starting from two possible orientations
-;;<<<<<<< simple_fit.pro
-;;chisquared=fltarr(2)
-;;parinfo0=parinfo
-;;parinfo0[6].value=parinfo[6].value
-;;step=1
-;;fitparam0= mpfit('simple_fit_func',/autoderivative, $
-                 ;;maxiter=maxiter,parinfo=parinfo0,status=status, $
-                 ;;covar=covar0,ftol=1.e-10)
-;;chisquared[0]=total(simple_fit_func(fitparam0)^2)
-;;parinfo1=parinfo
-;;parinfo1[4].value=parinfo0[4].value
-;;parinfo1[5].value=parinfo0[5].value
-;;parinfo1[6].value=parinfo[6].value
-;;parinfo1[7].value=(sersicfit.orientation+90.) mod 360.
-;;fitparam1= mpfit('simple_fit_func',/autoderivative, $
-                 ;;maxiter=maxiter,parinfo=parinfo1, status=status,  $
-                 ;;covar=covar1,ftol=1.e-10)
-;;help,status
-;;chisquared[1]=total(simple_fit_func(fitparam1)^2)
-;;=======
     chisquared=fltarr(2)
     parinfo0=parinfo
     parinfo0[6].value=parinfo[6].value
     parinfo0[7].value=45.
     step=1
-    fitparam0= mpfit('simple_fit_func',/autoderivative, $
+    fitparam0= mpfit('dsersic_func',/autoderivative, $
                      maxiter=maxiter,parinfo=parinfo0,status=status, $
                      covar=covar0,ftol=1.e-10)
-    chisquared[0]=total(simple_fit_func(fitparam0)^2)
+    chisquared[0]=total(dsersic_func(fitparam0)^2)
     parinfo1=parinfo
     parinfo1[4].value=parinfo0[4].value
     parinfo1[5].value=parinfo0[5].value
     parinfo1[6].value=parinfo[6].value
     parinfo1[7].value=135.
-    fitparam1= mpfit('simple_fit_func',/autoderivative, $
+    fitparam1= mpfit('dsersic_func',/autoderivative, $
                      maxiter=maxiter,parinfo=parinfo1, status=status,  $
                      covar=covar1,ftol=1.e-10)
     help,status
-    chisquared[1]=total(simple_fit_func(fitparam1)^2)
+    chisquared[1]=total(dsersic_func(fitparam1)^2)
 ;;>>>>>>> 1.6
 
 ; take better version
@@ -249,10 +229,10 @@ if(NOT keyword_set(nofit)) then begin
     endelse
 
     step=1
-    chisquared=total(simple_fit_func(fitparam)^2)
+    chisquared=total(dsersic_func(fitparam)^2)
 
 ; construct output
-    model=simple_fit_model(fitparam)
+    model=dsersic_model(fitparam)
     sersicfit.sersicflux=    fitparam[0]
     sersicfit.sky=           fitparam[1]
     sersicfit.xcen=          fitparam[2]
@@ -278,7 +258,7 @@ endif else begin
               sersicfit.axisratio, $
               sersicfit.orientation, $
               sersicfit.addcoeff]
-    model=simple_fit_model(fitparam)
+    model=dsersic_model(fitparam)
 endelse
 
 end

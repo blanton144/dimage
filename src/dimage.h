@@ -1,4 +1,5 @@
 
+#define SIGN(a,b) ((b)>0. ? fabs(a) : -fabs(a))
 float dzbrent(float (*func)(float), float x1, float x2, float tol);
 float dmidinf(float (*funk)(float), float aa, float bb, int n);
 void dpolint(float xa[], float ya[], int n, float x, float *y, 
@@ -67,3 +68,4 @@ int simplexy(float *image, int nx, int ny, float dpsf, float plim,
 						 float *sigma, float *x, float *y, float *flux, int *npeaks);
 int dtemplates(float *image, int nx, int ny, int *ntemplates, int *xcen, 
 							 int *ycen, float *templates, float sigma, float parallel);
+int dsersic_params(float flux, float n, float r50, float *amp, float *r0);

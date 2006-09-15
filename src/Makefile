@@ -15,7 +15,7 @@ SHELL = /bin/sh
 INC = ../../include
 CFLAGS  = $(SDSS_CFLAGS) -DCHECK_LEAKS -I$(INC)
 
-BIN = $(ASTROMETRY_DIR)/bin
+BIN = $(DIMAGE_DIR)/bin
 LIB = $(DIMAGE_DIR)/lib
 
 OBJECTS = \
@@ -61,6 +61,7 @@ OBJECTS = \
 	dqromo2.o \
 	dmidpnt.o \
 	dmidpnt2.o \
+	dsersic_params.o \
 	dpolint.o \
 	dpolint2.o \
 	nmf.o \
@@ -69,7 +70,7 @@ OBJECTS = \
 
 all : $(LIB)/libdimage.$(SO_EXT) 
 
-$(LIB)/libdimage.$(SO_EXT): $(OBJECTS)  dimage.h
+$(LIB)/libdimage.$(SO_EXT): $(OBJECTS) dimage.h
 	$(LD) $(X_LD_FLAGS) -o $(LIB)/libdimage.$(SO_EXT) $(OBJECTS) -lm
 
 #
