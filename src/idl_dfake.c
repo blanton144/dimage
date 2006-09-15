@@ -1,21 +1,23 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include "export.h"
 #include "dimage.h"
+#include "export.h"
 
 #define FREEVEC(a) {if((a)!=NULL) free((char *) (a)); (a)=NULL;}
 static void free_memory()
 {
 }
 
+int dfake(float *image, int nx, int ny, float xcen, float ycen,
+					float n, float r50, float ba, float phi0); 
 
 /********************************************************************/
-IDL_LONG idl_dtemplates (int      argc,
-												 void *   argv[])
+IDL_LONG idl_dfake (int      argc,
+                          void *   argv[])
 {
-	IDL_LONG nx,ny, *ntemplates, *xcen, *ycen;
-	float *image, *templates, parallel, sigma;
+  IDL_LONG nx,ny;
+	float *image, n, r50, ba, phi0, xcen, ycen;
 	
 	IDL_LONG i;
 	IDL_LONG retval=1;
@@ -25,17 +27,15 @@ IDL_LONG idl_dtemplates (int      argc,
 	image=((float *)argv[i]); i++;
 	nx=*((int *)argv[i]); i++;
 	ny=*((int *)argv[i]); i++;
-	ntemplates=((IDL_LONG *)argv[i]); i++;
-	xcen=((IDL_LONG *)argv[i]); i++;
-	ycen=((IDL_LONG *)argv[i]); i++;
-	templates=((float *)argv[i]); i++;
-	sigma=*((float *)argv[i]); i++;
-	parallel=*((float *)argv[i]); i++;
+	xcen=*((float *)argv[i]); i++;
+	ycen=*((float *)argv[i]); i++;
+	n=*((float *)argv[i]); i++;
+	r50=*((float *)argv[i]); i++;
+	ba=*(float *)argv[i]; i++;
+	phi0=*(float *)argv[i]; i++;
 	
 	/* 1. run the fitting routine */
-	retval=(IDL_LONG) dtemplates(image, nx, ny, (int *) ntemplates, 
-															 (int *) xcen, (int *) ycen, templates, 
-															 sigma, parallel);
+	retval=dfake(image,nx,ny,xcen,ycen,n,r50,ba,phi0);
 	
 	/* 2. free memory and leave */
 	free_memory();

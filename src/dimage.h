@@ -1,4 +1,14 @@
 
+void dpolint(float xa[], float ya[], int n, float x, float *y, 
+						 float *dy);
+void dpolint2(float xa[], float ya[], int n, float x, float *y, 
+							float *dy);
+float dmidpnt(float (*func)(float), float a, float b, int n);
+float dmidpnt2(float (*func)(float), float a, float b, int n);
+float dqromo(float (*func)(float), float a, float b,
+						 float (*choose)(float(*)(float), float, float, int));
+float dqromo2(float (*func)(float), float a, float b,
+							float (*choose)(float(*)(float), float, float, int));
 int dfluxes(float *image, float *templates, float *weights, int nx, int ny,
             float *xcen, float *ycen, int nchild, float *children, 
             float sigma);

@@ -50,9 +50,17 @@ OBJECTS = \
 	dweights.o \
 	idl_dfluxes.o \
 	dfluxes.o \
+	idl_dfake.o \
+	dfake.o \
 	idl_dfind.o \
 	dfind.o \
 	dpeaks.o \
+	dqromo.o \
+	dqromo2.o \
+	dmidpnt.o \
+	dmidpnt2.o \
+	dpolint.o \
+	dpolint2.o \
 	nmf.o \
 	dran3.o \
 	idl_dpeaks.o
