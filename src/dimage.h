@@ -1,4 +1,6 @@
 
+float dzbrent(float (*func)(float), float x1, float x2, float tol);
+float dmidinf(float (*funk)(float), float aa, float bb, int n);
 void dpolint(float xa[], float ya[], int n, float x, float *y, 
 						 float *dy);
 void dpolint2(float xa[], float ya[], int n, float x, float *y, 

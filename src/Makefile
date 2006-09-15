@@ -40,6 +40,8 @@ OBJECTS = \
 	dcholsl.o \
 	dselip.o \
 	dcen3x3.o \
+	dzbrent.o \
+	dmidinf.o \
 	idl_dcen3x3.o \
 	dallpeaks.o \
 	idl_dallpeaks.o \
