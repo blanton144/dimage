@@ -43,7 +43,7 @@ common atv_point, markcoord
 if(NOT keyword_set(plim)) then plim=5.
 if(NOT keyword_set(glim)) then glim=5.
 if(NOT keyword_set(gsmooth)) then gsmooth=2.
-if(NOT keyword_set(saddle)) then saddle=100.
+if(NOT keyword_set(saddle)) then saddle=5.
 if(keyword_set(xstars)) then nstars=n_elements(xstars)
 if(keyword_set(xgals)) then ngals=n_elements(xgals)
 
@@ -102,7 +102,7 @@ if(keyword_set(nc) gt 0 or $
             nimage= image
         endelse
     endif
-        
+
     if(keyword_set(xgals) eq 0) then begin
         ngals=0
         while(ngals eq 0 and gsmooth gt 1.) do begin
