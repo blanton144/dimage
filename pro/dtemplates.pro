@@ -49,7 +49,7 @@ templates=templates[*,*,0:nt-1L]
 if(keyword_set(sersic)) then begin
     iv=fltarr(nx,ny)+1./sigma^2
     for i=0L, nt-1L do begin
-        simple_fit, templates[*,*,i], iv, xcen=xin[i], ycen=yin[i], $
+        dsersic, templates[*,*,i], iv, xcen=xin[i], ycen=yin[i], $
           /fixcen, model=model, /reinit, /fixsky
         signt=2.*(float(templates[*,*,i] gt 0.)-0.5)
         templates[*,*,i]=signt*(abs(templates[*,*,i]) < (model*2.+0.1*sigma))
