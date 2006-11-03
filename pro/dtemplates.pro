@@ -2,7 +2,7 @@
 ; NAME:
 ;   dtemplates
 ; PURPOSE:
-;   build templates around centers
+;   build templates around centers  
 ; CALLING SEQUENCE:
 ;   dtemplates, image, xc, yc, templates= [, parallel=, sigma=, /sersic]
 ; INPUTS:
