@@ -22,26 +22,37 @@
 ;   1-Mar-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function dpsfcheck, image, ivar, x, y, amp=amp, psf=psf
+function dpsfcheck, image, ivar, x, y, amp=amp, psf=psf, vpsf=vpsf
 
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
+
+if(keyword_set(psf)) then begin
+    havevar=0
+    fit_mult_gauss, psf, 1, amp, psfsig, model=model
+    fwhm=psfsig*2.*sqrt(2.*alog(2.))
+endif
+
+if(keyword_set(vpsf)) then begin
+    havevar=1
+    psf=dvpsf(nx*0.5, ny*0.5, psfsrc=vpsf)
+    fit_mult_gauss, psf, 1, amp, psfsig, model=model
+    fwhm=psfsig*2.*sqrt(2.*alog(2.))
+endif
+
 npx=(size(psf,/dim))[0]
 npy=(size(psf,/dim))[1]
-
-fit_mult_gauss, psf, 1, amp, psfsig, model=model
-fwhm=psfsig*2.*sqrt(2.*alog(2.))
 
 cc=fltarr(npx,npy)+1.
 xx=reform(replicate(1., npx)#findgen(npy), npx*npy)/float(npx)-0.5
 yy=reform(findgen(npx)#replicate(1., npy), npx*npy)/float(npy)-0.5
 rr=sqrt((xx-npx*0.5)^2+(yy-npy*0.5)^2)
 
-cmodel=fltarr(npx*npy, 4)
-cmodel[*,0]=reform(psf/max(psf), npx*npy)
-cmodel[*,1]=xx
-cmodel[*,2]=yy
-cmodel[*,3]=cc
+cmodel=fltarr(4,npx*npy)
+cmodel[0,*]=reform(psf/max(psf), npx*npy)
+cmodel[1,*]=xx
+cmodel[2,*]=yy
+cmodel[3,*]=cc
 
 amp=fltarr(n_elements(x))
 for i=0L, n_elements(x)-1L do begin 
@@ -51,8 +62,14 @@ for i=0L, n_elements(x)-1L do begin
     embed_stamp, cutout_image, image, npx/2L-x[i], npy/2L-y[i] 
     embed_stamp, cutout_ivar, ivar, npx/2L-x[i], npy/2L-y[i] 
     
+    if(keyword_set(havevar)) then begin
+        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
+        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy)
+    endif
+    ;;hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
+    ;;  reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
     hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
-      reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
+      replicate(median(cutout_ivar), npx*npy), coeffs, nsigma=10 
     amp[i]=coeffs[0] 
 endfor
 

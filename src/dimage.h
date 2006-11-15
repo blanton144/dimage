@@ -23,6 +23,8 @@ int dfind(int *image, int nx, int ny, int *object);
 int dsmooth(float *image, int nx, int ny, float sigma, float *smooth);
 int dobjects(float *image, float *smooth, int nx, int ny, 
 						 float dpsf, float plim, int *objects);
+int dobjects_multi(float *image, int nx, int ny, int nim, 
+									 float dpsf, float plim, int *objects);
 int dnonneg(float *xx, float *invcovar, float *bb, float offset,
             int nn, float tolerance, int maxiter, int *niter, float *chi2,
             int verbose);

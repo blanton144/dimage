@@ -21,6 +21,8 @@ LIB = $(DIMAGE_DIR)/lib
 OBJECTS = \
 	idl_dobjects.o \
 	dobjects.o \
+	idl_dobjects_multi.o \
+	dobjects_multi.o \
 	idl_dsmooth.o \
 	dsmooth.o \
 	idl_dmedsmooth.o \

@@ -13,9 +13,6 @@
  
 #define FREEVEC(a) {if((a)!=NULL) free((char *) (a)); (a)=NULL;}
 
-static float *templates=NULL;
-static float *coeffs=NULL;
-
 int nmf(float *data, float *ivar, int ndata, int nim, float *coeffs,
         float *templates, int nc);
 
@@ -31,12 +28,12 @@ int dfitpsf(float *atlas,
             int nc,
             int np)
 {
+	int k,c;
 
   printf("%d %d %d %d\n", nx, ny, nc, nim); fflush(stdout);
 
+	/* first do the full psf fit */
   nmf(atlas, atlas_ivar, nx*ny, nim, psfc, psft, nc);
 
-  FREEVEC(templates);
-  FREEVEC(coeffs);
 	return(1);
 } /* end dfitpsf */

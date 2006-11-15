@@ -32,7 +32,6 @@ int nmf(float *data,
   maxiters=10000;
   tol=1.e-6;
   
-  printf("blah\n"); fflush(stdout);
   datap=(float *) malloc(ndata*nim*sizeof(float));
   datahat=(float *) malloc(ndata*nim*sizeof(float));
   datahatp=(float *) malloc(ndata*nim*sizeof(float));
@@ -41,7 +40,6 @@ int nmf(float *data,
     for(i=0;i<ndata;i++)
       datap[i+k*ndata]=data[i+k*ndata]*ivar[i+k*ndata];
 
-  printf("blah\n"); fflush(stdout);
   seed=-1;
   for(c=0;c<nc;c++) {
     for(i=0;i<ndata;i++)
@@ -60,7 +58,6 @@ int nmf(float *data,
         coeffs[k*nc+c]+=templates[i+c*ndata]*data[i+k*ndata]; 
     }
   }
-  printf("blah\n"); fflush(stdout);
 
   for(i=0;i<ndata;i++) {
       for(k=0;k<nim;k++) {
@@ -75,10 +72,12 @@ int nmf(float *data,
   eold=1.e+20;
   iters=1;
 
-  printf("blah\n"); fflush(stdout);
   while(iters<maxiters && fabs(err-eold)/err>tol) {
     
-    printf("iters=%d\n", iters); fflush(stdout);
+    if((iters%100)==0) {
+			printf("iters=%d\n", iters); fflush(stdout);
+			printf("err=%e\n", err); fflush(stdout);
+		}
     
     for(k=0;k<nim;k++)
       for(i=0;i<ndata;i++)
@@ -135,7 +134,6 @@ int nmf(float *data,
       }
     }
 
-    printf("err=%e\n", err); fflush(stdout);
     iters++;
   }
   
