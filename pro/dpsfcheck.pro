@@ -48,11 +48,11 @@ xx=reform(replicate(1., npx)#findgen(npy), npx*npy)/float(npx)-0.5
 yy=reform(findgen(npx)#replicate(1., npy), npx*npy)/float(npy)-0.5
 rr=sqrt((xx-npx*0.5)^2+(yy-npy*0.5)^2)
 
-cmodel=fltarr(4,npx*npy)
+cmodel=fltarr(3,npx*npy)
 cmodel[0,*]=reform(psf/max(psf), npx*npy)
 cmodel[1,*]=xx
 cmodel[2,*]=yy
-cmodel[3,*]=cc
+;;cmodel[3,*]=cc
 
 amp=fltarr(n_elements(x))
 for i=0L, n_elements(x)-1L do begin 
@@ -66,10 +66,10 @@ for i=0L, n_elements(x)-1L do begin
         currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
         cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy)
     endif
-    ;;hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
-    ;;  reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
     hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
-      replicate(median(cutout_ivar), npx*npy), coeffs, nsigma=10 
+      reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
+    ;;hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
+     ;; replicate(median(cutout_ivar), npx*npy), coeffs, nsigma=10 
     amp[i]=coeffs[0] 
 endfor
 

@@ -24,6 +24,7 @@ nx=long(sxpar(hdr, 'NX'))
 ny=long(sxpar(hdr, 'NY'))
 nc=long(sxpar(hdr, 'NP'))
 np=long(sxpar(hdr, 'NC'))
+softbias=float(sxpar(hdr, 'SOFTBIAS'))
 natlas=long(sxpar(hdr, 'NATLAS'))
 
 psfstr={NX:nx, $
@@ -31,6 +32,7 @@ psfstr={NX:nx, $
         NP:np, $
         NC:nc, $
         NATLAS:natlas, $
+        SOFTBIAS:softbias, $
         COEFFS:fltarr(np*(np+1L)/2L,nc), $
         PSFT:fltarr(natlas, natlas, nc)}
 

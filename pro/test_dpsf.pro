@@ -2,12 +2,13 @@ pro test_dpsf, base
 
 maxnpeaks=1000L
 
-image=mrdfits(base+'.fits.gz')
-ivar=mrdfits(base+'.fits.gz',1)
+image=mrdfits(base+'.fits')
+sigma=dsigma(image, sp=4L)
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
+ivar=fltarr(nx,ny)+1./sigma^2
 
-dfitpsf, base+'.fits.gz', natlas=41
+dfitpsf, base+'.fits', natlas=41
 
 vpsf=dpsfread(base+'-vpsf.fits')
 
