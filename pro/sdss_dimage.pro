@@ -19,6 +19,7 @@ if(n_elements(ra) gt 1) then begin
         sdss_dimage, ra[i], dec[i], sz[i], rerun=rerun, nodetect=nodetect, $
           noclobber=noclobber, links=links, gmosaic=gmosaic
     endfor
+    return
 endif
 
 common com_sdss_dimage, seed

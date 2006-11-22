@@ -64,8 +64,10 @@ for i=0L, n_elements(x)-1L do begin
     
     if(keyword_set(havevar)) then begin
         currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
-        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy)
-    endif
+        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
+    endif else begin
+        currpsf=psf
+    endelse
     hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
       reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
     ;;hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
@@ -74,9 +76,16 @@ for i=0L, n_elements(x)-1L do begin
 endfor
 
 model=fltarr(nx,ny)
-for i=0L, n_elements(x)-1L do $ 
-  embed_stamp, model, amp[i]*psf/max(psf), $
-  x[i]-float(npx/2L), y[i]-float(npy/2L)
+for i=0L, n_elements(x)-1L do begin 
+    if(keyword_set(havevar)) then begin
+        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
+        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
+    endif else begin
+        currpsf=psf
+    endelse
+    embed_stamp, model, amp[i]*currpsf/max(currpsf), $
+      x[i]-float(npx/2L), y[i]-float(npy/2L)
+endfor
 nimage= image-model
 simage=dmedsmooth(nimage,box=ceil(fwhm)) 
 

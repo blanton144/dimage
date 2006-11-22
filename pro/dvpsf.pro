@@ -43,7 +43,8 @@ for c=0L, psfsrc.nc-1L do begin
 endfor 
 
 psf=reform(reform(psfsrc.psft, psfsrc.natlas*psfsrc.natlas, psfsrc.nc)#cmap, $
-           psfsrc.natlas, psfsrc.natlas)-psfsrc.softbias
+           psfsrc.natlas, psfsrc.natlas)-psfsrc.softbias+psfsrc.bpsf
+psf=psfsrc.bpsf
 
 return, psf
 

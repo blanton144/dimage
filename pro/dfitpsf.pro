@@ -26,14 +26,14 @@ nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 
 ;; set a bunch of parameters
-plim=20.
+plim=10.
 box=natlas/2L
 small=(natlas-1L)/2L
 minbatlas=1.e-6
 nc=1L
 np=1L
 stardiff=20.
-maxnstar=60
+maxnstar=50
 
 ; Set source object name
 soname=filepath('libdimage.'+idlutils_so_ext(), $
@@ -110,7 +110,7 @@ retval=call_external(soname, 'idl_dfitpsf', float(batlas), $
                      float(atlas_ivar), long(natlas), long(natlas), $
                      long(n_elements(extract)), float(psfc), float(psft), $
                      float(xpsf), float(ypsf), long(nc), long(np))
-psf=psft
+psft=psft-median(psft)
 
 ; output basic PSF
 mwrfits, reform(psft, natlas, natlas), base+'-bpsf.fits', /create
@@ -133,14 +133,35 @@ mwrfits, reform(psft, natlas, natlas), base+'-bpsf.fits', /create
                      ;float(xpsf), float(ypsf), long(nc), long(np))
 
 ; find variable PSF
-nc=3L
-np=1L
+nc=2L
+np=2L
+
 atlas=extract.atlas
 atlas_ivar=extract.atlas_ivar
-batlas=reform(atlas, natlas*natlas, n_elements(extract)) 
-em_pca, batlas, 3, eatlas, ecoeffs
+batlas_all=reform(atlas, natlas*natlas, n_elements(extract)) 
+psft=reform(total(batlas_all, 2), natlas, natlas)
+for i=0L, n_elements(extract)-1L do begin
+    coeff=total(psft*batlas_all[*,i])/total(psft*psft)
+    batlas_all[*,i]=batlas_all[*,i]/coeff-reform(psft, natlas*natlas)
+endfor
 
-np=3
+batlas=reform(atlas, natlas*natlas, np^2*4L)
+nb=fltarr(np^2*4L)
+for i=0L, np*2L-1L do begin
+    for j=0L, np*2L-1L do begin
+        ii=where(extract.xcen gt nx*(i)/(np*2L) AND $
+                 extract.xcen le nx*(i+1)/(np*2L) AND $
+                 extract.ycen gt ny*(j)/(np*2L) AND $
+                 extract.ycen le ny*(j+1)/(np*2L), nii)
+        if(nii eq 0) then begin
+            nb[i+(np*2L)*j]=nii	
+            batlas[*,i+(np*2L)*j]= total(batlas_all[*,ii], 2)
+        endif
+    endfor
+endfor
+
+em_pca, batlas, nc, eatlas, ecoeffs
+
 aa=dblarr(np*(np+1)/2L,n_elements(extract))
 xx=(extract.xcen/float(nx))-0.5
 yy=(extract.ycen/float(ny))-0.5
@@ -155,16 +176,13 @@ endfor
 xarr=(findgen(nx)#replicate(1.,ny))/float(nx)-0.5
 yarr=(replicate(1.,nx)#findgen(ny))/float(ny)-0.5
 
-psfc=dblarr(n_elements(extract), nc)
-for c=0L, nc-1L do $
-  psfc[*,c]=((reform(ecoeffs[c,*], n_elements(extract))/ecoeffs[0,*]))
 cmap=fltarr(nx,ny,nc)
 coeffs=fltarr(np*(np+1)/2L, nc)
-coeffs[0,0]=1.
-for c=1L, nc-1L do begin 
-    weights=replicate(1., n_elements(extract)) 
-    hogg_iter_linfit,aa, psfc[*,c], weights, tmp_coeffs, nsigma=4, $
-      /med, /true  
+for c=0L, nc-1L do begin 
+    sig=djsig(ecoeffs[c,*])
+    weights=replicate(1., n_elements(extract)) /sig^2
+    hogg_iter_linfit,aa, transpose(ecoeffs[c,*]), weights, tmp_coeffs, $
+      nsigma=3
     k=0L 
     for i=0L, np-1L do begin 
         for j=i, np-1L do begin 
@@ -183,7 +201,8 @@ sxaddpar, hdr, 'NATLAS', natlas, 'size of PSF image'
 sxaddpar, hdr, 'NX', nx, 'dimension of source image'
 sxaddpar, hdr, 'NY', ny, 'dimension of source image'
 sxaddpar, hdr, 'SOFTBIAS', softbias, 'dimension of source image'
-mwrfits, reform(eatlas, natlas, natlas, nc), base+'-vpsf.fits', hdr, /create
+mwrfits, psft, base+'-vpsf.fits', hdr, /create
+mwrfits, reform(eatlas, natlas, natlas, nc), base+'-vpsf.fits'
 mwrfits, coeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'
 
