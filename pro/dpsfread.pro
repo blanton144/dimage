@@ -22,12 +22,16 @@ function dpsfread, psffile
 hdr=headfits(psffile, ext=0)
 nx=long(sxpar(hdr, 'NX'))
 ny=long(sxpar(hdr, 'NY'))
+xst=long(sxpar(hdr, 'XST'))
+yst=long(sxpar(hdr, 'YST'))
 nc=long(sxpar(hdr, 'NP'))
 np=long(sxpar(hdr, 'NC'))
 softbias=float(sxpar(hdr, 'SOFTBIAS'))
 natlas=long(sxpar(hdr, 'NATLAS'))
 
-psfstr={NX:nx, $
+psfstr={XST:xst, $
+        YST:yst, $
+        NX:nx, $
         NY:ny, $
         NP:np, $
         NC:nc, $

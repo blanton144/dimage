@@ -26,7 +26,9 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect_multi, base, imfiles, dbset=dbset, hand=hand
+pro detect_multi, base, imfiles, dbset=dbset, hand=hand, ref=ref
+
+if(NOT keyword_set(ref)) then ref=0
 
 if(NOT keyword_set(dbset)) then begin
     dbset={base:base, $
@@ -58,15 +60,20 @@ if(NOT keyword_set(dbset)) then begin
     endelse
     
 ;; get parents (creates pcat, pimage, parents files)
-    dparents_multi, imfile
+    dparents_multi, base, imfiles
 
 ;; read in parents and look for biggest object
+    hdr=headfits(base+'-pimage.fits',ext=0)
+    nx=long(sxpar(hdr, 'NAXIS1'))
+    ny=long(sxpar(hdr, 'NAXIS2'))
     pcat=mrdfits(base+'-pcat.fits',1)
-    xs=pcat.xnd-pcat.xst+1L
-    mxs=max(xs, imxs)
-    dbset.parent=imxs
+    distance=sqrt((pcat.xc-nx*0.5)^2+ $
+                  (pcat.yc-ny*0.5)^2)
+    mdist=min(distance, imdist)
+    dbset.parent=imdist
     
 ;; fit for psf (creates bpsf and vpsf files)
+    nim=n_elements(imfiles)
     for k=0L, nim-1L do $
       dfitpsf, imfiles[k]
 endif else begin
@@ -81,7 +88,7 @@ if(dbset.ngals gt 0) then begin
     xgals=dbset.xgals[0:dbset.ngals-1]
     ygals=dbset.ygals[0:dbset.ngals-1]
 endif
-dchildren, dbset.base, dbset.parent, psf=psf, $
+dchildren_multi, dbset.base, dbset.parent, psf=psf, $
   gsmooth=dbset.gsmooth, xstars=xstars, ystars=ystars, $
   xgals=xgals, ygals=ygals, hand=hand
 

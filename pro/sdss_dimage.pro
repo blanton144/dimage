@@ -66,7 +66,7 @@ spawn, 'gzip -vf '+prefix[0]+'-nd.fits'
 filters=['u','g','r','i','z']
 base=prefix[0]
 if(NOT keyword_set(nodetect)) then $
-  detect_multi, base, prefix[0]+'-'+filters+'.fits.gz', /hand
+  detect_multi, base, prefix[0]+'-'+filters+'.fits.gz', /hand, ref=2
 
 cd, cdir
 

@@ -18,7 +18,7 @@
 ;------------------------------------------------------------------------------
 pro dfitpsf, imfile, natlas=natlas
 
-if(NOT keyword_set(natlas)) then natlas=31
+if(NOT keyword_set(natlas)) then natlas=41L
 
 base=(stregex(imfile, '(.*)\.fits.*', /sub, /extr))[1]
 image=mrdfits(imfile)
@@ -27,13 +27,13 @@ ny=(size(image,/dim))[1]
 
 ;; set a bunch of parameters
 plim=10.
-box=natlas/2L
+box=natlas
 small=(natlas-1L)/2L
 minbatlas=1.e-6
 nc=1L
 np=1L
-stardiff=20.
-maxnstar=50
+stardiff=100.
+maxnstar=200
 
 ; Set source object name
 soname=filepath('libdimage.'+idlutils_so_ext(), $
@@ -70,26 +70,17 @@ endif
 
 ; do initial fit
 atlas=extract.atlas
-atlas_ivar=extract.atlas_ivar
-batlas=(atlas) 
-batlas=batlas>minbatlas
-psf=fltarr(natlas,natlas)
-psfc=fltarr(nc, n_elements(extract))
-psft=fltarr(natlas,natlas,nc)
-xpsf=fltarr(np,nc)
-ypsf=fltarr(np,nc)
-retval=call_external(soname, 'idl_dfitpsf', float(batlas), $
-                     float(atlas_ivar), long(natlas), long(natlas), $
-                     long(n_elements(extract)), float(psfc), float(psft), $
-                     float(xpsf), float(ypsf), long(nc), long(np))
-psf=psft
+bpsf= reform(total(reform(atlas, natlas*natlas, n_elements(extract)), 2), $
+             natlas,natlas)
+bpsf=bpsf/total(bpsf)
 
 ; clip non-stars
 diff=fltarr(n_elements(extract))
+model=reform(bpsf, natlas*natlas)
 for i=0L, n_elements(extract)-1L do begin 
-    model=reform(reform(psft, natlas*natlas, nc)#psfc[*,i], natlas, natlas) 
-    scale=max(model) 
-    diff[i]=total((atlas[*,*,i]-model)^2/scale^2) 
+    scale=total(model*reform(atlas[*,*,i],natlas*natlas))/ $
+      total(model*model)
+    diff[i]=total((atlas[*,*,i]/scale-model)^2*extract.atlas_ivar)
 endfor
 isort=sort(diff)
 istar=isort[where(diff[isort] lt stardiff and $
@@ -98,77 +89,47 @@ extract=extract[istar]
 
 ; find basic PSF
 atlas=extract.atlas
-atlas_ivar=extract.atlas_ivar
-batlas=(atlas) 
-batlas=batlas>minbatlas
-psf=fltarr(natlas,natlas)
-psfc=fltarr(nc, n_elements(extract))
-psft=fltarr(natlas,natlas,nc)
-xpsf=fltarr(np,nc)
-ypsf=fltarr(np,nc)
-retval=call_external(soname, 'idl_dfitpsf', float(batlas), $
-                     float(atlas_ivar), long(natlas), long(natlas), $
-                     long(n_elements(extract)), float(psfc), float(psft), $
-                     float(xpsf), float(ypsf), long(nc), long(np))
-psft=psft-median(psft)
+bpsf= reform(total(reform(atlas, natlas*natlas, n_elements(extract)),2), $
+             natlas,natlas)
+bpsf=bpsf/total(bpsf)
 
 ; output basic PSF
-mwrfits, reform(psft, natlas, natlas), base+'-bpsf.fits', /create
+mwrfits, reform(bpsf, natlas, natlas), base+'-bpsf.fits', /create
 
-; find variable PSF
-;nc=3L
-;np=1L
-;atlas=extract.atlas
-;atlas_ivar=extract.atlas_ivar
-;batlas=(atlas) 
-;batlas=batlas>minbatlas
-;psf=fltarr(natlas,natlas)
-;psfc=fltarr(nc, n_elements(extract))
-;psft=fltarr(natlas,natlas,nc)
-;xpsf=fltarr(np,nc)
-;ypsf=fltarr(np,nc)
-;retval=call_external(soname, 'idl_dfitpsf', float(batlas), $
-                     ;float(atlas_ivar), long(natlas), long(natlas), $
-                     ;long(n_elements(extract)), float(psfc), float(psft), $
-                     ;float(xpsf), float(ypsf), long(nc), long(np))
-
-; find variable PSF
-nc=2L
 np=2L
+nc=2L
 
-atlas=extract.atlas
-atlas_ivar=extract.atlas_ivar
-batlas_all=reform(atlas, natlas*natlas, n_elements(extract)) 
-psft=reform(total(batlas_all, 2), natlas, natlas)
-for i=0L, n_elements(extract)-1L do begin
-    coeff=total(psft*batlas_all[*,i])/total(psft*psft)
-    batlas_all[*,i]=batlas_all[*,i]/coeff-reform(psft, natlas*natlas)
-endfor
-
-batlas=reform(atlas, natlas*natlas, np^2*4L)
-nb=fltarr(np^2*4L)
+vatlas=fltarr(natlas*natlas, np^2*4L)
+nb=lonarr(np^2*4L)
+xx=fltarr(np^2*4L)
+yy=fltarr(np^2*4L)
+model=reform(bpsf, natlas*natlas)
 for i=0L, np*2L-1L do begin
     for j=0L, np*2L-1L do begin
         ii=where(extract.xcen gt nx*(i)/(np*2L) AND $
                  extract.xcen le nx*(i+1)/(np*2L) AND $
                  extract.ycen gt ny*(j)/(np*2L) AND $
                  extract.ycen le ny*(j+1)/(np*2L), nii)
-        if(nii eq 0) then begin
+        if(nii gt 0) then begin
             nb[i+(np*2L)*j]=nii	
-            batlas[*,i+(np*2L)*j]= total(batlas_all[*,ii], 2)
+            vatlas[*,i+(np*2L)*j]= $
+              total(reform(extract[ii].atlas, natlas*natlas, nii), 2)
+            scale=total(model*vatlas[*,i+(np*2L)*j])/ total(model*model)
+            vatlas[*,i+(np*2L)*j]= (vatlas[*,i+(np*2L)*j]/scale - model)
+            xx[i+(np*2L)*j]=mean(extract[ii].xcen)/float(nx)-0.5
+            yy[i+(np*2L)*j]=mean(extract[ii].ycen)/float(ny)-0.5
         endif
     endfor
 endfor
 
-em_pca, batlas, nc, eatlas, ecoeffs
+iv=where(nb gt 0, nv)
+em_pca, vatlas[*, iv], nc, eatlas, ecoeffs
 
-aa=dblarr(np*(np+1)/2L,n_elements(extract))
-xx=(extract.xcen/float(nx))-0.5
-yy=(extract.ycen/float(ny))-0.5
+aa=dblarr(np*(np+1)/2L, nv)
 k=0L
 for i=0L, np-1L do begin 
     for j=i, np-1L do begin 
-        aa[k,*]=xx^(float(i))*yy^(float(j)) 
+        aa[k,*]=xx[iv]^(float(i))*yy[iv]^(float(j)) 
         k=k+1L 
     endfor 
 endfor
@@ -180,7 +141,7 @@ cmap=fltarr(nx,ny,nc)
 coeffs=fltarr(np*(np+1)/2L, nc)
 for c=0L, nc-1L do begin 
     sig=djsig(ecoeffs[c,*])
-    weights=replicate(1., n_elements(extract)) /sig^2
+    weights=replicate(1., nv) /sig^2
     hogg_iter_linfit,aa, transpose(ecoeffs[c,*]), weights, tmp_coeffs, $
       nsigma=3
     k=0L 
@@ -198,10 +159,12 @@ hdr=['']
 sxaddpar, hdr, 'NP', np, 'number of polynomial terms'
 sxaddpar, hdr, 'NC', nc, 'number of components in NMF'
 sxaddpar, hdr, 'NATLAS', natlas, 'size of PSF image'
-sxaddpar, hdr, 'NX', nx, 'dimension of source image'
-sxaddpar, hdr, 'NY', ny, 'dimension of source image'
+sxaddpar, hdr, 'XST', xst, 'start of source image used'
+sxaddpar, hdr, 'YST', yst, 'start of source image used'
+sxaddpar, hdr, 'NX', nx, 'dimension of source image (as used)'
+sxaddpar, hdr, 'NY', ny, 'dimension of source image (as used)'
 sxaddpar, hdr, 'SOFTBIAS', softbias, 'dimension of source image'
-mwrfits, psft, base+'-vpsf.fits', hdr, /create
+mwrfits, bpsf, base+'-vpsf.fits', hdr, /create
 mwrfits, reform(eatlas, natlas, natlas, nc), base+'-vpsf.fits'
 mwrfits, coeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'

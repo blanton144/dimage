@@ -18,9 +18,10 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dparents_multi, base, imfiles, plim=plim
+pro dparents_multi, base, imfiles, plim=plim, ref=ref
 
 if(NOT keyword_set(plim)) then plim=5.
+if(NOT keyword_set(red)) then ref=0
 
 nim=n_elements(imfiles)
 hdr=headfits(imfiles[0],ext=0)
@@ -45,7 +46,7 @@ endfor
 dobjects_multi, images, object=oimage, plim=plim
 mwrfits, oimage, base+'-pimage.fits', /create
 
-pcat=replicate({xst:0L, yst:0L, xnd:0L, ynd:0L},max(oimage)+1L)
+pcat=replicate({xst:0L, yst:0L, xnd:0L, ynd:0L, xc:0., yc:0.},max(oimage)+1L)
 spawn, 'mkdir -p parents'
 for iobj=0L, max(oimage) do begin
     io=where(oimage eq iobj)
@@ -63,6 +64,7 @@ for iobj=0L, max(oimage) do begin
     sxaddpar, hdr, 'YST', ystart
     sxaddpar, hdr, 'XND', xend
     sxaddpar, hdr, 'YND', yend
+    sxaddpar, hdr, 'NIM', nim
     pcat[iobj].xst=xstart
     pcat[iobj].xnd=xend
     pcat[iobj].yst=ystart
@@ -80,6 +82,13 @@ for iobj=0L, max(oimage) do begin
         if(nii gt 0) then $
           iimage[ii]=randomn(seed, nii)/sqrt(iivar[ii])
         iimage[io]=timage[io]
+
+        if(k eq ref) then begin
+            dpeaks, iimage, xc=xc, yc=yc, npeaks=1
+            isort=reverse(sort(iimage[xc,yc]))
+            pcat[iobj].xc=xc[isort[0]]+xstart
+            pcat[iobj].yc=yc[isort[0]]+ystart
+        endif
         
         if(k eq 0) then $
           first=1 $
