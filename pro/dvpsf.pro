@@ -35,7 +35,7 @@ cmap=fltarr(psfsrc.nc)
 for c=0L, psfsrc.nc-1L do begin
     k=0L 
     for i=0L, psfsrc.np-1L do begin 
-        for j=i, psfsrc.np-1L do begin 
+        for j=0, psfsrc.np-1L do begin 
             cmap[c]=cmap[c]+psfsrc.coeffs[k,c]*xx^(float(i))*yy^(float(j)) 
             k=k+1L 
         endfor 

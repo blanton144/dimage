@@ -29,7 +29,6 @@ ny=(size(image,/dim))[1]
 plim=10.
 box=natlas
 small=(natlas-1L)/2L
-minbatlas=1.e-6
 nc=1L
 np=1L
 stardiff=100.
@@ -93,66 +92,80 @@ bpsf= reform(total(reform(atlas, natlas*natlas, n_elements(extract)),2), $
              natlas,natlas)
 bpsf=bpsf/total(bpsf)
 
+pnx=(size(bpsf,/dim))[0]
+pny=(size(bpsf,/dim))[1]
+fit_mult_gauss, bpsf, 1, amp, psfsig, model=model
+mm=max(model)
+gpsf=(model/mm) > 0.001
+
 ; output basic PSF
 mwrfits, reform(bpsf, natlas, natlas), base+'-bpsf.fits', /create
 
 np=2L
-nc=2L
+nc=4L
+nchunk=2L
+niter=3L
 
-vatlas=fltarr(natlas*natlas, np^2*4L)
-nb=lonarr(np^2*4L)
-xx=fltarr(np^2*4L)
-yy=fltarr(np^2*4L)
+vatlas=fltarr(natlas*natlas, np^2*nchunk^2)
+nb=lonarr(np^2*nchunk^2)
+xx=fltarr(np^2*nchunk^2)
+yy=fltarr(np^2*nchunk^2)
 model=reform(bpsf, natlas*natlas)
-for i=0L, np*2L-1L do begin
-    for j=0L, np*2L-1L do begin
-        ii=where(extract.xcen gt nx*(i)/(np*2L) AND $
-                 extract.xcen le nx*(i+1)/(np*2L) AND $
-                 extract.ycen gt ny*(j)/(np*2L) AND $
-                 extract.ycen le ny*(j+1)/(np*2L), nii)
+for i=0L, np*nchunk-1L do begin
+    for j=0L, np*nchunk-1L do begin
+        ii=where(extract.xcen gt nx*(i)/(np*nchunk) AND $
+                 extract.xcen le nx*(i+1)/(np*nchunk) AND $
+                 extract.ycen gt ny*(j)/(np*nchunk) AND $
+                 extract.ycen le ny*(j+1)/(np*nchunk), nii)
         if(nii gt 0) then begin
-            nb[i+(np*2L)*j]=nii	
-            vatlas[*,i+(np*2L)*j]= $
+            nb[i+(np*nchunk)*j]=nii	
+            vatlas[*,i+(np*nchunk)*j]= $
               total(reform(extract[ii].atlas, natlas*natlas, nii), 2)
-            scale=total(model*vatlas[*,i+(np*2L)*j])/ total(model*model)
-            vatlas[*,i+(np*2L)*j]= (vatlas[*,i+(np*2L)*j]/scale - model)
-            xx[i+(np*2L)*j]=mean(extract[ii].xcen)/float(nx)-0.5
-            yy[i+(np*2L)*j]=mean(extract[ii].ycen)/float(ny)-0.5
+            scale=total(model*vatlas[*,i+(np*nchunk)*j])/ total(model*model)
+            vatlas[*,i+(np*nchunk)*j]= (vatlas[*,i+(np*nchunk)*j]/scale - model)
+            vatlas[*,i+(np*nchunk)*j]= vatlas[*,i+(np*nchunk)*j]*gpsf
+            xx[i+(np*nchunk)*j]=mean(extract[ii].xcen)/float(nx)-0.5
+            yy[i+(np*nchunk)*j]=mean(extract[ii].ycen)/float(ny)-0.5
         endif
     endfor
 endfor
 
-iv=where(nb gt 0, nv)
-em_pca, vatlas[*, iv], nc, eatlas, ecoeffs
+clipped=lonarr(np^2*nchunk^2)
 
-aa=dblarr(np*(np+1)/2L, nv)
-k=0L
-for i=0L, np-1L do begin 
-    for j=i, np-1L do begin 
-        aa[k,*]=xx[iv]^(float(i))*yy[iv]^(float(j)) 
-        k=k+1L 
-    endfor 
-endfor
-
-xarr=(findgen(nx)#replicate(1.,ny))/float(nx)-0.5
-yarr=(replicate(1.,nx)#findgen(ny))/float(ny)-0.5
-
-cmap=fltarr(nx,ny,nc)
-coeffs=fltarr(np*(np+1)/2L, nc)
-for c=0L, nc-1L do begin 
-    sig=djsig(ecoeffs[c,*])
-    weights=replicate(1., nv) /sig^2
-    hogg_iter_linfit,aa, transpose(ecoeffs[c,*]), weights, tmp_coeffs, $
-      nsigma=3
-    k=0L 
+for iter=0L, niter-1L do begin
+    iv=where(nb gt np^2 and clipped eq 0, nv)
+    em_pca, vatlas[*, iv], nc, eatlas, ecoeffs
+    
+    aa=dblarr(np*np, nv)
+    k=0L
     for i=0L, np-1L do begin 
-        for j=i, np-1L do begin 
-            cmap[*,*,c]=cmap[*,*,c]+ $
-              tmp_coeffs[k]*xarr^(float(i))*yarr^(float(j)) 
+        for j=0, np-1L do begin 
+            aa[k,*]=xx[iv]^(float(i))*yy[iv]^(float(j)) 
             k=k+1L 
         endfor 
-    endfor 
-    coeffs[*,c]=tmp_coeffs
+    endfor
+    
+    xarr=(findgen(nx)#replicate(1.,ny))/float(nx)-0.5
+    yarr=(replicate(1.,nx)#findgen(ny))/float(ny)-0.5
+    
+    cmap=fltarr(nx,ny,nc)
+    coeffs=fltarr(np*np, nc)
+    for c=0L, nc-1L do begin 
+        sig=djsig(ecoeffs[c,*])
+        weights=replicate(1., nv) /sig^2
+        hogg_iter_linfit,aa, transpose(ecoeffs[c,*]), weights, tmp_coeffs, $
+          nsigma=3., /true
+        clipped[iv]=clipped[iv] OR (weights eq 0.)
+        k=0L 
+        for i=0L, np-1L do begin 
+            for j=0, np-1L do begin 
+                cmap[*,*,c]=cmap[*,*,c]+ $
+                  tmp_coeffs[k]*xarr^(float(i))*yarr^(float(j)) 
+                k=k+1L 
+            endfor 
+        endfor 
+        coeffs[*,c]=tmp_coeffs
+    endfor
 endfor
 
 hdr=['']
@@ -165,9 +178,15 @@ sxaddpar, hdr, 'NX', nx, 'dimension of source image (as used)'
 sxaddpar, hdr, 'NY', ny, 'dimension of source image (as used)'
 sxaddpar, hdr, 'SOFTBIAS', softbias, 'dimension of source image'
 mwrfits, bpsf, base+'-vpsf.fits', hdr, /create
-mwrfits, reform(eatlas, natlas, natlas, nc), base+'-vpsf.fits'
+mwrfits, reform(eatlas, natlas, natlas, nc)/gpsf, base+'-vpsf.fits'
 mwrfits, coeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'
+
+ii=7
+im=reform(vatlas[*,iv[ii]],natlas,natlas)
+mo=reform(eatlas#reform((reform(cmap,nx*ny,nc))[(xx[iv[ii]]+0.5)*nx+nx*(yy[iv[ii]]+0.5)*ny,*],nc),natlas,natlas)
+splot,transpose(ecoeffs[*,*])                                                
+soplot,(reform(cmap,nx*ny,nc))[(xx[iv]+0.5)*nx+nx*(yy[iv]+0.5)*ny,*],color='red'
 
 end
 ;------------------------------------------------------------------------------
