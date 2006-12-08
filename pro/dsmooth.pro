@@ -16,8 +16,13 @@
 ;------------------------------------------------------------------------------
 function dsmooth, image, sigma
 
-nx=(size(image,/dim))[0]
-ny=(size(image,/dim))[1]
+if((size(image))[0] eq 1) then begin
+    ny=1
+    nx=(size(image,/dim))[0]
+endif else begin
+    nx=(size(image,/dim))[0]
+    ny=(size(image,/dim))[1]
+endelse
 
 ; Set source object name
 soname=filepath('libdimage.'+idlutils_so_ext(), $
