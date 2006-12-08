@@ -28,8 +28,8 @@ function dvpsf, x, y, psfsrc=psfsrc
 
 if(n_tags(psfsrc) eq 0) then psfsrc=dpsfread(psfsrc)
 
-xx=(x/float(psfsrc.nx))-0.5
-yy=(y/float(psfsrc.ny))-0.5
+xx=((x+psfsrc.xst)/float(psfsrc.nx))-0.5
+yy=((y+psfsrc.yst)/float(psfsrc.ny))-0.5
 
 cmap=fltarr(psfsrc.nc)
 for c=0L, psfsrc.nc-1L do begin

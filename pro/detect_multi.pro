@@ -26,7 +26,8 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect_multi, base, imfiles, dbset=dbset, hand=hand, ref=ref
+pro detect_multi, base, imfiles, dbset=dbset, hand=hand, ref=ref, sky=sky, $
+                  noclobber=noclobber
 
 if(NOT keyword_set(ref)) then ref=0
 
@@ -46,39 +47,33 @@ if(NOT keyword_set(dbset)) then begin
            ragals:fltarr(128), $
            decgals:fltarr(128), $
            ngals:0L}
+endif
 
-;; determine scale 
-    hdr=headfits(imfiles[0],ext=0)
-    ctype1=sxpar(hdr, 'CTYPE1')
-    if(keyword_set(ctype1)) then begin
-        xyad, hdr, 0., 0., ra1, dec1
-        xyad, hdr, 0., 10., ra2, dec2
-        spherematch,ra1,dec1,ra2,dec2, 10., m1, m2, d12
-        app=d12*3600./10.
-    endif else begin
-        app=1.
-    endelse
-    
 ;; get parents (creates pcat, pimage, parents files)
-    dparents_multi, base, imfiles
+dparents_multi, base, imfiles, sky=sky, noclobber=noclobber
 
-;; read in parents and look for biggest object
-    hdr=headfits(base+'-pimage.fits',ext=0)
-    nx=long(sxpar(hdr, 'NAXIS1'))
-    ny=long(sxpar(hdr, 'NAXIS2'))
-    pcat=mrdfits(base+'-pcat.fits',1)
-    distance=sqrt((pcat.xc-nx*0.5)^2+ $
-                  (pcat.yc-ny*0.5)^2)
-    mdist=min(distance, imdist)
-    dbset.parent=imdist
-    
+;; read in parents and look for closest object to center
+hdr=headfits(base+'-pimage.fits',ext=0)
+nx=long(sxpar(hdr, 'NAXIS1'))
+ny=long(sxpar(hdr, 'NAXIS2'))
+pcat=mrdfits(base+'-pcat.fits',1)
+distance=sqrt((pcat.xc-nx*0.5)^2+ $
+              (pcat.yc-ny*0.5)^2)
+mdist=min(distance, imdist)
+dbset.parent=imdist
+
 ;; fit for psf (creates bpsf and vpsf files)
-    nim=n_elements(imfiles)
-    for k=0L, nim-1L do $
-      dfitpsf, imfiles[k]
-endif else begin
-    dbset=mrdfits(base+'-dbset.fits', 1)
-endelse
+nim=n_elements(imfiles)
+for k=0L, nim-1L do $
+  dfitpsf, imfiles[k], noclobber=noclobber
+
+for k=0L, nim-1L do begin
+    bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
+    if(n_tags(psfs) eq 0) then $
+      psfs=dpsfread(bimfile+'-vpsf.fits') $
+    else $
+      psfs=[psfs, dpsfread(bimfile+'-vpsf.fits')]
+endfor
 
 if(dbset.nstars gt 0) then begin 
     xstars=dbset.xstars[0:dbset.nstars-1]
@@ -88,14 +83,14 @@ if(dbset.ngals gt 0) then begin
     xgals=dbset.xgals[0:dbset.ngals-1]
     ygals=dbset.ygals[0:dbset.ngals-1]
 endif
-dchildren_multi, dbset.base, dbset.parent, psf=psf, $
-  gsmooth=dbset.gsmooth, xstars=xstars, ystars=ystars, $
-  xgals=xgals, ygals=ygals, hand=hand
+psfs.xst= pcat[dbset.parent].xst
+psfs.yst= pcat[dbset.parent].yst
+dchildren_multi, dbset.base, dbset.parent, psfs=psfs, $
+  ref=ref, gsmooth=dbset.gsmooth, xstars=xstars, ystars=ystars, $
+  xgals=xgals, ygals=ygals, hand=hand, nstars=nstars, ngals=ngals
 
-dbset.nstars=n_elements(xstars)
-if(xstars[0] eq -1) then dbset.nstars=0
-dbset.ngals=n_elements(xgals)
-if(xgals[0] eq -1) then dbset.ngals=0
+dbset.nstars=nstars
+dbset.ngals=ngals
 if(dbset.nstars gt 0) then begin
     dbset.xstars[0:dbset.nstars-1]=xstars
     dbset.ystars[0:dbset.nstars-1]=ystars

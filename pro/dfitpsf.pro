@@ -16,11 +16,17 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dfitpsf, imfile, natlas=natlas
+pro dfitpsf, imfile, natlas=natlas, noclobber=noclobber
 
 if(NOT keyword_set(natlas)) then natlas=41L
 
 base=(stregex(imfile, '(.*)\.fits.*', /sub, /extr))[1]
+
+if(keyword_set(noclobber)) then begin
+    if(file_test(base+'-bpsf.fits') gt 0 AND $
+       file_test(base+'-vpsf.fits') gt 0) then return
+endif
+
 image=mrdfits(imfile)
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
@@ -133,39 +139,46 @@ endfor
 clipped=lonarr(np^2*nchunk^2)
 
 for iter=0L, niter-1L do begin
-    iv=where(nb gt np^2 and clipped eq 0, nv)
-    em_pca, vatlas[*, iv], nc, eatlas, ecoeffs
-    
-    aa=dblarr(np*np, nv)
-    k=0L
-    for i=0L, np-1L do begin 
-        for j=0, np-1L do begin 
-            aa[k,*]=xx[iv]^(float(i))*yy[iv]^(float(j)) 
-            k=k+1L 
-        endfor 
-    endfor
-    
-    xarr=(findgen(nx)#replicate(1.,ny))/float(nx)-0.5
-    yarr=(replicate(1.,nx)#findgen(ny))/float(ny)-0.5
-    
-    cmap=fltarr(nx,ny,nc)
-    coeffs=fltarr(np*np, nc)
-    for c=0L, nc-1L do begin 
-        sig=djsig(ecoeffs[c,*])
-        weights=replicate(1., nv) /sig^2
-        hogg_iter_linfit,aa, transpose(ecoeffs[c,*]), weights, tmp_coeffs, $
-          nsigma=3., /true
-        clipped[iv]=clipped[iv] OR (weights eq 0.)
-        k=0L 
+    iv=where(nb gt 0L and clipped eq 0, nv)
+    if(nv gt np^2L) then begin
+
+        em_pca, vatlas[*, iv], nc, eatlas, ecoeffs
+        
+        aa=dblarr(np*np, nv)
+        k=0L
         for i=0L, np-1L do begin 
             for j=0, np-1L do begin 
-                cmap[*,*,c]=cmap[*,*,c]+ $
-                  tmp_coeffs[k]*xarr^(float(i))*yarr^(float(j)) 
+                aa[k,*]=xx[iv]^(float(i))*yy[iv]^(float(j)) 
                 k=k+1L 
             endfor 
-        endfor 
-        coeffs[*,c]=tmp_coeffs
-    endfor
+        endfor
+        
+        xarr=(findgen(nx)#replicate(1.,ny))/float(nx)-0.5
+        yarr=(replicate(1.,nx)#findgen(ny))/float(ny)-0.5
+        
+        cmap=fltarr(nx,ny,nc)
+        coeffs=fltarr(np*np, nc)
+        for c=0L, nc-1L do begin 
+            sig=djsig(ecoeffs[c,*])
+            weights=replicate(1., nv) /sig^2
+            hogg_iter_linfit,aa, transpose(ecoeffs[c,*]), weights, $
+              tmp_coeffs, nsigma=3., /true
+            clipped[iv]=clipped[iv] OR (weights eq 0.)
+            k=0L 
+            for i=0L, np-1L do begin 
+                for j=0, np-1L do begin 
+                    cmap[*,*,c]=cmap[*,*,c]+ $
+                      tmp_coeffs[k]*xarr^(float(i))*yarr^(float(j)) 
+                    k=k+1L 
+                endfor 
+            endfor 
+            coeffs[*,c]=tmp_coeffs
+        endfor
+    endif else begin
+        eatlas=fltarr(natlas, natlas, nc)
+        coeffs=fltarr(np*np, nc)
+        cmap=fltarr(nx,ny,nc)
+    endelse
 endfor
 
 hdr=['']
@@ -181,12 +194,6 @@ mwrfits, bpsf, base+'-vpsf.fits', hdr, /create
 mwrfits, reform(eatlas, natlas, natlas, nc)/gpsf, base+'-vpsf.fits'
 mwrfits, coeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'
-
-ii=7
-im=reform(vatlas[*,iv[ii]],natlas,natlas)
-mo=reform(eatlas#reform((reform(cmap,nx*ny,nc))[(xx[iv[ii]]+0.5)*nx+nx*(yy[iv[ii]]+0.5)*ny,*],nc),natlas,natlas)
-splot,transpose(ecoeffs[*,*])                                                
-soplot,(reform(cmap,nx*ny,nc))[(xx[iv]+0.5)*nx+nx*(yy[iv]+0.5)*ny,*],color='red'
 
 end
 ;------------------------------------------------------------------------------

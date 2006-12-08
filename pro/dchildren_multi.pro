@@ -34,9 +34,10 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dchildren_multi, base, iparent, psf=psf, plim=plim, gsmooth=gsmooth, $
+pro dchildren_multi, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                      glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
-                     ygals=ygals, hand=hand, saddle=saddle
+                     ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
+                     nstars=nstars, ngals=ngals
 
 common atv_point, markcoord
 
@@ -55,116 +56,157 @@ hdr=headfits('parents/'+base+'-parent-'+ $
 nim=long(sxpar(hdr, 'NIM'))
 nx=long(sxpar(hdr, 'NAXIS1'))
 ny=long(sxpar(hdr, 'NAXIS2'))
-image=fltarr(nx,ny, nim)
-ivar=fltarr(nx,ny, nim)
+images=fltarr(nx,ny, nim)
+ivars=fltarr(nx,ny, nim)
 
 for k=0L, nim-1L do begin
-    image[*,*,k]=mrdfits('parents/'+base+'-parent-'+ $
-                  strtrim(string(iparent),2)+'.fits',0+k*2L)
-    ivar[*,*,k]=mrdfits('parents/'+base+'-parent-'+ $
-                        strtrim(string(iparent),2)+'.fits',1+k*2L)
+    images[*,*,k]=mrdfits('parents/'+base+'-parent-'+ $
+                          strtrim(string(iparent),2)+'.fits',0+k*2L)
+    ivars[*,*,k]=mrdfits('parents/'+base+'-parent-'+ $
+                         strtrim(string(iparent),2)+'.fits',1+k*2L)
 endfor
 
+bpsf=dvpsf(nx/2L, ny/2L, psf=psfs[ref])
+pnx=(size(bpsf,/dim))[0]
+pny=(size(bpsf,/dim))[1]
+fit_mult_gauss, bpsf, 1, amp, psfsig, model=model
 
-    
-pnx=(size(psf,/dim))[0]
-pny=(size(psf,/dim))[1]
-fit_mult_gauss, psf, 1, amp, psfsig, model=model
 
-;; find all peaks 
-if(NOT keyword_set(xstars)) then begin
-    simage=dsmooth(image,psfsig)
+;;  find stellar peaks in all images
+for k=0, nim-1L do begin
+    simage=dsmooth(images[*,*,k],psfsig)
     ssigma=dsigma(simage, sp=psfsig*5.)
-    dpeaks, simage, xc=xc, yc=yc, sigma=ssigma, minpeak=plim*ssigma, $
-      /refine, npeaks=nc, maxnpeaks=maxnpeaks, /check
-endif    
-
-if(keyword_set(nc) gt 0 or $
-   keyword_set(xstars) gt 0 or $
-   keyword_set(xgals) gt 0 or $
-   keyword_set(hand) gt 0) then begin
+    dpeaks, simage, xc=tmp_xc, yc=tmp_yc, sigma=ssigma, $
+      minpeak=plim*ssigma, /refine, npeaks=nc, maxnpeaks=maxnpeaks, /check
     
-    if(keyword_set(xstars) eq 0 AND $
-       keyword_set(xgals) eq 0) then begin 
-
-        ;; try and guess which peaks are PSFlike
-        ispsf=dpsfcheck(image, ivar, xc, yc, amp=amp, psf=psf)
-        istars=where(ispsf gt 0, nstars)
-        if(nstars gt 0) then begin
-            xstars=xc[istars]
-            ystars=yc[istars]
-            ispsf=ispsf[istars]
-            amp=amp[istars]
-        
-            ;; subtract off PSFs, we don't care about them
-            model=fltarr(nx,ny)
-            for i=0L, nstars-1L do $ 
-              embed_stamp, model, amp[i]*psf/max(psf), $
-              xstars[i]-float(pnx/2L), ystars[i]-float(pny/2L)
-            nimage= image-model
+    ;; try and guess which peaks are PSFlike
+    ispsf=dpsfcheck(images[*,*,k], ivars[*,*,k], tmp_xc, tmp_yc, $
+                    vpsf=psfs[k])
+    istars=where(ispsf gt 0, nstars)
+    if(nstars gt 0) then begin
+        tmp_xstars=tmp_xc[istars]
+        tmp_ystars=tmp_yc[istars]
+        if(n_elements(xstars) eq 0) then begin
+            xstars=tmp_xstars
+            ystars=tmp_ystars
         endif else begin
-            nimage= image
+            xstars=[xstars, tmp_xstars]
+            ystars=[ystars, tmp_ystars]
         endelse
     endif
+endfor
+nstars=n_elements(xstars)
 
-    if(keyword_set(xgals) eq 0) then begin
-        ngals=0
-        while(ngals eq 0 and gsmooth gt 1.) do begin
-            subpix=long(gsmooth/3.) > 1L
-            nxsub=nx/subpix
-            nysub=ny/subpix
-            simage=rebin(nimage[0:nxsub*subpix-1, 0:nysub*subpix-1], $
-                         nxsub, nysub)
-            simage=dsmooth(simage, gsmooth/float(subpix))
-            ssig=dsigma(simage, sp=10)
-            sivar=fltarr(nxsub, nysub)+1./ssig^2
-            dpeaks, simage, xc=xc, yc=yc, sigma=ssig, minpeak=glim*ssig, $
-              /refine, npeaks=ngals, saddle=saddle, /check
-            
-            if(ngals eq 0) then $
-              gsmooth=gsmooth*0.8 > 1.
-        endwhile
+;; reduce to unique peaks
+if(nstars gt 0) then begin
+    xx=fltarr(2,n_elements(xstars))
+    xx[0, *]= xstars
+    xx[1, *]= ystars
+    ing= groupnd(xx, psfsig, firstg=firstg, nd=2)
+    xstars=xstars[firstg]
+    ystars=ystars[firstg]
+    nstars=n_elements(xstars)
+endif
+    
+;;  find galaxy peaks in all images
+for k=0L, nim-1L do begin
+
+    msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
+    fimage=images[*,*,k]-msimage
+    fivar=ivars[*,*,k]
+
+    ;; refine center and subtract off best fit psf for each star
+    model=fltarr(nx,ny)
+    if(nstars gt 0) then begin
+        drefine, fimage, xstars, ystars, xr=xr, yr=yr
+        for i=0L, nstars-1L do begin 
+            psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
+            tmp_model=fltarr(nx,ny)
+            embed_stamp, tmp_model, psf, $
+              xstars[i]-float(pnx/2L), $
+              ystars[i]-float(pny/2L)
+            ifit=where(tmp_model ne 0.)
+            scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
+              total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
+            tmp_model=tmp_model*scale
+            model=model+tmp_model
+        endfor
+    endif
+    nimage=images[*,*,k]-model
+
+    subpix=long(gsmooth/3.) > 1L
+    nxsub=nx/subpix
+    nysub=ny/subpix
+    simage=rebin(nimage[0:nxsub*subpix-1, 0:nysub*subpix-1], $
+                 nxsub, nysub)
+    simage=dsmooth(simage, gsmooth/float(subpix))
+    ssig=dsigma(simage, sp=10)
+    sivar=fltarr(nxsub, nysub)+1./ssig^2
+    dpeaks, simage, xc=xc, yc=yc, sigma=ssig, minpeak=glim*ssig, $
+      /refine, npeaks=ngals, saddle=saddle, /check
+    
+    if(ngals gt 0) then begin
+        tmp_xgals=(float(xc)+0.5)*float(subpix)
+        tmp_ygals=(float(yc)+0.5)*float(subpix)
         
-        if(ngals gt 0) then begin
-            xgals=(float(xc)+0.5)*float(subpix)
-            ygals=(float(yc)+0.5)*float(subpix)
-            
-            ;; refine the centers
-            drefine, nimage, xc, yc, smooth=2., xr=xgals, yr=ygals, $
-              box=long(5.*subpix)
-            
-            if(keyword_set(nstars)) then begin
-                x1=fltarr(2,n_elements(xstars))
-                x1[0,*]=xstars
-                x1[1,*]=ystars
-                x2=fltarr(2,n_elements(xgals))
-                x2[0,*]=xgals
-                x2[1,*]=ygals
-                matchnd, x1, x2, 10., m1=m1, m2=m2, nmatch=nm, nd=2
-                if(nm gt 0) then begin
-                    kpsf=lonarr(n_elements(xstars))+1L 
-                    kpsf[m1]=0 
-                    istars=where(kpsf gt 0, nstars) 
-                    if(nstars gt 0) then begin
-                        xstars=xstars[istars] 
-                        ystars=ystars[istars] 
-                    endif
-                endif
-            endif
+        ;; refine the centers
+        drefine, nimage, tmp_xgals, tmp_ygals, smooth=2., xr=r_xgals, $
+          yr=r_ygals, box=long(5.*subpix)
+        
+        if(n_elements(xgals) eq 0) then begin
+            xgals=r_xgals
+            ygals=r_ygals
+        endif else begin
+            xgals=[xgals, r_xgals]
+            ygals=[ygals, r_ygals]
+        endelse
+    endif
+endfor 
+ngals=n_elements(xgals)
+
+;; reduce to unique peaks
+if(ngals gt 0) then begin
+    xx=fltarr(2,ngals)
+    xx[0, *]= xgals
+    xx[1, *]= ygals
+    ing= groupnd(xx, subpix, firstg=firstg, nd=2)
+    xgals=xgals[firstg]
+    ygals=ygals[firstg]
+    ngals=n_elements(xgals)
+endif
+
+if(keyword_set(nstars) gt 0 AND $
+   keyword_set(ngals) gt 0) then begin
+    x1=fltarr(2,n_elements(xstars))
+    x1[0,*]=xstars
+    x1[1,*]=ystars
+    x2=fltarr(2,n_elements(xgals))
+    x2[0,*]=xgals
+    x2[1,*]=ygals
+    matchnd, x1, x2, 10., m1=m1, m2=m2, nmatch=nm, nd=2
+    if(nm gt 0) then begin
+        kpsf=lonarr(n_elements(xstars))+1L 
+        kpsf[m1]=0 
+        istars=where(kpsf gt 0, nstars) 
+        if(nstars gt 0) then begin
+            xstars=xstars[istars] 
+            ystars=ystars[istars] 
         endif
     endif
+endif
     
-    if(keyword_set(hand)) then $
-      dhand, image, xstars=xstars, ystars=ystars, nstars=nstars, $
-      xgals=xgals, ygals=ygals, ngals=ngals
+if(keyword_set(hand)) then $
+  dhand, images[*,*,ref], xstars=xstars, ystars=ystars, nstars=nstars, $
+  xgals=xgals, ygals=ygals, ngals=ngals
 
-;; deblend on those peaks
+for k=0L, nim-1L do begin
     if(nstars gt 0 OR ngals gt 0) then begin
-
+        
         ;; make stellar templates
         psfd=psf
         if(nstars gt 0) then begin
             psfd=fltarr(pnx, pny, n_elements(xstars))
+            psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
             for i=0L, n_elements(xstars)-1L do begin
                 psfd[*,*,i]=sshift2d(psf, [xstars[i]-long(xstars[i]), $
                                            ystars[i]-long(ystars[i])])
@@ -188,7 +230,6 @@ if(keyword_set(nc) gt 0 or $
           mwrfits, children[*,*,i], base+'-'+strtrim(string(iparent),2)+ $
           '-atlas.fits', hdr
     endif 
-endif
 
 end
 ;------------------------------------------------------------------------------
