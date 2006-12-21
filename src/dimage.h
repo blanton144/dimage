@@ -69,5 +69,6 @@ int simplexy(float *image, int nx, int ny, float dpsf, float plim,
 						 float dlim, float saddle, int maxper, int maxnpeaks,  
 						 float *sigma, float *x, float *y, float *flux, int *npeaks);
 int dtemplates(float *image, int nx, int ny, int *ntemplates, int *xcen, 
-							 int *ycen, float *templates, float sigma, float parallel);
+							 int *ycen, float *templates, float sigma, float parallel, 
+							 int *ikept);
 int dsersic_params(float flux, float n, float r50, float *amp, float *r0);

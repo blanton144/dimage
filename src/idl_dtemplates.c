@@ -14,7 +14,7 @@ static void free_memory()
 IDL_LONG idl_dtemplates (int      argc,
 												 void *   argv[])
 {
-	IDL_LONG nx,ny, *ntemplates, *xcen, *ycen;
+	IDL_LONG nx,ny, *ntemplates, *xcen, *ycen, *ikept;
 	float *image, *templates, parallel, sigma;
 	
 	IDL_LONG i;
@@ -31,11 +31,12 @@ IDL_LONG idl_dtemplates (int      argc,
 	templates=((float *)argv[i]); i++;
 	sigma=*((float *)argv[i]); i++;
 	parallel=*((float *)argv[i]); i++;
+	ikept=((IDL_LONG *)argv[i]); i++;
 	
 	/* 1. run the fitting routine */
 	retval=(IDL_LONG) dtemplates(image, nx, ny, (int *) ntemplates, 
 															 (int *) xcen, (int *) ycen, templates, 
-															 sigma, parallel);
+															 sigma, parallel, (int *) ikept);
 	
 	/* 2. free memory and leave */
 	free_memory();

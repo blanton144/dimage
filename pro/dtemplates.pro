@@ -20,7 +20,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dtemplates, image, xc, yc, templates=templates, parallel=parallel, $
-                sigma=sigma, sersic=sersic
+                sigma=sigma, sersic=sersic, ikept=ikept
 
 if(NOT keyword_set(parallel)) then parallel=0.5
 if(NOT keyword_set(sigma)) then sigma=dsigma(image, sp=5)
@@ -35,6 +35,7 @@ soname=filepath('libdimage.'+idlutils_so_ext(), $
 
 xin=long(xc)
 yin=long(yc)
+ikept=lonarr(nt)
 retval=call_external(soname, 'idl_dtemplates', float(image), $
                      long(nx), long(ny), $
                      long(nt), $
@@ -42,9 +43,11 @@ retval=call_external(soname, 'idl_dtemplates', float(image), $
                      long(yin), $
                      float(templates), $
                      float(sigma), $
-                     float(parallel))
+                     float(parallel), $
+                     long(ikept))
 
 templates=templates[*,*,0:nt-1L]
+ikept=ikept[0:nt-1L]
 
 if(keyword_set(sersic)) then begin
     iv=fltarr(nx,ny)+1./sigma^2

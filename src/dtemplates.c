@@ -36,7 +36,8 @@ int dtemplates(float *image,
 							 int *ycen, 
 							 float *templates, 
 							 float sigma, 
-							 float parallel)
+							 float parallel, 
+							 int *ikept)
 {
   int i,j,k,ip,jp,di,dj,kp, tmpnt;
   float v1,v2,cross;
@@ -106,9 +107,13 @@ int dtemplates(float *image,
         }
       }
     }
+  for(k=0;k<(*ntemplates);k++) 
+		ikept[k]=-1;
   tmpnt=0;
   for(k=0;k<(*ntemplates);k++) {
+		ikept[tmpnt]=k;
     if(keep[k]) {
+			ikept[tmpnt]=k;
       xcen[tmpnt]=xcen[k];
       ycen[tmpnt]=ycen[k];
       for(j=0;j<ny;j++) 

@@ -10,14 +10,16 @@
 ;-
 ;------------------------------------------------------------------------------
 pro sdss_dimage, ra, dec, sz, rerun=rerun, nodetect=nodetect, $
-	noclobber=noclobber, links=links, gmosaic=gmosaic
+                 noclobber=noclobber, links=links, gmosaic=gmosaic, $
+                 all=all, hand=hand
 
 if(n_elements(ra) gt 1) then begin
     if(n_elements(sz) ne n_elements(ra)) then $
       sz=fltarr(n_elements(ra))+sz[0]
     for i=0L, n_elements(ra)-1L do begin
         sdss_dimage, ra[i], dec[i], sz[i], rerun=rerun, nodetect=nodetect, $
-          noclobber=noclobber, links=links, gmosaic=gmosaic
+          noclobber=noclobber, links=links, gmosaic=gmosaic, all=all, $
+          hand=hand
     endfor
     return
 endif
@@ -66,7 +68,8 @@ spawn, 'gzip -vf '+prefix[0]+'-nd.fits'
 filters=['u','g','r','i','z']
 base=prefix[0]
 if(NOT keyword_set(nodetect)) then $
-  detect_multi, base, prefix[0]+'-'+filters+'.fits.gz', /hand, ref=2
+  detect_multi, base, prefix[0]+'-'+filters+'.fits.gz', hand=hand, ref=2, $
+  all=all
 
 cd, cdir
 

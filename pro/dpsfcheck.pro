@@ -29,14 +29,14 @@ ny=(size(image,/dim))[1]
 
 if(keyword_set(psf)) then begin
     havevar=0
-    fit_mult_gauss, psf, 1, amp, psfsig, model=model
+    fit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet
     fwhm=psfsig*2.*sqrt(2.*alog(2.))
 endif
 
 if(keyword_set(vpsf)) then begin
     havevar=1
     psf=dvpsf(nx*0.5, ny*0.5, psfsrc=vpsf)
-    fit_mult_gauss, psf, 1, amp, psfsig, model=model
+    fit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet
     fwhm=psfsig*2.*sqrt(2.*alog(2.))
 endif
 

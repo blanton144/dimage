@@ -63,7 +63,7 @@ endfor
 
 ;; do general object detection
 dobjects_multi, images, object=oimage, plim=plim
-mwrfits, oimage, base+'-pimage.fits', /create
+mwrfits, oimage, base+'-pimage.fits', hdr, /create
 
 pcat=replicate({xst:0L, yst:0L, xnd:0L, ynd:0L, xc:0., yc:0.},max(oimage)+1L)
 spawn, 'mkdir -p parents'

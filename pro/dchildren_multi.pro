@@ -37,7 +37,8 @@
 pro dchildren_multi, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                      glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                      ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
-                     nstars=nstars, ngals=ngals
+                     nstars=nstars, ngals=ngals, sersic=sersic
+                     
 
 common atv_point, markcoord
 
@@ -57,6 +58,7 @@ nim=long(sxpar(hdr, 'NIM'))
 nx=long(sxpar(hdr, 'NAXIS1'))
 ny=long(sxpar(hdr, 'NAXIS2'))
 images=fltarr(nx,ny, nim)
+nimages=fltarr(nx,ny, nim)
 ivars=fltarr(nx,ny, nim)
 
 for k=0L, nim-1L do begin
@@ -69,8 +71,7 @@ endfor
 bpsf=dvpsf(nx/2L, ny/2L, psf=psfs[ref])
 pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
-fit_mult_gauss, bpsf, 1, amp, psfsig, model=model
-
+fit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
 
 ;;  find stellar peaks in all images
 for k=0, nim-1L do begin
@@ -79,20 +80,27 @@ for k=0, nim-1L do begin
     dpeaks, simage, xc=tmp_xc, yc=tmp_yc, sigma=ssigma, $
       minpeak=plim*ssigma, /refine, npeaks=nc, maxnpeaks=maxnpeaks, /check
     
-    ;; try and guess which peaks are PSFlike
-    ispsf=dpsfcheck(images[*,*,k], ivars[*,*,k], tmp_xc, tmp_yc, $
-                    vpsf=psfs[k])
-    istars=where(ispsf gt 0, nstars)
-    if(nstars gt 0) then begin
-        tmp_xstars=tmp_xc[istars]
-        tmp_ystars=tmp_yc[istars]
-        if(n_elements(xstars) eq 0) then begin
-            xstars=tmp_xstars
-            ystars=tmp_ystars
-        endif else begin
-            xstars=[xstars, tmp_xstars]
-            ystars=[ystars, tmp_ystars]
-        endelse
+    nstars=0
+    if(nc gt 0) then begin
+        tmp_xc=tmp_xc[0:nc-1]
+        tmp_yc=tmp_yc[0:nc-1]
+
+        ;; try and guess which peaks are PSFlike
+        ispsf=dpsfcheck(images[*,*,k], ivars[*,*,k], tmp_xc, tmp_yc, $
+                        vpsf=psfs[k])
+        
+        istars=where(ispsf gt 0, nstars)
+        if(nstars gt 0) then begin
+            tmp_xstars=tmp_xc[istars]
+            tmp_ystars=tmp_yc[istars]
+            if(n_elements(xstars) eq 0) then begin
+                xstars=tmp_xstars
+                ystars=tmp_ystars
+            endif else begin
+                xstars=[xstars, tmp_xstars]
+                ystars=[ystars, tmp_ystars]
+            endelse
+        endif
     endif
 endfor
 nstars=n_elements(xstars)
@@ -103,12 +111,15 @@ if(nstars gt 0) then begin
     xx[0, *]= xstars
     xx[1, *]= ystars
     ing= groupnd(xx, psfsig, firstg=firstg, nd=2)
-    xstars=xstars[firstg]
-    ystars=ystars[firstg]
-    nstars=n_elements(xstars)
+    nstars=max(ing)+1L
+    xstars=xstars[firstg[0:nstars-1]]
+    ystars=ystars[firstg[0:nstars-1]]
 endif
     
 ;;  find galaxy peaks in all images
+if(nstars gt 0) then begin
+    stimages=fltarr(nx,ny,nstars)
+endif
 for k=0L, nim-1L do begin
 
     msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
@@ -128,16 +139,16 @@ for k=0L, nim-1L do begin
             ifit=where(tmp_model ne 0.)
             scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
               total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
-            tmp_model=tmp_model*scale
-            model=model+tmp_model
+            stimages[*,*,i]=tmp_model*scale
+            model=model+stimages[*,*,i]
         endfor
     endif
-    nimage=images[*,*,k]-model
+    nimages[*,*,k]=images[*,*,k]-model
 
     subpix=long(gsmooth/3.) > 1L
     nxsub=nx/subpix
     nysub=ny/subpix
-    simage=rebin(nimage[0:nxsub*subpix-1, 0:nysub*subpix-1], $
+    simage=rebin(nimages[0:nxsub*subpix-1, 0:nysub*subpix-1, k], $
                  nxsub, nysub)
     simage=dsmooth(simage, gsmooth/float(subpix))
     ssig=dsigma(simage, sp=10)
@@ -150,7 +161,7 @@ for k=0L, nim-1L do begin
         tmp_ygals=(float(yc)+0.5)*float(subpix)
         
         ;; refine the centers
-        drefine, nimage, tmp_xgals, tmp_ygals, smooth=2., xr=r_xgals, $
+        drefine, nimages[*,*,k], tmp_xgals, tmp_ygals, smooth=2., xr=r_xgals, $
           yr=r_ygals, box=long(5.*subpix)
         
         if(n_elements(xgals) eq 0) then begin
@@ -199,37 +210,63 @@ if(keyword_set(hand)) then $
   dhand, images[*,*,ref], xstars=xstars, ystars=ystars, nstars=nstars, $
   xgals=xgals, ygals=ygals, ngals=ngals
 
+if(ngals gt 0) then begin
+    acat=replicate({pid:iparent, $
+                    aid:-1L, $
+                    xcen:0., $
+                    ycen:0., $
+                    bgood:lonarr(nim), $
+                    good:0L}, ngals)
+    acat.aid=lindgen(ngals)
+endif
 for k=0L, nim-1L do begin
-    if(nstars gt 0 OR ngals gt 0) then begin
-        
-        ;; make stellar templates
-        psfd=psf
-        if(nstars gt 0) then begin
-            psfd=fltarr(pnx, pny, n_elements(xstars))
-            psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
-            for i=0L, n_elements(xstars)-1L do begin
-                psfd[*,*,i]=sshift2d(psf, [xstars[i]-long(xstars[i]), $
-                                           ystars[i]-long(ystars[i])])
-            endfor
-        endif
+    if(ngals gt 0) then begin
+        spawn, 'mkdir -p atlases/'+strtrim(string(iparent),2)
 
         ;; make galaxy templates
-        dtemplates, nimage, xgals, ygals, templates=templates, /sersic
-
-        ;; combine the two
-
-        ;; find weights
-        dweights, nimage, ivar, templates, weights=weights, /nonneg
-        dfluxes, nimage, templates, weights, xgals, ygals, children=children
+        dtemplates, nimages[*,*,k], xgals, ygals, templates=templates, $
+          sersic=sersic, ikept=ikept
         
+        ;; find weights
+        dweights, nimages[*,*,k], ivars[*,*,k], templates, $
+          weights=weights, /nonneg
+        dfluxes, nimages[*,*,k], templates, weights, xgals, ygals, $
+          children=children
+
         nchild=n_elements(children)/nx/ny
 
-        mwrfits, children[*,*,0], base+'-'+strtrim(string(iparent),2)+ $
-          '-atlas.fits', hdr, /create
-        for i=1L, nchild-1L do $
-          mwrfits, children[*,*,i], base+'-'+strtrim(string(iparent),2)+ $
-          '-atlas.fits', hdr
+        if(k eq 0) then first=1 else first=0
+        for i=0L, nchild-1L do begin
+            if(total(children[*,*,i]) gt 0) then begin
+                acat[ikept[i]].good=1
+                acat[ikept[i]].bgood[k]=1
+                acat[ikept[i]].xcen=xgals[ikept[i]]
+                acat[ikept[i]].ycen=ygals[ikept[i]]
+            endif
+            mwrfits, children[*,*,i], 'atlases/'+strtrim(string(iparent),2)+ $
+              '/'+base+'-'+strtrim(string(iparent),2)+ $
+              '-atlas-'+strtrim(string(ikept[i]),2)+'.fits', hdr, create=first
+        endfor
+
+        notkept=bytarr(ngals)+1
+        notkept[ikept]=0
+        inot=where(notkept, nnot)
+        if(nnot gt 0) then begin
+            for i=0L, nnot-1L do begin
+                mwrfits, fltarr(nx,ny), $
+                  'atlases/'+strtrim(string(iparent),2)+ $
+                  '/'+base+'-'+strtrim(string(iparent),2)+ $
+                  '-atlas-'+strtrim(string(inot[i]),2)+'.fits', hdr, $
+                  create=first
+            endfor
+        endif
     endif 
+endfor
+if(n_tags(acat) gt 0) then begin
+    mwrfits, acat, 'atlases/'+strtrim(string(iparent),2)+ $
+      '/'+base+'-'+strtrim(string(iparent),2)+ $
+      '-acat.fits', /create
+endif
 
 end
 ;------------------------------------------------------------------------------
