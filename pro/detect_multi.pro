@@ -4,7 +4,7 @@
 ; PURPOSE:
 ;   detect objects in multi-band image of bright object
 ; CALLING SEQUENCE:
-;   detect_multi, base, imfile [, /dbset, /hand ]
+;   detect_multi, base, imfile [, /aset, /pset, /hand ]
 ; INPUTS:
 ;   base - base name for output
 ;   imfiles - array of FITS files with images in HDU 0
@@ -26,34 +26,28 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect_multi, base, imfiles, dbset=dbset, hand=hand, ref=ref, sky=sky, $
-                  noclobber=noclobber, glim=glim, all=all
+pro detect_multi, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
+                  noclobber=noclobber, glim=glim, all=all, single=single, $
+                  aset=aset, sgset=sgset
 
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(glim)) then glim=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=5.
 
-if(NOT keyword_set(dbset)) then begin
-    dbset={base:base, $
-           gsmooth:gsmooth, $
-           glim:glim, $
-           saddle:5.} 
+if(NOT keyword_set(pset)) then begin
+    pset={base:base, $
+          ref:ref}
 endif else begin
-    dbset=mrdfits(base+'-dbset.fits', 1)
+    pset=mrdfits(base+'-pset.fits', 1)
 endelse
 
 ;; get parents (creates pcat, pimage, parents files)
-dparents_multi, base, imfiles, sky=sky, noclobber=noclobber
+dparents_multi, base, imfiles, sky=sky, noclobber=noclobber, $
+  ref=pset.ref
 
 ;; read in parents and look for closest object to center
 hdr=headfits(base+'-pimage.fits',ext=0)
-;;nx=long(sxpar(hdr, 'NAXIS1'))
-;;ny=long(sxpar(hdr, 'NAXIS2'))
 pcat=mrdfits(base+'-pcat.fits',1)
-;;distance=sqrt((pcat.xc-nx*0.5)^2+ $
-              ;;(pcat.yc-ny*0.5)^2)
-;;mdist=min(distance, imdist)
-;;dbset.parent=imdist
 
 ;; fit for psf (creates bpsf and vpsf files)
 nim=n_elements(imfiles)
@@ -72,14 +66,23 @@ if(keyword_set(all)) then begin
     for iparent=0L, n_elements(pcat)-1L do begin
         psfs.xst= pcat[iparent].xst
         psfs.yst= pcat[iparent].yst
-        dchildren_multi, dbset.base, iparent, psfs=psfs, $
-          ref=ref, gsmooth=dbset.gsmooth, glim=dbset.glim, hand=hand
+        dchildren_multi, base, iparent, psfs=psfs, $
+          ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
+          sgset=sgset
     endfor
 endif
 
-dcombine_multi, dbset.base
+if(n_elements(single) gt 0) then begin
+    psfs.xst= pcat[single].xst
+    psfs.yst= pcat[single].yst
+    dchildren_multi, base, single, psfs=psfs, $
+      ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
+      sgset=sgset
+endif
 
-mwrfits, dbset, base+'-dbset.fits', /create
+dcombine_multi, base, hand=hand
+
+mwrfits, pset, base+'-pset.fits', /create
 
 ;;dhtmlpage, dbset.base, dbset.parent, /install
 

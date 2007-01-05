@@ -22,7 +22,7 @@ pro dparents_multi, base, imfiles, plim=plim, ref=ref, sky=sky, $
                     noclobber=noclobber
 
 if(NOT keyword_set(plim)) then plim=5.
-if(NOT keyword_set(red)) then ref=0
+if(NOT keyword_set(ref)) then ref=0
 
 if(keyword_set(noclobber)) then begin
     gotall=0

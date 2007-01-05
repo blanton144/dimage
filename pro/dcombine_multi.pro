@@ -12,7 +12,7 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dcombine_multi, base
+pro dcombine_multi, base, hand=hand
 
 hdr=headfits(base+'-pimage.fits',ext=0)
 pcat=mrdfits(base+'-pcat.fits',1)
@@ -28,12 +28,23 @@ ucat0={uid:0L, $
        xst:0L, $
        yst:0L, $
        xnd:0L, $
-       ynd:0L}
+       ynd:0L, $
+       hand:0L}
 for pid=0L, n_elements(pcat)-1L do begin
+    chand=0
     struct_assign, pcat[pid], ucat0
     afile='atlases/'+strtrim(string(pid),2)+ $
       '/'+base+'-'+strtrim(string(pid),2)+ $
       '-acat.fits'
+    if(keyword_set(hand)) then begin
+        hfile='hand/'+strtrim(string(pid),2)+ $
+          '/'+base+'-'+strtrim(string(pid),2)+ $
+          '-acat.fits'
+        if(file_test(hfile)) then begin
+            afile=hfile
+            chand=1
+        endif
+    endif
     if(file_test(afile)) then begin
         acat=mrdfits(afile,1)
         if(n_tags(acat) gt 0) then begin
@@ -42,6 +53,7 @@ for pid=0L, n_elements(pcat)-1L do begin
                     ucat0.uid=uid
                     ucat0.aid=aid
                     ucat0.pid=pid
+                    ucat0.hand=chand
                     ucat0.x=acat[aid].xcen+pcat[pid].xst
                     ucat0.y=acat[aid].ycen+pcat[pid].yst
                     if(n_tags(ucat) eq 0) then $
