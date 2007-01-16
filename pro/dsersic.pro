@@ -34,7 +34,7 @@
 function dsersic_model, fitparam
 
 common com_simple, image, invvar, nx, ny, psf, xcen, ycen, oldfitparam, $
-  parinfo, oldmodel, addtemplate, step
+  parinfo, oldmodel, addtemplate, step, simple
 
 ; we have to guarantee we don't fall out, since mpfit does not
 use_fitparam=fitparam
@@ -49,7 +49,7 @@ for i=0L, n_elements(fitparam)-1L do $
 model=dfakegal(nx=nx,ny=ny,xcen=use_fitparam[2],ycen=use_fitparam[3], $
                ba=use_fitparam[6],phi0=use_fitparam[7], $
                r50=exp(use_fitparam[4]), sersicn=use_fitparam[5], $
-               flux=1.)
+               flux=1., simple=simple)
 
 ; convolve with seeing
 if(n_elements(psf) gt 1) then model=convolve(model,psf)
@@ -122,7 +122,7 @@ end
 pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
             sersicfit=sersicfit,model=model, reinit=reinit, $
             fixcenter=fixcenter,fixsky=fixsky, addtemplate=in_addtemplate, $
-            nofit=nofit
+            nofit=nofit, simple=in_simple
 
 
 if(n_params() lt 1) then begin
@@ -142,6 +142,7 @@ if(n_elements(in_xcen) eq 0) then in_xcen=float(nx/2L)
 if(n_elements(in_ycen) eq 0) then in_ycen=float(ny/2L)
 if(n_elements(in_psf) eq 0) then in_psf=1
 if(n_elements(in_addtemplate) gt 0) then addtemplate=in_addtemplate
+if(n_elements(in_simple) gt 0) then simple=in_simple else simple=0
 image=in_image
 invvar=in_invvar
 psf=in_psf

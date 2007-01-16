@@ -37,7 +37,7 @@
 pro dchildren_multi, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                      glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                      ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
-                     nstars=nstars, ngals=ngals, sersic=sersic, $
+                     nstars=nstars, ngals=ngals, sersic=in_sersic, $
                      aset=aset, sgset=sgset
                      
 
@@ -49,23 +49,28 @@ if(NOT keyword_set(gsmooth)) then gsmooth=2.
 if(NOT keyword_set(saddle)) then saddle=5.
 if(keyword_set(xstars)) then nstars=n_elements(xstars)
 if(keyword_set(xgals)) then ngals=n_elements(xgals)
+if(keyword_set(in_sersic)) then sersic=in_sersic else sersic=0
 subdir='atlases'
 if(keyword_set(hand)) then subdir='hand'
 
+spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
 asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-aset.fits'
 if(keyword_set(aset) eq 0 OR file_test(asetfile) eq 0) then begin
     aset={base:base, $
           ref:ref, $
           iparent:iparent, $
+          sersic:sersic, $
           gsmooth:gsmooth, $
           glim:glim}
 endif else begin
     aset=mrdfits(asetfile, 1)
     gsmooth=aset.gsmooth
     glim=aset.glim
+    sersic=aset.sersic
 endelse
 
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-sgset.fits'
+newsg=1
 if(keyword_set(sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
     sgset={base:base, $
            ref:ref, $
@@ -77,6 +82,7 @@ if(keyword_set(sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
            xgals:fltarr(200), $
            ygals:fltarr(200) }
 endif else begin
+    newsg=0
     sgset=mrdfits(sgsetfile, 1)
 endelse
 
@@ -104,7 +110,8 @@ pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
 fit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
 
-if(keyword_set(sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
+if(keyword_set(newsg)) then begin
+
     
 ;;  find stellar peaks in all images
     for k=0, nim-1L do begin
@@ -244,18 +251,26 @@ if(keyword_set(sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
     endif
 
     sgset.nstars= nstars
-    sgset.xstars[0:nstars-1]= xstars
-    sgset.ystars[0:nstars-1]= ystars
+    if(nstars gt 0) then begin
+        sgset.xstars[0:nstars-1]= xstars
+        sgset.ystars[0:nstars-1]= ystars
+    endif
     sgset.ngals= ngals
-    sgset.xgals[0:ngals-1]= xgals
-    sgset.ygals[0:ngals-1]= ygals
+    if(ngals gt 0) then begin
+        sgset.xgals[0:ngals-1]= xgals
+        sgset.ygals[0:ngals-1]= ygals
+    endif
 endif else begin
     nstars=sgset.nstars
-    xstars=sgset.xstars[0:nstars-1]
-    ystars=sgset.ystars[0:nstars-1]
+    if(nstars gt 0) then begin
+        xstars=sgset.xstars[0:nstars-1]
+        ystars=sgset.ystars[0:nstars-1]
+    endif
     ngals=sgset.ngals
-    xgals=sgset.xgals[0:ngals-1]
-    ygals=sgset.ygals[0:ngals-1]
+    if(ngals gt 0) then begin
+        xgals=sgset.xgals[0:ngals-1]
+        ygals=sgset.ygals[0:ngals-1]
+    endif
     if(nstars gt 0) then begin
         stimages=fltarr(nx,ny,nstars)
     endif
@@ -307,12 +322,13 @@ if(NOT keyword_set(nodeblend)) then begin
                     mwrfits, stimages[*,*,i], $
                       subdir+'/'+strtrim(string(iparent),2)+ $
                       '/'+base+'-'+strtrim(string(iparent),2)+ $
-                  '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, create=first
+                      '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, $
+                      create=first
                     model=model+stimages[*,*,i]
                 endfor
             endif
             nimages[*,*,k]=images[*,*,k]-model
-            
+
             ;; make galaxy templates
             dtemplates, nimages[*,*,k], xgals, ygals, templates=templates, $
               sersic=sersic, ikept=ikept
@@ -322,6 +338,7 @@ if(NOT keyword_set(nodeblend)) then begin
               weights=weights, /nonneg
             dfluxes, nimages[*,*,k], templates, weights, xgals, ygals, $
               children=children
+            
 
             nchild=n_elements(children)/nx/ny
             
@@ -334,7 +351,8 @@ if(NOT keyword_set(nodeblend)) then begin
                     acat[nstars+ikept[i]].bgood[k]=1
                 endif
                 aid=acat[nstars+ikept[i]].aid
-                mwrfits, children[*,*,i], subdir+'/'+strtrim(string(iparent),2)+ $
+                mwrfits, children[*,*,i], subdir+'/'+ $
+                  strtrim(string(iparent),2)+ $
                   '/'+base+'-'+strtrim(string(iparent),2)+ $
                   '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, create=first
             endfor

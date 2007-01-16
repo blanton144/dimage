@@ -46,7 +46,7 @@ for pid=0L, n_elements(pcat)-1L do begin
         endif
     endif
     if(file_test(afile)) then begin
-        acat=mrdfits(afile,1)
+        acat=mrdfits(afile,1, /silent)
         if(n_tags(acat) gt 0) then begin
             for aid=0L, n_elements(acat)-1L do begin
                 if(acat[aid].good) then begin

@@ -10,13 +10,13 @@ static void free_memory()
 }
 
 int dfake(float *image, int nx, int ny, float xcen, float ycen,
-					float n, float r50, float ba, float phi0); 
+					float n, float r50, float ba, float phi0, int simple); 
 
 /********************************************************************/
 IDL_LONG idl_dfake (int      argc,
                           void *   argv[])
 {
-  IDL_LONG nx,ny;
+  IDL_LONG nx,ny, simple;
 	float *image, n, r50, ba, phi0, xcen, ycen;
 	
 	IDL_LONG i;
@@ -33,9 +33,10 @@ IDL_LONG idl_dfake (int      argc,
 	r50=*((float *)argv[i]); i++;
 	ba=*(float *)argv[i]; i++;
 	phi0=*(float *)argv[i]; i++;
+	simple=*(int *)argv[i]; i++;
 	
 	/* 1. run the fitting routine */
-	retval=dfake(image,nx,ny,xcen,ycen,n,r50,ba,phi0);
+	retval=dfake(image,nx,ny,xcen,ycen,n,r50,ba,phi0, simple);
 	
 	/* 2. free memory and leave */
 	free_memory();

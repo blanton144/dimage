@@ -34,6 +34,13 @@ if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(glim)) then glim=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=5.
 
+if(NOT keyword_set(base)) then begin
+    spawn, 'pwd', cwd
+    words=strsplit(cwd[0], '/',/extr)
+    base=words[n_elements(words)-1]
+    imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+endif
+
 if(NOT keyword_set(pset)) then begin
     pset={base:base, $
           ref:ref}

@@ -1,34 +1,61 @@
+
 pro dexplore_event, ev  
 
 common com_dexplore_widget, $
+  w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
+  w_settings, w_gsmooth, w_glim, w_sersic, w_redeblend, $
   basename, imagenames, $
-  parent, full, base, done, $
-  images, phdr, $
-  sgset, aset, subdir, $
-  stretch, band, iband, child, iparent, ichild, glist, slist, acat, ig, is, $
-  igstr, isstr, settings, setstr, setval, aset, sgset, starset, $
-  starshow, galset, galshow, redeblend
-common atv_point, markcoord
+  parent_images, parent_hdr, $
+  setval, band, child, parent, $
+  acat, ig, is, igstr, isstr, ng, ns, $
+  fix_stretch, hand, gsmooth, glim, sersic, atset, $
+  subdir
+common atv2_point, markcoord
 
-if(ev.ID eq done) then begin
+;; if we are done, close us out
+if(ev.ID eq w_done) then begin
     if ev.SELECT then WIDGET_CONTROL, ev.TOP, /DESTROY  
-    slist=0
-    glist=0
-    band=0
-    parent=0
-    full=0
+    w_slist=0
+    w_glist=0
+    w_band=0
+    w_sersic=0
+    w_gsmooth=0
+    w_glim=0
+    w_redeblend=0
+    w_parent=0
+    w_full=0
 endif
 
-if(ev.ID eq parent) then begin
+if(ev.ID eq w_parent) then begin
     if(ev.update) then begin
-        iparent=ev.value
+        newone=0
+        if(parent ne ev.value) then newone=1
+        parent=ev.value
+        dexplore_read_parent
         dexplore_parent_display
+        if(newone eq 1) then dexplore_child_list
+        dexplore_mark_children
     endif
 endif
 
-if(ev.ID eq band) then begin
-    if(ev.update) then $
-      iband=ev.value
+if(ev.ID eq w_band) then begin
+    if(ev.update) then begin
+        band=ev.value
+        dexplore_parent_display
+        dexplore_mark_children
+    endif
+endif
+
+if(ev.ID eq w_gsmooth) then begin
+    if(ev.update) then begin
+        gsmooth=ev.value
+    endif
+endif
+
+if(ev.ID eq w_glim) then begin
+    if(ev.update) then begin
+        glim=ev.value
+    endif
 endif
 
 if(keyword_set(starset)) then begin
@@ -75,21 +102,43 @@ if(keyword_set(starset)) then begin
             endif
         endif
     endif
+endif
 
-    if(ev.ID eq redeblend) then begin
-        subdir='hand'
-        spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
-        sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+basename+ $
-          '-sgset.fits'
-        mwrfits, sgset, sgsetfile, /create
-        detect_multi, basename, imagenames, ref=aset.ref, $
-          single=iparent, /sgset, /hand, /noclobber
-        dexplore_parent_display
-    endif
+if(ev.ID eq w_redeblend) then begin
+    dexplore_setval, /hand
+    spawn, 'mkdir -p '+subdir+'/'+strtrim(string(parent),2)
+    atsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+ $
+      '-aset.fits'
+    atset_hand=atset
+    atset_hand.sersic=sersic
+    atset_hand.gsmooth=gsmooth
+    atset_hand.glim=glim
+    mwrfits, atset_hand, atsetfile, /create
+    detect_multi, basename, imagenames, ref=atset.ref, $
+      single=parent, /aset, /hand, /noclobber
+    dexplore_parent_display
+    dexplore_child_list
+    dexplore_mark_children
 endif
 
 end  
 
+pro dexplore_setval, hand=in_hand
+COMPILE_OPT hidden
+common com_dexplore_widget
+
+fix_stretch=setval[0]
+hand=setval[1]
+
+if(keyword_set(in_hand)) then begin
+    hand=in_hand
+    setval[1]=in_hand
+    subdir='hand'
+endif
+
+end
+
+;; settings
 function dexplore_settings, ev
 COMPILE_OPT hidden
 
@@ -102,31 +151,65 @@ for i=0L, n_elements(setstr)-1L do begin
         setval[i]=val
     endif
 endfor
+dexplore_setval
 
 end
 
+;; sersic  or not
+function dexplore_sersic, ev
+COMPILE_OPT hidden
+
+common com_dexplore_widget
+
+WIDGET_CONTROL, ev.ID, GET_VALUE=val, GET_UVALUE=uval
+
+if(ev.value eq 'sersic') then begin
+    sersic=val
+endif
+
+end
+
+;; display full images
 function dexplore_full_display, ev
 COMPILE_OPT hidden
 
 common com_dexplore_widget
 
 image=mrdfits(ev.value,0,hdr)
-atv, image, /align, head=hdr, stretch=setval[0]
+atv, image, /align, head=hdr, stretch=fix_stretch
 
 END
 
+;; display a parent
 pro dexplore_parent_display, nomarks=nomarks
 COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-if(keyword_set(image)) then $
-  atv, image, /align, head=hdr, stretch=setval[0]
+if(keyword_set(parent_images)) then $
+  atv2, parent_images[*,*,band], /align, head=hdr, stretch=fix_stretch
 
-if(keyword_set(slist)) then $
-  WIDGET_CONTROL, slist, /destroy
-if(keyword_set(glist)) then $
-  WIDGET_CONTROL, glist, /destroy
+end
+
+;; create new list
+pro dexplore_child_list
+COMPILE_OPT hidden
+
+common com_dexplore_widget
+
+;; destroy previous
+if(keyword_set(w_redeblend)) then $
+  WIDGET_CONTROL, w_redeblend, /destroy
+if(keyword_set(w_gsmooth)) then $
+  WIDGET_CONTROL, w_gsmooth, /destroy
+if(keyword_set(w_sersic)) then $
+  WIDGET_CONTROL, w_sersic, /destroy
+if(keyword_set(w_glim)) then $
+  WIDGET_CONTROL, w_glim, /destroy
+if(keyword_set(w_slist)) then $
+  WIDGET_CONTROL, w_slist, /destroy
+if(keyword_set(w_glist)) then $
+  WIDGET_CONTROL, w_glist, /destroy
 if(keyword_set(starshow)) then $
   WIDGET_CONTROL, starshow, /destroy
 if(keyword_set(galshow)) then $
@@ -135,155 +218,183 @@ if(keyword_set(starset)) then $
   WIDGET_CONTROL, starset, /destroy
 if(keyword_set(galset)) then $
   WIDGET_CONTROL, galset, /destroy
+w_redeblend=0
+w_gsmooth=0
+w_sersic=0
+w_glim=0
+w_slist=0
+w_glist=0
 
-if(setval[1] eq 0) then $
-  subdir='atlases' $
-else $
-  subdir='hand'
-acatfile=subdir+'/'+strtrim(string(iparent),2)+'/'+basename+'-'+ $
-  strtrim(string(iparent),2)+ '-acat.fits'
+if(NOT keyword_set(parent_images)) then return
+
+acatfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
+  strtrim(string(parent),2)+ '-acat.fits'
 acat= mrdfits(acatfile,1)
 if(n_tags(acat) gt 0) then begin
     ig=where(acat.good gt 0 and acat.type eq 0L, ng)
+    
     if(ng gt 0) then begin
         igstr=strtrim(string(ig),2)
-        atvplot, acat[ig].xcen, acat[ig].ycen, psym=4, th=2
-        if(NOT keyword_set(nomarks)) then $
-          atvxyouts, acat[ig].xcen, acat[ig].ycen, igstr, align=0.8, $
-          charsize=1.7
-        glist = CW_BGROUP(base, igstr, /row, /return_name, frame=1, $
-                          event_func='dexplore_child_display', $
-                          label_left='gals')
+        w_glist = CW_BGROUP(w_base, igstr, /row, /return_name, frame=1, $
+                            event_func='dexplore_child_display', $
+                            label_left='gals')
     endif
+
     is=where(acat.good gt 0 and acat.type eq 1L, ns)
     if(ns gt 0) then begin
         isstr=strtrim(string(is),2)
-        atvplot, acat[is].xcen, acat[is].ycen, psym=5
-        if(NOT keyword_set(nomarks)) then $
-          atvxyouts, acat[is].xcen, acat[is].ycen, isstr, align=0.8, $
-          charsize=1.7
-        slist = CW_BGROUP(base, isstr, /row, /return_name, frame=1, $
+        w_slist = CW_BGROUP(w_base, isstr, /row, /return_name, frame=1, $
                           event_func='dexplore_child_display', $
                           label_left='stars')
     endif
 endif
 
-if(setval[1] eq 0) then $
-  subdir='atlases' $
-else $
-  subdir='hand'
-sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+basename+'-sgset.fits'
+dexplore_mark_children
+
+sgsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-sgset.fits'
 if(file_test(sgsetfile)) then begin
     sgset=mrdfits(sgsetfile,1)
 ;; star marking
-    starshow = WIDGET_BUTTON(base, value='star show')  
-    starset = WIDGET_BUTTON(base, value='star set')  
-    galshow = WIDGET_BUTTON(base, value='gal show')  
-    galset = WIDGET_BUTTON(base, value='gal set')  
-    redeblend = WIDGET_BUTTON(base, value='redeblend')  
+    ;;starshow = WIDGET_BUTTON(w_base, value='star show')  
+    ;;starset = WIDGET_BUTTON(w_base, value='star set')  
+    ;;galshow = WIDGET_BUTTON(w_base, value='gal show')  
+    ;;galset = WIDGET_BUTTON(w_base, value='gal set')  
 endif
 
-asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+basename+'-aset.fits'
+asetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-aset.fits'
 if(file_test(asetfile)) then begin
-    aset=mrdfits(asetfile,1)
+    atset=mrdfits(asetfile,1)
+    sersic=atset.sersic
+    gsmooth=atset.gsmooth
+    glim=atset.glim
+    w_gsmooth = CW_FIELD(w_base, TITLE = "gsmooth", $
+                         /FLOAT, /FRAME, /return_events, $
+                         value=gsmooth)  
+    w_glim = CW_FIELD(w_base, TITLE = "glim", $
+                      /FLOAT, /FRAME, /return_events, $
+                      value=glim)  
+    w_sersic = CW_BGROUP(w_base, 'sersic', /nonexclusive, /column, $
+                         /return_name, uvalue=0, $
+                         event_func='dexplore_sersic', $
+                         set_value=sersic)
+    w_redeblend = WIDGET_BUTTON(w_base, value='redeblend')  
 endif
 
 END
+
+pro dexplore_mark_children
+COMPILE_OPT hidden
+
+common com_dexplore_widget
+
+if(n_tags(acat)) then begin
+    if(ng gt 0) then begin
+        atv2plot, acat[ig].xcen, acat[ig].ycen, psym=4, th=2
+        atv2xyouts, acat[ig].xcen, acat[ig].ycen, igstr, align=0.8, $
+          charsize=1.7
+    endif
+    if(ns gt 0) then begin
+        atv2plot, acat[is].xcen, acat[is].ycen, psym=5
+        atv2xyouts, acat[is].xcen, acat[is].ycen, isstr, align=0.8, $
+          charsize=1.7
+    endif
+endif
+
+end
 
 function dexplore_child_display, ev
 COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-imfile='atlases/'+strtrim(string(iparent),2)+'/'+basename+'-'+ $
-  strtrim(string(iparent),2)+'-atlas-'+strtrim(string(ev.value),2)+'.fits'
+child=long(ev.value)
+
+imfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
+  strtrim(string(parent),2)+'-atlas-'+strtrim(string(child),2)+'.fits'
 if(file_test(imfile)) then begin
-    image=mrdfits(imfile, iband, hdr)
-    atv, image, /align, head=hdr, stretch=setval[0]
-    atvplot, acat[ig].xcen, acat[ig].ycen, psym=4, th=2
-    atvxyouts, acat[ig].xcen, acat[ig].ycen, igstr, align=0.8, $
-      charsize=1.7
-    atvplot, acat[is].xcen, acat[is].ycen, psym=5
-    atvxyouts, acat[is].xcen, acat[is].ycen, isstr, align=0.8, $
-      charsize=1.7
+    image=mrdfits(imfile, band, hdr)
+    atv2, image, /align, head=hdr, stretch=fix_stretch
+    dexplore_mark_children
 endif
 
 END
 
-pro dexplore_read_parent, ip
+pro dexplore_read_parent
 COMPILE_OPT hidden
 
 common com_dexplore_widget
 
 ;; read in parent image
-imfile='parents/'+basename+'-parent-'+strtrim(string(ip),2)+'.fits'
-image=mrdfits(imfile, 0L, phdr)
-nx=(size(image, /dim))[0]
-ny=(size(image, /dim))[1]
-images=fltarr(nx,ny, n_elements(imagenames))
+imfile='parents/'+basename+'-parent-'+strtrim(string(parent),2)+'.fits'
+parent_image=mrdfits(imfile, 0L, parent_hdr)
+nx=(size(parent_image, /dim))[0]
+ny=(size(parent_image, /dim))[1]
+parent_images=fltarr(nx,ny, n_elements(imagenames))
 for i=0L, n_elements(imagenames)-1L do begin
-    images[*,*,i]=mrdfits(imfile, i*2L)
+    parent_images[*,*,i]=mrdfits(imfile, i*2L)
 endfor
 
-subdir='atlases'
-if(keyword_set(hand)) then subdir='hand'
-
 ;; read in sgset file
-sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+basename+'-sgset.fits'
+sgsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-sgset.fits'
 if(file_test(sgsetfile)) then begin
     sgset=mrdfits(sgsetfile,1)
 endif
 
 ;; read in aset file
-asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+basename+'-aset.fits'
+asetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-aset.fits'
 if(file_test(asetfile)) then begin
-    aset=mrdfits(asetfile,1)
+    atset=mrdfits(asetfile,1)
 endif
+
 
 end
   
+;; main
 pro dexplore_widget, in_basename, in_imagenames
 
 common com_dexplore_widget
 
 basename=in_basename
 imagenames=in_imagenames
-ichild=0L
-iband=0L
-iparent=0L
+child=0L
+band=0L
+parent=0L
+subdir='atlases'
 
 ;; set up base widget
-base = WIDGET_BASE(ROW=14)  
-done = WIDGET_BUTTON(base, value='Done')  
+w_base = WIDGET_BASE(ROW=14)  
+w_done = WIDGET_BUTTON(w_base, value='Done')  
 
 ;; set up full image display widget
 allimagenames= [basename+'-pimage.fits', imagenames]
-full = CW_BGROUP(base, allimagenames, /column, /return_name, $
-                 event_func='dexplore_full_display', $
-                 label_top='Images of field', $
-                 frame=2)
+w_full = CW_BGROUP(w_base, allimagenames, /column, /return_name, $
+                   event_func='dexplore_full_display', $
+                   label_top='Images of field', $
+                   frame=2)
 
 ;; settings
 setstr= ['fix stretch', 'hand']
-setval=bytarr(n_elements(setstr))+1L
-settings = CW_BGROUP(base, setstr, /nonexclusive, /column, /return_name, $
-                     uvalue=0, event_func='dexplore_settings', $
-                     set_value=setval)
+setval=bytarr(n_elements(setstr))
+setval[0]=1 ;; fix stretch by default
+w_settings = CW_BGROUP(w_base, setstr, /nonexclusive, /column, /return_name, $
+                       uvalue=0, event_func='dexplore_settings', $
+                       set_value=setval)
+dexplore_setval
 
 ;; set up band selection widget
-band = CW_FIELD(base, TITLE = "band", $
-                /LONG, /FRAME, /return_events)  
+w_band = CW_FIELD(w_base, TITLE = "band", $
+                  /LONG, /FRAME, /return_events, value=band)  
 
 ;; set up parent display widget
-parent = CW_FIELD(base, TITLE = "parent", $
-                  /LONG, /FRAME, /return_events)  
+w_parent = CW_FIELD(w_base, TITLE = "parent", $
+                    /LONG, /FRAME, /return_events)  
 
 
-stash = {done: done}
+stash = {done: w_done}
 
-WIDGET_CONTROL, base, /REALIZE, set_uvalue=stash
+WIDGET_CONTROL, w_base, /REALIZE, set_uvalue=stash
 
-XMANAGER, 'dexplore', base
+XMANAGER, 'dexplore', w_base
 
 end  
 

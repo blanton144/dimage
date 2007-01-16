@@ -76,7 +76,8 @@ int dfake(float *image,
 					float n,
 					float r50,
 					float ba,
-					float phi0) 
+					float phi0, 
+          int simple) 
 {
   float oldim,amp,r0,sinph0,cosph0,ab2,d2r,r2;
   int i,j,k,inner,cont;
@@ -110,36 +111,38 @@ int dfake(float *image,
       image[j*nx+i]=amp*exp(-pow(r2/(r0*r0), 1./(n*2.)));
     } /* end for i j */
 
-  /* now look at inner pixels and integrate em */
-  imrad2=(float *) malloc(nx*ny*sizeof(float));
-  impos=(int *) malloc(nx*ny*sizeof(int));
-  for(i=0;i<nx;i++) 
-    for(j=0;j<ny;j++) {
-      impos[j*nx+i]=j*nx+i;
-      imrad2[j*nx+i]=fake_radius2((float) i, (float) j);
+  if(simple==0) {
+    /* now look at inner pixels and integrate em */
+    imrad2=(float *) malloc(nx*ny*sizeof(float));
+    impos=(int *) malloc(nx*ny*sizeof(int));
+    for(i=0;i<nx;i++) 
+      for(j=0;j<ny;j++) {
+        impos[j*nx+i]=j*nx+i;
+        imrad2[j*nx+i]=fake_radius2((float) i, (float) j);
+      }
+    qsort(impos,nx*ny,sizeof(int),fgcomp);
+    cont=1;
+    for(k=0;(k<36 && cont) || k<16;k++) {
+      i=impos[k]%nx;
+      j=impos[k]/nx;
+      oldim=image[j*nx+i];
+      if(i==floor(xcen+0.5) && j==floor(ycen+0.5)) {
+        exact=1;
+        delj=0.25;
+        fg_j=(float) j - 0.25;
+        image[j*nx+i]=dqromo2(fgintx,(float)i-0.5, (float) i, dmidpnt2);
+        image[j*nx+i]+=dqromo2(fgintx,(float) i, (float)i+0.5, dmidpnt2);
+        fg_j=(float) j + 0.25;
+        image[j*nx+i]+=dqromo2(fgintx,(float)i-0.5, (float)i, dmidpnt2);
+        image[j*nx+i]+=dqromo2(fgintx,(float)i, (float)i+0.5, dmidpnt2);
+      } else {
+        delj=0.5;
+        exact=1;
+        fg_j=(float) j;
+        image[j*nx+i]=dqromo2(fgintx,(float)i-0.5, (float)i+0.5, dmidpnt2);
+      }
+      if(fabs(oldim-image[j*nx+i])<1.e-5) cont=0;
     }
-  qsort(impos,nx*ny,sizeof(int),fgcomp);
-  cont=1;
-  for(k=0;(k<36 && cont) || k<16;k++) {
-    i=impos[k]%nx;
-    j=impos[k]/nx;
-    oldim=image[j*nx+i];
-    if(i==floor(xcen+0.5) && j==floor(ycen+0.5)) {
-      exact=1;
-      delj=0.25;
-      fg_j=(float) j - 0.25;
-      image[j*nx+i]=dqromo2(fgintx,(float)i-0.5, (float) i, dmidpnt2);
-      image[j*nx+i]+=dqromo2(fgintx,(float) i, (float)i+0.5, dmidpnt2);
-      fg_j=(float) j + 0.25;
-      image[j*nx+i]+=dqromo2(fgintx,(float)i-0.5, (float)i, dmidpnt2);
-      image[j*nx+i]+=dqromo2(fgintx,(float)i, (float)i+0.5, dmidpnt2);
-    } else {
-      delj=0.5;
-      exact=1;
-      fg_j=(float) j;
-      image[j*nx+i]=dqromo2(fgintx,(float)i-0.5, (float)i+0.5, dmidpnt2);
-    }
-    if(fabs(oldim-image[j*nx+i])<1.e-5) cont=0;
   }
   
   FREEVEC(imrad2);
