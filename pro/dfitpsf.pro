@@ -88,8 +88,16 @@ for i=0L, n_elements(extract)-1L do begin
     diff[i]=total((atlas[*,*,i]/scale-model)^2*extract.atlas_ivar)
 endfor
 isort=sort(diff)
-istar=isort[where(diff[isort] lt stardiff and $
-                  lindgen(n_elements(isort)) lt maxnstar)]
+
+istarsort=where(diff[isort] lt stardiff and $
+                lindgen(n_elements(isort)) lt maxnstar, $
+                nstarsort)
+if(nstarsort eq 0) then begin
+    istar=isort[0]
+endif else begin
+    istar=isort[where(diff[isort] lt stardiff and $
+                      lindgen(n_elements(isort)) lt maxnstar)]
+endelse
 extract=extract[istar]
 
 ; find basic PSF
