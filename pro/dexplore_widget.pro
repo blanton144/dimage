@@ -1,5 +1,4 @@
-
-pro dexplore_event, ev  
+pro dexplore_clean
 
 common com_dexplore_widget, $
   w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
@@ -10,20 +9,30 @@ common com_dexplore_widget, $
   acat, ig, is, igstr, isstr, ng, ns, $
   fix_stretch, hand, gsmooth, glim, sersic, atset, $
   subdir
+
+w_slist=0
+w_glist=0
+w_band=0
+w_sersic=0
+w_gsmooth=0
+w_glim=0
+w_redeblend=0
+w_parent=0
+w_full=0
+
+end
+;
+pro dexplore_event, ev  
+
+common com_dexplore_widget
 common atv2_point, markcoord
 
 ;; if we are done, close us out
 if(ev.ID eq w_done) then begin
-    if ev.SELECT then WIDGET_CONTROL, ev.TOP, /DESTROY  
-    w_slist=0
-    w_glist=0
-    w_band=0
-    w_sersic=0
-    w_gsmooth=0
-    w_glim=0
-    w_redeblend=0
-    w_parent=0
-    w_full=0
+    if ev.SELECT then begin
+        WIDGET_CONTROL, ev.TOP, /DESTROY  
+        dexplore_clean
+    endif
 endif
 
 if(ev.ID eq w_parent) then begin
@@ -354,11 +363,14 @@ pro dexplore_widget, in_basename, in_imagenames
 
 common com_dexplore_widget
 
+;; clean up before starting
+dexplore_clean
+
 basename=in_basename
 imagenames=in_imagenames
 child=0L
 band=0L
-parent=0L
+parent=-1L
 subdir='atlases'
 
 ;; set up base widget

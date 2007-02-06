@@ -27,7 +27,7 @@ endif
 common com_sdss_dimage, seed
 
 if(NOT keyword_set(sz)) then sz=0.1
-if(NOT keyword_set(rerun)) then rerun=137
+if(NOT keyword_set(rerun)) then rerun=['137', '161']
 
 ihr=long(ra/15.)
 idec=long(abs(dec)/2.)*2.
@@ -56,7 +56,7 @@ if(keyword_set(noclobber)) then begin
 endif
 if(keyword_set(doit)) then $
   smosaic_make, ra, dec, sz, sz, /global, seed=seed, $
-  /fpbin, rerun=137, prefix=prefix[0], /all, /ivarout, $
+  /fpbin, rerun=rerun, prefix=prefix[0], /all, /ivarout, $
 	noclobber=noclobber, /dropweights
 ;;hdr=headfits(outdir+'/'+prefix[0]+'-z.fits.gz')
 ;;extast, hdr, bigast
