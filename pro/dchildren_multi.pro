@@ -128,11 +128,33 @@ if(keyword_set(newsg)) then begin
             ;; try and guess which peaks are PSFlike
             ispsf=dpsfcheck(images[*,*,k], ivars[*,*,k], tmp_xc, tmp_yc, $
                             vpsf=psfs[k])
-            
+
             istars=where(ispsf gt 0, nstars)
             if(nstars gt 0) then begin
                 tmp_xstars=tmp_xc[istars]
                 tmp_ystars=tmp_yc[istars]
+                
+                ;; refine center and subtract off best fit psf for each star
+                ;; IN THIS BAND!!
+                msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
+                fimage=images[*,*,k]-msimage
+                fivar=ivars[*,*,k]
+                model=fltarr(nx,ny)
+                drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr
+                for i=0L, n_elements(tmp_xstars)-1L do begin 
+                    psf=dvpsf(tmp_xstars[i], tmp_ystars[i], psf=psfs[k])
+                    tmp_model=fltarr(nx,ny)
+                    embed_stamp, tmp_model, psf, $
+                      tmp_xstars[i]-float(pnx/2L), $
+                      tmp_ystars[i]-float(pny/2L)
+                    ifit=where(tmp_model ne 0.)
+                    scale= total(fimage[ifit]* $
+                                 tmp_model[ifit]*fivar[ifit])/ $
+                      total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
+                    model=model+tmp_model*scale
+                endfor
+                nimages[*,*,k]=images[*,*,k]-model
+
                 if(n_elements(xstars) eq 0) then begin
                     xstars=tmp_xstars
                     ystars=tmp_ystars
@@ -140,7 +162,9 @@ if(keyword_set(newsg)) then begin
                     xstars=[xstars, tmp_xstars]
                     ystars=[ystars, tmp_ystars]
                 endelse
-            endif
+            endif else begin
+                nimages[*,*,k]=images[*,*,k]
+            endelse
         endif
     endfor
     nstars=n_elements(xstars)
@@ -161,29 +185,6 @@ if(keyword_set(newsg)) then begin
         stimages=fltarr(nx,ny,nstars)
     endif
     for k=0L, nim-1L do begin
-        
-        msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
-        fimage=images[*,*,k]-msimage
-        fivar=ivars[*,*,k]
-        
-        ;; refine center and subtract off best fit psf for each star
-        model=fltarr(nx,ny)
-        if(nstars gt 0) then begin
-            drefine, fimage, xstars, ystars, xr=xr, yr=yr
-            for i=0L, nstars-1L do begin 
-                psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
-                tmp_model=fltarr(nx,ny)
-                embed_stamp, tmp_model, psf, $
-                  xstars[i]-float(pnx/2L), $
-                  ystars[i]-float(pny/2L)
-                ifit=where(tmp_model ne 0.)
-                scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
-                  total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
-                stimages[*,*,i]=tmp_model*scale
-                model=model+stimages[*,*,i]
-            endfor
-        endif
-        nimages[*,*,k]=images[*,*,k]-model
         
         subpix=long(gsmooth/3.) > 1L
         nxsub=nx/subpix
@@ -221,11 +222,11 @@ if(keyword_set(newsg)) then begin
         xx[0, *]= xgals
         xx[1, *]= ygals
         ing= groupnd(xx, gsmooth, firstg=firstg, nd=2)
-        xgals=xgals[firstg]
-        ygals=ygals[firstg]
-        ngals=n_elements(xgals)
+        ngals=max(ing)+1L
+        xgals=xgals[firstg[0:ngals-1]]
+        ygals=ygals[firstg[0:ngals-1]]
     endif
-    
+
 ;; then take out stars that are near galaxies
 ;; but give the center as the center of the star
     if(keyword_set(nstars) gt 0 AND $
