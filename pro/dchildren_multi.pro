@@ -38,7 +38,7 @@ pro dchildren_multi, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                      glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                      ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                      nstars=nstars, ngals=ngals, sersic=in_sersic, $
-                     aset=aset, sgset=sgset
+                     aset=in_aset, sgset=in_sgset
                      
 
 common atv_point, markcoord
@@ -55,7 +55,7 @@ if(keyword_set(hand)) then subdir='hand'
 
 spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
 asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-aset.fits'
-if(keyword_set(aset) eq 0 OR file_test(asetfile) eq 0) then begin
+if(keyword_set(in_aset) eq 0 OR file_test(asetfile) eq 0) then begin
     aset={base:base, $
           ref:ref, $
           iparent:iparent, $
@@ -71,7 +71,7 @@ endelse
 
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-sgset.fits'
 newsg=1
-if(keyword_set(sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
+if(keyword_set(in_sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
     sgset={base:base, $
            ref:ref, $
            iparent:iparent, $
@@ -215,6 +215,7 @@ if(keyword_set(newsg)) then begin
         endif
     endfor 
     ngals=n_elements(xgals)
+
 
 ;; reduce to unique peaks
     if(ngals gt 0) then begin
