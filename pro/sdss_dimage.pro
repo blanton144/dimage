@@ -57,7 +57,7 @@ endif
 if(keyword_set(doit)) then $
   smosaic_make, ra, dec, sz, sz, /global, seed=seed, $
   /fpbin, rerun=rerun, prefix=prefix[0], /all, /ivarout, $
-	noclobber=noclobber, /dropweights
+	noclobber=noclobber, /dropweights, /sheldon
 ;;hdr=headfits(outdir+'/'+prefix[0]+'-z.fits.gz')
 ;;extast, hdr, bigast
 ;;bigast= create_struct(bigast, 'NAXIS', [long(sxpar(hdr, 'NAXIS1')), long(sxpar(hdr, 'NAXIS2'))])

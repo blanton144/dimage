@@ -8,7 +8,7 @@ common com_dexplore_widget, $
   setval, band, child, parent, $
   acat, ig, is, igstr, isstr, ng, ns, $
   fix_stretch, hand, gsmooth, glim, sersic, atset, $
-  subdir
+  subdir, setstr
 
 w_slist=0
 w_glist=0
@@ -136,10 +136,21 @@ pro dexplore_setval, hand=in_hand
 COMPILE_OPT hidden
 common com_dexplore_widget
 
+if(keyword_set(hand) ne keyword_set(setval[1])) then begin
+    if(setval[1]) then begin
+        subdir='hand'
+    endif else begin
+        subdir='atlases'
+    endelse
+    dexplore_parent_display
+    dexplore_child_list
+    dexplore_mark_children
+endif
+
 fix_stretch=setval[0]
 hand=setval[1]
 
-if(keyword_set(in_hand)) then begin
+if(keyword_set(in_hand) gt 0) then begin
     hand=in_hand
     setval[1]=in_hand
     subdir='hand'
@@ -157,7 +168,7 @@ WIDGET_CONTROL, ev.ID, GET_VALUE=val, GET_UVALUE=uval
 
 for i=0L, n_elements(setstr)-1L do begin
     if(setstr[i] eq ev.value) then begin
-        setval[i]=val
+        setval[i]=val[i]
     endif
 endfor
 dexplore_setval
@@ -326,8 +337,63 @@ if(file_test(imfile)) then begin
     dexplore_mark_children
 endif
 
-END
+dexplore_child_eyeball
 
+END
+;;
+pro dexplore_child_eyeball
+COMPILE_OPT hidden
+
+common com_dexplore_widget
+
+if(keyword_set(w_eyeball)) then $
+  WIDGET_CONTROL, w_eyeball, /destroy
+w_eyeball=0
+
+;; read in eyeball
+eyeballs=mrdfits(subdir+'/deblend_eyeball.fits',1)
+if(n_tags(eyeballs) eq 0) then begin
+    ;; eyeballs=
+endif
+
+w_eyeball = WIDGET_BASE(/COLUMN, /BASE_ALIGN_TOP, /SCROLL)
+
+w_table = WIDGET_BASE(w_eyeball, TITLE='Quality', /COLUMN)
+w_label = WIDGET_LABEL(w_table, VALUE='Flag values')
+group1=['QUESTIONABLE', 'BLAH']
+ngroup1=n_elements(group1)
+init_group1=bytarr(ngroup1)
+if(keyword_set(eyeball)) then begin
+    for i=0L, ngroup1-1L do begin
+        if((eyeball AND $
+            dimage_flagval('DEBLEND_EYEBALL',group1[i])) gt 0) then $
+           init_group1[i]=1
+    endfor
+endif else begin
+    eyeball=0L
+endelse
+w_eyeball_list = CW_BGROUP(w_table, group1, /COLUMN, /NONEXCLUSIVE, $
+                           /RETURN_NAME, UVALUE=0, $
+                           EVENT_FUNC='dexplore_eyeball_save', $
+                           SET_VALUE=init_group1)
+
+WIDGET_CONTROL, w_eyeball, /REALIZE
+
+end
+;
+FUNCTION dexplore_eyeball_save, ev
+COMPILE_OPT hidden
+
+WIDGET_CONTROL, ev.ID, GET_VALUE=val, GET_UVALUE=uval
+
+eyeball=0L
+for i=0L, n_elements(val)-1L do begin
+    if(val[i]) then $
+      eyeball= eyeball OR 2L^(i)
+endfor
+
+END
+;;
 pro dexplore_read_parent
 COMPILE_OPT hidden
 
