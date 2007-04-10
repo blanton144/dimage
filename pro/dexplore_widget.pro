@@ -374,6 +374,7 @@ group1=['QUESTIONABLE', $
         'MULTIPLE', $
         'INCORRECTLY_STAR', $
         'INCORRECT_PIXELS', $
+        'FATALLY_BAD_PIXELS', $
         'BAD_SPLIT_GALAXY', $
         'BAD_UNSPLIT_GALAXY']
 ngroup1=n_elements(group1)
