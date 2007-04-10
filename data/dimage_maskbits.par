@@ -1,0 +1,20 @@
+
+typedef struct {
+  char flag[20];  # Flag name
+  int bit;        # Bit number, 0-indexed (0 to 31)
+  char label[20]; # Bit label
+} maskbits;
+
+#------------------------------------------------------------------------------
+
+maskbits DEBLEND_EYEBALL_MERGER 0 QUESTIONABLE 
+maskbits DEBLEND_EYEBALL_MERGER 1 MERGING
+maskbits DEBLEND_EYEBALL_MERGER 2 EXCLUDE
+maskbits DEBLEND_EYEBALL_MERGER 3 RING
+maskbits DEBLEND_EYEBALL_MERGER 4 TIDAL_TAILS
+maskbits DEBLEND_EYEBALL_MERGER 5 DRY
+maskbits DEBLEND_EYEBALL_MERGER 6 MULTIPLE
+maskbits DEBLEND_EYEBALL_MERGER 7 INCORRECTLY_STAR
+maskbits DEBLEND_EYEBALL_MERGER 8 INCORRECT_PIXELS
+maskbits DEBLEND_EYEBALL_MERGER 9 BAD_SPLIT_GALAXY
+maskbits DEBLEND_EYEBALL_MERGER 10 BAD_UNSPLIT_GALAXY
