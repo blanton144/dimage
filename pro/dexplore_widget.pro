@@ -8,7 +8,7 @@ common com_dexplore_widget, $
   setval, band, child, parent, $
   acat, ig, is, igstr, isstr, ng, ns, $
   fix_stretch, hand, gsmooth, glim, sersic, atset, $
-  subdir, setstr
+  subdir, setstr, w_eyeball_merger, eyeball_merger
 
 w_slist=0
 w_glist=0
@@ -19,6 +19,7 @@ w_glim=0
 w_redeblend=0
 w_parent=0
 w_full=0
+w_eyeball_merger=0
 
 end
 ;
@@ -238,7 +239,10 @@ if(keyword_set(starset)) then $
   WIDGET_CONTROL, starset, /destroy
 if(keyword_set(galset)) then $
   WIDGET_CONTROL, galset, /destroy
+if(keyword_set(w_eyeball_merger)) then $
+  WIDGET_CONTROL, w_eyeball_merger, /destroy
 w_redeblend=0
+w_eyeball_merger=0
 w_gsmooth=0
 w_sersic=0
 w_glim=0
@@ -346,51 +350,69 @@ COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-if(keyword_set(w_eyeball)) then $
-  WIDGET_CONTROL, w_eyeball, /destroy
-w_eyeball=0
+if(keyword_set(w_eyeball_merger)) then $
+  WIDGET_CONTROL, w_eyeball_merger, /destroy
+w_eyeball_merger=0
 
 ;; read in eyeball
-eyeballs=mrdfits(subdir+'/deblend_eyeball.fits',1)
-if(n_tags(eyeballs) eq 0) then begin
-    ;; eyeballs=
+eyeball_merger=mrdfits(subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
+                 strtrim(string(parent),2)+'-eyeball-merger.fits',1)
+if(n_tags(eyeball_merger) eq 0) then begin
+    eyeball_merger=replicate({EYEBALL_MERGER:0L}, n_elements(acat))
 endif
 
-w_eyeball = WIDGET_BASE(/COLUMN, /BASE_ALIGN_TOP, /SCROLL)
+w_eyeball_merger = WIDGET_BASE(/COLUMN, /BASE_ALIGN_TOP, /SCROLL, $
+                              scr_xsize=200, scr_ysize=500)
 
-w_table = WIDGET_BASE(w_eyeball, TITLE='Quality', /COLUMN)
-w_label = WIDGET_LABEL(w_table, VALUE='Flag values')
-group1=['QUESTIONABLE', 'BLAH']
+w_label = WIDGET_LABEL(w_eyeball_merger, VALUE='Flag values')
+group1=['QUESTIONABLE', $
+        'MERGING', $
+        'EXCLUDE', $
+        'RING', $
+        'TIDAL_TAILS', $
+        'DRY', $
+        'MULTIPLE', $
+        'INCORRECTLY_STAR', $
+        'INCORRECT_PIXELS', $
+        'BAD_SPLIT_GALAXY', $
+        'BAD_UNSPLIT_GALAXY']
 ngroup1=n_elements(group1)
 init_group1=bytarr(ngroup1)
-if(keyword_set(eyeball)) then begin
+if(keyword_set(eyeball_merger)) then begin
     for i=0L, ngroup1-1L do begin
-        if((eyeball AND $
-            dimage_flagval('DEBLEND_EYEBALL',group1[i])) gt 0) then $
-           init_group1[i]=1
+        if((eyeball_merger[child].eyeball_merger AND $
+            dimage_flagval('DEBLEND_EYEBALL_MERGER',group1[i])) gt 0) then $
+          init_group1[i]=1
     endfor
 endif else begin
-    eyeball=0L
+    eyeball_merger=0L
 endelse
-w_eyeball_list = CW_BGROUP(w_table, group1, /COLUMN, /NONEXCLUSIVE, $
+w_eyeball_list = CW_BGROUP(w_eyeball_merger, group1, /COLUMN, /NONEXCLUSIVE, $
                            /RETURN_NAME, UVALUE=0, $
                            EVENT_FUNC='dexplore_eyeball_save', $
                            SET_VALUE=init_group1)
 
-WIDGET_CONTROL, w_eyeball, /REALIZE
+WIDGET_CONTROL, w_eyeball_merger, /REALIZE
 
 end
 ;
 FUNCTION dexplore_eyeball_save, ev
 COMPILE_OPT hidden
 
+common com_dexplore_widget
+
 WIDGET_CONTROL, ev.ID, GET_VALUE=val, GET_UVALUE=uval
 
-eyeball=0L
+eyeball_merger[child].eyeball_merger=0L
 for i=0L, n_elements(val)-1L do begin
     if(val[i]) then $
-      eyeball= eyeball OR 2L^(i)
+      eyeball_merger[child].eyeball_merger= $
+      eyeball_merger[child].eyeball_merger OR 2L^(i)
 endfor
+
+outfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
+  strtrim(string(parent),2)+'-eyeball-merger.fits'
+mwrfits, eyeball_merger, outfile, /create
 
 END
 ;;

@@ -5,9 +5,8 @@ cldir=getenv('DATA')+'/masked_clusters/'
 all=mrdfits(cldir+'/maxbcg_icl_sample.fits',1)
 
 ii=where(lindgen(n_elements(all)) ge 0 and $
-         lindgen(n_elements(all)) le 2100 AND $
-         all.z gt 0.25 and all.z lt 0.31, nii)
-
+         lindgen(n_elements(all)) le 8000 AND $
+         all.z gt 0.10 and all.z lt 0.15, nii)
 
 gfull=dblarr(500,500)
 rfull=dblarr(500,500)
@@ -48,7 +47,7 @@ rfinal=rfull/(weight+float(rfull eq 0.))
 gfinal=gfull/(weight+float(gfull eq 0.))
 ifinal=ifull/(weight+float(ifull eq 0.))
 
-nw_rgb_make, ifinal, rfinal, gfinal, name='final.jpg', $
+nw_rgb_make, ifinal, rfinal, gfinal, name='final_low.jpg', $
   scales=[400., 400., 400.]
 
 save, filename='try.sav'
