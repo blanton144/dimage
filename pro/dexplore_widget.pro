@@ -367,7 +367,6 @@ w_eyeball_merger = WIDGET_BASE(/COLUMN, /BASE_ALIGN_TOP, /SCROLL, $
 w_label = WIDGET_LABEL(w_eyeball_merger, VALUE='Flag values')
 group1=['QUESTIONABLE', $
         'MERGING', $
-        'EXCLUDE', $
         'RING', $
         'TIDAL_TAILS', $
         'DRY', $
