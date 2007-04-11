@@ -15,7 +15,7 @@ SHELL = /bin/sh
 #
 CFLAGS  = $(SDSS_CFLAGS) -DCHECK_LEAKS -I../include
 
-SUBDIRS = pro src lib ups
+SUBDIRS = pro src lib ups data
 
 all :
 	@ for f in $(SUBDIRS); do \
