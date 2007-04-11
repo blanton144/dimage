@@ -79,9 +79,9 @@ $(LIB)/libdimage.$(SO_EXT): $(OBJECTS) dimage.h
 # Install things in their proper places in $(DIMAGE_DIR)
 #
 install : 
-	-@ cp *.c $(DIMAGE_DIR)/image
-	-@ cp *.h $(DIMAGE_DIR)/image
-	-@ cp Makefile $(DIMAGE_DIR)/image
+	-@ cp *.c $(DIMAGE_DIR)/pro
+	-@ cp *.h $(DIMAGE_DIR)/pro
+	-@ cp Makefile $(DIMAGE_DIR)/pro
 
 clean :
 	- /bin/rm -f *~ core *.o so_locations
