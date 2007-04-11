@@ -45,10 +45,10 @@ float sersic_diff(float r0)
 }
 
 int dsersic_params(float flux,
-                  float n, 
-                  float r50,
-                  float *amp, 
-                  float *r0)
+									 float n, 
+									 float r50,
+									 float *amp, 
+									 float *r0)
 {
   float flux1;
 

@@ -64,6 +64,7 @@ OBJECTS = \
 	dmidpnt.o \
 	dmidpnt2.o \
 	dsersic_params.o \
+	idl_dsersic_params.o \
 	dpolint.o \
 	dpolint2.o \
 	nmf.o \
