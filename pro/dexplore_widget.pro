@@ -376,7 +376,9 @@ group1=['QUESTIONABLE', $
         'FATALLY_BAD_PIXELS', $
         'BAD_SPLIT_GALAXY', $
         'BAD_UNSPLIT_GALAXY', $
-        'PRIMARY']
+        'PRIMARY', $
+        'REPEAT']
+
 ngroup1=n_elements(group1)
 init_group1=bytarr(ngroup1)
 if(keyword_set(eyeball_merger)) then begin
