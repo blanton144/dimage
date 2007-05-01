@@ -21,7 +21,7 @@ fields=(all.photoid mod ulong64(10)^11L)/ulong64(10L)^6L
 ;; i==59 hits run 4512 (looking for unprocessed frames)
 ;; i==180 hits run 308 (no u-band skyframes!)
 ;; i==185(?) hits run 4512 (looking for unprocessed frames)
-for i=185L, n_elements(all)-1L do begin
+for i=8000L, n_elements(all)-1L do begin
     splog, string(i)
     obj=sdss_findobj(all[i].ra, all[i].dec, run=runs[i], $
                      rerun=[137], childobj=include)

@@ -4,13 +4,15 @@
 ; PURPOSE:
 ;   get parameters associated with sersic settings
 ; CALLING SEQUENCE:
-;   dfakegal, flux, n, r50, amp=amp, r0=r0
+;   im= dfakegal([ sersicn=, r50=, flux=, phi0=, ba=, /simple, $
+;                  nx=, ny=, xcen=, ycen=, sersic= ])
 ; INPUTS:
-;   flux - flux
-;   n - Sersic index
-;   r50 - half-light radius
-; OPTIONAL INPUTS:
-; KEYWORDS:
+;   flux - flux (default 1.)
+;   sersicn - Sersic index (default 1.)
+;   r50 - half-light radius (default 1.)
+;   phi0 - position angle (deg counterclockwise from up, default 0.)
+;   ba - axis ratio (b/a, default 1.)
+;   nx, ny - size of output image (defuat 
 ; OUTPUTS:
 ;   amp - amplitude 
 ;   r0 - radius
