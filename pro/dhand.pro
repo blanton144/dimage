@@ -48,7 +48,7 @@ while(notdone) do begin
       mark=transpose(reform([xstars, ystars], n_elements(xstars),2))
     splog, 'Hand mark stars in the image!'
     splog, '(d: shows marks, m: makes mark, k: kills mark)'
-    atv,image, /block, mark= mark
+    atv2,image, mark= mark, /block
     
     ;; refine stellar peaks 
     nstars=n_elements(mark)/2L
@@ -69,7 +69,7 @@ while(notdone) do begin
       mark=transpose(reform([xgals, ygals], n_elements(xgals),2))
     splog, 'Hand mark galaxies in the image!'
     splog, '(d: shows marks, m: makes mark, k: kills mark)'
-    atv,image, /block, mark= mark
+    atv2,image, mark= mark, /block
     
     ;; refine galaxy peaks 
     ngals=n_elements(mark)/2L

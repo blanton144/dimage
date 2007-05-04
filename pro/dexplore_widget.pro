@@ -2,7 +2,7 @@ pro dexplore_clean
 
 common com_dexplore_widget, $
   w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
-  w_settings, w_gsmooth, w_glim, w_sersic, w_redeblend, $
+  w_settings, w_gsmooth, w_glim, w_sersic, w_redeblend, w_mark, $
   basename, imagenames, $
   parent_images, parent_hdr, $
   setval, band, child, parent, $
@@ -17,6 +17,7 @@ w_sersic=0
 w_gsmooth=0
 w_glim=0
 w_redeblend=0
+w_mark=0
 w_parent=0
 w_full=0
 w_eyeball_merger=0
@@ -114,7 +115,11 @@ if(keyword_set(starset)) then begin
     endif
 endif
 
-if(ev.ID eq w_redeblend) then begin
+if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
+    if(ev.ID eq w_mark) then begin
+        print, 'ablh'
+    endif
+
     dexplore_setval, /hand
     spawn, 'mkdir -p '+subdir+'/'+strtrim(string(parent),2)
     atsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+ $
@@ -221,6 +226,8 @@ common com_dexplore_widget
 ;; destroy previous
 if(keyword_set(w_redeblend)) then $
   WIDGET_CONTROL, w_redeblend, /destroy
+if(keyword_set(w_mark)) then $
+  WIDGET_CONTROL, w_mark, /destroy
 if(keyword_set(w_gsmooth)) then $
   WIDGET_CONTROL, w_gsmooth, /destroy
 if(keyword_set(w_sersic)) then $
@@ -242,6 +249,7 @@ if(keyword_set(galset)) then $
 if(keyword_set(w_eyeball_merger)) then $
   WIDGET_CONTROL, w_eyeball_merger, /destroy
 w_redeblend=0
+w_mark=0
 w_eyeball_merger=0
 w_gsmooth=0
 w_sersic=0
@@ -302,6 +310,7 @@ if(file_test(asetfile)) then begin
                          event_func='dexplore_sersic', $
                          set_value=sersic)
     w_redeblend = WIDGET_BUTTON(w_base, value='redeblend')  
+    w_mark = WIDGET_BUTTON(w_base, value='mark')  
 endif
 
 END

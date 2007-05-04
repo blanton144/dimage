@@ -199,9 +199,14 @@ sxaddpar, hdr, 'NX', nx, 'dimension of source image (as used)'
 sxaddpar, hdr, 'NY', ny, 'dimension of source image (as used)'
 sxaddpar, hdr, 'SOFTBIAS', softbias, 'dimension of source image'
 mwrfits, bpsf, base+'-vpsf.fits', hdr, /create
-mwrfits, reform(eatlas, natlas, natlas, nc)/gpsf, base+'-vpsf.fits'
+outatlas=reform(eatlas, natlas, natlas, nc)
+for i=0L, nc-1L do $
+  outatlas[*,*,i]=outatlas[*,*,i]/gpsf
+mwrfits, outatlas, base+'-vpsf.fits'
 mwrfits, coeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'
+
+stop
 
 end
 ;------------------------------------------------------------------------------
