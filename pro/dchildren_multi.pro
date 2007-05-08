@@ -108,7 +108,7 @@ endfor
 bpsf=dvpsf(nx/2L, ny/2L, psf=psfs[ref])
 pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
-fit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
+dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet ; jm07may01nyu
 
 if(keyword_set(newsg)) then begin
 

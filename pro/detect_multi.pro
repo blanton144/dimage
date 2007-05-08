@@ -28,7 +28,7 @@
 ;------------------------------------------------------------------------------
 pro detect_multi, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
                   noclobber=noclobber, glim=glim, all=all, single=single, $
-                  aset=aset, sgset=sgset
+                  aset=aset, sgset=sgset, gsmooth=gsmooth
 
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(glim)) then glim=20.
@@ -62,6 +62,7 @@ for k=0L, nim-1L do $
   dfitpsf, imfiles[k], noclobber=noclobber
 
 for k=0L, nim-1L do begin
+
     bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
     if(n_tags(psfs) eq 0) then $
       psfs=dpsfread(bimfile+'-vpsf.fits') $

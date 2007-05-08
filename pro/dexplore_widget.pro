@@ -332,7 +332,6 @@ if(n_tags(acat)) then begin
           charsize=1.7
     endif
 endif
-
 end
 
 function dexplore_child_display, ev

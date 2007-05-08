@@ -54,7 +54,7 @@ for k=0L, nim-1L do begin
         images[*,*,k]= images[*,*,k]-msimage
     endif
     sigma[k]=dsigma(images[*,*,k], sp=10)
-    ivar=mrdfits(imfiles[k],2)
+    ivar=mrdfits(imfiles[k],1) ; jm07may01nyu
     if(NOT keyword_set(ivar)) then $
       ivars[*,*,k]=fltarr(nx, ny)+1./sigma[k]^2 $
     else $

@@ -7,6 +7,13 @@
 ;   dfitpsf, imfile
 ; INPUTS:
 ;   imfile - input FITS file
+; OPTIONAL INPUTS:
+;   natlas   - size of the PSF postage stamp (default 41)
+;   maxnstar - maximum number of stars to use when constructing the
+;              PSF (default 200)
+;   
+; KEYWORD PARAMETERS:
+;   noclobber - if the PSF files already exist, do nothing and return 
 ; COMMENTS:
 ;   Currently always uses Nc=1 (no varying PSFs allowed)
 ;   Seems to work OK but many arbitrary parameters.
@@ -16,7 +23,7 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dfitpsf, imfile, natlas=natlas, noclobber=noclobber
+pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber
 
 if(NOT keyword_set(natlas)) then natlas=41L
 
@@ -27,7 +34,13 @@ if(keyword_set(noclobber)) then begin
        file_test(base+'-vpsf.fits') gt 0) then return
 endif
 
-image=mrdfits(imfile)
+splog, 'Reading image '+imfile
+image=mrdfits(imfile,/silent)
+fits_info, imfile, n_ext=next, /silent
+if (next ge 1L) then begin
+   splog, 'Reading inverse variance map'
+   invvar = mrdfits(imfile,1,/silent)
+endif
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 
@@ -35,10 +48,10 @@ ny=(size(image,/dim))[1]
 plim=10.
 box=natlas
 small=(natlas-1L)/2L
-nc=1L
-np=1L
+;nc=1L
+;np=1L
 stardiff=100.
-maxnstar=200
+if (n_elements(maxnstar) eq 0L) then maxnstar=200L
 
 ; Set source object name
 soname=filepath('libdimage.'+idlutils_so_ext(), $
@@ -56,49 +69,73 @@ if(sigma eq 0) then begin
     xnd=max(ii mod nx)
     ynd=max(ii / nx)
     image=image[xst:xnd, yst:ynd]
+    if (n_elements(invvar) ne 0L) then invvar = invvar[xst:xnd,yst:ynd]
     sigma=dsigma(image)
     nx=(size(image,/dim))[0]
     ny=(size(image,/dim))[1]
 endif
-invvar=fltarr(nx,ny)+1./sigma^2
+if (n_elements(invvar) eq 0L) then invvar=fltarr(nx,ny)+1./sigma^2
 
 ;; median smooth the image and find and extract objects
 msimage=dmedsmooth(image, invvar, box=box)
 simage=image-msimage
 dobjects, simage, objects=obj, plim=plim
 dextract, simage, invvar, object=obj, extract=extract, small=small
-  
 if(n_tags(extract) eq 0) then begin
     splog, 'no small enough objects in image'
     return
 endif
 
+extract1 = extract
+splog, 'Identified ', n_elements(extract), ' objects.'
+
+rejsigma = [3.0,2.5,1.0]
+for iter = 0L, n_elements(rejsigma)-1L do begin
+
 ; do initial fit
-atlas=extract.atlas
-bpsf= reform(total(reform(atlas, natlas*natlas, n_elements(extract)), 2), $
-             natlas,natlas)
-bpsf=bpsf/total(bpsf)
+
+   bpsf= reform(total(reform(extract.atlas,natlas*natlas,n_elements(extract)),2),natlas,natlas)
+   bpsf=bpsf/total(bpsf)
 
 ; clip non-stars
-diff=fltarr(n_elements(extract))
-model=reform(bpsf, natlas*natlas)
-for i=0L, n_elements(extract)-1L do begin 
-    scale=total(model*reform(atlas[*,*,i],natlas*natlas))/ $
-      total(model*model)
-    diff[i]=total((atlas[*,*,i]/scale-model)^2*extract.atlas_ivar)
-endfor
-isort=sort(diff)
 
-istarsort=where(diff[isort] lt stardiff and $
-                lindgen(n_elements(isort)) lt maxnstar, $
-                nstarsort)
-if(nstarsort eq 0) then begin
-    istar=isort[0]
-endif else begin
-    istar=isort[where(diff[isort] lt stardiff and $
-                      lindgen(n_elements(isort)) lt maxnstar)]
-endelse
-extract=extract[istar]
+   diff=fltarr(n_elements(extract))
+   model=reform(bpsf, natlas*natlas)
+   for i=0L, n_elements(extract)-1L do begin 
+      scale=total(model*reform(extract[i].atlas,natlas*natlas))/ $
+        total(model*model)
+      diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) ; jm07may07nyu
+   endfor
+
+; reject REJSIGMA outliers
+   
+   keep = where(diff lt mpchilim(rejsigma[iter],1.0,/sigma),nkeep)
+   splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
+   if (nkeep eq 0L) then begin
+      splog, 'No good stars found.'
+      return
+   endif
+
+   extract = extract[keep]
+   
+endfor
+   
+;plotimage, logscl(image,exp=0.5,min=-1,max=5), /preserve, xrange=[400,700], yrange=[400,700]
+;for jj = 0L, n_elements(extract1)-1L do tvcircle, 10.0, extract1[jj].xcen, extract1[jj].ycen, color=djs_icolor('red'), /data
+;for kk = 0L, n_elements(extract)-1L do tvcircle, 10.0, extract[kk].xcen, extract[kk].ycen, thick=2.0, color=djs_icolor('yellow'), /data
+
+;isort=sort(diff)
+;
+;istarsort=where(diff[isort] lt stardiff and $
+;                lindgen(n_elements(isort)) lt maxnstar, $
+;                nstarsort)
+;if(nstarsort eq 0) then begin
+;    istar=isort[0]
+;endif else begin
+;    istar=isort[where(diff[isort] lt stardiff and $
+;                      lindgen(n_elements(isort)) lt maxnstar)]
+;endelse
+;extract=extract[istar]
 
 ; find basic PSF
 atlas=extract.atlas
@@ -108,12 +145,13 @@ bpsf=bpsf/total(bpsf)
 
 pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
-fit_mult_gauss, bpsf, 1, amp, psfsig, model=model
+dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model ; jm07may01nyu
 mm=max(model)
 gpsf=(model/mm) > 0.001
 
 ; output basic PSF
 mwrfits, reform(bpsf, natlas, natlas), base+'-bpsf.fits', /create
+mwrfits, reform(model, natlas, natlas), base+'-bpsf.fits' ; jm07may01nyu
 
 np=2L
 nc=4L

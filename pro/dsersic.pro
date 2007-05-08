@@ -167,6 +167,8 @@ if(n_tags(sersicfit) eq 0 OR keyword_set(reinit)) then begin
                addcoeff:0., $
                ndof:0L, $
                chisquared:0., $
+               fitparam: fltarr(9), $
+               perror:   fltarr(9), $
                covariance:fltarr(9,9)}
 endif
 
@@ -206,7 +208,7 @@ if(NOT keyword_set(nofit)) then begin
     step=1
     fitparam0= mpfit('dsersic_func',/autoderivative, $
                      maxiter=maxiter,parinfo=parinfo0,status=status, $
-                     covar=covar0,ftol=1.e-10)
+                     covar=covar0,ftol=1.e-10,perror=perror0)
     chisquared[0]=total(dsersic_func(fitparam0)^2)
     parinfo1=parinfo
     parinfo1[4].value=parinfo0[4].value
@@ -215,7 +217,7 @@ if(NOT keyword_set(nofit)) then begin
     parinfo1[7].value=135.
     fitparam1= mpfit('dsersic_func',/autoderivative, $
                      maxiter=maxiter,parinfo=parinfo1, status=status,  $
-                     covar=covar1,ftol=1.e-10)
+                     covar=covar1,ftol=1.e-10,perror=perror1)
     help,status
     chisquared[1]=total(dsersic_func(fitparam1)^2)
 ;;>>>>>>> 1.6
@@ -224,9 +226,11 @@ if(NOT keyword_set(nofit)) then begin
     if(chisquared[0] le chisquared[1]) then begin
         fitparam=fitparam0
         covar=covar0
+        perror=perror0
     endif else begin
         fitparam=fitparam1
         covar=covar1
+        perror=perror1
     endelse
 
     step=1
@@ -245,6 +249,8 @@ if(NOT keyword_set(nofit)) then begin
     sersicfit.addcoeff=      fitparam[8]
     sersicfit.ndof=          n_elements(model)-total(parinfo.fixed EQ 0)
     sersicfit.chisquared=    chisquared
+    sersicfit.fitparam=      fitparam
+    sersicfit.perror=        perror
     sersicfit.covariance=    covar
 
     help,/st,sersicfit

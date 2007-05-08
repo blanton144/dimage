@@ -58,7 +58,7 @@ ny=(size(image,/dim))[1]
 ;; clip PSF if desired
 pnx=(size(psf,/dim))[0]
 pny=(size(psf,/dim))[1]
-fit_mult_gauss, psf, 1, amp, psfsig, model=model
+dfit_mult_gauss, psf, 1, amp, psfsig, model=model ; jm07may01nyu
 if(keyword_set(clippsf)) then begin
     xx=reform(replicate(1., pnx)#findgen(pny), pnx*pny)-float(pnx/2L)
     yy=reform(findgen(pnx)#replicate(1., pny), pnx*pny)-float(pny/2L)
