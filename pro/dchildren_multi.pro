@@ -179,6 +179,8 @@ if(keyword_set(newsg)) then begin
         xstars=xstars[firstg[0:nstars-1]]
         ystars=ystars[firstg[0:nstars-1]]
     endif
+
+    save
     
 ;;  find galaxy peaks in all images
     if(nstars gt 0) then begin

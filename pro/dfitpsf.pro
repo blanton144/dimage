@@ -45,7 +45,7 @@ nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 
 ;; set a bunch of parameters
-plim=10.
+plim=15.
 box=natlas
 small=(natlas-1L)/2L
 ;nc=1L
@@ -147,13 +147,14 @@ pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model ; jm07may01nyu
 mm=max(model)
-gpsf=(model/mm) > 0.001
+gpsf=(model/mm) > 0.0001
+gpsf=fltarr(pnx,pny)+1.
 
 ; output basic PSF
 mwrfits, reform(bpsf, natlas, natlas), base+'-bpsf.fits', /create
 mwrfits, reform(model, natlas, natlas), base+'-bpsf.fits' ; jm07may01nyu
 
-np=2L
+np=3L
 nc=4L
 nchunk=2L
 niter=3L
@@ -170,11 +171,20 @@ for i=0L, np*nchunk-1L do begin
                  extract.ycen gt ny*(j)/(np*nchunk) AND $
                  extract.ycen le ny*(j+1)/(np*nchunk), nii)
         if(nii gt 0) then begin
+            sextract=fltarr(natlas*natlas, nii)
+            for m=0L, nii-1L do begin
+                sextract[*,m]= reform(extract[ii[m]].atlas, natlas*natlas)
+                scale=total(model*sextract[*,m])/ total(model*model)
+                sextract[*,m]=sextract[*,m]/scale
+            endfor
             nb[i+(np*nchunk)*j]=nii	
-            vatlas[*,i+(np*nchunk)*j]= $
-              total(reform(extract[ii].atlas, natlas*natlas, nii), 2)
+            if(nii gt 1) then $
+              vatlas[*,i+(np*nchunk)*j]= total(sextract, 2) $
+            else $
+              vatlas[*,i+(np*nchunk)*j]= sextract
             scale=total(model*vatlas[*,i+(np*nchunk)*j])/ total(model*model)
-            vatlas[*,i+(np*nchunk)*j]= (vatlas[*,i+(np*nchunk)*j]/scale - model)
+            vatlas[*,i+(np*nchunk)*j]= $
+              (vatlas[*,i+(np*nchunk)*j]/scale - model)
             vatlas[*,i+(np*nchunk)*j]= vatlas[*,i+(np*nchunk)*j]*gpsf
             xx[i+(np*nchunk)*j]=mean(extract[ii].xcen)/float(nx)-0.5
             yy[i+(np*nchunk)*j]=mean(extract[ii].ycen)/float(ny)-0.5
@@ -186,7 +196,7 @@ clipped=lonarr(np^2*nchunk^2)
 
 for iter=0L, niter-1L do begin
     iv=where(nb gt 0L and clipped eq 0, nv)
-    if(nv gt np^2L) then begin
+    if(nv gt np*(np-1L)/2L) then begin
 
         em_pca, vatlas[*, iv], nc, eatlas, ecoeffs
         
@@ -220,6 +230,7 @@ for iter=0L, niter-1L do begin
             endfor 
             coeffs[*,c]=tmp_coeffs
         endfor
+
     endif else begin
         eatlas=fltarr(natlas, natlas, nc)
         coeffs=fltarr(np*np, nc)
@@ -244,7 +255,7 @@ mwrfits, outatlas, base+'-vpsf.fits'
 mwrfits, coeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'
 
-stop
+save
 
 end
 ;------------------------------------------------------------------------------
