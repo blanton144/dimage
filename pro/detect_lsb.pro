@@ -31,8 +31,8 @@ pro detect_lsb, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
                   aset=aset, sgset=sgset
 
 if(NOT keyword_set(ref)) then ref=0
-if(NOT keyword_set(glim)) then glim=5.
-if(NOT keyword_set(gsmooth)) then gsmooth=1.
+if(NOT keyword_set(glim)) then glim=10.
+if(NOT keyword_set(gsmooth)) then gsmooth=2.
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd

@@ -89,7 +89,7 @@ endif
 extract1 = extract
 splog, 'Identified ', n_elements(extract), ' objects.'
 
-rejsigma = [3.0,2.5,1.0]
+rejsigma = [4.0,3.,2.0]
 for iter = 0L, n_elements(rejsigma)-1L do begin
 
 ; do initial fit
@@ -114,7 +114,7 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
    if (nkeep eq 0L) then begin
       splog, 'No good stars found.'
       return
-   endif
+  endif
 
    extract = extract[keep]
    

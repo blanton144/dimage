@@ -25,7 +25,7 @@
 function dpsfsub, imbase
 
 
-image=mrdfits(imbase+'.fits',0)
+image=mrdfits(imbase+'.fits.gz',0)
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 vpsf=dpsfread(imbase+'-vpsf.fits')

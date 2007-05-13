@@ -136,24 +136,25 @@ if(keyword_set(newsg)) then begin
                 
                 ;; refine center and subtract off best fit psf for each star
                 ;; IN THIS BAND!!
-                msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
+                msimage=dmedsmooth(images[*,*,k], box=long(psfsig*50L))
                 fimage=images[*,*,k]-msimage
                 fivar=ivars[*,*,k]
                 model=fltarr(nx,ny)
                 drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr
                 for i=0L, n_elements(tmp_xstars)-1L do begin 
-                    psf=dvpsf(tmp_xstars[i], tmp_ystars[i], psf=psfs[k])
+                    psf=dvpsf(xr[i], yr[i], psf=psfs[k])
                     tmp_model=fltarr(nx,ny)
                     embed_stamp, tmp_model, psf, $
-                      tmp_xstars[i]-float(pnx/2L), $
-                      tmp_ystars[i]-float(pny/2L)
-                    ifit=where(tmp_model ne 0.)
+                      xr[i]-float(pnx/2L), $
+                      yr[i]-float(pny/2L)
+                    ifit=where(tmp_model gt max(tmp_model)*1.e-4)
                     scale= total(fimage[ifit]* $
                                  tmp_model[ifit]*fivar[ifit])/ $
                       total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
                     model=model+tmp_model*scale
                 endfor
-                nimages[*,*,k]=images[*,*,k]-model
+                ;; in this pass don't let noise spikes come in 
+                nimages[*,*,k]=(images[*,*,k]-model) < images[*,*,k]
 
                 if(n_elements(xstars) eq 0) then begin
                     xstars=tmp_xstars
@@ -180,8 +181,6 @@ if(keyword_set(newsg)) then begin
         ystars=ystars[firstg[0:nstars-1]]
     endif
 
-    save
-    
 ;;  find galaxy peaks in all images
     if(nstars gt 0) then begin
         stimages=fltarr(nx,ny,nstars)
@@ -307,11 +306,11 @@ if(NOT keyword_set(nodeblend)) then begin
                 fivar=ivars[*,*,k]
                 drefine, fimage, xstars, ystars, xr=xr, yr=yr
                 for i=0L, nstars-1L do begin 
-                    psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
+                    psf=dvpsf(xr[i], yr[i], psf=psfs[k])
                     tmp_model=fltarr(nx,ny)
                     embed_stamp, tmp_model, psf, $
-                      xstars[i]-float(pnx/2L), $
-                      ystars[i]-float(pny/2L)
+                      xr[i]-float(pnx/2L), $
+                      yr[i]-float(pny/2L)
                     ifit=where(tmp_model ne 0.)
                     scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
                       total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
