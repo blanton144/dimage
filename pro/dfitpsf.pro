@@ -255,7 +255,5 @@ mwrfits, outatlas, base+'-vpsf.fits'
 mwrfits, coeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'
 
-save
-
 end
 ;------------------------------------------------------------------------------

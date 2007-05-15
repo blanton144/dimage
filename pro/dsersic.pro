@@ -122,7 +122,7 @@ end
 pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
             sersicfit=sersicfit,model=model, reinit=reinit, $
             fixcenter=fixcenter,fixsky=fixsky, addtemplate=in_addtemplate, $
-            nofit=nofit, simple=in_simple
+            nofit=nofit, simple=in_simple, axisymmetric=axisymmetric
 
 
 if(n_params() lt 1) then begin
@@ -153,6 +153,7 @@ ycen_orig=ycen
 oldfitparam=0
 fixsky=keyword_set(fixsky)
 fixcen=keyword_set(fixcenter)
+axisymmetric=keyword_set(axisymmetric)
 
 ; set initialization arbitrarily
 if(n_tags(sersicfit) eq 0 OR keyword_set(reinit)) then begin
@@ -171,6 +172,7 @@ if(n_tags(sersicfit) eq 0 OR keyword_set(reinit)) then begin
                perror:   fltarr(9), $
                covariance:fltarr(9,9)}
 endif
+if(keyword_set(axisymmetric)) then sersicfit.axisratio=1.
 
 ; set up parinfo for mpfit
 str1 = {value:0D,fixed:1B,limited:[1B,1B],limits:[0D,1D], $
@@ -187,7 +189,7 @@ parinfo.limits[0]=  $
 parinfo.limits[1]=  $
   [     1.,   1000.,     nx,     ny,  6.00,  6., 1.00,  360.00, 1.]
 parinfo.fixed=      $
-  [      1,  fixsky, fixcen, fixcen,     0,    0,    0,       0, 1]
+  [      1,  fixsky, fixcen, fixcen,     0,    0,    axisymmetric, axisymmetric, 1]
 parinfo.value=      [sersicfit.sersicflux, $
                      sersicfit.sky, $
                      sersicfit.xcen, $
@@ -210,17 +212,21 @@ if(NOT keyword_set(nofit)) then begin
                      maxiter=maxiter,parinfo=parinfo0,status=status, $
                      covar=covar0,ftol=1.e-10,perror=perror0)
     chisquared[0]=total(dsersic_func(fitparam0)^2)
-    parinfo1=parinfo
-    parinfo1[4].value=parinfo0[4].value
-    parinfo1[5].value=parinfo0[5].value
-    parinfo1[6].value=parinfo[6].value
-    parinfo1[7].value=135.
-    fitparam1= mpfit('dsersic_func',/autoderivative, $
-                     maxiter=maxiter,parinfo=parinfo1, status=status,  $
-                     covar=covar1,ftol=1.e-10,perror=perror1)
-    help,status
-    chisquared[1]=total(dsersic_func(fitparam1)^2)
-;;>>>>>>> 1.6
+
+    if(NOT keyword_set(axisymmetric)) then begin
+        parinfo1=parinfo
+        parinfo1[4].value=parinfo0[4].value
+        parinfo1[5].value=parinfo0[5].value
+        parinfo1[6].value=parinfo[6].value
+        parinfo1[7].value=135.
+        fitparam1= mpfit('dsersic_func',/autoderivative, $
+                         maxiter=maxiter,parinfo=parinfo1, status=status,  $
+                         covar=covar1,ftol=1.e-10,perror=perror1)
+        help,status
+        chisquared[1]=total(dsersic_func(fitparam1)^2)
+    endif else begin
+        chisquared[1]=chisquared[0]+10.
+    endelse
 
 ; take better version
     if(chisquared[0] le chisquared[1]) then begin

@@ -38,6 +38,8 @@ int dfluxes(float *image,
   int i,j,k,kp;
   float r2, maxval, val, ss;
 
+  printf("nchild=%d\n", nchild);
+
   /* 1. smooth templates*/
   stemplates=(float *) malloc(nx*ny*nchild*sizeof(float));
   for(k=0;k<nchild;k++) 
@@ -91,12 +93,14 @@ int dfluxes(float *image,
         for(k=0;k<nchild;k++) {
           r2=((float) i - xcen[k])*((float) i - xcen[k])+
             ((float) j - ycen[k])*((float) j - ycen[k]);
+          if(r2<1.) r2=1.;
           val=fr[k]/r2;
           if(val>maxval) {
             maxval=val;
             kp=k;
           }
         }
+        if(kp==-1) kp=0;
         children[i+j*nx+kp*nx*ny]=image[i+j*nx];
       }
     }

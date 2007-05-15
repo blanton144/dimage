@@ -30,9 +30,9 @@ ucat0={uid:0L, $
        xnd:0L, $
        ynd:0L, $
        hand:0L}
+ucat0_init=0
 for pid=0L, n_elements(pcat)-1L do begin
     chand=0
-    struct_assign, pcat[pid], ucat0
     afile='atlases/'+strtrim(string(pid),2)+ $
       '/'+base+'-'+strtrim(string(pid),2)+ $
       '-acat.fits'
@@ -48,8 +48,19 @@ for pid=0L, n_elements(pcat)-1L do begin
     if(file_test(afile)) then begin
         acat=mrdfits(afile,1, /silent)
         if(n_tags(acat) gt 0) then begin
+            if(ucat0_init eq 0) then begin
+                tags=tag_names(acat[0])
+                for itag=0L, n_elements(tags)-1L do begin
+                    indx=tag_indx(ucat0, tags[itag])
+                    if(indx eq -1) then $
+                      ucat0=create_struct(ucat0, tags[itag], acat[0].(itag))
+                endfor
+                ucat0_init=1
+            endif
             for aid=0L, n_elements(acat)-1L do begin
                 if(acat[aid].good) then begin
+                    struct_assign, acat[aid], ucat0
+                    struct_assign, pcat[pid], ucat0, /nozero
                     ucat0.uid=uid
                     ucat0.aid=aid
                     ucat0.pid=pid

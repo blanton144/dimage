@@ -2,17 +2,18 @@ pro dexplore_clean
 
 common com_dexplore_widget, $
   w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
-  w_settings, w_gsmooth, w_glim, w_sersic, w_redeblend, w_mark, $
+  w_settings, w_gsmooth, w_glim, w_sersic, w_redeblend, w_mark, w_smooth, $
   basename, imagenames, $
   parent_images, parent_hdr, $
-  setval, band, child, parent, $
+  setval, band, smooth, child, parent, $
   acat, ig, is, igstr, isstr, ng, ns, $
-  fix_stretch, hand, gsmooth, glim, sersic, atset, $
-  subdir, setstr, w_eyeball, eyeball, eyeball_name
+  fix_stretch, hand, show_templates, gsmooth, glim, sersic, atset, $
+  subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup
 
 w_slist=0
 w_glist=0
 w_band=0
+w_smooth=0
 w_sersic=0
 w_gsmooth=0
 w_glim=0
@@ -52,8 +53,24 @@ endif
 if(ev.ID eq w_band) then begin
     if(ev.update) then begin
         band=ev.value
-        dexplore_parent_display
-        dexplore_mark_children
+        if(keyword_set(pup)) then begin
+            dexplore_parent_display
+            dexplore_mark_children
+        endif else if(keyword_set(cup)) then begin
+            dexplore_child_display
+        endif
+    endif
+endif
+
+if(ev.ID eq w_smooth) then begin
+    if(ev.update) then begin
+        smooth=ev.value
+        if(keyword_set(pup)) then begin
+            dexplore_parent_display
+            dexplore_mark_children
+        endif else if(keyword_set(cup)) then begin
+            dexplore_child_display
+        endif
     endif
 endif
 
@@ -153,6 +170,16 @@ if(keyword_set(hand) ne keyword_set(setval[1])) then begin
     dexplore_mark_children
 endif
 
+if(keyword_set(show_templates) ne keyword_set(setval[2])) then begin
+    show_templates=setval[2]
+    if(keyword_set(pup)) then begin
+        dexplore_parent_display
+        dexplore_mark_children
+    endif else if(keyword_set(cup)) then begin
+        dexplore_child_display
+    endif
+endif
+
 fix_stretch=setval[0]
 hand=setval[1]
 
@@ -203,6 +230,7 @@ common com_dexplore_widget
 
 image=mrdfits(ev.value,0,hdr)
 atv, image, /align, head=hdr, stretch=fix_stretch
+fix_stretch=setval[0]
 
 END
 
@@ -212,8 +240,16 @@ COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-if(keyword_set(parent_images)) then $
-  atv2, parent_images[*,*,band], /align, head=hdr, stretch=fix_stretch
+if(keyword_set(parent_images)) then begin
+    pim=parent_images[*,*,band]
+    if(keyword_set(smooth)) then $
+      pim=dsmooth(pim, smooth)
+    atv2, pim, /align, head=hdr, stretch=fix_stretch
+    fix_stretch=setval[0]
+endif
+
+pup=1
+cup=0
 
 end
 
@@ -268,7 +304,7 @@ if(n_tags(acat) gt 0) then begin
     if(ng gt 0) then begin
         igstr=strtrim(string(ig),2)
         w_glist = CW_BGROUP(w_base, igstr, /row, /return_name, frame=1, $
-                            event_func='dexplore_child_display', $
+                            event_func='dexplore_child_display_widget', $
                             label_left='gals')
     endif
 
@@ -276,7 +312,7 @@ if(n_tags(acat) gt 0) then begin
     if(ns gt 0) then begin
         isstr=strtrim(string(is),2)
         w_slist = CW_BGROUP(w_base, isstr, /row, /return_name, frame=1, $
-                          event_func='dexplore_child_display', $
+                          event_func='dexplore_child_display_widget', $
                           label_left='stars')
     endif
 endif
@@ -334,23 +370,40 @@ if(n_tags(acat)) then begin
 endif
 end
 
-function dexplore_child_display, ev
+function dexplore_child_display_widget, ev
 COMPILE_OPT hidden
 
 common com_dexplore_widget
 
 child=long(ev.value)
 
+dexplore_child_display
+
+end
+;
+pro dexplore_child_display
+
+common com_dexplore_widget
+
 imfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
   strtrim(string(parent),2)+'-atlas-'+strtrim(string(child),2)+'.fits'
+if(keyword_set(show_templates)) then $
+  imfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
+  strtrim(string(parent),2)+'-templates-'+strtrim(string(child),2)+'.fits'
 if(file_test(imfile)) then begin
     image=mrdfits(imfile, band, hdr)
+    if(keyword_set(smooth)) then $
+      image=dsmooth(image, smooth)
     atv2, image, /align, head=hdr, stretch=fix_stretch
+    fix_stretch=setval[0]
     dexplore_mark_children
 endif
 
 if(keyword_set(eyeball_name)) then $
   dexplore_child_eyeball
+
+cup=1
+pup=0
 
 END
 ;;
@@ -470,6 +523,7 @@ basename=in_basename
 imagenames=in_imagenames
 child=0L
 band=0L
+smooth=0.
 parent=-1L
 subdir='atlases'
 
@@ -485,13 +539,18 @@ w_full = CW_BGROUP(w_base, allimagenames, /column, /return_name, $
                    frame=2)
 
 ;; settings
-setstr= ['fix stretch', 'hand']
+setstr= ['fix stretch', 'hand', 'show templates']
 setval=bytarr(n_elements(setstr))
+fix_stretch=1
 setval[0]=1 ;; fix stretch by default
 w_settings = CW_BGROUP(w_base, setstr, /nonexclusive, /column, /return_name, $
                        uvalue=0, event_func='dexplore_settings', $
                        set_value=setval)
 dexplore_setval
+
+;; set up smoothing widget
+w_smooth = CW_FIELD(w_base, TITLE = "smooth", $
+                  /FLOAT, /FRAME, /return_events, value=smooth)  
 
 ;; set up band selection widget
 w_band = CW_FIELD(w_base, TITLE = "band", $

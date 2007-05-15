@@ -23,8 +23,8 @@ IDL_LONG idl_dtemplates (int      argc,
 	/* 0. allocate pointers from IDL */
 	i=0;
 	image=((float *)argv[i]); i++;
-	nx=*((int *)argv[i]); i++;
-	ny=*((int *)argv[i]); i++;
+	nx=*((IDL_LONG *)argv[i]); i++;
+	ny=*((IDL_LONG *)argv[i]); i++;
 	ntemplates=((IDL_LONG *)argv[i]); i++;
 	xcen=((IDL_LONG *)argv[i]); i++;
 	ycen=((IDL_LONG *)argv[i]); i++;

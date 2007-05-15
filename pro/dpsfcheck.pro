@@ -22,7 +22,7 @@
 ;   1-Mar-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function dpsfcheck, image, ivar, x, y, amp=amp, psf=psf, vpsf=vpsf
+function dpsfcheck, image, ivar, x, y, amp=amp, psf=psf, vpsf=vpsf, flux=flux
 
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
@@ -55,6 +55,7 @@ cmodel[2,*]=yy
 ;;cmodel[3,*]=cc
 
 amp=fltarr(n_elements(x))
+flux=fltarr(n_elements(x))
 for i=0L, n_elements(x)-1L do begin 
     cutout_image=fltarr(npx,npy) 
     cutout_ivar=fltarr(npx,npy) 
@@ -64,15 +65,19 @@ for i=0L, n_elements(x)-1L do begin
     
     if(keyword_set(havevar)) then begin
         currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
+        scale=total(currpsf)/max(currpsf)
         cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
     endif else begin
         currpsf=psf
+        scale=max(currpsf)/total(currpsf)
+        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
     endelse
     hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
       reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
     ;;hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
      ;; replicate(median(cutout_ivar), npx*npy), coeffs, nsigma=10 
     amp[i]=coeffs[0] 
+    flux[i]=coeffs[0] *scale
 endfor
 
 model=fltarr(nx,ny)
@@ -90,6 +95,7 @@ nimage= image-model
 simage=dmedsmooth(nimage,box=ceil(fwhm)) 
 
 ispsf=image[long(x), long(y)] gt 10.*simage[long(x), long(y)]
+
 
 return, ispsf
 

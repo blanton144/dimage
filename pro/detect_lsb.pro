@@ -30,9 +30,10 @@ pro detect_lsb, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
                   noclobber=noclobber, glim=glim, all=all, single=single, $
                   aset=aset, sgset=sgset
 
-if(NOT keyword_set(ref)) then ref=0
-if(NOT keyword_set(glim)) then glim=10.
-if(NOT keyword_set(gsmooth)) then gsmooth=2.
+if(NOT keyword_set(ref)) then ref=2
+if(NOT keyword_set(glim)) then glim=8.
+if(NOT keyword_set(plim)) then plim=10.
+if(NOT keyword_set(gsmooth)) then gsmooth=8.
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -75,7 +76,7 @@ if(keyword_set(all)) then begin
         psfs.yst= pcat[iparent].yst
         dchildren_multi, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
-          sgset=sgset
+          sgset=sgset, starlimit=500., sizelimit=100, plim=plim
     endfor
 endif
 
@@ -84,12 +85,14 @@ if(n_elements(single) gt 0) then begin
     psfs.yst= pcat[single].yst
     dchildren_multi, base, single, psfs=psfs, $
       ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
-      sgset=sgset
+      sgset=sgset, plim=plim
 endif
 
 dcombine_multi, base, hand=hand
 
 mwrfits, pset, base+'-pset.fits', /create
+
+fit_lsb
 
 ;;dhtmlpage, dbset.base, dbset.parent, /install
 

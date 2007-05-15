@@ -38,7 +38,8 @@ pro dchildren_multi, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                      glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                      ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                      nstars=nstars, ngals=ngals, sersic=in_sersic, $
-                     aset=in_aset, sgset=in_sgset
+                     aset=in_aset, sgset=in_sgset, starlimit=starlimit, $
+                     sizelimit=sizelimit
                      
 
 common atv_point, markcoord
@@ -53,7 +54,20 @@ if(keyword_set(in_sersic)) then sersic=in_sersic else sersic=0
 subdir='atlases'
 if(keyword_set(hand)) then subdir='hand'
 
-spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
+;; read in images and psfs
+hdr=headfits('parents/'+base+'-parent-'+ $
+             strtrim(string(iparent),2)+'.fits',ext=0)
+nim=long(sxpar(hdr, 'NIM'))
+nx=long(sxpar(hdr, 'NAXIS1'))
+ny=long(sxpar(hdr, 'NAXIS2'))
+images=fltarr(nx,ny, nim)
+nimages=fltarr(nx,ny, nim)
+ivars=fltarr(nx,ny, nim)
+
+if(keyword_set(sizelimit)) then begin
+    if(nx lt sizelimit OR ny lt sizelimit) then return
+endif
+
 asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-aset.fits'
 if(keyword_set(in_aset) eq 0 OR file_test(asetfile) eq 0) then begin
     aset={base:base, $
@@ -88,16 +102,6 @@ endelse
 
 maxnpeaks=1000L
 
-;; read in images and psfs
-hdr=headfits('parents/'+base+'-parent-'+ $
-             strtrim(string(iparent),2)+'.fits',ext=0)
-nim=long(sxpar(hdr, 'NIM'))
-nx=long(sxpar(hdr, 'NAXIS1'))
-ny=long(sxpar(hdr, 'NAXIS2'))
-images=fltarr(nx,ny, nim)
-nimages=fltarr(nx,ny, nim)
-ivars=fltarr(nx,ny, nim)
-
 for k=0L, nim-1L do begin
     images[*,*,k]=mrdfits('parents/'+base+'-parent-'+ $
                           strtrim(string(iparent),2)+'.fits',0+k*2L)
@@ -110,8 +114,24 @@ pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet ; jm07may01nyu
 
-if(keyword_set(newsg)) then begin
+;; quick check for a bright star
+if(keyword_set(starlimit)) then begin
+    simage=dsmooth(images[*,*,ref],psfsig)
+    ssigma=dsigma(simage, sp=psfsig*5.)
+    dpeaks, simage, xc=tmp_xc, yc=tmp_yc, sigma=ssigma, $
+      minpeak=30.*ssigma, /refine, npeaks=nc, maxnpeaks=50
+    if(nc gt 0) then begin
+        tmp_xc=tmp_xc[0:nc-1L]
+        tmp_yc=tmp_yc[0:nc-1L]
+        ispsf=dpsfcheck(images[*,*,ref], ivars[*,*,ref], tmp_xc, tmp_yc, $
+                        vpsf=psfs[ref], flux=flux, amp=amp)
+        if(max(flux) gt starlimit) then return
+    endif
+endif
 
+spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
+
+if(keyword_set(newsg)) then begin
     
 ;;  find stellar peaks in all images
     for k=0, nim-1L do begin
@@ -119,7 +139,7 @@ if(keyword_set(newsg)) then begin
         ssigma=dsigma(simage, sp=psfsig*5.)
         dpeaks, simage, xc=tmp_xc, yc=tmp_yc, sigma=ssigma, $
           minpeak=plim*ssigma, /refine, npeaks=nc, maxnpeaks=maxnpeaks, /check
-        
+
         nstars=0
         if(nc gt 0) then begin
             tmp_xc=tmp_xc[0:nc-1]
@@ -130,13 +150,16 @@ if(keyword_set(newsg)) then begin
                             vpsf=psfs[k])
 
             istars=where(ispsf gt 0, nstars)
+            help,k
+            help, nstars
             if(nstars gt 0) then begin
                 tmp_xstars=tmp_xc[istars]
                 tmp_ystars=tmp_yc[istars]
+                fluxes=fltarr(nstars)
                 
                 ;; refine center and subtract off best fit psf for each star
                 ;; IN THIS BAND!!
-                msimage=dmedsmooth(images[*,*,k], box=long(psfsig*50L))
+                msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
                 fimage=images[*,*,k]-msimage
                 fivar=ivars[*,*,k]
                 model=fltarr(nx,ny)
@@ -147,12 +170,13 @@ if(keyword_set(newsg)) then begin
                     embed_stamp, tmp_model, psf, $
                       xr[i]-float(pnx/2L), $
                       yr[i]-float(pny/2L)
-                    ifit=where(tmp_model gt max(tmp_model)*1.e-4)
-                    scale= total(fimage[ifit]* $
+                    ifit=where(tmp_model gt (-max(tmp_model)*1.e-2))
+                    fluxes[i]= total(fimage[ifit]* $
                                  tmp_model[ifit]*fivar[ifit])/ $
                       total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
-                    model=model+tmp_model*scale
+                    model=model+tmp_model*fluxes[i]
                 endfor
+                
                 ;; in this pass don't let noise spikes come in 
                 nimages[*,*,k]=(images[*,*,k]-model) < images[*,*,k]
 
@@ -166,10 +190,12 @@ if(keyword_set(newsg)) then begin
             endif else begin
                 nimages[*,*,k]=images[*,*,k]
             endelse
-        endif
+        endif else begin
+            nimages[*,*,k]=images[*,*,k]
+        endelse
     endfor
     nstars=n_elements(xstars)
-    
+
 ;; reduce to unique peaks
     if(nstars gt 0) then begin
         xx=fltarr(2,n_elements(xstars))
@@ -186,7 +212,6 @@ if(keyword_set(newsg)) then begin
         stimages=fltarr(nx,ny,nstars)
     endif
     for k=0L, nim-1L do begin
-        
         subpix=long(gsmooth/3.) > 1L
         nxsub=nx/subpix
         nysub=ny/subpix
@@ -223,7 +248,7 @@ if(keyword_set(newsg)) then begin
         xx=fltarr(2,ngals)
         xx[0, *]= xgals
         xx[1, *]= ygals
-        ing= groupnd(xx, gsmooth, firstg=firstg, nd=2)
+        ing= groupnd(xx, 2.*gsmooth, firstg=firstg, nd=2)
         ngals=max(ing)+1L
         xgals=xgals[firstg[0:ngals-1]]
         ygals=ygals[firstg[0:ngals-1]]
@@ -293,55 +318,105 @@ if(NOT keyword_set(nodeblend)) then begin
                         good:0L}, ngals+nstars)
         acat.aid=lindgen(ngals+nstars)
     endif
+
+    ;; refine galaxy peaks again
+    model=fltarr(nx,ny)
+    if(nstars gt 0) then begin
+        msimage=dmedsmooth(images[*,*,ref], box=long(psfsig*30L))
+        fimage=images[*,*,ref]-msimage
+        fivar=ivars[*,*,ref]
+        drefine, fimage, xstars, ystars, xr=xr, yr=yr
+        for i=0L, nstars-1L do begin 
+            psf=dvpsf(xr[i], yr[i], psf=psfs[ref])
+            tmp_model=fltarr(nx,ny)
+            embed_stamp, tmp_model, psf, $
+              xr[i]-float(pnx/2L), $
+              yr[i]-float(pny/2L)
+            ifit=where(tmp_model ne 0.)
+            scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
+              total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
+            model=model+tmp_model*scale
+        endfor
+    endif
+    rimage=images[*,*,ref]-model
+    if(ngals gt 0) then begin
+        ;; refine the centers
+        drefine, rimage, xgals, ygals, smooth=2., $
+          xr=r_xgals, yr=r_ygals, box=long(5.*subpix)
+        xgals=r_xgals
+        ygals=r_ygals
+    endif 
+
     for k=0L, nim-1L do begin
         if(k eq 0) then first=1 else first=0
         
-        if(ngals gt 0) then begin
-            spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
+        spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
             
-            model=fltarr(nx,ny)
-            if(nstars gt 0) then begin
-                msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
-                fimage=images[*,*,k]-msimage
-                fivar=ivars[*,*,k]
-                drefine, fimage, xstars, ystars, xr=xr, yr=yr
-                for i=0L, nstars-1L do begin 
-                    psf=dvpsf(xr[i], yr[i], psf=psfs[k])
-                    tmp_model=fltarr(nx,ny)
-                    embed_stamp, tmp_model, psf, $
-                      xr[i]-float(pnx/2L), $
-                      yr[i]-float(pny/2L)
-                    ifit=where(tmp_model ne 0.)
-                    scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
-                      total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
-                    stimages[*,*,i]=tmp_model*scale
+        model=fltarr(nx,ny)
+        if(nstars gt 0) then begin
+            msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
+            fimage=images[*,*,k]-msimage
+            fivar=ivars[*,*,k]
+            drefine, fimage, xstars, ystars, xr=xr, yr=yr
+            for i=0L, nstars-1L do begin 
+                psf=dvpsf(xr[i], yr[i], psf=psfs[k])
+                tmp_model=fltarr(nx,ny)
+                embed_stamp, tmp_model, psf, $
+                  xr[i]-float(pnx/2L), $
+                  yr[i]-float(pny/2L)
+                ifit=where(tmp_model ne 0.)
+                scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
+                  total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
+                stimages[*,*,i]=tmp_model*scale
                 
-                    acat[i].xcen=xstars[i]
-                    acat[i].ycen=ystars[i]
-                    acat[i].good=1
-                    acat[i].type=1L
-                    acat[i].bgood[k]=1
-                    aid=acat[i].aid
-                    mwrfits, stimages[*,*,i], $
-                      subdir+'/'+strtrim(string(iparent),2)+ $
-                      '/'+base+'-'+strtrim(string(iparent),2)+ $
-                      '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, $
-                      create=first
-                    model=model+stimages[*,*,i]
-                endfor
-            endif
-            nimages[*,*,k]=images[*,*,k]-model
-
+                acat[i].xcen=xstars[i]
+                acat[i].ycen=ystars[i]
+                acat[i].good=1
+                acat[i].type=1L
+                acat[i].bgood[k]=1
+                aid=acat[i].aid
+                mwrfits, stimages[*,*,i], $
+                  subdir+'/'+strtrim(string(iparent),2)+ $
+                  '/'+base+'-'+strtrim(string(iparent),2)+ $
+                  '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, $
+                  create=first
+                mwrfits, tmp_model, $
+                  subdir+'/'+strtrim(string(iparent),2)+ $
+                  '/'+base+'-'+strtrim(string(iparent),2)+ $
+                  '-templates-'+strtrim(string(aid),2)+'.fits', hdr, $
+                  create=first
+                model=model+stimages[*,*,i]
+            endfor
+        endif
+        nimages[*,*,k]=images[*,*,k]-model
+        
+        if(ngals gt 0) then begin
             ;; make galaxy templates
             dtemplates, nimages[*,*,k], xgals, ygals, templates=templates, $
               sersic=sersic, ikept=ikept
+            sig=dsigma(nimages[*,*,k],sp=5)
+            nchild=n_elements(templates)/nx/ny
+            stemplates=fltarr(nx,ny,nchild)
+            for i=0L, nchild-1L do begin
+                stemplates[*,*,i]= dsmooth(templates[*,*,i], 2.5)
+                tmp_stemplates=reform(stemplates[*,*,i],nx*ny)
+                tmp_templates=reform(templates[*,*,i],nx*ny)
+                ii=where(tmp_stemplates lt 2.*sig, nii)
+                if(nii gt 0) then $
+                  tmp_templates[ii]= tmp_stemplates[ii]
+                ii=where(tmp_stemplates lt 0.2*sig, nii)
+                if(nii gt 0) then $
+                  tmp_templates[ii]= 0.02*sig
+                templates[*,*,i]=reform(tmp_templates, nx, ny)
+            endfor
         
             ;; find weights
             dweights, nimages[*,*,k], ivars[*,*,k], templates, $
               weights=weights, /nonneg
+            help,templates
             dfluxes, nimages[*,*,k], templates, weights, xgals, ygals, $
               children=children
-            
+            help,children
 
             nchild=n_elements(children)/nx/ny
             
@@ -358,6 +433,11 @@ if(NOT keyword_set(nodeblend)) then begin
                   strtrim(string(iparent),2)+ $
                   '/'+base+'-'+strtrim(string(iparent),2)+ $
                   '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, create=first
+                mwrfits, templates[*,*,i], subdir+'/'+ $
+                  strtrim(string(iparent),2)+ $
+                  '/'+base+'-'+strtrim(string(iparent),2)+ $
+                  '-templates-'+strtrim(string(aid),2)+'.fits', hdr, $
+                  create=first
             endfor
 
             notkept=bytarr(ngals)+1
@@ -371,6 +451,11 @@ if(NOT keyword_set(nodeblend)) then begin
                       subdir+'/'+strtrim(string(iparent),2)+ $
                       '/'+base+'-'+strtrim(string(iparent),2)+ $
                       '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, $
+                      create=first
+                    mwrfits, fltarr(nx,ny), $
+                      subdir+'/'+strtrim(string(iparent),2)+ $
+                      '/'+base+'-'+strtrim(string(iparent),2)+ $
+                      '-templates-'+strtrim(string(aid),2)+'.fits', hdr, $
                       create=first
                 endfor
             endif
