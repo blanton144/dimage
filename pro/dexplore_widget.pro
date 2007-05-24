@@ -6,9 +6,9 @@ common com_dexplore_widget, $
   basename, imagenames, $
   parent_images, parent_hdr, $
   setval, band, smooth, child, parent, $
-  acat, ig, is, igstr, isstr, ng, ns, $
+  pcat, acat, ig, is, igstr, isstr, ng, ns, lsb, $
   fix_stretch, hand, show_templates, gsmooth, glim, sersic, atset, $
-  subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup
+  subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs
 
 w_slist=0
 w_glist=0
@@ -22,6 +22,7 @@ w_mark=0
 w_parent=0
 w_full=0
 w_eyeball=0
+psfs=0
 
 end
 ;
@@ -146,8 +147,12 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
     atset_hand.gsmooth=gsmooth
     atset_hand.glim=glim
     mwrfits, atset_hand, atsetfile, /create
-    detect_multi, basename, imagenames, ref=atset.ref, $
-      single=parent, /aset, /hand, /noclobber
+    if(NOT keyword_set(lsb)) then $
+      detect_multi, basename, imagenames, ref=atset.ref, $
+      single=parent, /aset, /hand, /noclobber $
+    else $
+      detect_lsb, basename, imagenames, ref=atset.ref, $
+      single=parent, /aset, /hand, /noclobber 
     dexplore_parent_display
     dexplore_child_list
     dexplore_mark_children
@@ -295,6 +300,8 @@ w_glist=0
 
 if(NOT keyword_set(parent_images)) then return
 
+pcatfile=basename+'-pcat.fits'
+pcat= mrdfits(pcatfile,1)
 acatfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
   strtrim(string(parent),2)+ '-acat.fits'
 acat= mrdfits(acatfile,1)
@@ -395,6 +402,10 @@ if(file_test(imfile)) then begin
     if(keyword_set(smooth)) then $
       image=dsmooth(image, smooth)
     atv2, image, /align, head=hdr, stretch=fix_stretch
+
+    ;;atv3, dvpsf(pcat[parent].xst+acat[child].xcen, $
+    ;;            pcat[parent].yst+acat[child].ycen, $
+    ;;            psf=psfs[band]), /align, /stretch
     fix_stretch=setval[0]
     dexplore_mark_children
 endif
@@ -489,6 +500,7 @@ common com_dexplore_widget
 ;; read in parent image
 imfile='parents/'+basename+'-parent-'+strtrim(string(parent),2)+'.fits'
 parent_image=mrdfits(imfile, 0L, parent_hdr)
+
 nx=(size(parent_image, /dim))[0]
 ny=(size(parent_image, /dim))[1]
 parent_images=fltarr(nx,ny, n_elements(imagenames))
@@ -512,9 +524,11 @@ endif
 end
   
 ;; main
-pro dexplore_widget, in_basename, in_imagenames
+pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb
 
 common com_dexplore_widget
+
+if(keyword_set(in_lsb)) then lsb=1
 
 ;; clean up before starting
 dexplore_clean
@@ -526,6 +540,16 @@ band=0L
 smooth=0.
 parent=-1L
 subdir='atlases'
+
+psfs=0
+for i=0L, n_elements(imagenames)-1L do begin
+    imbase=(stregex(imagenames[i],'(.*)\.fits.*',/sub,/extr))[1]
+    ;;tmppsf=dpsfread(imbase+'-vpsf.fits')
+    ;;if(n_tags(psfs) eq 0) then $
+    ;;  psfs=tmppsf $
+    ;;else $
+    ;;  psfs=[psfs, tmppsf]
+endfor
 
 ;; set up base widget
 w_base = WIDGET_BASE(ROW=14)  
@@ -566,6 +590,8 @@ stash = {done: w_done}
 WIDGET_CONTROL, w_base, /REALIZE, set_uvalue=stash
 
 XMANAGER, 'dexplore', w_base
+
+dexplore_clean
 
 end  
 

@@ -11,7 +11,7 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dexplore, base
+pro dexplore, base, lsb=lsb
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -21,7 +21,7 @@ endif
 
 images=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
 
-dexplore_widget, base, images
+dexplore_widget, base, images, lsb=lsb
 
 end
 ;------------------------------------------------------------------------------
