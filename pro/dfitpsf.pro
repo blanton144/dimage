@@ -93,33 +93,41 @@ rejsigma = [4.0,3.,2.0]
 for iter = 0L, n_elements(rejsigma)-1L do begin
 
 ; do initial fit
+    exatlas=fltarr(natlas*natlas, n_elements(extract))
+    for i=0L, n_elements(extract)-1L do begin & $
+        scale=total(extract[i].atlas) & $
+        exatlas[*,i]=reform(extract[i].atlas/scale, natlas*natlas) & $
+    endfor
+    bpsf=reform(djs_median( exatlas, 2), natlas, natlas)
 
-   bpsf= reform(total(reform(extract.atlas,natlas*natlas,n_elements(extract)),2),natlas,natlas)
-   bpsf=bpsf/total(bpsf)
-
+    ;;bpsf= reform(total(reform(extract.atlas,natlas*natlas, $
+    ;;                          n_elements(extract)),2),natlas,natlas)
+    bpsf=bpsf/total(bpsf)
+    
 ; clip non-stars
-
-   diff=fltarr(n_elements(extract))
-   model=reform(bpsf, natlas*natlas)
-   for i=0L, n_elements(extract)-1L do begin 
-      scale=total(model*reform(extract[i].atlas,natlas*natlas))/ $
-        total(model*model)
-      diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) ; jm07may07nyu
-   endfor
-
+    
+    diff=fltarr(n_elements(extract))
+    model=reform(bpsf, natlas*natlas)
+    for i=0L, n_elements(extract)-1L do begin 
+        scale=total(model*reform(extract[i].atlas,natlas*natlas))/ $
+          total(model*model)
+        diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) ; jm07may07nyu
+    endfor
+    
 ; reject REJSIGMA outliers
-   
-   keep = where(diff lt mpchilim(rejsigma[iter],1.0,/sigma),nkeep)
-   splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
-   if (nkeep eq 0L) then begin
-      splog, 'No good stars found.'
-      return
-  endif
-
-   extract = extract[keep]
-   
+    
+    keep = where(diff lt mpchilim(rejsigma[iter],1.0,/sigma),nkeep)
+    splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
+    if (nkeep eq 0L) then begin
+        splog, 'No good stars found.'
+        save
+        return
+    endif
+    
+    extract = extract[keep]
+    
 endfor
-   
+
 ;plotimage, logscl(image,exp=0.5,min=-1,max=5), /preserve, xrange=[400,700], yrange=[400,700]
 ;for jj = 0L, n_elements(extract1)-1L do tvcircle, 10.0, extract1[jj].xcen, extract1[jj].ycen, color=djs_icolor('red'), /data
 ;for kk = 0L, n_elements(extract)-1L do tvcircle, 10.0, extract[kk].xcen, extract[kk].ycen, thick=2.0, color=djs_icolor('yellow'), /data
@@ -154,8 +162,9 @@ gpsf=fltarr(pnx,pny)+1.
 mwrfits, reform(bpsf, natlas, natlas), base+'-bpsf.fits', /create
 mwrfits, reform(model, natlas, natlas), base+'-bpsf.fits' ; jm07may01nyu
 
-np=3L
-nc=4L
+npinit=4L
+np=npinit
+nc=3L
 nchunk=2L
 niter=3L
 
@@ -196,7 +205,11 @@ clipped=lonarr(np^2*nchunk^2)
 
 for iter=0L, niter-1L do begin
     iv=where(nb gt 0L and clipped eq 0, nv)
-    if(nv gt np*(np-1L)/2L) then begin
+	  if(nv gt 4L) then begin
+        if(nv gt npinit*npinit) then $
+		      np=npinit $
+        else $
+          np=long(sqrt(nv))-1L
 
         em_pca, vatlas[*, iv], nc, eatlas, ecoeffs
         
@@ -252,7 +265,9 @@ outatlas=reform(eatlas, natlas, natlas, nc)
 for i=0L, nc-1L do $
   outatlas[*,*,i]=outatlas[*,*,i]/gpsf
 mwrfits, outatlas, base+'-vpsf.fits'
-mwrfits, coeffs, base+'-vpsf.fits'
+outcoeffs=fltarr(200L, nc)
+outcoeffs[0:np*np-1L, *]= coeffs
+mwrfits, outcoeffs, base+'-vpsf.fits'
 mwrfits, cmap, base+'-vpsf.fits'
 
 end
