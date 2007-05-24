@@ -38,12 +38,12 @@ psfstr={XST:xst, $
         NATLAS:natlas, $
         SOFTBIAS:softbias, $
         BPSF:fltarr(natlas,natlas), $
-        COEFFS:fltarr(np*np,nc), $
+        COEFFS:fltarr(200L,nc), $
         PSFT:fltarr(natlas, natlas, nc)}
 
 psfstr.bpsf=mrdfits(psffile, 0)
 psfstr.psft=mrdfits(psffile, 1)
-psfstr.coeffs=mrdfits(psffile, 2)
+psfstr.coeffs[0:np*np-1]=(mrdfits(psffile, 2))[0:np*np-1]
 
 return, psfstr
 
