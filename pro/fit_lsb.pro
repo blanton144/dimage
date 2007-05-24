@@ -9,6 +9,8 @@ endif
 
 ucat=mrdfits(base+'-ucat.fits',1)
 
+if(n_tags(ucat) eq 0) then return
+
 igal=where(ucat.type eq 0, ngal)
 
 for i=0L, ngal-1L do begin
