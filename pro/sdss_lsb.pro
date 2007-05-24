@@ -11,22 +11,11 @@
 ;------------------------------------------------------------------------------
 pro sdss_lsb, ra, dec, sz, rerun=rerun, nodetect=nodetect, $
               noclobber=noclobber, links=links, gmosaic=gmosaic, $
-              all=all, hand=hand
-
-if(n_elements(ra) gt 1) then begin
-    if(n_elements(sz) ne n_elements(ra)) then $
-      sz=fltarr(n_elements(ra))+sz[0]
-    for i=0L, n_elements(ra)-1L do begin
-        sdss_dimage, ra[i], dec[i], sz[i], rerun=rerun, nodetect=nodetect, $
-          noclobber=noclobber, links=links, gmosaic=gmosaic, all=all, $
-          hand=hand
-    endfor
-    return
-endif
+              all=all, hand=hand, runs=runs
 
 common com_sdss_dimage, seed
 
-if(NOT keyword_set(sz)) then sz=0.25
+if(NOT keyword_set(sz)) then sz=0.5
 if(NOT keyword_set(rerun)) then rerun=['137', '161']
 
 ihr=long(ra/15.)
@@ -54,14 +43,17 @@ if(keyword_set(noclobber)) then begin
 endif
 if(keyword_set(doit)) then $
   smosaic_make, ra, dec, sz, sz, /global, seed=seed, $
-  /fpbin, rerun=rerun, prefix=prefix[0], /all, /ivarout, $
-  noclobber=noclobber, /dropweights, /sheldon
+  /fpbin, rerun=rerun, prefix=prefix[0], /ivarout, $
+  noclobber=noclobber, /dropweights, /sheldon, run=runs
 
 filters=['u','g','r','i','z']
 base=prefix[0]
+splog, prefix[0]
+if(file_test(prefix[0]+'-'+filters[2]+'.fits.gz')) then begin
 if(NOT keyword_set(nodetect)) then $
   detect_lsb, base, prefix[0]+'-'+filters+'.fits.gz', hand=hand, ref=2, $
-  all=all
+  all=all, gsmooth=8., noclobber=noclobber
+endif
 
 cd, cdir
 
