@@ -28,7 +28,7 @@
 ;------------------------------------------------------------------------------
 pro detect_lsb, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
                   noclobber=noclobber, glim=glim, all=all, single=single, $
-                  aset=aset, sgset=sgset
+                  aset=aset, sgset=sgset, gsmooth=gsmooth
 
 if(NOT keyword_set(ref)) then ref=2
 if(NOT keyword_set(glim)) then glim=8.
@@ -39,8 +39,8 @@ if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
     words=strsplit(cwd[0], '/',/extr)
     base=words[n_elements(words)-1]
-    imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
 endif
+imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
 
 if(NOT keyword_set(pset)) then begin
     pset={base:base, $
@@ -92,7 +92,7 @@ dcombine_multi, base, hand=hand
 
 mwrfits, pset, base+'-pset.fits', /create
 
-fit_lsb
+if(keyword_set(all)) then fit_lsb
 
 ;;dhtmlpage, dbset.base, dbset.parent, /install
 
