@@ -22,7 +22,8 @@ fields=(all.photoid mod ulong64(10)^11L)/ulong64(10L)^6L
 ;; i==180 hits run 308 (no u-band skyframes!)
 ;; i==185(?) hits run 4512 (looking for unprocessed frames)
 ;; 12429 does somethiong super-weird
-for i=12430, n_elements(all)-1L do begin
+;; 13608 does somethiong super-weird
+for i=13609, n_elements(all)-1L do begin
     splog, string(i)
     obj=sdss_findobj(all[i].ra, all[i].dec, run=runs[i], $
                      rerun=[137], childobj=include)
