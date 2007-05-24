@@ -54,6 +54,8 @@ if(keyword_set(in_sersic)) then sersic=in_sersic else sersic=0
 subdir='atlases'
 if(keyword_set(hand)) then subdir='hand'
 
+maxnstar=2000L
+
 ;; read in images and psfs
 hdr=headfits('parents/'+base+'-parent-'+ $
              strtrim(string(iparent),2)+'.fits',ext=0)
@@ -90,11 +92,11 @@ if(keyword_set(in_sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
            ref:ref, $
            iparent:iparent, $
            nstars:0L, $
-           xstars:fltarr(200), $
-           ystars:fltarr(200), $
+           xstars:fltarr(maxnstar), $
+           ystars:fltarr(maxnstar), $
            ngals:0L, $
-           xgals:fltarr(200), $
-           ygals:fltarr(200) }
+           xgals:fltarr(maxnstar), $
+           ygals:fltarr(maxnstar) }
 endif else begin
     newsg=0
     sgset=mrdfits(sgsetfile, 1)
@@ -163,7 +165,7 @@ if(keyword_set(newsg)) then begin
                 fimage=images[*,*,k]-msimage
                 fivar=ivars[*,*,k]
                 model=fltarr(nx,ny)
-                drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr
+                drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr, smooth=1
                 for i=0L, n_elements(tmp_xstars)-1L do begin 
                     psf=dvpsf(xr[i], yr[i], psf=psfs[k])
                     tmp_model=fltarr(nx,ny)
@@ -280,8 +282,8 @@ if(keyword_set(newsg)) then begin
 
     sgset.nstars= nstars
     if(nstars gt 0) then begin
-        sgset.xstars[0:nstars-1]= xstars
-        sgset.ystars[0:nstars-1]= ystars
+        sgset.xstars[0:(nstars-1)<maxnstar]= xstars
+        sgset.ystars[0:(nstars-1)<maxnstar]= ystars
     endif
     sgset.ngals= ngals
     if(ngals gt 0) then begin
@@ -291,8 +293,8 @@ if(keyword_set(newsg)) then begin
 endif else begin
     nstars=sgset.nstars
     if(nstars gt 0) then begin
-        xstars=sgset.xstars[0:nstars-1]
-        ystars=sgset.ystars[0:nstars-1]
+        xstars=sgset.xstars[0:(nstars-1)<maxnstar]
+        ystars=sgset.ystars[0:(nstars-1)<maxnstar]
     endif
     ngals=sgset.ngals
     if(ngals gt 0) then begin
@@ -325,7 +327,7 @@ if(NOT keyword_set(nodeblend)) then begin
         msimage=dmedsmooth(images[*,*,ref], box=long(psfsig*30L))
         fimage=images[*,*,ref]-msimage
         fivar=ivars[*,*,ref]
-        drefine, fimage, xstars, ystars, xr=xr, yr=yr
+        drefine, fimage, xstars, ystars, xr=xr, yr=yr, smooth=2
         for i=0L, nstars-1L do begin 
             psf=dvpsf(xr[i], yr[i], psf=psfs[ref])
             tmp_model=fltarr(nx,ny)
@@ -357,20 +359,20 @@ if(NOT keyword_set(nodeblend)) then begin
             msimage=dmedsmooth(images[*,*,k], box=long(psfsig*30L))
             fimage=images[*,*,k]-msimage
             fivar=ivars[*,*,k]
-            drefine, fimage, xstars, ystars, xr=xr, yr=yr
             for i=0L, nstars-1L do begin 
-                psf=dvpsf(xr[i], yr[i], psf=psfs[k])
+                psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
+                dprefine, fimage, psf, xstars[i], ystars[i], xr=xr, yr=yr
                 tmp_model=fltarr(nx,ny)
                 embed_stamp, tmp_model, psf, $
-                  xr[i]-float(pnx/2L), $
-                  yr[i]-float(pny/2L)
+                  xr-float(pnx/2L), $
+                  yr-float(pny/2L)
                 ifit=where(tmp_model ne 0.)
                 scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
                   total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
                 stimages[*,*,i]=tmp_model*scale
                 
-                acat[i].xcen=xstars[i]
-                acat[i].ycen=ystars[i]
+                acat[i].xcen=xr
+                acat[i].ycen=yr
                 acat[i].good=1
                 acat[i].type=1L
                 acat[i].bgood[k]=1
@@ -397,16 +399,19 @@ if(NOT keyword_set(nodeblend)) then begin
             sig=dsigma(nimages[*,*,k],sp=5)
             nchild=n_elements(templates)/nx/ny
             stemplates=fltarr(nx,ny,nchild)
+            stemplates2=fltarr(nx,ny,nchild)
             for i=0L, nchild-1L do begin
                 stemplates[*,*,i]= dsmooth(templates[*,*,i], 2.5)
+                stemplates2[*,*,i]= dsmooth(templates[*,*,i], 7.5)
                 tmp_stemplates=reform(stemplates[*,*,i],nx*ny)
+                tmp_stemplates2=reform(stemplates2[*,*,i],nx*ny)
                 tmp_templates=reform(templates[*,*,i],nx*ny)
                 ii=where(tmp_stemplates lt 2.*sig, nii)
                 if(nii gt 0) then $
                   tmp_templates[ii]= tmp_stemplates[ii]
                 ii=where(tmp_stemplates lt 0.2*sig, nii)
                 if(nii gt 0) then $
-                  tmp_templates[ii]= 0.02*sig
+                  tmp_templates[ii]=tmp_stemplates2[ii]
                 templates[*,*,i]=reform(tmp_templates, nx, ny)
             endfor
         
