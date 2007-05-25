@@ -122,8 +122,9 @@ for i=1L, n_elements(iuniq)-1L do begin
                 
                 atlas[*,*,i-1]=sshift2d(subimg, -[xfit[i-1]-xcen[i-1], $
                                                   yfit[i-1]-ycen[i-1]])
-                atlas_ivar[*,*,i-1]=sshift2d(subinv, -[xfit[i-1]-xcen[i-1], $
-                                                       yfit[i-1]-ycen[i-1]])
+                atlas_ivar[*,*,i-1]= $
+                  sshift2d(subinv, -[xfit[i-1]-xcen[i-1], $
+                                     yfit[i-1]-ycen[i-1]]) > 0.
                 
                 good[i-1]=1
             endif
