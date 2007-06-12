@@ -23,7 +23,8 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber
+pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber, $
+             cmap=cmap
 
 if(NOT keyword_set(natlas)) then natlas=41L
 
@@ -203,6 +204,7 @@ endfor
 
 clipped=lonarr(np^2*nchunk^2)
 
+splog, 'Iterating ...'
 for iter=0L, niter-1L do begin
     iv=where(nb gt 0L and clipped eq 0, nv)
 	  if(nv gt 4L) then begin
@@ -225,7 +227,6 @@ for iter=0L, niter-1L do begin
         xarr=(findgen(nx)#replicate(1.,ny))/float(nx)-0.5
         yarr=(replicate(1.,nx)#findgen(ny))/float(ny)-0.5
         
-        cmap=fltarr(nx,ny,nc)
         coeffs=fltarr(np*np, nc)
         for c=0L, nc-1L do begin 
             sig=djsig(ecoeffs[c,*])
@@ -233,23 +234,15 @@ for iter=0L, niter-1L do begin
             hogg_iter_linfit,aa, transpose(ecoeffs[c,*]), weights, $
               tmp_coeffs, nsigma=3., /true
             clipped[iv]=clipped[iv] OR (weights eq 0.)
-            k=0L 
-            for i=0L, np-1L do begin 
-                for j=0, np-1L do begin 
-                    cmap[*,*,c]=cmap[*,*,c]+ $
-                      tmp_coeffs[k]*xarr^(float(i))*yarr^(float(j)) 
-                    k=k+1L 
-                endfor 
-            endfor 
             coeffs[*,c]=tmp_coeffs
         endfor
 
     endif else begin
         eatlas=fltarr(natlas, natlas, nc)
         coeffs=fltarr(np*np, nc)
-        cmap=fltarr(nx,ny,nc)
     endelse
 endfor
+
 
 hdr=['']
 sxaddpar, hdr, 'NP', np, 'number of polynomial terms'
@@ -268,7 +261,24 @@ mwrfits, outatlas, base+'-vpsf.fits'
 outcoeffs=fltarr(200L, nc)
 outcoeffs[0:np*np-1L, *]= coeffs
 mwrfits, outcoeffs, base+'-vpsf.fits'
-mwrfits, cmap, base+'-vpsf.fits'
+
+if(keyword_set(cmap)) then begin
+    splog, 'Making cmap ...'
+    out_cmap=fltarr(nx,ny,nc)
+    if(min(coeffs) ne 0. OR max(coeffs) ne 0.) then begin
+        for c=0L, nc-1L do begin
+            k=0L 
+            for i=0L, np-1L do begin 
+                for j=0, np-1L do begin 
+                    out_cmap[*,*,c]=out_cmap[*,*,c]+ $
+                      coeffs[k,c]*xarr^(float(i))*yarr^(float(j)) 
+                    k=k+1L 
+                endfor 
+            endfor 
+        endfor
+    endif
+    mwrfits, out_cmap, base+'-vpsf.fits'
+endif
 
 end
 ;------------------------------------------------------------------------------
