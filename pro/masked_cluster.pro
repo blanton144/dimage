@@ -10,7 +10,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro masked_cluster, ra, dec, z, obj=obj, include=include, outdir=outdir, $
-                    outbase=outbase, rerun=rerun
+                    outbase=outbase, rerun=rerun, noclobber=noclobber
 
 if(NOT keyword_set(rerun)) then $
   rerun=[137, 161]
@@ -31,20 +31,41 @@ spawn, 'mkdir -p '+outdir
 
 cd, outdir
 
+filters=['u', 'g', 'r', 'i', 'z']
+nfilter=n_elements(filters)
+
 if(keyword_set(include)) then begin
     use_prefix='cen-'+prefix
+	  doagain=keyword_set(noclobber) eq 0
+		for ifilter=0L, nfilter-1L do begin
+		  if(NOT file_test(use_prefix+'-'+filters[ifilter]+'.fits.gz')) then $
+				doagain=1
+    endfor
+		if(keyword_set(doagain)) then $
     smosaic_make, ra, dec, angsz, angsz, rerun=rerun, /fpbin, $
       /global, /noran, /ivarout, prefix=use_prefix, pixscale=pixscale, $
       objlist=include, /maskobj, ncache=1, /ivarclip, /processed
 endif
 
-smosaic_make, ra, dec, angsz, angsz, rerun=rerun, /fpbin, $
+doagain=keyword_set(noclobber) eq 0
+for ifilter=0L, nfilter-1L do begin
+  if(NOT file_test(prefix+'-'+filters[ifilter]+'.fits.gz')) then $
+	doagain=1
+endfor
+if(keyword_set(doagain)) then $
+  smosaic_make, ra, dec, angsz, angsz, rerun=rerun, /fpbin, $
   /global, /maskobj, objlist={run:0, camcol:0, field:0, id:0, rerun:''}, $
   /noran, /ivarout, prefix=prefix, pixscale=pixscale, ncache=1, $
   /ivarclip, /processed
 
 if(keyword_set(obj)) then begin
     use_prefix='all-'+prefix
+	  doagain=keyword_set(noclobber) eq 0
+		for ifilter=0L, nfilter-1L do begin
+		  if(NOT file_test(use_prefix+'-'+filters[ifilter]+'.fits.gz')) then $
+				doagain=1
+    endfor
+ 		if(keyword_set(doagain)) then $
     smosaic_make, ra, dec, angsz, angsz, rerun=rerun, /fpbin, $
       /global, /noran, /ivarout, prefix=use_prefix, pixscale=pixscale, $
       ncache=1, /ivarclip, /processed

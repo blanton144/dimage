@@ -1,6 +1,6 @@
 ;+
 ; NAME:
-;   dparents_lsb
+;   dparents_sdss_gal
 ; PURPOSE:
 ;   take a fits file, detect objects, and create parents file
 ; CALLING SEQUENCE:
@@ -18,11 +18,12 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dparents_lsb, base, imfiles, plim=plim, ref=ref, sky=sky, $
-                  noclobber=noclobber
+pro dparents_sdss_gal, base, imfiles, plim=plim, ref=ref, sky=sky, $
+                       noclobber=noclobber, sdss=sdss
 
 if(NOT keyword_set(plim)) then plim=5.
 if(NOT keyword_set(ref)) then ref=0
+
 
 if(keyword_set(noclobber)) then begin
     gotall=0
@@ -50,8 +51,8 @@ psfs=fltarr(nim)
 sigma=fltarr(nim)
 for k=0L, nim-1L do begin
     images[*,*,k]=mrdfits(imfiles[k],0)
-    bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
-    psf=mrdfits(bimfile+'-bpsf.fits')
+    sdss.filter=filtername(k)
+    psf=dvpsf(nx/2., ny/2., sdss=sdss)
     fit_mult_gauss, psf, 1., amp, psfsig, /quiet
     psfs[k]=psfsig
     sigma[k]=dsigma(images[*,*,k], sp=10)
@@ -62,13 +63,11 @@ for k=0L, nim-1L do begin
       ivars[*,*,k]=ivar
 endfor
 
-
 ;; do general object detection
 dobjects_multi, images, object=oimage, plim=plim, dpsf=median(psfs)
 
 ;; now iteratively rebin 
 for level=1L, 2L do begin
-
     rnx=nx/2L^level
     rny=ny/2L^level
     rimages=fltarr(rnx, rny, nim)
@@ -87,7 +86,8 @@ for level=1L, 2L do begin
     endfor
     dobjects_multi, rimages, object=tmp_oimage, plim=plim, dpsf=median(psfs)
     newmask=lonarr(nx, ny)
-    newmask= rebin(float(tmp_oimage ge 0L), nx, ny, /sample)
+    newmask[0L:nnx-1L, 0L:nny-1L]= $
+      rebin(float(tmp_oimage ge 0L), nnx, nny, /sample)
     
     mask=(oimage ge 0) OR (newmask gt 0L)
     dfind, mask, object=oimage

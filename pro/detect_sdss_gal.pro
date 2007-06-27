@@ -26,22 +26,28 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect_lsb, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
-                  noclobber=noclobber, glim=glim, all=all, single=single, $
-                  aset=aset, sgset=sgset, gsmooth=gsmooth
+pro detect_sdss_gal, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
+                     noclobber=noclobber, glim=glim, all=all, single=single, $
+                     aset=aset, sgset=sgset, gsmooth=gsmooth
 
 if(NOT keyword_set(ref)) then ref=2
-if(NOT keyword_set(glim)) then glim=15.
+if(NOT keyword_set(glim)) then glim=8.
 if(NOT keyword_set(plim)) then plim=10.
-if(NOT keyword_set(gsmooth)) then gsmooth=13.
+if(NOT keyword_set(gsmooth)) then gsmooth=8.
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
     words=strsplit(cwd[0], '/',/extr)
     base=words[n_elements(words)-1]
 endif
-if(NOT keyword_set(imfiles)) then $
-  imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+
+extrs=stregex(base, '.*-(......)-(.)-(....)-(.*)', /sub, /extr)
+sdss={run:long(extrs[1]), $
+      camcol:long(extrs[2]), $
+      field:long(extrs[3]), $
+      filter:'', $
+      rerun:long(extrs[4])}
 
 if(NOT keyword_set(pset)) then begin
     pset={base:base, $
@@ -50,22 +56,9 @@ endif else begin
     pset=mrdfits(base+'-pset.fits', 1)
 endelse
 
-;; fit for psf (creates bpsf and vpsf files)
-nim=n_elements(imfiles)
-for k=0L, nim-1L do $
-  dfitpsf, imfiles[k], noclobber=noclobber
-
-for k=0L, nim-1L do begin
-    bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
-    if(n_tags(psfs) eq 0) then $
-      psfs=dpsfread(bimfile+'-vpsf.fits') $
-    else $
-      psfs=[psfs, dpsfread(bimfile+'-vpsf.fits')]
-endfor
-
 ;; get parents (creates pcat, pimage, parents files)
-dparents_lsb, base, imfiles, sky=sky, noclobber=noclobber, $
-  ref=pset.ref
+dparents_sdss_gal, base, imfiles, sky=sky, noclobber=noclobber, $
+  ref=pset.ref, sdss=sdss
 
 ;; read in parents and look for closest object to center
 hdr=headfits(base+'-pimage.fits',ext=0)
@@ -73,11 +66,10 @@ pcat=mrdfits(base+'-pcat.fits',1)
 
 if(keyword_set(all)) then begin
     for iparent=0L, n_elements(pcat)-1L do begin
-        psfs.xst= pcat[iparent].xst
-        psfs.yst= pcat[iparent].yst
         dchildren_multi, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
-          sgset=sgset, starlimit=500., sizelimit=100, plim=plim
+          sgset=sgset, starlimit=500., sizelimit=100, plim=plim, $
+          sdss=sdss
     endfor
 endif
 
@@ -86,14 +78,14 @@ if(n_elements(single) gt 0) then begin
     psfs.yst= pcat[single].yst
     dchildren_multi, base, single, psfs=psfs, $
       ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
-      sgset=sgset, plim=plim
+      sgset=sgset, plim=plim, sdss=sdss
 endif
 
 dcombine_multi, base, hand=hand
 
 mwrfits, pset, base+'-pset.fits', /create
 
-if(keyword_set(all)) then fit_lsb
+if(keyword_set(all)) then fit_lsb, base
 
 ;;dhtmlpage, dbset.base, dbset.parent, /install
 

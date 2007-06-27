@@ -1,4 +1,4 @@
-pro fit_lsb
+pro fit_lsb, base
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd

@@ -39,7 +39,7 @@ pro dchildren_multi, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                      ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                      nstars=nstars, ngals=ngals, sersic=in_sersic, $
                      aset=in_aset, sgset=in_sgset, starlimit=starlimit, $
-                     sizelimit=sizelimit
+                     sizelimit=sizelimit, sdss=sdss
                      
 
 common atv_point, markcoord
@@ -111,7 +111,12 @@ for k=0L, nim-1L do begin
                          strtrim(string(iparent),2)+'.fits',1+k*2L)
 endfor
 
-bpsf=dvpsf(nx/2L, ny/2L, psf=psfs[ref])
+if(n_tags(sdss) gt 0) then begin
+    sdss.filter=filtername(ref)
+    bpsf=dvpsf(nx/2L, ny/2L, sdss=sdss) 
+endif else begin
+    bpsf=dvpsf(nx/2L, ny/2L, psf=psfs[ref])
+endelse
 pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet ; jm07may01nyu
@@ -125,8 +130,14 @@ if(keyword_set(starlimit)) then begin
     if(nc gt 0) then begin
         tmp_xc=tmp_xc[0:nc-1L]
         tmp_yc=tmp_yc[0:nc-1L]
-        ispsf=dpsfcheck(images[*,*,ref], ivars[*,*,ref], tmp_xc, tmp_yc, $
-                        vpsf=psfs[ref], flux=flux, amp=amp)
+        if(n_tags(sdss) gt 0) then begin
+            sdss.filter=filtername(ref)
+            ispsf=dpsfcheck(images[*,*,ref], ivars[*,*,ref], tmp_xc, tmp_yc, $
+                            flux=flux, amp=amp, sdss=sdss) 
+        endif else begin
+            ispsf=dpsfcheck(images[*,*,ref], ivars[*,*,ref], tmp_xc, tmp_yc, $
+                            vpsf=psfs[ref], flux=flux, amp=amp) 
+        endelse
         if(max(flux) gt starlimit) then return
     endif
 endif
@@ -148,8 +159,14 @@ if(keyword_set(newsg)) then begin
             tmp_yc=tmp_yc[0:nc-1]
             
             ;; try and guess which peaks are PSFlike
-            ispsf=dpsfcheck(images[*,*,k], ivars[*,*,k], tmp_xc, tmp_yc, $
-                            vpsf=psfs[k])
+            if(n_tags(sdss) gt 0) then begin
+                sdss.filter=filtername(k)
+                ispsf=dpsfcheck(images[*,*,k], ivars[*,*,k], tmp_xc, tmp_yc, $
+                                sdss=sdss) 
+            endif else begin
+                ispsf=dpsfcheck(images[*,*,k], ivars[*,*,k], tmp_xc, tmp_yc, $
+                                vpsf=psfs[k])
+            endelse
 
             istars=where(ispsf gt 0, nstars)
             help,k
@@ -167,7 +184,12 @@ if(keyword_set(newsg)) then begin
                 model=fltarr(nx,ny)
                 drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr, smooth=1
                 for i=0L, n_elements(tmp_xstars)-1L do begin 
-                    psf=dvpsf(xr[i], yr[i], psf=psfs[k])
+                    if(n_tags(sdss) gt 0) then begin
+                        sdss.filter=filtername(k)
+                        psf=dvpsf(xr[i], yr[i], sdss=sdss)
+                    endif else begin
+                        psf=dvpsf(xr[i], yr[i], psf=psfs[k])
+                    endelse
                     tmp_model=fltarr(nx,ny)
                     embed_stamp, tmp_model, psf, $
                       xr[i]-float(pnx/2L), $
@@ -329,7 +351,12 @@ if(NOT keyword_set(nodeblend)) then begin
         fivar=ivars[*,*,ref]
         drefine, fimage, xstars, ystars, xr=xr, yr=yr, smooth=2
         for i=0L, nstars-1L do begin 
-            psf=dvpsf(xr[i], yr[i], psf=psfs[ref])
+            if(n_tags(sdss) gt 0) then begin
+                sdss.filter=filtername(ref)
+                psf=dvpsf(xr[i], yr[i], sdss=sdss)
+            endif else begin
+                psf=dvpsf(xr[i], yr[i], psf=psfs[ref])
+            endelse
             tmp_model=fltarr(nx,ny)
             embed_stamp, tmp_model, psf, $
               xr[i]-float(pnx/2L), $
@@ -360,7 +387,12 @@ if(NOT keyword_set(nodeblend)) then begin
             fimage=images[*,*,k]-msimage
             fivar=ivars[*,*,k]
             for i=0L, nstars-1L do begin 
-                psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
+                if(n_tags(sdss) gt 0) then begin
+                    sdss.filter=filtername(k)
+                    psf=dvpsf(xstars[i], ystars[i], sdss=sdss)
+                endif else begin
+                    psf=dvpsf(xstars[i], ystars[i], psf=psfs[k])
+                endelse
                 dprefine, fimage, psf, xstars[i], ystars[i], xr=xr, yr=yr
                 tmp_model=fltarr(nx,ny)
                 embed_stamp, tmp_model, psf, $

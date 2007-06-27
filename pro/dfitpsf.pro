@@ -24,11 +24,12 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber, $
-             cmap=cmap
+             cmap=cmap, base=base
 
 if(NOT keyword_set(natlas)) then natlas=41L
 
-base=(stregex(imfile, '(.*)\.fits.*', /sub, /extr))[1]
+if(NOT keyword_set(base)) then $
+  base=(stregex(imfile, '(.*)\.fits.*', /sub, /extr))[1]
 
 if(keyword_set(noclobber)) then begin
     if(file_test(base+'-bpsf.fits') gt 0 AND $
@@ -128,23 +129,6 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
     extract = extract[keep]
     
 endfor
-
-;plotimage, logscl(image,exp=0.5,min=-1,max=5), /preserve, xrange=[400,700], yrange=[400,700]
-;for jj = 0L, n_elements(extract1)-1L do tvcircle, 10.0, extract1[jj].xcen, extract1[jj].ycen, color=djs_icolor('red'), /data
-;for kk = 0L, n_elements(extract)-1L do tvcircle, 10.0, extract[kk].xcen, extract[kk].ycen, thick=2.0, color=djs_icolor('yellow'), /data
-
-;isort=sort(diff)
-;
-;istarsort=where(diff[isort] lt stardiff and $
-;                lindgen(n_elements(isort)) lt maxnstar, $
-;                nstarsort)
-;if(nstarsort eq 0) then begin
-;    istar=isort[0]
-;endif else begin
-;    istar=isort[where(diff[isort] lt stardiff and $
-;                      lindgen(n_elements(isort)) lt maxnstar)]
-;endelse
-;extract=extract[istar]
 
 ; find basic PSF
 atlas=extract.atlas

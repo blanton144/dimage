@@ -24,7 +24,15 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function dvpsf, x, y, psfsrc=psfsrc
+function dvpsf, x, y, psfsrc=psfsrc, sdss=sdss
+
+if(n_tags(sdss) gt 0) then begin
+    psfieldfile= sdss_name('psField', sdss.run, sdss.camcol, $
+                           sdss.field, rerun=sdss.rerun)
+    psfield=mrdfits(psfieldfile, (filternum(sdss.filter))[0]+1L)
+    psf=sdss_psf_recon(psfield, x, y, /normalize)
+    return, psf
+endif
 
 if(n_tags(psfsrc) eq 0) then psfsrc=dpsfread(psfsrc)
 
