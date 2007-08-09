@@ -95,7 +95,7 @@ int dfluxes(float *image,
             ((float) j - ycen[k])*((float) j - ycen[k]);
           if(r2<1.) r2=1.;
           val=fr[k]/r2;
-          if(val>maxval) {
+          if(val>maxval && templates[k*nx*ny+i+j*nx]!=0.) {
             maxval=val;
             kp=k;
           }

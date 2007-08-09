@@ -524,7 +524,8 @@ endif
 end
   
 ;; main
-pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb
+pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb, $
+                     twomass=in_twomass
 
 common com_dexplore_widget
 

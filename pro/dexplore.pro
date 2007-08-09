@@ -11,7 +11,7 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dexplore, base, lsb=lsb
+pro dexplore, base, lsb=lsb, twomass=twomass
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -19,9 +19,12 @@ if(NOT keyword_set(base)) then begin
     base=words[n_elements(words)-1]
 endif
 
-images=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+if(NOT keyword_set(twomass)) then $
+  images=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz' $
+else $
+  images=base+'-'+['J', 'H', 'K']+'.fits.gz' 
 
-dexplore_widget, base, images, lsb=lsb
+dexplore_widget, base, images, lsb=lsb, twomass=twomass
 
 end
 ;------------------------------------------------------------------------------

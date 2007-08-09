@@ -28,7 +28,7 @@
 ;------------------------------------------------------------------------------
 pro detect_lsb, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
                   noclobber=noclobber, glim=glim, all=all, single=single, $
-                  aset=aset, sgset=sgset, gsmooth=gsmooth
+                  aset=aset, sgset=sgset, gsmooth=gsmooth, twomass=twomass
 
 if(NOT keyword_set(ref)) then ref=2
 if(NOT keyword_set(glim)) then glim=15.
@@ -40,8 +40,12 @@ if(NOT keyword_set(base)) then begin
     words=strsplit(cwd[0], '/',/extr)
     base=words[n_elements(words)-1]
 endif
-if(NOT keyword_set(imfiles)) then $
-  imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+if(NOT keyword_set(imfiles)) then begin
+    if(NOT keyword_set(twomass)) then $
+      imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz' $
+    else $
+      imfiles=base+'-'+['J', 'H', 'K']+'.fits.gz' 
+endif
 
 if(NOT keyword_set(pset)) then begin
     pset={base:base, $
@@ -75,7 +79,7 @@ if(keyword_set(all)) then begin
     for iparent=0L, n_elements(pcat)-1L do begin
         psfs.xst= pcat[iparent].xst
         psfs.yst= pcat[iparent].yst
-        dchildren_multi, base, iparent, psfs=psfs, $
+        dchildren_lsb, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
           sgset=sgset, starlimit=500., sizelimit=100, plim=plim
     endfor
@@ -84,7 +88,7 @@ endif
 if(n_elements(single) gt 0) then begin
     psfs.xst= pcat[single].xst
     psfs.yst= pcat[single].yst
-    dchildren_multi, base, single, psfs=psfs, $
+    dchildren_lsb, base, single, psfs=psfs, $
       ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
       sgset=sgset, plim=plim
 endif

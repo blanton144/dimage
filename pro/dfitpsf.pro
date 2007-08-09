@@ -110,15 +110,15 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
     
     diff=fltarr(n_elements(extract))
     model=reform(bpsf, natlas*natlas)
-    for i=0L, n_elements(extract)-1L do begin 
+    for i=0L, n_elements(extract)-1L do begin  & $
         scale=total(model*reform(extract[i].atlas,natlas*natlas))/ $
-          total(model*model)
-        diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) ; jm07may07nyu
+          total(model*model) & $
+        diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) & $ ; jm07may07nyu
     endfor
     
 ; reject REJSIGMA outliers
     
-    keep = where(diff lt mpchilim(rejsigma[iter],1.0,/sigma),nkeep)
+    keep = where(diff lt mpchilim(rejsigma[iter],float(natlas)^2,/sigma),nkeep)
     splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
     if (nkeep eq 0L) then begin
         splog, 'No good stars found.'

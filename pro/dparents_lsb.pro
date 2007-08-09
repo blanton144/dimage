@@ -62,12 +62,11 @@ for k=0L, nim-1L do begin
       ivars[*,*,k]=ivar
 endfor
 
-
 ;; do general object detection
 dobjects_multi, images, object=oimage, plim=plim, dpsf=median(psfs)
 
 ;; now iteratively rebin 
-for level=1L, 2L do begin
+for level=1L, 3L do begin
 
     rnx=nx/2L^level
     rny=ny/2L^level

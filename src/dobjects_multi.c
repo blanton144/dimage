@@ -40,7 +40,7 @@ int dobjects_multi(float *images,
 	for(k=0;k<nim;k++) {
 		dsmooth(&(images[k*nx*ny]), nx, ny, dpsf, smooth);
 		
-		dsigma(smooth, nx, ny, (int) (3*dpsf), &sigma);
+		dsigma(smooth, nx, ny, (int) (8*dpsf), &sigma);
 		limit=sigma*plim;
 		
 		for(j=0;j<ny;j++) {

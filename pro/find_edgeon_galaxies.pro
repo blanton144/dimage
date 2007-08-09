@@ -27,22 +27,4 @@ mwrfits, im, $
 mwrfits, sp, $
   getenv('DATA')+'/'+outbase+'/'+outbase+'-sp.fits', /create
 
-for i=0L, nflat-1L do begin
-    ra=cal[i].ra
-    dec=cal[i].dec
-
-    ihr=long(ra/15.)
-    idec=long(abs(dec)/2.)*2.
-    dsign='p'
-    if(dec lt 0.) then dsign='m'
-    outdir=getenv('DATA')+'/'+outbase+'/'+string(ihr,f='(i2.2)')+'h'
-    outdir=outdir+'/'+dsign+strtrim(string(idec, f='(i2.2)'),2)
-    prefix=hogg_iau_name(ra,dec,'')
-    outdir=outdir+'/'+prefix
-    spawn, 'mkdir -p '+outdir
-    smosaic_dimage, cal[i].ra, cal[i].dec, 0.02, run=cal[i].run, $
-      objlist=cal[i], orientation=(-cal[i].phi_iso_deg[2]), /maskobj, $
-      /ivarclip, prefix=outdir[0]+'/'+prefix[0]
-endfor
-
 end
