@@ -144,8 +144,12 @@ gpsf=(model/mm) > 0.0001
 gpsf=fltarr(pnx,pny)+1.
 
 ; output basic PSF
-mwrfits, reform(bpsf, natlas, natlas), base+'-bpsf.fits', /create
-mwrfits, reform(model, natlas, natlas), base+'-bpsf.fits' ; jm07may01nyu
+mkhdr, hdr, 4, [41,41], /extend
+sxdelpar, hdr, 'COMMENT' & sxdelpar, hdr, 'DATE'
+sxaddpar, hdr, 'PSFSIGMA', float(psfsig[0]), ' Gaussian sigma [pixel]'
+sxaddpar, hdr, 'NPSFSTAR', long(n_elements(extract)), ' number of stars used in the PSF'
+mwrfits, float(reform(bpsf, natlas, natlas)), base+'-bpsf.fits', hdr, /create
+mwrfits, float(reform(model, natlas, natlas)), base+'-bpsf.fits', hdr ; jm07may01nyu
 
 npinit=4L
 np=npinit
