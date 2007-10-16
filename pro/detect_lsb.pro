@@ -54,6 +54,16 @@ endif else begin
     pset=mrdfits(base+'-pset.fits', 1)
 endelse
 
+allthere=1
+for i=0L, n_elements(imfiles)-1L do begin
+    if(NOT file_test(imfiles[i])) then allthere=0
+endfor
+
+if(NOT allthere) then begin
+    splog, 'not all imfiles there for '+base
+    return
+endif
+
 ;; fit for psf (creates bpsf and vpsf files)
 nim=n_elements(imfiles)
 for k=0L, nim-1L do $
