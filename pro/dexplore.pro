@@ -20,7 +20,7 @@ if(NOT keyword_set(base)) then begin
 endif
 
 if(NOT keyword_set(twomass)) then $
-  images=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz' $
+  images=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd']+'.fits.gz' $
 else $
   images=base+'-'+['J', 'H', 'K']+'.fits.gz' 
 

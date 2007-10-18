@@ -2,170 +2,114 @@
 ; NAME:
 ;   detect
 ; PURPOSE:
-;   detect objects 
+;   detect objects in multi-band, multi-res images 
 ; CALLING SEQUENCE:
-;   detect, imfile [, psf= ]
+;   detect, base, imfile [, /pset, /aset
 ; INPUTS:
-;   imfile - FITS image file 
+;   base - base name for output
+;   imfiles - [Nband] array of FITS files with images in HDU 0
 ; OPTIONAL INPUTS:
-;   psf - guess sigma for gaussian PSF (default 2.)
+;   ref - integer indicating which imfile is the "reference"
+;   sky - if set, subtracts a median smoothed sky with this box size
+;         (in arcsec)
+;   glim - number of sigma for a galaxy detection (default 20)
+;   gsmooth - smoothing scale for galaxies (default 5)
+;   single - if set, only process this parent number
+;   puse - [Nband] 0 or 1, whether to use band to find parents
+; OPTIONAL KEYWORDS:
+;   /all - process all parents
+;   /pset - use "parent" settings from base-pset.fits file
+;   /aset - use "child" settings from base-aset.fits file
+;   /sgset - get locations of stars and galaxies from base-sgset.fits file
+;   /hand - for children, put results in "hand" subdir (used by dexplore)
+;   /noclobber - do not overwrite previously created files
 ; COMMENTS:
-;   If you input 'myimage.fits' it outputs:
-;    myimage-cat.fits (catalog)
-;    myimage-parents.fits (atlases)
-;    myimage-atlas.fits (atlases)
+;   When calling automatically, it is best not to use the /hand
+;     option; reserve that for when dexplore calls this function and you
+;     have set the parameters by hand.
+;   Assumes that multi-res images are APPROXIMATELY overlapping
+;     (within a pixel or two)
+;   Assumes a sky-subtracted image in HDU 0
+;   Works better if ivars supplied in HDU 1
+;   Finds objects, selects largest one to deblend 
+;   Outputs (assuming imfile is 'base.fits' or 'base.fits.gz'):
+;     base-dbset.fits - settings, locations of stars and gals, etc
+;     base-bpsf.fits - "basic" PSF estimate
+;     base-pcat.fits - locations of parents in full image
+;     base-parents.fits - in HDUs 2N+1 and 2N+2, imagse and ivars of parents
+;     base-[parent]-atlas.fits - images of children of biggest parent
+;     base-[parent].tar.gz - tar file with JPGs, etc
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect, imfile, guess=guess, plim=plim, msub=msub
+pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
+            noclobber=noclobber, glim=glim, all=all, single=single, $
+            aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse
 
-common atv_point, markcoord
+if(NOT keyword_set(ref)) then ref=0
+if(NOT keyword_set(glim)) then glim=20.
+if(NOT keyword_set(gsmooth)) then gsmooth=5.
 
-if(NOT keyword_set(guess)) then guess=1.5
-if(NOT keyword_set(plim)) then plim=20.
+if(NOT keyword_set(base)) then begin
+    spawn, 'pwd', cwd
+    words=strsplit(cwd[0], '/',/extr)
+    base=words[n_elements(words)-1]
+    imfiles=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd']+'.fits.gz'
+    puse=[1,1,1,1,1,0,0]
+    tuse=[1,1,2,3,4,1,1]
+endif
 
-base=(stregex(imfile, '(.*)\.fits.*', /sub, /extr))[1]
+if(NOT keyword_set(pset)) then begin
+    pset={base:base, $
+          ref:ref}
+endif else begin
+    pset=mrdfits(base+'-pset.fits', 1)
+endelse
 
-image=mrdfits(imfile)
-if(keyword_set(msub)) then image=image-median(image)
+;; get parents (creates pcat, pimage, parents files)
+dparents, base, imfiles, sky=sky, noclobber=noclobber, ref=pset.ref, $
+  puse=puse
 
-nx=(size(image,/dim))[0]
-ny=(size(image,/dim))[1]
+;; read in parents 
+hdr=headfits(base+'-pimage.fits',ext=0)
+pcat=mrdfits(base+'-pcat.fits',1)
 
-;; do general object detection
-sigma=dsigma(image)
-invvar=fltarr(nx,ny)+1./sigma^2
-dobjects, image, invvar, object=oimage, plim=plim
-mwrfits, oimage, base+'-pimage.fits', /create
+;; fit for psf (creates bpsf and vpsf files)
+nim=n_elements(imfiles)
+for k=0L, nim-1L do $
+  dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas
 
-cat0={x:0., y:0.}
-
-mwrfits, 0, base+'-atlas.fits', /create
-mwrfits, 0, base+'-parents.fits', /create
-for iobj=0L, max(oimage) do begin
-    io=where(oimage eq iobj)
-    ixo=io mod nx
-    iyo=io / nx
-    xstart=(min(ixo)-30L)>0
-    xend=(max(ixo)+30L)<(nx-1L)
-    ystart=(min(iyo)-30L)>0
-    yend=(max(iyo)+30L)<(ny-1L)
-    nxnew=xend-xstart+1L
-    nynew=yend-ystart+1L
-
-    timage=image[xstart:xend, ystart:yend]
-    nimage=oimage[xstart:xend, ystart:yend]
-    
-;; now choose the object that includes the center
-    io=where(nimage eq iobj OR nimage eq -1L)
-    
-    iimage=randomn(seed, nxnew, nynew)*sigma
-    iimage[io]=timage[io]
-    iivar=fltarr(nxnew,nynew)+1./sigma^2
-
-    hdr=['']
-    sxaddpar, hdr, 'XOFF', xstart
-    sxaddpar, hdr, 'YOFF', ystart
-    mwrfits, iimage, base+'-parents.fits', hdr
-    
-;; find all peaks 
-    dpeaks, iimage, xc=xc, yc=yc, sigma=sigma, minpeak=5.*sigma/(4.*!DPI), $
-      /refine, npeaks=nc, /smooth
-
-    if(nc gt 0) then begin
-        
-;; try and guess which peaks are PSFlike
-        psf=dpsfcheck(iimage, iivar, xc, yc, amp=amp, guess=guess)
-        ipsf=where(psf gt 0., npsf)
-        xstars=-1
-        ystars=-1
-        if(npsf gt 0) then begin
-            xstars=xc[ipsf]
-            ystars=yc[ipsf]
-            psf=psf[ipsf]
-            amp=amp[ipsf]
-        endif
-        
-        nxi=(size(iimage,/dim))[0]
-        nyi=(size(iimage,/dim))[1]
-        
-        nimage=iimage
-        for i=0L, npsf-1L do begin 
-            xst=long(xstars[i]-psf[i]*8)>0L  
-            xnd=long(xstars[i]+psf[i]*8)<(nxi-1L)  
-            xs=xnd-xst+1L  
-            yst=long(ystars[i]-psf[i]*8)>0L  
-            ynd=long(ystars[i]+psf[i]*8)<(nyi-1L)  
-            ys=ynd-yst+1L  
-            xx=(xst+findgen(xs))#replicate(1., ys)  
-            yy=replicate(1., xs)#(yst+findgen(ys))  
-            model=amp[i]*exp(-0.5*((xx-xstars[i])^2+ $
-                                   (yy-ystars[i])^2)/psf[i]^2)  
-            nimage[xst:xnd, yst:ynd]= nimage[xst:xnd, yst:ynd]- model 
-        endfor
-        
-        psmooth=15.
-        subpix=long(psmooth/3.) > 1L
-        nxsub=nxi/subpix
-        nysub=nyi/subpix
-        simage=rebin(nimage[0:nxsub*subpix-1, 0:nysub*subpix-1], nxsub, nysub)
-        simage=dsmooth(simage, psmooth/float(subpix))
-        ssig=dsigma(simage)
-        sivar=fltarr(nxsub, nysub)+1./ssig^2
-        dpeaks, simage, xc=xc, yc=yc, sigma=ssig, minpeak=5.*ssig, $
-          /refine, npeaks=nc
-        xgals=-1
-        ygals=-1
-        if(nc gt 0) then begin
-            xgals=(float(xc)+0.5)*float(subpix)
-            ygals=(float(yc)+0.5)*float(subpix)
-        endif
-        
-        x1=fltarr(2,n_elements(xstars))
-        x1[0,*]=xstars
-        x1[1,*]=ystars
-        x2=fltarr(2,n_elements(xgals))
-        x2[0,*]=xgals
-        x2[1,*]=ygals
-        matchnd, x1, x2, 5., m1=m1, m2=m2, nmatch=nm, nd=2
-        if(nm gt 0) then begin
-            kpsf=lonarr(n_elements(xstars))+1L 
-            kpsf[m1]=0 
-            ik=where(kpsf gt 0, nk) 
-            if(nk gt 0) then begin
-                xstars=xstars[ik] 
-                ystars=ystars[ik] 
-            endif else begin
-                xstars=-1
-                ystars=-1
-            endelse
-        endif
-
-;; deblend on those peaks
-        if(xstars[0] ge 0 OR xgals[0] gt 0) then begin
-            deblend, iimage, iivar, nchild=nchild, xcen=xcen, ycen=ycen, $
-              children=children, templates=templates, xgals=xgals, $
-              ygals=ygals, xstars=xstars, ystars=ystars
-    
-            for i=0L, nchild-1L do begin
-                cat0.x=xcen[i]+xstart
-                cat0.y=ycen[i]+ystart
-                if(n_tags(cat) eq 0) then $
-                  cat=cat0 $ 
-                else $
-                  cat=[cat, cat0]
-                mwrfits, children[*,*,i], base+'-atlas.fits', hdr
-            endfor
-        endif 
-    endif
-
+for k=0L, nim-1L do begin
+    bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
+    tmp_psf=dpsfread(bimfile+'-vpsf.fits') 
+    if(n_tags(tmp_psf) eq 0) then $
+      tmp_psf=dummy_psf(natlas,10000L, 10000L)
+    if(n_tags(psfs) eq 0) then $
+      psfs=tmp_psf $
+    else $
+      psfs=[psfs, tmp_psf]
 endfor
-mwrfits, cat, base+'-cat.fits', /create
 
-atv,image
-atvplot, cat.x, cat.y, psym=4
-atvxyouts, cat.x, cat.y, strtrim(string(lindgen(n_elements(cat))),2), chars=2.
+if(keyword_set(all)) then begin
+    for iparent=0L, n_elements(pcat)-1L do begin
+        psfs.xst= pcat[iparent].xst
+        psfs.yst= pcat[iparent].yst
+        dchildren, base, iparent, psfs=psfs, $
+          ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
+          sgset=sgset, puse=puse, tuse=tuse
+    endfor
+endif
+
+if(n_elements(single) gt 0) then begin
+    psfs.xst= pcat[single].xst
+    psfs.yst= pcat[single].yst
+    dchildren, base, single, psfs=psfs, $
+      ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
+      sgset=sgset, puse=puse, tuse=tuse
+endif
+
+mwrfits, pset, base+'-pset.fits', /create
 
 end
 ;------------------------------------------------------------------------------

@@ -21,7 +21,7 @@ void dcholsl(float *a, int n, float p[], float b[], float x[]);
 void dcholdc(float *a, int n, float p[]);
 int dfind(int *image, int nx, int ny, int *object);
 int dsmooth(float *image, int nx, int ny, float sigma, float *smooth);
-int dobjects(float *image, float *smooth, int nx, int ny, 
+int dobjects(float *image, int nx, int ny, 
 						 float dpsf, float plim, int *objects);
 int dobjects_multi(float *image, int nx, int ny, int nim, 
 									 float dpsf, float plim, int *objects);

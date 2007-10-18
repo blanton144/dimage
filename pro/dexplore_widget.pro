@@ -4,7 +4,7 @@ common com_dexplore_widget, $
   w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
   w_settings, w_gsmooth, w_glim, w_sersic, w_redeblend, w_mark, w_smooth, $
   basename, imagenames, $
-  parent_images, parent_hdr, $
+  parent_images, parent_hdrs, $
   setval, band, smooth, child, parent, $
   pcat, acat, ig, is, igstr, isstr, ng, ns, lsb, $
   fix_stretch, hand, show_templates, gsmooth, glim, sersic, atset, $
@@ -246,10 +246,11 @@ COMPILE_OPT hidden
 common com_dexplore_widget
 
 if(keyword_set(parent_images)) then begin
-    pim=parent_images[*,*,band]
+    pim=(*parent_images[band])
+    phdr=(*parent_hdrs[band])
     if(keyword_set(smooth)) then $
       pim=dsmooth(pim, smooth)
-    atv2, pim, /align, head=hdr, stretch=fix_stretch
+    atv2, pim, /align, head=phdr, stretch=fix_stretch
     fix_stretch=setval[0]
 endif
 
@@ -365,14 +366,16 @@ common com_dexplore_widget
 
 if(n_tags(acat)) then begin
     if(ng gt 0) then begin
-        atv2plot, acat[ig].xcen, acat[ig].ycen, psym=4, th=2
-        atv2xyouts, acat[ig].xcen, acat[ig].ycen, igstr, align=0.8, $
-          charsize=1.7
+        phdr=(*parent_hdrs[band])
+        adxy, phdr, acat[ig].racen, acat[ig].deccen, xcen, ycen
+        atv2plot, xcen, ycen, psym=4, th=2
+        atv2xyouts, xcen, ycen, igstr, align=0.8, charsize=1.7
     endif
     if(ns gt 0) then begin
-        atv2plot, acat[is].xcen, acat[is].ycen, psym=5
-        atv2xyouts, acat[is].xcen, acat[is].ycen, isstr, align=0.8, $
-          charsize=1.7
+        phdr=(*parent_hdrs[band])
+        adxy, phdr, acat[is].racen, acat[is].deccen, xcen, ycen
+        atv2plot, xcen, ycen, psym=5
+        atv2xyouts, xcen, ycen, isstr, align=0.8, charsize=1.7
     endif
 endif
 end
@@ -499,13 +502,11 @@ common com_dexplore_widget
 
 ;; read in parent image
 imfile='parents/'+basename+'-parent-'+strtrim(string(parent),2)+'.fits'
-parent_image=mrdfits(imfile, 0L, parent_hdr)
-
-nx=(size(parent_image, /dim))[0]
-ny=(size(parent_image, /dim))[1]
-parent_images=fltarr(nx,ny, n_elements(imagenames))
+parent_images=ptrarr(n_elements(imagenames))
+parent_hdrs=ptrarr(n_elements(imagenames))
 for i=0L, n_elements(imagenames)-1L do begin
-    parent_images[*,*,i]=mrdfits(imfile, i*2L)
+    parent_images[i]=ptr_new(mrdfits(imfile, i*2L, hdr))
+    parent_hdrs[i]=ptr_new(hdr)
 endfor
 
 ;; read in sgset file

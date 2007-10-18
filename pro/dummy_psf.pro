@@ -1,36 +1,29 @@
 ;+
 ; NAME:
-;   dpsfread
+;   dummy_psf
 ; PURPOSE:
-;   read a PSF structure from a file
+;   return a dummy psf for cases where it is unknown
 ; CALLING SEQUENCE:
-;   psfstr= dpsfread(psffile)
-; INPUTS:
-;   psffile - input FITS file output by dpsffit
+;   psfstr =dummy_psf(natlas, nx, ny)
 ; OUTPUTS:
 ;   psfstr - structure with:
 ;             NX
 ;             NY
 ;             COEFFS[NP, NC]
 ;             PSFT[NATLAS, NATLAS, NC]
+; COMMENTS:
+;   returns output like that of dpsfread()
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function dpsfread, psffile
+function dummy_psf, natlas, nx, ny
 
-hdr=headfits(psffile, ext=0)
-
-if(n_elements(hdr) eq 1) then return,0
-
-nx=long(sxpar(hdr, 'NX'))
-ny=long(sxpar(hdr, 'NY'))
-xst=long(sxpar(hdr, 'XST'))
-yst=long(sxpar(hdr, 'YST'))
-nc=long(sxpar(hdr, 'NC'))
-np=long(sxpar(hdr, 'NP'))
-softbias=float(sxpar(hdr, 'SOFTBIAS'))
-natlas=long(sxpar(hdr, 'NATLAS'))
+xst=0L
+yst=0L
+nc=3L
+np=1L
+softbias=0.
 
 psfstr={XST:xst, $
         YST:yst, $
@@ -44,9 +37,7 @@ psfstr={XST:xst, $
         COEFFS:fltarr(200L,nc), $
         PSFT:fltarr(natlas, natlas, nc)}
 
-psfstr.bpsf=mrdfits(psffile, 0)
-psfstr.psft=mrdfits(psffile, 1)
-psfstr.coeffs[0:np*np-1]=(mrdfits(psffile, 2))[0:np*np-1]
+psfstr.bpsf= psf_gaussian(npix=natlas, st_dev=1.5, /normalize)
 
 return, psfstr
 

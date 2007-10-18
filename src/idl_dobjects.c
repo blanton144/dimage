@@ -23,7 +23,6 @@ IDL_LONG idl_dobjects (int      argc,
 	/* 0. allocate pointers from IDL */
 	i=0;
 	image=((float *)argv[i]); i++;
-	smooth=((float *)argv[i]); i++;
 	nx=*((int *)argv[i]); i++;
 	ny=*((int *)argv[i]); i++;
 	dpsf=*((float *)argv[i]); i++;
@@ -31,7 +30,7 @@ IDL_LONG idl_dobjects (int      argc,
 	objects=((IDL_LONG *)argv[i]); i++;
 	
 	/* 1. run the fitting routine */
-	retval=(IDL_LONG) dobjects(image, smooth, nx, ny, dpsf, plim, 
+	retval=(IDL_LONG) dobjects(image, nx, ny, dpsf, plim, 
                              (int *) objects);
 	
 	/* 2. free memory and leave */
