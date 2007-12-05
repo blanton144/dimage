@@ -7,7 +7,7 @@
 
 SHELL = /bin/sh
 #
-SUBDIRS = .
+SUBDIRS = utils 
 
 all :;
 

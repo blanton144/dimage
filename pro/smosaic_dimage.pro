@@ -1,6 +1,14 @@
 pro smosaic_dimage, ra, dec, sz=sz, prefix=prefix, noclobber=noclobber, $
                     iau_name=iau_name, scales=scales, sub=sub, $
-                    _EXTRA=extra_for_smosaic
+                    raw=raw, jpg=jpg, _EXTRA=extra_for_smosaic, $
+                    satvalue=satvalue, nonlinearity=nonlinearity
+
+if(NOT keyword_set(scales)) then scales=[20.,20.,20.]
+if(NOT keyword_set(satvalue)) then satvalue=30.
+if(NOT keyword_set(nonlinearity)) then nonlinearity=3.
+
+fpbin=1
+if(keyword_set(raw)) then fpbin=0
 
 if(n_elements(ra) eq 0) then begin
     iau_to_radec, iau_name, ra, dec
@@ -26,7 +34,7 @@ if(keyword_set(noclobber)) then begin
 endif
 
 if(redo) then $
-  smosaic_make, ra, dec, sz, sz, /fpbin, /global, rerun=[137, 161], $
+  smosaic_make, ra, dec, sz, sz, fpbin=fpbin, /global, rerun=[137, 161], $
   /dropweights, /ivarout, /sheldon, prefix=prefix, $
   _EXTRA=extra_for_smosaic
 
@@ -35,6 +43,7 @@ if(keyword_set(noclobber)) then begin
     redo=0
     if(NOT file_test(prefix+'.jpg')) then redo=1
 endif
+if(keyword_set(jpg)) then redo=1
 
 if(NOT keyword_set(scales)) then scales=[3.,3.,3.]
 if(redo) then $
@@ -43,7 +52,7 @@ if(redo) then $
   prefix[0]+'-g.fits.gz', $
   name=prefix+'.jpg', $
   scales=scales, $
-  nonlinearity=3., satvalue=50., $
+  nonlinearity=nonlinearity, satvalue=satvalue, $
   quality=100.
 
 end

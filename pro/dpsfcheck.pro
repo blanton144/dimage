@@ -60,9 +60,9 @@ flux=fltarr(n_elements(x))
 for i=0L, n_elements(x)-1L do begin 
     cutout_image=fltarr(npx,npy) 
     cutout_ivar=fltarr(npx,npy) 
-    cutout_ivar=cutout_ivar>0. 
     embed_stamp, cutout_image, image, npx/2L-x[i], npy/2L-y[i] 
     embed_stamp, cutout_ivar, ivar, npx/2L-x[i], npy/2L-y[i] 
+    cutout_ivar=cutout_ivar>0.
     
     if(keyword_set(havevar)) then begin
         currpsf=dvpsf(x[i], y[i], psfsrc=vpsf, sdss=sdss)
@@ -73,6 +73,8 @@ for i=0L, n_elements(x)-1L do begin
         scale=max(currpsf)/total(currpsf)
         cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
     endelse
+    maxm=max(model)
+    cutout_ivar=cutout_ivar*(1.+3.*model/maxm)
     hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
       reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
     ;;hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $

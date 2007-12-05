@@ -24,7 +24,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dobjects, images, objects=objects, dpsf=dpsf, plim=plim, puse=puse, $
-              fobject=fobject
+              fobject=fobject, seed=seed
 
 nlevel=3L
 
@@ -90,7 +90,7 @@ for k=0L, nim-1L do begin
             tmp_objects=lonarr(rnx, rny)
             retval=call_external(soname, 'idl_dobjects', $
                                  float(tmp_image), $
-                                 long(rnx), long(rnx), $
+                                 long(rnx), long(rny), $
                                  float(dpsf), $
                                  float(plim), $
                                  long(tmp_objects))

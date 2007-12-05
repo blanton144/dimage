@@ -26,11 +26,13 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dparents, base, imfiles, plim=plim, ref=ref, sky=sky, $
-              noclobber=noclobber, puse=puse
+              noclobber=noclobber, puse=puse, seed=seed0
 
 if(NOT keyword_set(plim)) then plim=5.
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(puse)) then puse=replicate(1, n_elements(imfiles))
+if(NOT keyword_set(seed0)) then seed0=108L
+seed=seed0
 
 ;; check for all files, if we have them and we aren't supposed to
 ;; clobber them, then return
@@ -99,7 +101,8 @@ for k=0L, nim-1L do begin
 endfor
 
 ;; do general object detection
-dobjects, images, object=oimage, plim=plim, puse=puse, fobject=fobject
+dobjects, images, object=oimage, plim=plim, puse=puse, fobject=fobject, $
+  seed=seed
 mwrfits, fobject, base+'-pimage.fits', /create
 for k=0L, nim-1L do begin
     mwrfits, *oimage[k], base+'-'+strtrim(string(k),2)+'-pimage.fits', $

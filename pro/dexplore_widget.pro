@@ -8,8 +8,11 @@ common com_dexplore_widget, $
   setval, band, smooth, child, parent, $
   pcat, acat, ig, is, igstr, isstr, ng, ns, lsb, $
   fix_stretch, hand, show_templates, gsmooth, glim, sersic, atset, $
-  subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs
+  subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
+  curr_nx, curr_ny
 
+curr_nx=0
+curr_ny=0
 w_slist=0
 w_glist=0
 w_band=0
@@ -148,7 +151,7 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
     atset_hand.glim=glim
     mwrfits, atset_hand, atsetfile, /create
     if(NOT keyword_set(lsb)) then $
-      detect_multi, basename, imagenames, ref=atset.ref, $
+      detect, basename, imagenames, ref=atset.ref, $
       single=parent, /aset, /hand, /noclobber $
     else $
       detect_lsb, basename, imagenames, ref=atset.ref, $
@@ -234,8 +237,17 @@ COMPILE_OPT hidden
 common com_dexplore_widget
 
 image=mrdfits(ev.value,0,hdr)
-atv, image, /align, head=hdr, stretch=fix_stretch
+nx=(size(image, /dim))[0]
+ny=(size(image, /dim))[1]
+align=0
+if(keyword_set(curr_nx) AND keyword_set(curr_ny)) then begin
+    if(nx eq curr_nx and ny eq curr_ny) then $
+      align=1
+endif
+atv, image, align=align, head=hdr, stretch=fix_stretch
 fix_stretch=setval[0]
+curr_nx=nx
+curr_ny=ny
 
 END
 

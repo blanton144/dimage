@@ -24,9 +24,11 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber, $
-             cmap=cmap, base=base
+             cmap=cmap, base=base, seed=seed0
 
 if(NOT keyword_set(natlas)) then natlas=41L
+if(NOT keyword_set(seed0)) then seed0=108L
+seed=seed0
 
 if(NOT keyword_set(base)) then $
   base=(stregex(imfile, '(.*)\.fits.*', /sub, /extr))[1]
@@ -66,6 +68,10 @@ sigma=dsigma(image)
 softbias=0.
 if(sigma eq 0) then begin
     ii=where(image gt 0., nii)
+    if(nii eq 0) then begin
+        splog, 'totally empty image'
+        return
+    endif
     xst=min(ii mod nx)
     yst=min(ii / nx)
     xnd=max(ii mod nx)
@@ -78,13 +84,19 @@ if(sigma eq 0) then begin
 endif
 if (n_elements(invvar) eq 0L) then invvar=fltarr(nx,ny)+1./sigma^2
 
+if(nx lt box OR ny lt box) then begin
+    splog, 'image too small!'
+    return
+endif
+
 ;; median smooth the image and find and extract objects
 msimage=dmedsmooth(image, invvar, box=box)
 simage=image-msimage
-dobjects, simage, objects=obj, plim=plim
-dextract, simage, invvar, object=obj, extract=extract, small=small
-if(n_tags(extract) eq 0) then begin
-    splog, 'no small enough objects in image'
+dobjects, simage, objects=obj, plim=plim, seed=seed
+dextract, simage, invvar, object=obj, extract=extract, small=small, $
+  seed=seed
+if(n_elements(extract) lt 3) then begin
+    splog, 'not enough small enough objects in image'
     return
 endif
 
@@ -120,8 +132,8 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
     
     keep = where(diff lt mpchilim(rejsigma[iter],float(natlas)^2,/sigma),nkeep)
     splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
-    if (nkeep eq 0L) then begin
-        splog, 'No good stars found.'
+    if (nkeep lt 3L) then begin
+        splog, 'Not enough good stars found.'
         save
         return
     endif

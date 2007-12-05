@@ -56,67 +56,78 @@ for k=0, nim-1L do begin
             ;; try and guess which peaks are PSFlike
             if(n_tags(sdss) gt 0) then begin
                 sdss.filter=filtername(k)
-            ispsf=dpsfcheck(*images[k], *ivars[k], tmp_xc, tmp_yc, $
-                            sdss=sdss) 
-        endif else begin
-            ispsf=dpsfcheck(*images[k], *ivars[k], tmp_xc, tmp_yc, $
-                            vpsf=psfs[k])
-        endelse
-        
-        istars=where(ispsf gt 0, nstars)
-        help,k
-        help, nstars
-        if(nstars gt 0) then begin
-            tmp_xstars=tmp_xc[istars]
-            tmp_ystars=tmp_yc[istars]
-            fluxes=fltarr(nstars)
-            
-            ;; refine center and subtract off best fit 
-            ;; psf for each star in this band
-            msimage=dmedsmooth(*images[k], box=long(psfsig*30L))
-            fimage=*images[k]-msimage
-            fivar=*ivars[k]
-            model=fltarr(nx[k],ny[k])
-            drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr, smooth=1
-            for i=0L, n_elements(tmp_xstars)-1L do begin 
-                if(n_tags(sdss) gt 0) then begin
-                    sdss.filter=filtername(k)
-                    psf=dvpsf(xr[i], yr[i], sdss=sdss)
-                endif else begin
-                    psf=dvpsf(xr[i], yr[i], psf=psfs[k])
-                endelse
-                tmp_model=fltarr(nx[k],ny[k])
-                embed_stamp, tmp_model, psf, $
-                  xr[i]-float(pnx/2L), $
-                  yr[i]-float(pny/2L)
-                ifit=where(tmp_model gt (-max(tmp_model)*1.e-2))
-                fluxes[i]= total(fimage[ifit]* $
-                                 tmp_model[ifit]*fivar[ifit])/ $
-                  total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
-                model=model+tmp_model*fluxes[i]
-            endfor
-            
-            ;; in this pass don't let noise spikes come in 
-            nimages[k]=ptr_new(((*images[k])-model) < (*images[k]))
-            
-            ;; now convert to RA and Dec
-            xyad, *hdrs[k], tmp_xstars, tmp_ystars, $
-              tmp_ra_stars, tmp_dec_stars
-            
-            if(n_elements(ra_stars) eq 0) then begin
-                ra_stars=tmp_ra_stars
-                dec_stars=tmp_dec_stars
+                ispsf=dpsfcheck(*images[k], *ivars[k], tmp_xc, tmp_yc, $
+                                sdss=sdss) 
             endif else begin
-                ra_stars=[ra_stars, tmp_ra_stars]
-                dec_stars=[dec_stars, tmp_dec_stars]
+                ispsf=dpsfcheck(*images[k], *ivars[k], tmp_xc, tmp_yc, $
+                                vpsf=psfs[k])
+            endelse
+        
+            istars=where(ispsf gt 0, nstars)
+            help,k
+            help, nstars
+            if(nstars gt 0) then begin
+                tmp_xstars=tmp_xc[istars]
+                tmp_ystars=tmp_yc[istars]
+                fluxes=fltarr(nstars)
+                
+                ;; refine center and subtract off best fit 
+                ;; psf for each star in this band
+                msimage=dmedsmooth(*images[k], box=long(psfsig*30L))
+                fimage=*images[k]-msimage
+                fivar=*ivars[k]
+                model=fltarr(nx[k],ny[k])
+                xx=findgen(nx[k])#replicate(1.,ny[k])
+                yy=replicate(1.,nx[k])#findgen(ny[k])
+                drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr, smooth=1
+                for i=0L, n_elements(tmp_xstars)-1L do begin 
+                    if(n_tags(sdss) gt 0) then begin
+                        sdss.filter=filtername(k)
+                        psf=dvpsf(xr[i], yr[i], sdss=sdss)
+                    endif else begin
+                        psf=dvpsf(xr[i], yr[i], psf=psfs[k])
+                    endelse
+                    sigpsf=dsigma(psf, sp=3)
+                    tmp_model=fltarr(nx[k],ny[k])
+                    embed_stamp, tmp_model, psf, $
+                      xr[i]-float(pnx/2L), $
+                      yr[i]-float(pny/2L)
+                    r2away=(xx-xr[i])^2+(yy-yr[i])^2
+                    ifit=where(tmp_model gt (-max(tmp_model)*1.e-2) AND $
+                               r2away lt (psfsig[0]*5.)^2 AND $
+                               tmp_model ne 0.)
+                    tmp_flux= total(fimage[ifit]* $
+                                    tmp_model[ifit]*fivar[ifit])/ $
+                      total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
+                    sigpsf=sigpsf*tmp_flux
+                    ivar=1./((1./fivar[ifit])+sigpsf^2)
+                    fluxes[i]= total(fimage[ifit]* $
+                                     tmp_model[ifit]*ivar)/ $
+                      total(tmp_model[ifit]*tmp_model[ifit]*ivar)
+                    model=model+tmp_model*fluxes[i]
+                endfor
+                
+                ;; in this pass don't let noise spikes come in 
+                nimages[k]=ptr_new(((*images[k])-model) < (*images[k]))
+                
+                ;; now convert to RA and Dec
+                xyad, *hdrs[k], tmp_xstars, tmp_ystars, $
+                  tmp_ra_stars, tmp_dec_stars
+                
+                if(n_elements(ra_stars) eq 0) then begin
+                    ra_stars=tmp_ra_stars
+                    dec_stars=tmp_dec_stars
+                endif else begin
+                    ra_stars=[ra_stars, tmp_ra_stars]
+                    dec_stars=[dec_stars, tmp_dec_stars]
+                endelse
+            endif else begin
+                nimages[k]=ptr_new(*images[k])
             endelse
         endif else begin
             nimages[k]=ptr_new(*images[k])
         endelse
-    endif else begin
-        nimages[k]=ptr_new(*images[k])
-    endelse
-endif
+    endif
 endfor
 nstars=n_elements(ra_stars)
 

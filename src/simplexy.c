@@ -60,7 +60,7 @@ int simplexy(float *image,
 	/* find objects */
 	smooth=(float *) malloc(nx*ny*sizeof(float));
 	oimage=(int *) malloc(nx*ny*sizeof(int));
-	dobjects(simage, smooth, nx, ny, dpsf, plim, oimage);
+	dobjects(simage, nx, ny, dpsf, plim, oimage);
 
 	/* find all peaks within each object */
 	dallpeaks(simage, nx, ny, oimage, x, y, npeaks, (*sigma), dlim, saddle, 

@@ -33,7 +33,7 @@ int dmedsmooth(float *image,
 							 int box,
 							 float *smooth)
 {
-  int i,j,ip,jp,ist,jst,nxt,nyt,nb,ind,jnd,sp;
+  int k,i,j,ip,jp,ist,jst,nxt,nyt,nb,ind,jnd,sp;
   int xoff, yoff, nm, nxgrid, nygrid;
   int ypsize, ymsize, xpsize, xmsize;
   float dx,dy,xkernel,ykernel;

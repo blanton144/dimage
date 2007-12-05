@@ -88,11 +88,11 @@ if(keyword_set(in_sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
            ref:ref, $
            iparent:iparent, $
            nstars:0L, $
-           ra_stars:fltarr(maxnstar), $
-           dec_stars:fltarr(maxnstar), $
+           ra_stars:dblarr(maxnstar), $
+           dec_stars:dblarr(maxnstar), $
            ngals:0L, $
-           ra_gals:fltarr(maxnstar), $
-           dec_gals:fltarr(maxnstar) }
+           ra_gals:dblarr(maxnstar), $
+           dec_gals:dblarr(maxnstar) }
 endif else begin
     newsg=0
     sgset=mrdfits(sgsetfile, 1)
@@ -176,8 +176,8 @@ if(ngals eq 0 and nstars eq 0) then return
 
 acat=replicate({pid:iparent, $
                 aid:-1L, $
-                racen:0., $
-                deccen:0., $
+                racen:0.D, $
+                deccen:0.D, $
                 bgood:lonarr(nim), $
                 type:0L, $
                 good:0L}, ngals+nstars)
@@ -339,8 +339,9 @@ for k=0L, nim-1L do begin
     use_child=lindgen(nstars+ngals)
     if(ngals gt 0) then begin
         use_child[0:ngals-1]=-1L
-        use_child[ikept]=ikept
-        use_child[ngals:ngals+nstars-1]=nkept+lindgen(nstars)
+        use_child[ikept]=lindgen(nkept)
+        if(nstars gt 0) then $
+          use_child[ngals:ngals+nstars-1]=nkept+lindgen(nstars)
     endif
 
     for i=0L, nstars+ngals-1L do begin

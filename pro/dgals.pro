@@ -28,9 +28,9 @@ if(keyword_set(puse[k])) then begin
     xyad, *hdrs[k], nx[k]/2L, ny[k]/2L, ra1, dec1
     xyad, *hdrs[k], nx[k]/2L+ntest, ny[k]/2L, ra2, dec2
     spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
-    pixscale=d12/float(ntest)*3600.
+    pixscale=(d12/float(ntest)*3600.)[0]
 
-    subpix=long(gsmooth/pixscale/3.) > 1L
+    subpix=(long(gsmooth/pixscale/3.) > 1L)[0]
     nxsub=nx[k]/subpix
     nysub=ny[k]/subpix
     simage=rebin((*nimages[k])[0:nxsub*subpix-1, 0:nysub*subpix-1], $
@@ -43,7 +43,7 @@ if(keyword_set(puse[k])) then begin
     if(ngals eq 0) then begin
         while(ngals eq 0 AND gsmooth gt 1.) do begin
             gsmooth=(gsmooth*0.7)>1.
-            subpix=long(gsmooth/3.) > 1L
+            subpix=(long(gsmooth/3.) > 1L)[0]
             nxsub=nx[k]/subpix
             nysub=ny[k]/subpix
             simage=rebin((*nimages[k])[0:nxsub*subpix-1, 0:nysub*subpix-1], $

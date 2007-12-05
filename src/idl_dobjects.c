@@ -15,7 +15,7 @@ IDL_LONG idl_dobjects (int      argc,
 											void *   argv[])
 {
 	IDL_LONG nx,ny, *objects;
-	float *image, dpsf, plim, *smooth;
+	float *image, dpsf, plim;
 	
 	IDL_LONG i;
 	IDL_LONG retval=1;

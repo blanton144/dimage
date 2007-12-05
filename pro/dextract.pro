@@ -25,12 +25,15 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dextract, image, invvar, object=object, extract=extract, small=small
+pro dextract, image, invvar, object=object, extract=extract, small=small, $
+              seed=seed
 
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 asize=2*small+1L
 sigma=1./sqrt(median(invvar))
+
+if(max(object) eq -1L) then return
 
 isort=sort(object)
 iuniq=uniq(object[isort])

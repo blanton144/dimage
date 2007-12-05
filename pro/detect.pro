@@ -45,11 +45,14 @@
 ;------------------------------------------------------------------------------
 pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             noclobber=noclobber, glim=glim, all=all, single=single, $
-            aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse
+            aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
+            center=center, seed=seed0
 
+if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(glim)) then glim=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=5.
+
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -57,6 +60,7 @@ if(NOT keyword_set(base)) then begin
     base=words[n_elements(words)-1]
     imfiles=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd']+'.fits.gz'
     puse=[1,1,1,1,1,0,0]
+    dopsf=[1,1,1,1,1,1,0]
     tuse=[1,1,2,3,4,1,1]
 endif
 
@@ -68,8 +72,9 @@ endif else begin
 endelse
 
 ;; get parents (creates pcat, pimage, parents files)
+seed_parents=seed0
 dparents, base, imfiles, sky=sky, noclobber=noclobber, ref=pset.ref, $
-  puse=puse
+  puse=puse, seed=seed_parents
 
 ;; read in parents 
 hdr=headfits(base+'-pimage.fits',ext=0)
@@ -77,14 +82,16 @@ pcat=mrdfits(base+'-pcat.fits',1)
 
 ;; fit for psf (creates bpsf and vpsf files)
 nim=n_elements(imfiles)
+seed_psf=seed0+1L+lindgen(nim)
 for k=0L, nim-1L do $
-  dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas
+  if(dopsf[k]) then $
+  dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas, seed=seed_psf[k]
 
 for k=0L, nim-1L do begin
     bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
     tmp_psf=dpsfread(bimfile+'-vpsf.fits') 
     if(n_tags(tmp_psf) eq 0) then $
-      tmp_psf=dummy_psf(natlas,10000L, 10000L)
+      tmp_psf=dummy_psf(41L,10000L, 10000L)
     if(n_tags(psfs) eq 0) then $
       psfs=tmp_psf $
     else $
@@ -101,12 +108,21 @@ if(keyword_set(all)) then begin
     endfor
 endif
 
+if(keyword_set(center)) then begin
+    pim=mrdfits(base+'-pimage.fits')
+    nx=(size(pim,/dim))[0]
+    ny=(size(pim,/dim))[1]
+    single=pim[nx/2L, ny/2L]
+endif
+
 if(n_elements(single) gt 0) then begin
-    psfs.xst= pcat[single].xst
-    psfs.yst= pcat[single].yst
-    dchildren, base, single, psfs=psfs, $
-      ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
-      sgset=sgset, puse=puse, tuse=tuse
+    if(single ge 0) then begin
+        psfs.xst= pcat[single].xst
+        psfs.yst= pcat[single].yst
+        dchildren, base, single, psfs=psfs, $
+          ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
+          sgset=sgset, puse=puse, tuse=tuse
+    endif
 endif
 
 mwrfits, pset, base+'-pset.fits', /create

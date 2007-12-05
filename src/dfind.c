@@ -122,20 +122,21 @@ int dfind(int *image,
   }
 
   for(i=0;i<nx*ny;i++) 
-    object[i]=mapgroup[object[i]];
+		if(object[i]>=0) 
+			object[i]=mapgroup[object[i]];
   
   for(i=0;i<nx*ny;i++) 
     mapgroup[i]=-1;
   igroup=0;
   for(k=0;k<nx*ny;k++) {
-    if(image[k]>0 && mapgroup[object[k]]==-1) {
+    if(image[k]>0 && mapgroup[object[k]]==-1 && object[k]>=0) {
       mapgroup[object[k]]=igroup;
       igroup++;
     }
   }
 
   for(i=0;i<nx*ny;i++) 
-    if(image[i]>0)
+    if(image[i]>0 && object[i]>=0)
       object[i]=mapgroup[object[i]];
     else 
       object[i]=-1;
