@@ -1,0 +1,9 @@
+; IDL commands for building HTML documentation
+
+make_html_help, [ getenv('DIMAGE_DIR')+'/pro/detect', $
+getenv('DIMAGE_DIR')+'/pro/psf', $
+getenv('DIMAGE_DIR')+'/pro/utils', $
+getenv('DIMAGE_DIR')+'/pro/sersic'], $
+  getenv('DIMAGE_DIR')+'/docs/html/dimage_help.html', $
+  /strict, title='IDL Help for DIMAGE', /verbose
+exit
