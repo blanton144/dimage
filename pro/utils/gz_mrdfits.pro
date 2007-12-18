@@ -12,6 +12,8 @@
 function gz_mrdfits, file, ext, hdr, status=status, $
                      _EXTRA=extra_for_gz_mrdfits 
 
+if(n_elements(ext) eq 0) then ext=0
+
 str=mrdfits(file, ext, hdr, status=status, $
             _EXTRA=extra_for_gz_mrdfits)
 if(status ne 0) then begin
