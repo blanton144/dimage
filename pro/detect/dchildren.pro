@@ -52,7 +52,7 @@ if(keyword_set(hand)) then subdir='hand'
 spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
 
 ;; read in images and psfs
-hdr=headfits('parents/'+base+'-parent-'+ $
+hdr=gz_headfits('parents/'+base+'-parent-'+ $
              strtrim(string(iparent),2)+'.fits',ext=0)
 
 nim=long(sxpar(hdr, 'NIM'))
@@ -66,24 +66,27 @@ hdrs=ptrarr(nim)
 
 ;; read in settings if desired
 asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-aset.fits'
-if(keyword_set(in_aset) eq 0 OR file_test(asetfile) eq 0) then begin
+if(keyword_set(in_aset) eq 0 OR gz_file_test(asetfile) eq 0) then begin
     aset={base:base, $
           ref:ref, $
           iparent:iparent, $
           sersic:sersic, $
           gsmooth:gsmooth, $
-          glim:glim}
+          glim:glim, $
+          tuse:tuse}
 endif else begin
-    aset=mrdfits(asetfile, 1)
+    aset=gz_mrdfits(asetfile, 1)
     gsmooth=aset.gsmooth
     glim=aset.glim
     sersic=aset.sersic
+    tuse=aset.tuse
+    ref=aset.ref
 endelse
 
 ;; read in star and galaxy settings if desired
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-sgset.fits'
 newsg=1
-if(keyword_set(in_sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
+if(keyword_set(in_sgset) eq 0 OR gz_file_test(sgsetfile) eq 0) then begin
     sgset={base:base, $
            ref:ref, $
            iparent:iparent, $
@@ -95,17 +98,17 @@ if(keyword_set(in_sgset) eq 0 OR file_test(sgsetfile) eq 0) then begin
            dec_gals:dblarr(maxnstar) }
 endif else begin
     newsg=0
-    sgset=mrdfits(sgsetfile, 1)
+    sgset=gz_mrdfits(sgsetfile, 1)
 endelse
 
 ;; read in images 
 for k=0L, nim-1L do begin
-    images[k]=ptr_new(mrdfits('parents/'+base+'-parent-'+ $
+    images[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
                               strtrim(string(iparent),2)+'.fits',0+k*2L,hdr))
     hdrs[k]=ptr_new(hdr)
     nx[k]=(size(*images[k],/dim))[0]
     ny[k]=(size(*images[k],/dim))[1]
-    ivars[k]=ptr_new(mrdfits('parents/'+base+'-parent-'+ $
+    ivars[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
                              strtrim(string(iparent),2)+'.fits',1+k*2L))
 endfor
 
@@ -355,22 +358,22 @@ for k=0L, nim-1L do begin
             mwrfits, children[*,*,use_child[i]], subdir+'/'+ $
               strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, create=first
+              '-atlas-'+strtrim(string(aid),2)+'.fits', *hdrs[k], create=first
             mwrfits, templates[*,*,use_child[i]], subdir+'/'+ $
               strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-templates-'+strtrim(string(aid),2)+'.fits', hdr, $
+              '-templates-'+strtrim(string(aid),2)+'.fits', *hdrs[k], $
               create=first
         endif else begin
             mwrfits, fltarr(nx[k],ny[k]), $
               subdir+'/'+strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-atlas-'+strtrim(string(aid),2)+'.fits', hdr, $
+              '-atlas-'+strtrim(string(aid),2)+'.fits', *hdrs[k], $
               create=first
             mwrfits, fltarr(nx[k],ny[k]), $
               subdir+'/'+strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-templates-'+strtrim(string(aid),2)+'.fits', hdr, $
+              '-templates-'+strtrim(string(aid),2)+'.fits', *hdrs[k], $
               create=first
         endelse
     endfor

@@ -16,7 +16,7 @@
 ;------------------------------------------------------------------------------
 pro twomass_convert, jfile, hfile, kfile, outbase
 
-jim=mrdfits(jfile,0,hdr)
+jim=gz_mrdfits(jfile,0,hdr)
 magzp=sxpar(hdr, 'MAGZP')
 jim=jim*10.^(-0.4*(magzp-22.5))
 med_jim=median(jim)
@@ -28,7 +28,7 @@ mwrfits, jiv, outbase+'-J.fits'
 spawn, 'gzip -vf '+outbase+'-J.fits'
 
 
-him=mrdfits(hfile,0,hdr)
+him=gz_mrdfits(hfile,0,hdr)
 magzp=sxpar(hdr, 'MAGZP')
 him=him*10.^(-0.4*(magzp-22.5))
 med_him=median(him)
@@ -40,7 +40,7 @@ mwrfits, hiv, outbase+'-H.fits'
 spawn, 'gzip -vf '+outbase+'-H.fits'
 
 
-kim=mrdfits(kfile,0,hdr)
+kim=gz_mrdfits(kfile,0,hdr)
 magzp=sxpar(hdr, 'MAGZP')
 kim=kim*10.^(-0.4*(magzp-22.5))
 med_kim=median(kim)

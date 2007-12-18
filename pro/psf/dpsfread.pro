@@ -19,7 +19,7 @@
 ;------------------------------------------------------------------------------
 function dpsfread, psffile
 
-hdr=headfits(psffile, ext=0)
+hdr=gz_headfits(psffile, ext=0)
 
 if(n_elements(hdr) eq 1) then return,0
 
@@ -44,9 +44,9 @@ psfstr={XST:xst, $
         COEFFS:fltarr(200L,nc), $
         PSFT:fltarr(natlas, natlas, nc)}
 
-psfstr.bpsf=mrdfits(psffile, 0)
-psfstr.psft=mrdfits(psffile, 1)
-psfstr.coeffs[0:np*np-1]=(mrdfits(psffile, 2))[0:np*np-1]
+psfstr.bpsf=gz_mrdfits(psffile, 0)
+psfstr.psft=gz_mrdfits(psffile, 1)
+psfstr.coeffs[0:np*np-1]=(gz_mrdfits(psffile, 2))[0:np*np-1]
 
 return, psfstr
 

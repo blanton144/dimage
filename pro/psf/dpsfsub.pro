@@ -1,29 +1,19 @@
 ;+
 ; NAME:
-;   dpsfcheck
+;   dpsfsub
 ; PURPOSE:
-;   check how well a PSF fits some data
+;   return an attempt at subtracting the fit PSF from some image
 ; CALLING SEQUENCE:
-;   ispsf= dpsfcheck(image, ivar, x, y [, psf=, amp= ])
+;   subim= dpsfsub(imbas)
 ; INPUTS:
-;   image - [nx, ny] input image
-;   ivar - [nx, ny] input invverse variance
-;   x, y - [N] positions to check
-;   psf - [npx, npy] PSF image
+;   imbase - file base name (full name should be imbase+'.fits.gz')
 ; OUTPUTS:
-;   ispsf - [N] 1 for PSF, 0 otherwise
-;   amp - amplitude of fit (after peak-normalizing PSF)
-; COMMENTS:
-;   Fits a simple linear background plus the PSF.  Subtracts off the
-;   model, median smoothes the image in FWHM boxes, and calls it a PSF
-;   if the median smoothed image is < 0.1 times the original image at
-;   the PSF peak. 
+;   subim - attempt at fitting and subtracting PSFs
 ; REVISION HISTORY:
 ;   1-Mar-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
 function dpsfsub, imbase
-
 
 image=mrdfits(imbase+'.fits.gz',0)
 nx=(size(image,/dim))[0]

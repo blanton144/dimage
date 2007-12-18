@@ -62,29 +62,32 @@ if(NOT keyword_set(base)) then begin
     puse=[1,1,1,1,1,0,0]
     dopsf=[1,1,1,1,1,1,0]
     tuse=[1,1,2,3,4,1,1]
+    ref=2
 endif
 
 if(NOT keyword_set(pset)) then begin
     pset={base:base, $
-          ref:ref}
+          ref:ref, $
+          puse:puse, $
+          dopsf:dopsf}
 endif else begin
-    pset=mrdfits(base+'-pset.fits', 1)
+    pset=gz_mrdfits(base+'-pset.fits', 1)
 endelse
 
 ;; get parents (creates pcat, pimage, parents files)
 seed_parents=seed0
 dparents, base, imfiles, sky=sky, noclobber=noclobber, ref=pset.ref, $
-  puse=puse, seed=seed_parents
+  puse=pset.puse, seed=seed_parents
 
 ;; read in parents 
-hdr=headfits(base+'-pimage.fits',ext=0)
-pcat=mrdfits(base+'-pcat.fits',1)
+hdr=gz_headfits(base+'-pimage.fits',ext=0)
+pcat=gz_mrdfits(base+'-pcat.fits',1)
 
 ;; fit for psf (creates bpsf and vpsf files)
 nim=n_elements(imfiles)
 seed_psf=seed0+1L+lindgen(nim)
 for k=0L, nim-1L do $
-  if(dopsf[k]) then $
+  if(pset.dopsf[k]) then $
   dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas, seed=seed_psf[k]
 
 for k=0L, nim-1L do begin
@@ -104,12 +107,12 @@ if(keyword_set(all)) then begin
         psfs.yst= pcat[iparent].yst
         dchildren, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
-          sgset=sgset, puse=puse, tuse=tuse
+          sgset=sgset, puse=pset.puse, tuse=tuse
     endfor
 endif
 
 if(keyword_set(center)) then begin
-    pim=mrdfits(base+'-pimage.fits')
+    pim=gz_mrdfits(base+'-pimage.fits')
     nx=(size(pim,/dim))[0]
     ny=(size(pim,/dim))[1]
     single=pim[nx/2L, ny/2L]
@@ -121,7 +124,7 @@ if(n_elements(single) gt 0) then begin
         psfs.yst= pcat[single].yst
         dchildren, base, single, psfs=psfs, $
           ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
-          sgset=sgset, puse=puse, tuse=tuse
+          sgset=sgset, puse=pset.puse, tuse=tuse
     endif
 endif
 

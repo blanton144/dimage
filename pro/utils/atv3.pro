@@ -1,6 +1,6 @@
 ;+
 ; NAME:
-;       ATV2
+;       ATV3
 ; 
 ; PURPOSE: 
 ;       Interactive display of 2-D images.
@@ -29,7 +29,7 @@
 ;       linear:     use linear stretch
 ;       log:        use log stretch 
 ;       histeq:     use histogram equalization
-;       block:      block IDL command line until ATV2 terminates
+;       block:      block IDL command line until ATV3 terminates
 ;       align:      align image with previously displayed image
 ;       stretch:    keep same min and max as previous image
 ;       header:     FITS image header (string array) for use with data array
@@ -231,7 +231,7 @@ common atv3_state
 common atv3_color
 
 ; Read in a color table to initialize !d.table_size
-; As a bare minimum, we need the 8 basic colors used by ATV2_ICOLOR(),
+; As a bare minimum, we need the 8 basic colors used by ATV3_ICOLOR(),
 ; plus 2 more for a color map.
 
 loadct, 0, /silent
@@ -285,7 +285,7 @@ top_menu_desc = [ $
                   {cw_pdmenu_s, 0, 'Rainbow'}, $
                   {cw_pdmenu_s, 0, 'BGRY'}, $
                   {cw_pdmenu_s, 0, 'Stern Special'}, $
-                  {cw_pdmenu_s, 2, 'ATV2 Special'}, $
+                  {cw_pdmenu_s, 2, 'ATV3 Special'}, $
                   {cw_pdmenu_s, 1, 'Scaling'}, $ ; scaling menu
                   {cw_pdmenu_s, 0, 'Linear'}, $
                   {cw_pdmenu_s, 0, 'Log'}, $
@@ -314,7 +314,7 @@ top_menu_desc = [ $
                   {cw_pdmenu_s, 0, 'Ecliptic (J2000)'}, $
                   {cw_pdmenu_s, 2, 'Native'}, $
                   {cw_pdmenu_s, 1, 'Help'}, $         ; help menu
-                  {cw_pdmenu_s, 2, 'ATV2 Help'} $
+                  {cw_pdmenu_s, 2, 'ATV3 Help'} $
                 ]
 
 top_menu = cw_pdmenu(top_menu, top_menu_desc, $
@@ -630,7 +630,7 @@ case event_name of
     'Rainbow': atv3_getct, 13
     'Stern Special': atv3_getct, 15
     'Green-White': atv3_getct, 8
-    'ATV2 Special': atv3_makect, event_name
+    'ATV3 Special': atv3_makect, event_name
 ; Scaling options:
     'Linear': begin
         state.scaling = 0
@@ -714,7 +714,7 @@ case event_name of
 
     
 ; Help options:            
-    'ATV2 Help': atv3_help
+    'ATV3 Help': atv3_help
     
     else: print, 'Unknown event in file menu!'
 endcase
@@ -2598,7 +2598,7 @@ common atv3_state
 common atv3_color
 
 case tablename of
-    'ATV2 Special': begin
+    'ATV3 Special': begin
         r = atv3_polycolor([39.4609, $
                            -5.19434, $
                            0.128174, $
@@ -3031,7 +3031,7 @@ common atv3_state
 ; Library.
 
 ; Modifications for atv3:
-; Modified to work with zoomed ATV2 images, AJB Jan. 2000 
+; Modified to work with zoomed ATV3 images, AJB Jan. 2000 
 ; Moved text label upwards a bit for better results, AJB Jan. 2000
 
 On_error,2                      ;Return to caller
@@ -3160,12 +3160,12 @@ common atv3_state
 ; variable structure, and plot the line plot
 
 if (not(xregistered('atv3', /noshow))) then begin
-    print, 'You need to start ATV2 first!'
+    print, 'You need to start ATV3 first!'
     return
 endif
 
 if (N_params() LT 1) then begin
-   print, 'Too few parameters for ATV2PLOT.'
+   print, 'Too few parameters for ATV3PLOT.'
    return
 endif
 
@@ -3191,7 +3191,7 @@ if (nplot LT maxplot) then begin
    atv3_plot1plot, nplot
 
 endif else begin
-   print, 'Too many calls to ATV2PLOT.'
+   print, 'Too many calls to ATV3PLOT.'
 endelse
 
 end
@@ -3206,12 +3206,12 @@ common atv3_state
 ; variable structure, and overplot the text
 
 if (not(xregistered('atv3', /noshow))) then begin
-    print, 'You need to start ATV2 first!'
+    print, 'You need to start ATV3 first!'
     return
 endif
 
 if (N_params() LT 3) then begin
-   print, 'Too few parameters for ATV2XYOUTS'
+   print, 'Too few parameters for ATV3XYOUTS'
    return
 endif
 
@@ -3242,7 +3242,7 @@ if (nplot LT maxplot) then begin
    atv3_plot1text, nplot
 
 endif else begin
-   print, 'Too many calls to ATV2PLOT.'
+   print, 'Too many calls to ATV3PLOT.'
 endelse
 
 end
@@ -3260,12 +3260,12 @@ common atv3_state
 ; overplot correctly.
 
 if (not(xregistered('atv3', /noshow))) then begin
-    print, 'You need to start ATV2 first!'
+    print, 'You need to start ATV3 first!'
     return
 endif
 
 if (N_params() LT 1) then begin
-   print, 'Too few parameters for ATV2CONTOUR.'
+   print, 'Too few parameters for ATV3CONTOUR.'
    return
 endif
 
@@ -3297,7 +3297,7 @@ if (nplot LT maxplot) then begin
    atv3_plot1contour, nplot
 
 endif else begin
-   print, 'Too many calls to ATV2CONTOUR.'
+   print, 'Too many calls to ATV3CONTOUR.'
 endelse
 
 end
@@ -3307,8 +3307,8 @@ end
 pro atv3erase, nerase, norefresh = norefresh
 common atv3_pdata
 
-; Routine to erase line plots from ATV2PLOT, text from ATV2XYOUTS, and
-; contours from ATV2CONTOUR.
+; Routine to erase line plots from ATV3PLOT, text from ATV3XYOUTS, and
+; contours from ATV3CONTOUR.
 
 if (n_params() LT 1) then begin
     nerase = nplot
@@ -3868,7 +3868,7 @@ common atv3_state
 
 h = strarr(110)
 i = 0
-h[i] =  'ATV2 HELP'
+h[i] =  'ATV3 HELP'
 i = i + 1
 h[i] =  ''
 i = i + 1
@@ -4058,7 +4058,7 @@ h[i] = 'atv3_shutdown:   quits atv3'
 i = i + 1
 h[i] = 'NOTE: If atv3 should crash, type atv3_shutdown at the idl prompt.'
 i = i + 5
-h[i] = strcompress('ATV2.PRO version '+state.version)
+h[i] = strcompress('ATV3.PRO version '+state.version)
 i = i + 1
 h[i] = 'For full instructions, or to download the most recent version, go to:'
 i = i + 1
@@ -4406,7 +4406,7 @@ pro atv3_imcenterf, xcen, ycen
 ; program to calculate the center of mass of an image around
 ; the point (x,y), return the answer in (xcen,ycen).
 ;
-; by M. Liu, adapted for inclusion in ATV2 by AJB
+; by M. Liu, adapted for inclusion in ATV3 by AJB
 ;
 ; ALGORITHM:
 ;   1. first finds max pixel value in
@@ -4506,7 +4506,7 @@ function atv3_splinefwhm, rad, prof, splrad, splprof
 ;   where radial profile has dropped to half of that,
 ;   assumes peak value of radial profile is at minimum radius
 ;
-; original version by M. Liu, adapted for ATV2 by AJB
+; original version by M. Liu, adapted for ATV3 by AJB
 
 common atv3_state
 
@@ -4556,7 +4556,7 @@ pro atv3_radplotf, x, y, fwhm
 ; outer radius for sky subtraction annulus.  Calculates sky by
 ; median.
 ; 
-; original version by M. Liu, adapted for inclusion in ATV2 by AJB
+; original version by M. Liu, adapted for inclusion in ATV3 by AJB
 
 common atv3_state
 common atv3_images
@@ -5243,9 +5243,9 @@ end
 ;    atv3 main program.  needs to be last in order to compile.
 ;---------------------------------------------------------------------
 
-; Main program routine for ATV2.  If there is no current ATV2 session,
-; then run atv3_startup to create the widgets.  If ATV2 already exists,
-; then display the new image to the current ATV2 window.
+; Main program routine for ATV3.  If there is no current ATV3 session,
+; then run atv3_startup to create the widgets.  If ATV3 already exists,
+; then display the new image to the current ATV3 window.
 
 pro atv3, image, $
          min = minimum, $
@@ -5285,7 +5285,7 @@ if ( (n_params() EQ 0) AND (xregistered('atv3', /noshow))) then begin
 endif
 
 if (!d.name NE 'X' AND !d.name NE 'WIN' AND !d.name NE 'MAC') then begin
-    print, 'Graphics device must be set to X, WIN, or MAC for ATV2 to work.'
+    print, 'Graphics device must be set to X, WIN, or MAC for ATV3 to work.'
     retall
 endif
 

@@ -34,16 +34,16 @@ if(NOT keyword_set(base)) then $
   base=(stregex(imfile, '(.*)\.fits.*', /sub, /extr))[1]
 
 if(keyword_set(noclobber)) then begin
-    if(file_test(base+'-bpsf.fits') gt 0 AND $
-       file_test(base+'-vpsf.fits') gt 0) then return
+    if(gz_file_test(base+'-bpsf.fits') gt 0 AND $
+       gz_file_test(base+'-vpsf.fits') gt 0) then return
 endif
 
 splog, 'Reading image '+imfile
-image=mrdfits(imfile,/silent)
+image=gz_mrdfits(imfile,/silent)
 fits_info, imfile, n_ext=next, /silent
 if (next ge 1L) then begin
    splog, 'Reading inverse variance map'
-   invvar = mrdfits(imfile,1,/silent)
+   invvar = gz_mrdfits(imfile,1,/silent)
 endif
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]

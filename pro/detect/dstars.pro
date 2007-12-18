@@ -139,7 +139,6 @@ if(nstars gt 0) then begin
     out_ra_stars=ra_stars[firstg[0:nstars-1]]
     out_dec_stars=dec_stars[firstg[0:nstars-1]]
 endif
-save
 
 end
 ;------------------------------------------------------------------------------

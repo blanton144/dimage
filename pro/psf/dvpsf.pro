@@ -29,7 +29,7 @@ function dvpsf, x, y, psfsrc=psfsrc, sdss=sdss
 if(n_tags(sdss) gt 0) then begin
     psfieldfile= sdss_name('psField', sdss.run, sdss.camcol, $
                            sdss.field, rerun=sdss.rerun)
-    psfield=mrdfits(psfieldfile, (filternum(sdss.filter))[0]+1L)
+    psfield=gz_mrdfits(psfieldfile, (filternum(sdss.filter))[0]+1L)
     psf=sdss_psf_recon(psfield, x, y, /normalize)
     return, psf
 endif

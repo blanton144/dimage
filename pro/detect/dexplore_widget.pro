@@ -2,14 +2,14 @@ pro dexplore_clean
 
 common com_dexplore_widget, $
   w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
-  w_settings, w_gsmooth, w_glim, w_sersic, w_redeblend, w_mark, w_smooth, $
+  w_settings, w_gsmooth, w_glim, w_redeblend, w_mark, w_smooth, $
   basename, imagenames, $
   parent_images, parent_hdrs, $
   setval, band, smooth, child, parent, $
   pcat, acat, ig, is, igstr, isstr, ng, ns, lsb, $
-  fix_stretch, hand, show_templates, gsmooth, glim, sersic, atset, $
+  fix_stretch, hand, show_templates, gsmooth, glim, atset, $
   subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
-  curr_nx, curr_ny
+  curr_nx, curr_ny, curr_nx_2, curr_ny_2
 
 curr_nx=0
 curr_ny=0
@@ -17,7 +17,6 @@ w_slist=0
 w_glist=0
 w_band=0
 w_smooth=0
-w_sersic=0
 w_gsmooth=0
 w_glim=0
 w_redeblend=0
@@ -146,16 +145,11 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
     atsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+ $
       '-aset.fits'
     atset_hand=atset
-    atset_hand.sersic=sersic
     atset_hand.gsmooth=gsmooth
     atset_hand.glim=glim
     mwrfits, atset_hand, atsetfile, /create
-    if(NOT keyword_set(lsb)) then $
-      detect, basename, imagenames, ref=atset.ref, $
-      single=parent, /aset, /hand, /noclobber $
-    else $
-      detect_lsb, basename, imagenames, ref=atset.ref, $
-      single=parent, /aset, /hand, /noclobber 
+    detect, basename, imagenames, ref=atset.ref, $
+      single=parent, /aset, /hand, /noclobber, /pset
     dexplore_parent_display
     dexplore_child_list
     dexplore_mark_children
@@ -216,27 +210,13 @@ dexplore_setval
 
 end
 
-;; sersic  or not
-function dexplore_sersic, ev
-COMPILE_OPT hidden
-
-common com_dexplore_widget
-
-WIDGET_CONTROL, ev.ID, GET_VALUE=val, GET_UVALUE=uval
-
-if(ev.value eq 'sersic') then begin
-    sersic=val
-endif
-
-end
-
 ;; display full images
 function dexplore_full_display, ev
 COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-image=mrdfits(ev.value,0,hdr)
+image=gz_mrdfits(ev.value,0,hdr)
 nx=(size(image, /dim))[0]
 ny=(size(image, /dim))[1]
 align=0
@@ -262,7 +242,16 @@ if(keyword_set(parent_images)) then begin
     phdr=(*parent_hdrs[band])
     if(keyword_set(smooth)) then $
       pim=dsmooth(pim, smooth)
-    atv2, pim, /align, head=phdr, stretch=fix_stretch
+    nx=(size(pim,/dim))[0]
+    ny=(size(pim,/dim))[0]
+    align=0
+    if(keyword_set(curr_nx_2) AND keyword_set(curr_ny_2)) then begin
+        if(nx eq curr_nx_2 and ny eq curr_ny_2) then $
+          align=1
+    endif
+    atv2, pim, align=align, head=phdr, stretch=fix_stretch
+    curr_nx_2=nx
+    curr_ny_2=ny
     fix_stretch=setval[0]
 endif
 
@@ -284,8 +273,6 @@ if(keyword_set(w_mark)) then $
   WIDGET_CONTROL, w_mark, /destroy
 if(keyword_set(w_gsmooth)) then $
   WIDGET_CONTROL, w_gsmooth, /destroy
-if(keyword_set(w_sersic)) then $
-  WIDGET_CONTROL, w_sersic, /destroy
 if(keyword_set(w_glim)) then $
   WIDGET_CONTROL, w_glim, /destroy
 if(keyword_set(w_slist)) then $
@@ -306,7 +293,6 @@ w_redeblend=0
 w_mark=0
 w_eyeball=0
 w_gsmooth=0
-w_sersic=0
 w_glim=0
 w_slist=0
 w_glist=0
@@ -314,10 +300,10 @@ w_glist=0
 if(NOT keyword_set(parent_images)) then return
 
 pcatfile=basename+'-pcat.fits'
-pcat= mrdfits(pcatfile,1)
+pcat= gz_mrdfits(pcatfile,1)
 acatfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
   strtrim(string(parent),2)+ '-acat.fits'
-acat= mrdfits(acatfile,1)
+acat= gz_mrdfits(acatfile,1)
 if(n_tags(acat) gt 0) then begin
     ig=where(acat.good gt 0 and acat.type eq 0L, ng)
     
@@ -340,8 +326,9 @@ endif
 dexplore_mark_children
 
 sgsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-sgset.fits'
-if(file_test(sgsetfile)) then begin
-    sgset=mrdfits(sgsetfile,1)
+if(file_test(sgsetfile) gt 0 OR $
+   file_test(sgsetfile+'.gz') gt 0) then begin
+    sgset=gz_mrdfits(sgsetfile,1)
 ;; star marking
     ;;starshow = WIDGET_BUTTON(w_base, value='star show')  
     ;;starset = WIDGET_BUTTON(w_base, value='star set')  
@@ -350,9 +337,9 @@ if(file_test(sgsetfile)) then begin
 endif
 
 asetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-aset.fits'
-if(file_test(asetfile)) then begin
-    atset=mrdfits(asetfile,1)
-    sersic=atset.sersic
+if(file_test(asetfile) OR $
+   file_test(asetfile+'.gz') gt 0) then begin
+    atset=gz_mrdfits(asetfile,1)
     gsmooth=atset.gsmooth
     glim=atset.glim
     w_gsmooth = CW_FIELD(w_base, TITLE = "gsmooth", $
@@ -361,10 +348,6 @@ if(file_test(asetfile)) then begin
     w_glim = CW_FIELD(w_base, TITLE = "glim", $
                       /FLOAT, /FRAME, /return_events, $
                       value=glim)  
-    w_sersic = CW_BGROUP(w_base, 'sersic', /nonexclusive, /column, $
-                         /return_name, uvalue=0, $
-                         event_func='dexplore_sersic', $
-                         set_value=sersic)
     w_redeblend = WIDGET_BUTTON(w_base, value='redeblend')  
     w_mark = WIDGET_BUTTON(w_base, value='mark')  
 endif
@@ -412,11 +395,21 @@ imfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
 if(keyword_set(show_templates)) then $
   imfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
   strtrim(string(parent),2)+'-templates-'+strtrim(string(child),2)+'.fits'
-if(file_test(imfile)) then begin
-    image=mrdfits(imfile, band, hdr)
+if(file_test(imfile) gt 0 OR $
+   file_test(imfile+'.gz') gt 0) then begin
+    image=gz_mrdfits(imfile, band, hdr)
     if(keyword_set(smooth)) then $
       image=dsmooth(image, smooth)
-    atv2, image, /align, head=hdr, stretch=fix_stretch
+    nx=(size(image,/dim))[0]
+    ny=(size(image,/dim))[0]
+    align=0
+    if(keyword_set(curr_nx_2) AND keyword_set(curr_ny_2)) then begin
+        if(nx eq curr_nx_2 and ny eq curr_ny_2) then $
+          align=1
+    endif
+    atv2, image, align=align, head=hdr, stretch=fix_stretch
+    curr_nx_2=nx
+    curr_ny_2=ny
 
     ;;atv3, dvpsf(pcat[parent].xst+acat[child].xcen, $
     ;;            pcat[parent].yst+acat[child].ycen, $
@@ -443,7 +436,7 @@ if(keyword_set(w_eyeball)) then $
 w_eyeball=0
 
 ;; read in eyeball
-eyeball=mrdfits(subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
+eyeball=gz_mrdfits(subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
                 strtrim(string(parent),2)+'-eyeball-'+eyeball_name+'.fits',1)
 if(n_tags(eyeball) eq 0) then begin
     eyeball=replicate(create_struct('EYEBALL_'+eyeball_name, 0L), $
@@ -517,20 +510,22 @@ imfile='parents/'+basename+'-parent-'+strtrim(string(parent),2)+'.fits'
 parent_images=ptrarr(n_elements(imagenames))
 parent_hdrs=ptrarr(n_elements(imagenames))
 for i=0L, n_elements(imagenames)-1L do begin
-    parent_images[i]=ptr_new(mrdfits(imfile, i*2L, hdr))
+    parent_images[i]=ptr_new(gz_mrdfits(imfile, i*2L, hdr))
     parent_hdrs[i]=ptr_new(hdr)
 endfor
 
 ;; read in sgset file
 sgsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-sgset.fits'
-if(file_test(sgsetfile)) then begin
-    sgset=mrdfits(sgsetfile,1)
+if(file_test(sgsetfile) gt 0 OR $
+   file_test(sgsetfile+'.gz') gt 0) then begin
+    sgset=gz_mrdfits(sgsetfile,1)
 endif
 
 ;; read in aset file
 asetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-aset.fits'
-if(file_test(asetfile)) then begin
-    atset=mrdfits(asetfile,1)
+if(file_test(asetfile) gt 0 OR $
+   file_test(asetfile+'.gz') gt 0) then begin
+    atset=gz_mrdfits(asetfile,1)
 endif
 
 

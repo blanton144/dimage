@@ -5,7 +5,7 @@
 ;   run 2d sersic fitting on an image
 ; CALLING SEQUENCE:
 ;   dsersic,image [,invvar,xcen=,ycen=,psf=,sersicfit=, $
-;      model=, /reinit, fixsky, /fixcen]
+;      model=, /reinit, /fixsky, /fixcen]
 ; INPUTS:
 ;   image - [nx,ny] input image
 ; OPTIONAL INPUTS:
@@ -15,15 +15,13 @@
 ;   psf - [nxpsf,nypsf] estimated psf [default to just pixel convolution]
 ;   /reinit - don't use given sersicfit (if it exists) as initial conditions
 ;   /fixcen - fix the center at the input xcen, ycen
+;   /fixsky - fix the sky to zero
 ; OUTPUTS:
 ;   sersicfit - sersic parameters fit
 ;   model - image of best fit model
-; OPTIONAL INPUT/OUTPUTS:
-; DATA DEPENDENCIES:
 ; COMMENTS:
 ;   The input psf should be interpreted as an image of a delta
 ;   function source (pixel- and seeing-convolved)
-; EXAMPLES:
 ; BUGS:
 ;   sersic fitting by dsersic currently fails fake data tests
 ; PROCEDURES CALLED:
@@ -115,6 +113,7 @@ common com_simple
 model=dsersic_model(fitparam)
 
 ; return residuals
+
 return, reform(((model-image)*sqrt(invvar)),n_elements(model))
 
 end
@@ -122,7 +121,8 @@ end
 pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
             sersicfit=sersicfit,model=model, reinit=reinit, $
             fixcenter=fixcenter,fixsky=fixsky, addtemplate=in_addtemplate, $
-            nofit=nofit, simple=in_simple, axisymmetric=axisymmetric
+            nofit=nofit, simple=in_simple, axisymmetric=axisymmetric, $
+            onlyflux=onlyflux
 
 
 if(n_params() lt 1) then begin
@@ -200,7 +200,8 @@ parinfo.value=      [sersicfit.sersicflux, $
                      sersicfit.orientation, $
                      sersicfit.addcoeff]
 
-if(NOT keyword_set(nofit)) then begin 
+if(keyword_set(nofit) eq 0 AND $
+   keyword_set(onlyflux) eq 0) then begin 
 
 ; search starting from two possible orientations
     chisquared=fltarr(2)
@@ -272,6 +273,8 @@ endif else begin
               sersicfit.orientation, $
               sersicfit.addcoeff]
     model=dsersic_model(fitparam)
+    if(keyword_set(onlyflux)) then $
+      sersicfit.sersicflux= fitparam[0]
 endelse
 
 end

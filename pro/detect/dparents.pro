@@ -40,15 +40,15 @@ nim=n_elements(imfiles)
 if(keyword_set(noclobber)) then begin
     gotall=1
     for k=0L, nim-1L do begin
-        if(file_test(base+'-'+strtrim(string(k),2)+'-pimage.fits') eq 0) then $
-          gotall=0
+        if(gz_file_test(base+'-'+strtrim(string(k),2)+'-pimage.fits') eq 0) $
+          then gotall=0
     endfor
-    if(file_test(base+'-pcat.fits') eq 0) then $
+    if(gz_file_test(base+'-pcat.fits') eq 0) then $
       gotall=0
     if(gotall gt 0) then begin
-        pcat=mrdfits(base+'-pcat.fits',1)
+        pcat=gz_mrdfits(base+'-pcat.fits',1)
         for i=0L, n_elements(pcat)-1L do $
-          if(file_test('parents/'+base+'-parent-'+ $
+          if(gz_file_test('parents/'+base+'-parent-'+ $
                        strtrim(string(i),2)+'.fits') eq 0) then $
           gotall=0
     endif
@@ -62,7 +62,7 @@ nx=lonarr(nim)
 ny=lonarr(nim)
 hdrs=ptrarr(nim)
 for k=0L, nim-1L do begin
-    hdr=headfits(imfiles[k],ext=0)
+    hdr=gz_headfits(imfiles[k],ext=0)
     nx[k]=sxpar(hdr, 'NAXIS1')
     ny[k]=sxpar(hdr, 'NAXIS2')
     hdrs[k]=ptr_new(hdr)
@@ -75,7 +75,7 @@ sigma=fltarr(nim)
 pixscale=fltarr(nim)
 for k=0L, nim-1L do begin
     ;; read in image
-    *images[k]=mrdfits(imfiles[k],0,hdr)
+    *images[k]=gz_mrdfits(imfiles[k],0,hdr)
 
     ;; hack to find pixel scale
     ntest=10L
@@ -93,7 +93,7 @@ for k=0L, nim-1L do begin
 
     ;; set ivars (defaulting to sigma estimate)
     sigma[k]=dsigma(*images[k], sp=10)
-    ivar=mrdfits(imfiles[k],1) 
+    ivar=gz_mrdfits(imfiles[k],1) 
     if(NOT keyword_set(ivar)) then $
       *ivars[k]=fltarr(nx[k], ny[k])+1./sigma[k]^2 $
     else $
