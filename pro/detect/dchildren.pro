@@ -15,6 +15,8 @@
 ;   /sersic - fit template with Sersic profile to constrain better
 ;   /aset - use [base]-aset.fits file for parameter setting
 ;   /sgset - use [base]-aset.fits file for star and galaxy locations
+;   /gbig - treat galaxies as "big": resample smoothed image
+;           to save memory and ignore the small stuff
 ; OPTIONAL INPUTS:
 ;   psf - [npx, npy] PSF to assume (if none, doesn't search for stars)
 ;   plim - nsigma limit for point source detection (default 5.)
@@ -35,7 +37,7 @@ pro dchildren, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                sersic=in_sersic, aset=in_aset, sgset=in_sgset, $
-               sdss=sdss, puse=puse, tuse=tuse
+               sdss=sdss, puse=puse, tuse=tuse, gbig=gbig
 
 maxnstar=2000L
 if(NOT keyword_set(plim)) then plim=5.
@@ -60,9 +62,12 @@ if(NOT keyword_set(tuse)) then tuse=lindgen(nim)
 nx=lonarr(nim)
 ny=lonarr(nim)
 images=ptrarr(nim)
+simages=ptrarr(nim)
+sivars=ptrarr(nim)
 nimages=ptrarr(nim)
 ivars=ptrarr(nim)
 hdrs=ptrarr(nim)
+subhdrs=ptrarr(nim)
 
 ;; read in settings if desired
 asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-aset.fits'
@@ -105,11 +110,13 @@ endelse
 for k=0L, nim-1L do begin
     images[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
                               strtrim(string(iparent),2)+'.fits',0+k*2L,hdr))
+    simages[k]=images[k]
     hdrs[k]=ptr_new(hdr)
     nx[k]=(size(*images[k],/dim))[0]
     ny[k]=(size(*images[k],/dim))[1]
     ivars[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
-                             strtrim(string(iparent),2)+'.fits',1+k*2L))
+                                strtrim(string(iparent),2)+'.fits',1+k*2L))
+    sivars[k]=ivars[k]
 endfor
 
 ;; read in basic PSFs and get approximate size
@@ -125,11 +132,16 @@ dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
 
 ;; find stars and galaxies
 if(keyword_set(newsg)) then begin
+    save, filename='before_stars.sav'
     dstars, images, ivars, psfs, hdrs, sdss=sdss, plim=plim, ref=ref, $
       nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
       nstars=nstars, puse=puse
     dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
       ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse
+    for k=0L, nim-1L do begin
+        ptr_free, nimages[k]
+    endfor
+    nimages=0
     
     ;; then take out stars that are near galaxies
     ;; but give the center as the center of the star
@@ -236,15 +248,69 @@ if(nstars gt 0) then begin
     acat[ngals:nstars+ngals-1].type=1
 endif
 
+nxsub=lonarr(nim)
+nysub=lonarr(nim)
+subpix=lonarr(nim)
+pixscale=fltarr(nim)
+for k=0L, nim-1L do begin
+    kuse=tuse[k]
+    nxsub[k]=nx[k]
+    nysub[k]=ny[k]
+    subhdrs[k]=ptr_new(*hdrs[k])
+    if(keyword_set(gbig)) then begin
+        ntest=10L
+        xyad, *hdrs[k], nx[k]/2L, ny[k]/2L, ra1, dec1
+        xyad, *hdrs[k], nx[k]/2L+ntest, ny[k]/2L, ra2, dec2
+        spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
+        pixscale[k]=(d12/float(ntest)*3600.)[0]
+        
+        subpix[k]=(long(gsmooth/pixscale[k]/3.) > 1L)[0]
+        help,subpix[k]
+        if(subpix[k] gt 1) then begin
+            nxsub[k]=nx[k]/subpix[k]
+            nysub[k]=ny[k]/subpix[k]
+
+            ;; make new hdr (note it assumes certain config for ast)
+            crpix1= float(sxpar(*subhdrs[k], 'CRPIX1'))
+            crpix2= float(sxpar(*subhdrs[k], 'CRPIX2'))
+            cd1_1= float(sxpar(*subhdrs[k], 'CD1_1'))
+            cd1_2= float(sxpar(*subhdrs[k], 'CD1_2'))
+            cd2_1= float(sxpar(*subhdrs[k], 'CD2_1'))
+            cd2_2= float(sxpar(*subhdrs[k], 'CD2_2'))
+            crpix1= (crpix1-0.5)/float(subpix[k])+0.5
+            crpix2= (crpix2-0.5)/float(subpix[k])+0.5
+            cd1_1= cd1_1*float(subpix[k])
+            cd1_2= cd1_2*float(subpix[k])
+            cd2_1= cd2_1*float(subpix[k])
+            cd2_2= cd2_2*float(subpix[k])
+            sxaddpar, *subhdrs[k], 'CRPIX1', crpix1
+            sxaddpar, *subhdrs[k], 'CRPIX2', crpix2
+            sxaddpar, *subhdrs[k], 'CD1_1', cd1_1
+            sxaddpar, *subhdrs[k], 'CD1_2', cd1_2
+            sxaddpar, *subhdrs[k], 'CD2_1', cd2_1
+            sxaddpar, *subhdrs[k], 'CD2_2', cd2_2
+
+            ;; make sub-images
+            simages[k]=ptr_new(rebin((*images[k])[0:nxsub[k]*subpix[k]-1, $
+                                                  0:nysub[k]*subpix[k]-1], $
+                                     nxsub[k], nysub[k]))
+            ssig=dsigma((*simages[k]), sp=10)
+            sivars[k]=ptr_new(fltarr(nxsub[k], nysub[k])+1./ssig^2)
+
+        endif
+    endif 
+endfor
+
 for k=0L, nim-1L do begin
     if(k eq 0) then first=1 else first=0
     kuse=tuse[k]
     
     spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
-    
+
     model=fltarr(nx[kuse],ny[kuse])
     if(nstars gt 0) then begin
-        stimages=fltarr(nx[kuse], ny[kuse], nstars)
+        ;; use nxsub, nysub
+        stimages=fltarr(nxsub[kuse], nysub[kuse], nstars)
         msimage=dmedsmooth(*images[kuse], box=long(psfsig*30L))
         fimage=*images[kuse]-msimage
         fivar=*ivars[kuse]
@@ -266,54 +332,76 @@ for k=0L, nim-1L do begin
                 ifit=where(tmp_model ne 0.)
                 scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
                   total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
-                stimages[*,*,i]=tmp_model
-                model=model+stimages[*,*,i]*scale
+                
+                ;; need to smooth before storing
+                if(keyword_set(gbig) eq 0 or subpix[kuse] eq 1) then begin
+                    stimages[*,*,i]=tmp_model
+                endif else begin
+                    tmp_image=rebin(tmp_model[0:nxsub[kuse]*subpix[kuse]-1, $
+                                              0:nysub[kuse]*subpix[kuse]-1], $
+                                    nxsub[kuse], nysub[kuse])
+                    stimages[*,*,i]=tmp_image
+                    xstars[i]= (xstars[i]+0.5)/float(subpix[kuse])-0.5
+                    ystars[i]= (ystars[i]+0.5)/float(subpix[kuse])-0.5
+                endelse
+
+                ;; but use UNSMOOTHED model for subtraction
+                model=model+tmp_model*scale
             endif
         endfor
     endif
-    nimages[kuse]=ptr_new((*images[kuse]-model) > 0.)
+    if(keyword_set(gbig) eq 0 OR subpix[kuse] eq 1) then begin
+        nimage=((*simages[kuse])-model) > 0.
+    endif else begin 
+        smodel=rebin(model[0:nxsub[kuse]*subpix[kuse]-1, $
+                           0:nysub[kuse]*subpix[kuse]-1], $
+                     nxsub[kuse], nysub[kuse])
+        nimage=((*simages[kuse])-smodel)>0.
+        ssig=dsigma(nimage, sp=10)
+        nivar=fltarr(nxsub[kuse], nysub[kuse])+1./ssig^2
+    endelse
     
     if(ngals gt 0) then begin
         ;; make galaxy templates
-        adxy, *hdrs[kuse], ra_gals, dec_gals, xgals, ygals
-        dtemplates, *nimages[kuse], xgals, ygals, templates=gtemplates, $
+        adxy, *subhdrs[kuse], ra_gals, dec_gals, xgals, ygals
+        dtemplates, nimage, xgals, ygals, templates=gtemplates, $
           sersic=sersic, ikept=ikept
-        sig=dsigma(*nimages[kuse],sp=5)
-        nchild=n_elements(gtemplates)/nx[kuse]/ny[kuse]
-        stemplates=fltarr(nx[kuse],ny[kuse],nchild)
-        stemplates2=fltarr(nx[kuse],ny[kuse],nchild)
+        sig=dsigma(nimage,sp=5)
+        nchild=n_elements(gtemplates)/nxsub[kuse]/nysub[kuse]
+        stemplates=fltarr(nxsub[kuse],nysub[kuse],nchild)
+        stemplates2=fltarr(nxsub[kuse],nysub[kuse],nchild)
         for i=0L, nchild-1L do begin
             stemplates[*,*,i]= dsmooth(gtemplates[*,*,i], 2.5)
             stemplates2[*,*,i]= dsmooth(gtemplates[*,*,i], 7.5)
-            tmp_stemplates=reform(stemplates[*,*,i],nx[kuse]*ny[kuse])
-            tmp_stemplates2=reform(stemplates2[*,*,i],nx[kuse]*ny[kuse])
-            tmp_templates=reform(gtemplates[*,*,i],nx[kuse]*ny[kuse])
+            tmp_stemplates=reform(stemplates[*,*,i],nxsub[kuse]*nysub[kuse])
+            tmp_stemplates2=reform(stemplates2[*,*,i],nxsub[kuse]*nysub[kuse])
+            tmp_templates=reform(gtemplates[*,*,i],nxsub[kuse]*nysub[kuse])
             ii=where(tmp_stemplates lt 2.*sig, nii)
             if(nii gt 0) then $
               tmp_templates[ii]= tmp_stemplates[ii]
             ii=where(tmp_stemplates lt 0.2*sig, nii)
             if(nii gt 0) then $
               tmp_templates[ii]=tmp_stemplates2[ii]
-            gtemplates[*,*,i]=reform(tmp_templates, nx[kuse], ny[kuse])
+            gtemplates[*,*,i]=reform(tmp_templates, nxsub[kuse], nysub[kuse])
         endfor
     endif
 
     ;; add stars as templates
     nkept=n_elements(ikept)
     nchild=nkept+nstars
-    templates=fltarr(nx[kuse],ny[kuse], nchild)
+    templates=fltarr(nxsub[kuse],nysub[kuse], nchild)
     if(nkept gt 0) then $
       templates[*,*,0:nkept-1L]=gtemplates
     if(nstars gt 0) then $
       templates[*,*,nkept:nchild-1L]=stimages
-
-    if(nx[k] ne nx[kuse] OR $
-       ny[k] ne ny[kuse]) then begin
-        extast, *hdrs[k], k_ast
-        extast, *hdrs[kuse], kuse_ast
-        use_templates=fltarr(nx[k], ny[k], nchild)
+    
+    if(nxsub[k] ne nxsub[kuse] OR $
+       nysub[k] ne nysub[kuse]) then begin
+        extast, *subhdrs[k], k_ast
+        extast, *subhdrs[kuse], kuse_ast
+        use_templates=fltarr(nxsub[k], nysub[k], nchild)
         for i=0L, nchild-1L do begin
-            tmp_ut=fltarr(nx[k], ny[k])
+            tmp_ut=fltarr(nxsub[k], nysub[k])
             smosaic_remap, templates[*,*,i], kuse_ast, k_ast, $
               refimage=tmp_ut
             use_templates[*,*,i]=tmp_ut
@@ -321,7 +409,6 @@ for k=0L, nim-1L do begin
         templates=use_templates
     endif
 
-    ;; find weights
     if(ngals gt 0 and nstars gt 0) then begin
         xcen=[xgals[ikept], xstars]
         ycen=[ygals[ikept], ystars]
@@ -336,8 +423,11 @@ for k=0L, nim-1L do begin
         endif
     endelse 
     
-    dweights, *images[k], *ivars[k], templates, weights=weights, /nonneg
-    dfluxes, *images[k], templates, weights, xcen, ycen, children=children
+    dweights, *simages[k], *sivars[k], templates, weights=weights, /nonneg
+
+    dfluxes, *simages[k], templates, weights, xcen, ycen, children=children
+
+    if(k eq 2) then save
     
     use_child=lindgen(nstars+ngals)
     if(ngals gt 0) then begin
@@ -358,25 +448,31 @@ for k=0L, nim-1L do begin
             mwrfits, children[*,*,use_child[i]], subdir+'/'+ $
               strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-atlas-'+strtrim(string(aid),2)+'.fits', *hdrs[k], create=first
+              '-atlas-'+strtrim(string(aid),2)+'.fits', *subhdrs[k], $
+              create=first
             mwrfits, templates[*,*,use_child[i]], subdir+'/'+ $
               strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-templates-'+strtrim(string(aid),2)+'.fits', *hdrs[k], $
+              '-templates-'+strtrim(string(aid),2)+'.fits', *subhdrs[k], $
               create=first
         endif else begin
-            mwrfits, fltarr(nx[k],ny[k]), $
+            mwrfits, fltarr(nxsub[k],nysub[k]), $
               subdir+'/'+strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-atlas-'+strtrim(string(aid),2)+'.fits', *hdrs[k], $
+              '-atlas-'+strtrim(string(aid),2)+'.fits', *subhdrs[k], $
               create=first
-            mwrfits, fltarr(nx[k],ny[k]), $
+            mwrfits, fltarr(nxsub[k],nysub[k]), $
               subdir+'/'+strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
-              '-templates-'+strtrim(string(aid),2)+'.fits', *hdrs[k], $
+              '-templates-'+strtrim(string(aid),2)+'.fits', *subhdrs[k], $
               create=first
         endelse
     endfor
+    
+    mwrfits, *simages[k], subdir+'/'+ $
+      strtrim(string(iparent),2)+ $
+      '/'+base+'-'+strtrim(string(iparent),2)+ $
+      '-parent.fits', *subhdrs[k], create=first
 endfor
 
 if(n_tags(acat) gt 0) then begin

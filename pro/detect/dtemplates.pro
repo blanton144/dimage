@@ -33,8 +33,8 @@ templates=fltarr(nx,ny,nt)
 soname=filepath('libdimage.'+idlutils_so_ext(), $
                 root_dir=getenv('DIMAGE_DIR'), subdirectory='lib')
 
-xin=long(xc)
-yin=long(yc)
+xin=long(round(xc))
+yin=long(round(yc))
 ikept=lonarr(nt)
 retval=call_external(soname, 'idl_dtemplates', float(image), $
                      long(nx), long(ny), $

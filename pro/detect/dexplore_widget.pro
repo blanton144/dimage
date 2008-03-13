@@ -506,11 +506,12 @@ COMPILE_OPT hidden
 common com_dexplore_widget
 
 ;; read in parent image
-imfile='parents/'+basename+'-parent-'+strtrim(string(parent),2)+'.fits'
+imfile=subdir+'/'+strtrim(string(parent),2)+'/'+ $
+  basename+'-'+strtrim(string(parent),2)+'-parent.fits'
 parent_images=ptrarr(n_elements(imagenames))
 parent_hdrs=ptrarr(n_elements(imagenames))
 for i=0L, n_elements(imagenames)-1L do begin
-    parent_images[i]=ptr_new(gz_mrdfits(imfile, i*2L, hdr))
+    parent_images[i]=ptr_new(gz_mrdfits(imfile, i, hdr))
     parent_hdrs[i]=ptr_new(hdr)
 endfor
 

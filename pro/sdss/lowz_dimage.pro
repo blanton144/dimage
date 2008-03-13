@@ -64,7 +64,7 @@ for istep=start, nd do begin
                fzero lt 0.2) then begin
                 iseed=i
                 detect, noclobber=(keyword_set(redetect) eq 0), /cen, $
-                  glim=10., gsmooth=4., seed=iseed
+                  glim=10., gsmooth=4., seed=iseed, /gbig
             endif
         endif
     endif

@@ -23,6 +23,8 @@
 ;   /sgset - get locations of stars and galaxies from base-sgset.fits file
 ;   /hand - for children, put results in "hand" subdir (used by dexplore)
 ;   /noclobber - do not overwrite previously created files
+;   /gbig - treat galaxies as "big": resample smoothed image
+;           to save memory and ignore the small stuff
 ; COMMENTS:
 ;   When calling automatically, it is best not to use the /hand
 ;     option; reserve that for when dexplore calls this function and you
@@ -46,7 +48,7 @@
 pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             noclobber=noclobber, glim=glim, all=all, single=single, $
             aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
-            center=center, seed=seed0
+            center=center, seed=seed0, gbig=gbig
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
@@ -107,7 +109,7 @@ if(keyword_set(all)) then begin
         psfs.yst= pcat[iparent].yst
         dchildren, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
-          sgset=sgset, puse=pset.puse, tuse=tuse
+          sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig
     endfor
 endif
 
@@ -124,7 +126,7 @@ if(n_elements(single) gt 0) then begin
         psfs.yst= pcat[single].yst
         dchildren, base, single, psfs=psfs, $
           ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
-          sgset=sgset, puse=pset.puse, tuse=tuse
+          sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig
     endif
 endif
 
