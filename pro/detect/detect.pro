@@ -48,7 +48,7 @@
 pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             noclobber=noclobber, glim=glim, all=all, single=single, $
             aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
-            center=center, seed=seed0, gbig=gbig
+            center=center, seed=seed0, gbig=gbig, nogalex=nogalex
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
@@ -65,6 +65,12 @@ if(NOT keyword_set(base)) then begin
     dopsf=[1,1,1,1,1,1,0]
     tuse=[1,1,2,3,4,1,1]
     ref=2
+    if(keyword_set(nogalex)) then begin
+        imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+        puse=[1,1,1,1,1]
+        dopsf=[1,1,1,1,1]
+        tuse=[1,1,2,3,4]
+    endif
 endif
 
 if(NOT keyword_set(pset)) then begin
@@ -88,6 +94,7 @@ pcat=gz_mrdfits(base+'-pcat.fits',1)
 ;; fit for psf (creates bpsf and vpsf files)
 nim=n_elements(imfiles)
 seed_psf=seed0+1L+lindgen(nim)
+
 for k=0L, nim-1L do $
   if(pset.dopsf[k]) then $
   dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas, seed=seed_psf[k]

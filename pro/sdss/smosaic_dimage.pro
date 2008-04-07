@@ -1,8 +1,10 @@
 pro smosaic_dimage, ra, dec, sz=sz, prefix=prefix, noclobber=noclobber, $
                     iau_name=iau_name, scales=scales, sub=sub, $
                     raw=raw, jpg=jpg, _EXTRA=extra_for_smosaic, $
-                    satvalue=satvalue, nonlinearity=nonlinearity
+                    satvalue=satvalue, nonlinearity=nonlinearity, $
+                    rerun=rerun
 
+if(NOT keyword_set(rerun)) then rerun=[137, 648]
 if(NOT keyword_set(scales)) then scales=[20.,20.,20.]
 if(NOT keyword_set(satvalue)) then satvalue=30.
 if(NOT keyword_set(nonlinearity)) then nonlinearity=3.
@@ -34,7 +36,7 @@ if(keyword_set(noclobber)) then begin
 endif
 
 if(redo) then $
-  smosaic_make, ra, dec, sz, sz, fpbin=fpbin, /global, rerun=[137, 161], $
+  smosaic_make, ra, dec, sz, sz, fpbin=fpbin, /global, rerun=rerun, $
   /dropweights, /ivarout, /sheldon, prefix=prefix, $
   _EXTRA=extra_for_smosaic
 

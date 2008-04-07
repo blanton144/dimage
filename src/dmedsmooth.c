@@ -36,7 +36,7 @@ int dmedsmooth(float *image,
   int k,i,j,ip,jp,ist,jst,nxt,nyt,nb,ind,jnd,sp;
   int xoff, yoff, nm, nxgrid, nygrid;
   int ypsize, ymsize, xpsize, xmsize;
-  float dx,dy,xkernel,ykernel;
+  float dx,dy,xkernel,ykernel, maxarr, minarr;
 
 	/* guarantee odd */
 	sp=box;
@@ -83,6 +83,8 @@ int dmedsmooth(float *image,
     for(i=0;i<nxgrid;i++) 
       grid[i+j*nxgrid]=0.;
 
+	maxarr=-1.e+25;
+	minarr=1.e+25;
   for(j=0;j<nygrid;j++) {
     jst=ylo[j];
     jnd=yhi[j];
@@ -96,12 +98,16 @@ int dmedsmooth(float *image,
         for(ip=ist;ip<=ind;ip++) {
           if(invvar[ip+jp*nx]>0.) {
             arr[nb]=image[ip+jp*nx];
+						if(arr[nb]>maxarr) 
+							maxarr=arr[nb];
+						if(arr[nb]<minarr) 
+							minarr=arr[nb];
             nb++;
           }
         }
-      if(nb>1) {
-        nm=nb/2;
-        grid[i+j*nxgrid]=dselip(nm,nb,arr);
+      if(nb>1 && maxarr!=minarr) {
+        nm=2*(nb/4)+1;
+        grid[i+j*nxgrid]=dselip(nm,nb,arr); 
       } else {
         grid[i+j*nxgrid]=image[(long) xlo[i]+((long) ylo[j])*nx];
       }

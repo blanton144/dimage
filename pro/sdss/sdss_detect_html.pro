@@ -111,8 +111,8 @@ xyad, shdr, snx/2L, sny/2L, racen, deccen
 
 subdir='atlases'
 
-acat= mrdfits(subdir+'/'+strtrim(string(parent),2)+'/'+ $
-              base+'-'+strtrim(string(parent),2)+'-acat.fits',1)
+acat= gz_mrdfits(subdir+'/'+strtrim(string(parent),2)+'/'+ $
+                 base+'-'+strtrim(string(parent),2)+'-acat.fits',1)
 if(n_tags(acat) eq 0) then return
 
 ii=where(acat.type eq 0, nii) ;; find galaxies

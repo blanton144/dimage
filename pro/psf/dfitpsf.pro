@@ -89,6 +89,7 @@ if(nx lt box OR ny lt box) then begin
     return
 endif
 
+
 ;; median smooth the image and find and extract objects
 msimage=dmedsmooth(image, invvar, box=box)
 simage=image-msimage
@@ -134,7 +135,6 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
     splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
     if (nkeep lt 3L) then begin
         splog, 'Not enough good stars found.'
-        save
         return
     endif
     

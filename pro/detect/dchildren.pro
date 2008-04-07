@@ -132,7 +132,6 @@ dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
 
 ;; find stars and galaxies
 if(keyword_set(newsg)) then begin
-    save, filename='before_stars.sav'
     dstars, images, ivars, psfs, hdrs, sdss=sdss, plim=plim, ref=ref, $
       nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
       nstars=nstars, puse=puse
@@ -427,8 +426,6 @@ for k=0L, nim-1L do begin
 
     dfluxes, *simages[k], templates, weights, xcen, ycen, children=children
 
-    if(k eq 2) then save
-    
     use_child=lindgen(nstars+ngals)
     if(ngals gt 0) then begin
         use_child[0:ngals-1]=-1L
@@ -443,8 +440,6 @@ for k=0L, nim-1L do begin
             if(total(children[*,*,use_child[i]]) gt 0) then begin
                 acat[i].bgood[k]=	1
             endif 
-        endif 
-        if(acat[i].bgood[k]) then begin
             mwrfits, children[*,*,use_child[i]], subdir+'/'+ $
               strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
@@ -456,13 +451,13 @@ for k=0L, nim-1L do begin
               '-templates-'+strtrim(string(aid),2)+'.fits', *subhdrs[k], $
               create=first
         endif else begin
-            mwrfits, fltarr(nxsub[k],nysub[k]), $
-              subdir+'/'+strtrim(string(iparent),2)+ $
+            mwrfits, fltarr(nxsub[kuse], nysub[kuse]), subdir+'/'+ $
+              strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
               '-atlas-'+strtrim(string(aid),2)+'.fits', *subhdrs[k], $
               create=first
-            mwrfits, fltarr(nxsub[k],nysub[k]), $
-              subdir+'/'+strtrim(string(iparent),2)+ $
+            mwrfits, fltarr(nxsub[kuse], nysub[kuse]), subdir+'/'+ $
+              strtrim(string(iparent),2)+ $
               '/'+base+'-'+strtrim(string(iparent),2)+ $
               '-templates-'+strtrim(string(aid),2)+'.fits', *subhdrs[k], $
               create=first

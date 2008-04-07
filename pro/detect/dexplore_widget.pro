@@ -9,7 +9,7 @@ common com_dexplore_widget, $
   pcat, acat, ig, is, igstr, isstr, ng, ns, lsb, $
   fix_stretch, hand, show_templates, gsmooth, glim, atset, $
   subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
-  curr_nx, curr_ny, curr_nx_2, curr_ny_2
+  curr_nx, curr_ny, curr_nx_2, curr_ny_2, hidestars, bandnames
 
 curr_nx=0
 curr_ny=0
@@ -23,6 +23,10 @@ w_redeblend=0
 w_mark=0
 w_parent=0
 w_full=0
+parent=-1L
+
+if(keyword_set(w_eyeball)) then $
+  WIDGET_CONTROL, w_eyeball, /destroy
 w_eyeball=0
 psfs=0
 
@@ -53,17 +57,6 @@ if(ev.ID eq w_parent) then begin
     endif
 endif
 
-if(ev.ID eq w_band) then begin
-    if(ev.update) then begin
-        band=ev.value
-        if(keyword_set(pup)) then begin
-            dexplore_parent_display
-            dexplore_mark_children
-        endif else if(keyword_set(cup)) then begin
-            dexplore_child_display
-        endif
-    endif
-endif
 
 if(ev.ID eq w_smooth) then begin
     if(ev.update) then begin
@@ -156,6 +149,20 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
 endif
 
 end  
+
+function dexplore_setband, ev
+COMPILE_OPT hidden
+common com_dexplore_widget
+
+band=(where(ev.value eq bandnames))[0]
+if(keyword_set(pup)) then begin
+    dexplore_parent_display
+    dexplore_mark_children
+endif else if(keyword_set(cup)) then begin
+    dexplore_child_display
+endif
+
+end
 
 pro dexplore_setval, hand=in_hand
 COMPILE_OPT hidden
@@ -309,7 +316,8 @@ if(n_tags(acat) gt 0) then begin
     
     if(ng gt 0) then begin
         igstr=strtrim(string(ig),2)
-        w_glist = CW_BGROUP(w_base, igstr, /row, /return_name, frame=1, $
+        w_glist = CW_BGROUP(w_base, ['all', igstr], /row, /return_name, $
+                            frame=1, $
                             event_func='dexplore_child_display_widget', $
                             label_left='gals')
     endif
@@ -317,7 +325,8 @@ if(n_tags(acat) gt 0) then begin
     is=where(acat.good gt 0 and acat.type eq 1L, ns)
     if(ns gt 0) then begin
         isstr=strtrim(string(is),2)
-        w_slist = CW_BGROUP(w_base, isstr, /row, /return_name, frame=1, $
+        if(NOT keyword_set(hidestars)) then $
+          w_slist = CW_BGROUP(w_base, isstr, /row, /return_name, frame=1, $
                           event_func='dexplore_child_display_widget', $
                           label_left='stars')
     endif
@@ -380,9 +389,13 @@ COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-child=long(ev.value)
-
-dexplore_child_display
+if(ev.value eq 'all') then begin
+    dexplore_parent_display
+    dexplore_mark_children
+endif else begin
+    child=long(ev.value)
+    dexplore_child_display
+endelse
 
 end
 ;
@@ -444,7 +457,7 @@ if(n_tags(eyeball) eq 0) then begin
 endif
 
 w_eyeball = WIDGET_BASE(/COLUMN, /BASE_ALIGN_TOP, /SCROLL, $
-                        scr_xsize=200, scr_ysize=500)
+                        xoff=300, scr_xsize=200, scr_ysize=500)
 
 w_label = WIDGET_LABEL(w_eyeball, VALUE='Flag values')
 
@@ -534,21 +547,32 @@ end
   
 ;; main
 pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb, $
-                     twomass=in_twomass
+                     twomass=in_twomass, eyeball_name=in_eyeball_name, $
+                     hidestars=in_hidestars, parent=in_parent
 
 common com_dexplore_widget
 
 if(keyword_set(in_lsb)) then lsb=1
+if(keyword_set(in_eyeball_name)) then eyeball_name=in_eyeball_name
+if(keyword_set(in_hidestars)) then hidestars=in_hidestars
 
 ;; clean up before starting
 dexplore_clean
 
 basename=in_basename
 imagenames=in_imagenames
+
+bandnames=strarr(n_elements(imagenames))
+for i=0L, n_elements(imagenames)-1L do begin
+    tmpname=strmid(imagenames[i], strlen(basename))
+    bandnames[i]=(stregex(tmpname, '-(.*)\.fits.*', /extr, /sub))[1]
+endfor
+
 child=0L
 band=0L
 smooth=0.
 parent=-1L
+if(n_elements(in_parent) gt 0) then parent=in_parent
 subdir='atlases'
 
 psfs=0
@@ -587,20 +611,31 @@ w_smooth = CW_FIELD(w_base, TITLE = "smooth", $
                   /FLOAT, /FRAME, /return_events, value=smooth)  
 
 ;; set up band selection widget
-w_band = CW_FIELD(w_base, TITLE = "band", $
-                  /LONG, /FRAME, /return_events, value=band)  
+bandstr=strtrim(string(lindgen(n_elements(imagenames))),2)
+w_band = CW_BGROUP(w_base, bandnames, /row, /return_name, frame=1, $
+                   uvalue=0, event_func='dexplore_setband', $
+                   label_left='bands')  
 
 ;; set up parent display widget
 w_parent = CW_FIELD(w_base, TITLE = "parent", $
-                    /LONG, /FRAME, /return_events)  
+                    /LONG, /FRAME, /return_events, value=parent)  
 
 
 stash = {done: w_done}
 
 WIDGET_CONTROL, w_base, /REALIZE, set_uvalue=stash
 
+if(parent ge 0) then begin
+    dexplore_read_parent
+    dexplore_parent_display
+    dexplore_child_list
+    dexplore_mark_children
+endif
+
 XMANAGER, 'dexplore', w_base
 
+if(keyword_set(w_eyeball)) then $
+  WIDGET_CONTROL, w_eyeball, /destroy
 dexplore_clean
 
 end  
