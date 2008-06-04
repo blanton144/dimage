@@ -33,6 +33,18 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
+;; internal function: smooth for big galaxy treatment
+function gbig_smooth, image, nxsub, nysub, subpix
+
+tmp_image= dsmooth(image, subpix*2.2)
+tmp_image= rebin(tmp_image[0:nxsub*subpix-1, $
+                           0:nysub*subpix-1], $
+                 nxsub, nysub)
+
+return, tmp_image
+
+end
+;
 pro dchildren, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
@@ -106,7 +118,10 @@ endif else begin
     sgset=gz_mrdfits(sgsetfile, 1)
 endelse
 
-;; read in images 
+;; read in images and ivars
+;; (have simages and ivars point to same data
+;; by default --- if /gbig is set this will be 
+;; changed below)
 for k=0L, nim-1L do begin
     images[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
                               strtrim(string(iparent),2)+'.fits',0+k*2L,hdr))
@@ -135,6 +150,7 @@ if(keyword_set(newsg)) then begin
     dstars, images, ivars, psfs, hdrs, sdss=sdss, plim=plim, ref=ref, $
       nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
       nstars=nstars, puse=puse
+    save, file='before_dgals.sav'
     dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
       ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse
     for k=0L, nim-1L do begin
@@ -188,6 +204,7 @@ mwrfits, sgset, sgsetfile, /create
 
 if(ngals eq 0 and nstars eq 0) then return
 
+;; create acat structure to store children in
 acat=replicate({pid:iparent, $
                 aid:-1L, $
                 racen:0.D, $
@@ -236,6 +253,7 @@ if(ngals gt 0) then begin
     xyad, *hdrs[ref], r_xgals, r_ygals, ra_gals, dec_gals
 endif 
 
+;; now store away the centers in acat
 if(ngals gt 0) then begin
     acat[0:ngals-1].racen=ra_gals
     acat[0:ngals-1].deccen=dec_gals
@@ -247,12 +265,16 @@ if(nstars gt 0) then begin
     acat[ngals:nstars+ngals-1].type=1
 endif
 
+;; now set things up so that we can transparently use 
+;; subsampled images if necessary, by creating nxsub, nysub,
+;; and subhdrs. these are identical to the original full-res
+;; image if /gbig is not set, but are made into a version for
+;; the low-res image if /gbig IS set.
 nxsub=lonarr(nim)
 nysub=lonarr(nim)
 subpix=lonarr(nim)
 pixscale=fltarr(nim)
 for k=0L, nim-1L do begin
-    kuse=tuse[k]
     nxsub[k]=nx[k]
     nysub[k]=ny[k]
     subhdrs[k]=ptr_new(*hdrs[k])
@@ -290,9 +312,8 @@ for k=0L, nim-1L do begin
             sxaddpar, *subhdrs[k], 'CD2_2', cd2_2
 
             ;; make sub-images
-            simages[k]=ptr_new(rebin((*images[k])[0:nxsub[k]*subpix[k]-1, $
-                                                  0:nysub[k]*subpix[k]-1], $
-                                     nxsub[k], nysub[k]))
+            simages[k]=ptr_new(gbig_smooth((*images[k]), nxsub[k], nysub[k], $
+                                           subpix[k]))
             ssig=dsigma((*simages[k]), sp=10)
             sivars[k]=ptr_new(fltarr(nxsub[k], nysub[k])+1./ssig^2)
 
@@ -336,9 +357,8 @@ for k=0L, nim-1L do begin
                 if(keyword_set(gbig) eq 0 or subpix[kuse] eq 1) then begin
                     stimages[*,*,i]=tmp_model
                 endif else begin
-                    tmp_image=rebin(tmp_model[0:nxsub[kuse]*subpix[kuse]-1, $
-                                              0:nysub[kuse]*subpix[kuse]-1], $
-                                    nxsub[kuse], nysub[kuse])
+                    tmp_image=gbig_smooth(tmp_model, nxsub[kuse], $
+                                          nysub[kuse], subpix[kuse])
                     stimages[*,*,i]=tmp_image
                     xstars[i]= (xstars[i]+0.5)/float(subpix[kuse])-0.5
                     ystars[i]= (ystars[i]+0.5)/float(subpix[kuse])-0.5
@@ -352,9 +372,7 @@ for k=0L, nim-1L do begin
     if(keyword_set(gbig) eq 0 OR subpix[kuse] eq 1) then begin
         nimage=((*simages[kuse])-model) > 0.
     endif else begin 
-        smodel=rebin(model[0:nxsub[kuse]*subpix[kuse]-1, $
-                           0:nysub[kuse]*subpix[kuse]-1], $
-                     nxsub[kuse], nysub[kuse])
+        smodel=gbig_smooth(model, nxsub[kuse], nysub[kuse], subpix[kuse])
         nimage=((*simages[kuse])-smodel)>0.
         ssig=dsigma(nimage, sp=10)
         nivar=fltarr(nxsub[kuse], nysub[kuse])+1./ssig^2

@@ -37,7 +37,7 @@ endif
 
 if(redo) then $
   smosaic_make, ra, dec, sz, sz, fpbin=fpbin, /global, rerun=rerun, $
-  /dropweights, /ivarout, /sheldon, prefix=prefix, $
+  /dropweights, /ivarout, prefix=prefix, $
   _EXTRA=extra_for_smosaic
 
 redo=1

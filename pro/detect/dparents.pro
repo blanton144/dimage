@@ -93,6 +93,17 @@ for k=0L, nim-1L do begin
 
     ;; set ivars (defaulting to sigma estimate)
     sigma[k]=dsigma(*images[k], sp=10)
+    if(sigma[k] le 0.) then begin
+        scale=8L
+        newnx= nx[k]/scale 
+        newny= ny[k]/scale 
+        newim= rebin((*images[k])[0:newnx*scale-1, $
+                                  0:newny*scale-1], newnx, newny)* $
+          scale^2
+        sigma[k]=dsigma(newim, sp=10)/float(scale)
+        if(sigma[k] eq 0.) then sigma[k]=1.
+    endif
+
     ivar=gz_mrdfits(imfiles[k],1) 
     if(NOT keyword_set(ivar)) then $
       *ivars[k]=fltarr(nx[k], ny[k])+1./sigma[k]^2 $
