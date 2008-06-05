@@ -19,6 +19,8 @@ BIN = $(DIMAGE_DIR)/bin
 LIB = $(DIMAGE_DIR)/lib
 
 OBJECTS = \
+	idl_dfloodfill.o \
+	dfloodfill.o \
 	idl_dobjects.o \
 	dobjects.o \
 	idl_dobjects_multi.o \
