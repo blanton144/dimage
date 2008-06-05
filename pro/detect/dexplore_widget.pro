@@ -3,11 +3,11 @@ pro dexplore_clean
 common com_dexplore_widget, $
   w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
   w_settings, w_gsmooth, w_glim, w_redeblend, w_mark, w_smooth, $
-  basename, imagenames, $
+  w_gsaddle, basename, imagenames, $
   parent_images, parent_hdrs, $
   setval, band, smooth, child, parent, $
   pcat, acat, ig, is, igstr, isstr, ng, ns, lsb, $
-  fix_stretch, hand, show_templates, gsmooth, glim, atset, $
+  fix_stretch, hand, show_templates, gsmooth, glim, gsaddle, atset, $
   subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
   curr_nx, curr_ny, curr_nx_2, curr_ny_2, hidestars, bandnames
 
@@ -19,6 +19,7 @@ w_band=0
 w_smooth=0
 w_gsmooth=0
 w_glim=0
+w_gsaddle=0
 w_redeblend=0
 w_mark=0
 w_parent=0
@@ -82,6 +83,12 @@ if(ev.ID eq w_glim) then begin
     endif
 endif
 
+if(ev.ID eq w_gsaddle) then begin
+    if(ev.update) then begin
+        gsaddle=ev.value
+    endif
+endif
+
 if(keyword_set(starset)) then begin
     if(ev.ID eq starset) then begin
         if(ev.SELECT) then begin
@@ -140,6 +147,7 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
     atset_hand=atset
     atset_hand.gsmooth=gsmooth
     atset_hand.glim=glim
+    atset_hand.gsaddle=gsaddle
     mwrfits, atset_hand, atsetfile, /create
     detect, basename, imagenames, ref=atset.ref, $
       single=parent, /aset, /hand, /noclobber, /pset
@@ -282,6 +290,8 @@ if(keyword_set(w_gsmooth)) then $
   WIDGET_CONTROL, w_gsmooth, /destroy
 if(keyword_set(w_glim)) then $
   WIDGET_CONTROL, w_glim, /destroy
+if(keyword_set(w_gsaddle)) then $
+  WIDGET_CONTROL, w_gsaddle, /destroy
 if(keyword_set(w_slist)) then $
   WIDGET_CONTROL, w_slist, /destroy
 if(keyword_set(w_glist)) then $
@@ -301,6 +311,7 @@ w_mark=0
 w_eyeball=0
 w_gsmooth=0
 w_glim=0
+w_gsaddle=0
 w_slist=0
 w_glist=0
 
@@ -351,12 +362,16 @@ if(file_test(asetfile) OR $
     atset=gz_mrdfits(asetfile,1)
     gsmooth=atset.gsmooth
     glim=atset.glim
+    gsaddle=atset.gsaddle
     w_gsmooth = CW_FIELD(w_base, TITLE = "gsmooth", $
                          /FLOAT, /FRAME, /return_events, $
                          value=gsmooth)  
     w_glim = CW_FIELD(w_base, TITLE = "glim", $
                       /FLOAT, /FRAME, /return_events, $
                       value=glim)  
+    w_gsaddle = CW_FIELD(w_base, TITLE = "gsaddle", $
+                         /FLOAT, /FRAME, /return_events, $
+                         value=gsaddle)  
     w_redeblend = WIDGET_BUTTON(w_base, value='redeblend')  
     w_mark = WIDGET_BUTTON(w_base, value='mark')  
 endif

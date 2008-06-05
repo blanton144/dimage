@@ -30,7 +30,7 @@ int dnonneg(float *xx, float *invcovar, float *bb, float offset,
             int verbose);
 int dpeaks(float *image, int nx, int ny, int *npeaks, int *xcen, 
            int *ycen, float sigma, float dlim, float saddle, int maxnpeaks,
-           int smooth, int checkpeaks, float minpeak);
+           int smooth, int checkpeaks, float minpeak, int abssaddle);
 int dcentral(float *image, int nx, int ny, int npeaks, float *xcen, 
              float *ycen, int *central, float sigma, float dlim,    
              float saddle, int maxnpeaks);
@@ -72,3 +72,5 @@ int dtemplates(float *image, int nx, int ny, int *ntemplates, int *xcen,
 							 int *ycen, float *templates, float sigma, float parallel, 
 							 int *ikept);
 int dsersic_params(float flux, float n, float r50, float *amp, float *r0);
+int dfloodfill(int *image, int nx, int ny, int x, int y, int xst, int xnd, 
+							 int yst, int ynd, int nv);

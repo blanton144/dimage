@@ -105,7 +105,7 @@ int dallpeaks(float *image,
 			/* find peaks in cutout */
 			dsmooth(oimage, onx, ony, 2, simage);
 			dpeaks(simage, onx, ony, &nc, xc, yc, sigma, dlim, saddle, 
-						 maxper, 0, 1, minpeak);
+						 maxper, 0, 1, minpeak,0);
 			imore=0;
 			for(i=0;i<nc;i++) {
 				if(xc[i]>0 && xc[i]<onx-1 && yc[i]>0 && yc[i]<ony-1) {

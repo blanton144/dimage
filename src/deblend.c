@@ -79,7 +79,7 @@ int deblend(float *image,
   printf("finding peaks.\n"); fflush(stdout);
   if((*nchild)==0) {
     dpeaks(image, nx, ny, &npeaks, xcen, ycen, sigma, dlim, 
-           saddle, maxnchild, 1, 1, minpeak);
+           saddle, maxnchild, 1, 1, minpeak,0);
   } else {
     npeaks=(*nchild);
   }
@@ -152,7 +152,7 @@ int deblend(float *image,
 			printf("finding peaks in template %d.\n", k);
 			closest=-1;
 			dpeaks(&(templates[nx*ny*k]), nx, ny, &ntpeaks, xtcen, ytcen, sigma, 
-						 dlim, saddle, 5, 1, 0, 5.*sigma);
+						 dlim, saddle, 5, 1, 0, 5.*sigma,0);
 			printf("trimming peaks in template %d.\n", k);
 			if(ntpeaks>1) {
 				mindist=nx*ny;

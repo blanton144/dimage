@@ -51,7 +51,8 @@ int dpeaks(float *image,
            int maxnpeaks, 
            int smoothimage, 
            int checkpeaks, 
-           float minpeak)
+           float minpeak, 
+					 int abssaddle)
 {
   int i,j,ip,jp,ist,jst,ind,jnd,highest,tmpnpeaks;
   float dx,dy, level;
@@ -111,18 +112,18 @@ int dpeaks(float *image,
 
 		if(checkpeaks) {
 			/* look for peaks joined by a high saddle to brighter peaks */
-			level= (smooth[ fullxcen[i]+  fullycen[i]*nx]-saddle*sigma);
+			if(abssaddle) 
+				level= saddle;
+			else 
+				level= (smooth[ fullxcen[i]+  fullycen[i]*nx]-saddle*sigma);
 			if(level<sigma) level=sigma;
 			for(jp=0;jp<ny;jp++)
 				for(ip=0;ip<nx;ip++)
 					mask[ip+jp*nx]=smooth[ip+jp*nx]>level;
-			dfind(mask, nx, ny, object);
+			dfloodfill(mask, nx, ny, fullxcen[i], fullycen[i], 0, nx-1, 0, ny-1, 2);
 			for(j=i-1;j>=0;j--) 
-				if(object[ fullxcen[j]+ fullycen[j]*nx]==
-					 object[ fullxcen[i]+ fullycen[i]*nx] || 
-					 object[ fullxcen[i]+ fullycen[i]*nx]==-1 ) {
+				if(mask[ fullxcen[j]+ fullycen[j]*nx]==2)
 					keep[i]=0;
-				}
 		}
 
     /* look for close peaks */

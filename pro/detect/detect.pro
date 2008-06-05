@@ -48,12 +48,14 @@
 pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             noclobber=noclobber, glim=glim, all=all, single=single, $
             aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
-            center=center, seed=seed0, gbig=gbig, nogalex=nogalex
+            center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
+            gsaddle=gsaddle
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(glim)) then glim=20.
-if(NOT keyword_set(gsmooth)) then gsmooth=5.
+if(NOT keyword_set(gsaddle)) then gsaddle=20.
+if(NOT keyword_set(gsmooth)) then gsmooth=3.
 
 
 if(NOT keyword_set(base)) then begin
@@ -116,7 +118,8 @@ if(keyword_set(all)) then begin
         psfs.yst= pcat[iparent].yst
         dchildren, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
-          sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig
+          sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
+                   gsaddle=gsaddle
     endfor
 endif
 
@@ -133,7 +136,8 @@ if(n_elements(single) gt 0) then begin
         psfs.yst= pcat[single].yst
         dchildren, base, single, psfs=psfs, $
           ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
-          sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig
+          sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
+                   gsaddle=gsaddle
     endif
 endif
 

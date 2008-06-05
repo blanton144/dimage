@@ -49,7 +49,7 @@ int dcentral(float *image,
   sxcen=(int *) malloc(sizeof(int)*1);
   sycen=(int *) malloc(sizeof(int)*1);
   dpeaks(image, nx, ny, &nspeaks, sxcen, sycen, sigma, dlim, saddle, 1, 1, 
-         1, 1.*sigma);
+         1, 1.*sigma,0);
 
   /* 3. find brightest original peak near median peak */
   ist=(long) sxcen[0] - box/3;

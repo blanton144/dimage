@@ -49,11 +49,13 @@ pro dchildren, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                sersic=in_sersic, aset=in_aset, sgset=in_sgset, $
-               sdss=sdss, puse=puse, tuse=tuse, gbig=gbig
+               sdss=sdss, puse=puse, tuse=tuse, gbig=gbig, $
+               gsaddle=gsaddle
 
 maxnstar=2000L
 if(NOT keyword_set(plim)) then plim=5.
 if(NOT keyword_set(glim)) then glim=5.
+if(NOT keyword_set(gsaddle)) then gsaddle=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=2.
 if(NOT keyword_set(saddle)) then saddle=5.
 if(keyword_set(xstars)) then nstars=n_elements(xstars)
@@ -90,11 +92,13 @@ if(keyword_set(in_aset) eq 0 OR gz_file_test(asetfile) eq 0) then begin
           sersic:sersic, $
           gsmooth:gsmooth, $
           glim:glim, $
+          gsaddle:gsaddle, $
           tuse:tuse}
 endif else begin
     aset=gz_mrdfits(asetfile, 1)
     gsmooth=aset.gsmooth
     glim=aset.glim
+    gsaddle=aset.gsaddle
     sersic=aset.sersic
     tuse=aset.tuse
     ref=aset.ref
@@ -150,9 +154,9 @@ if(keyword_set(newsg)) then begin
     dstars, images, ivars, psfs, hdrs, sdss=sdss, plim=plim, ref=ref, $
       nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
       nstars=nstars, puse=puse
-    save, file='before_dgals.sav'
     dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
-      ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse
+           ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse, $
+           gsaddle=gsaddle
     for k=0L, nim-1L do begin
         ptr_free, nimages[k]
     endfor

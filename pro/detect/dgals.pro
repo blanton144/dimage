@@ -9,7 +9,9 @@
 ;------------------------------------------------------------------------------
 pro dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
            ra_gals=out_ra_gals, dec_gals=out_dec_gals, ngals=ngals, $
-           puse=puse
+           puse=puse, gsaddle=gsaddle
+
+if(NOT keyword_set(gsaddle)) then gsaddle=20.
 
 nim=n_elements(nimages)
 nx=lonarr(nim)
@@ -38,8 +40,9 @@ if(keyword_set(puse[k])) then begin
     simage=dsmooth(simage, gsmooth/pixscale/float(subpix))
     ssig=dsigma(simage, sp=10)
     sivar=fltarr(nxsub, nysub)+1./ssig^2
+    saddle=gsaddle*ssig
     dpeaks, simage, xc=xc, yc=yc, sigma=ssig, minpeak=glim*ssig, $
-      /refine, npeaks=ngals, saddle=saddle, /check
+      /refine, npeaks=ngals, saddle=saddle, /check, /abssaddle
     if(ngals eq 0) then begin
         while(ngals eq 0 AND gsmooth gt 1.) do begin
             gsmooth=(gsmooth*0.7)>1.
@@ -52,7 +55,7 @@ if(keyword_set(puse[k])) then begin
             ssig=dsigma(simage, sp=10)
             sivar=fltarr(nxsub, nysub)+1./ssig^2
             dpeaks, simage, xc=xc, yc=yc, sigma=ssig, minpeak=glim*ssig, $
-              /refine, npeaks=ngals, saddle=saddle, /check
+              /refine, npeaks=ngals, saddle=saddle, /check, /abssaddle
         endwhile
     endif
     

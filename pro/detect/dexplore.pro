@@ -23,9 +23,11 @@ endif
 icen=-1L
 if(keyword_set(cen)) then begin
     pim=gz_mrdfits(base+'-pimage.fits')
-    pnx=(size(pim, /dim))[0]
-    pny=(size(pim, /dim))[1]
-    icen= pim[pnx/2L, pny/2L]
+    if(keyword_set(pim)) then begin
+        pnx=(size(pim, /dim))[0]
+        pny=(size(pim, /dim))[1]
+        icen= pim[pnx/2L, pny/2L]
+    endif
 endif
 
 if(NOT keyword_set(twomass)) then $
