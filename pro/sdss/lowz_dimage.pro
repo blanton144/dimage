@@ -15,39 +15,46 @@ pro lowz_dimage, sample=sample, clobber=clobber, $
 
 noclobber=keyword_set(clobber) eq 0
 
-if(NOT keyword_set(sample)) then sample='dr7'
+if(NOT keyword_set(sample)) then sample='dr6'
 if(NOT keyword_set(start)) then start=0L
 
-cand=gz_mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_candidates.'+sample+ $
-                '.fits', 1)
+lowz=gz_mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_plus_ned.fits', 1)
 
 lowzdir=getenv('VAGC_REDUX')+'/lowz/'
-rootdir=lowzdir
+rootdir=getenv('DATA')+'/lowz-sdss'
 
+if(NOT keyword_set(nd)) then nd=n_elements(lowz)-1L
 
-if(NOT keyword_set(nd)) then nd=n_elements(cand)-1L
+isort=lindgen(n_elements(lowz))
+iexclude=-1
 
-isort=lindgen(n_elements(cand))
-if(keyword_set(sort)) then $
-  isort=sort(cand.mag)
-
-iexclude=[3208, 2926, 2740]
+;; set maximum and minimum sizes
+pixscale=0.396/3600.
+minsz=100.*pixscale
+maxsz=3000.*pixscale
 
 for istep=start, nd do begin
     i=isort[istep]
     splog, i
     ii=where(iexclude eq i, nii)
-    if(nii eq 0) then begin
-        subdir=image_subdir(cand[i].ra, cand[i].dec, $
+    if(nii eq 0 AND lowz[i].icomb ge 0) then begin
+        subdir=image_subdir(lowz[i].ra, lowz[i].dec, $
                             prefix=prefix, rootdir=rootdir)
         spawn, 'mkdir -p '+subdir
 
-        sc=1.-((((cand[i].mag-10.)/(16.-10.))>0.)<1.)
-        sz=0.1+0.25*sc
+        ;; get diameter in deg
+	      ldiam=0.
+	      ndiam=0.
+        if(lowz[i].lowz eq 1) then ldiam= lowz[i].petroth90[2]*3.5 
+        if(lowz[i].ned eq 1) then ndiam= lowz[i].ned_major*3.5 
+        diam=max([ldiam, ndiam])/3600. 
+        
+        ;; set size of image to be a bit bigger
+				sz= ((1.5*diam) > minsz)<maxsz
         
         cd, subdir
-        smosaic_dimage, cand[i].ra, cand[i].dec, sz=sz, prefix=prefix, $
-          noclobber=noclobber
+        smosaic_dimage, lowz[i].ra, lowz[i].dec, sz=sz, prefix=prefix, $
+          noclobber=noclobber, minscore=0.
 
         rim=mrdfits(subdir+'/'+prefix+'-r.fits.gz',0,hdr)
         if(keyword_set(rim)) then begin
@@ -57,14 +64,16 @@ for istep=start, nd do begin
             izero=where(rim eq 0., nzero)
             fzero=float(nzero)/float(npix)
             
-            gmosaic_make, cand[i].ra, cand[i].dec, sz, prefix=prefix, /sky, $
+            if(0) then $
+            gmosaic_make, lowz[i].ra, lowz[i].dec, sz, prefix=prefix, /sky, $
               noclobber=noclobber
             
             if(keyword_set(nodetect) eq 0 AND $
                fzero lt 0.2) then begin
                 iseed=i
                 detect, noclobber=(keyword_set(redetect) eq 0), /cen, $
-                  glim=10., gsmooth=4., seed=iseed, /gbig
+                  glim=10., gsmooth=4., seed=iseed, /gbig, /nogalex, $
+                  /nostarim
             endif
         endif
     endif

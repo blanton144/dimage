@@ -43,21 +43,26 @@ scales=[4.,5.,6.]
 readcol, getenv('DIMAGE_DIR')+'/data/crowl.dat', name, ra, dec, $
   f='(a,d,d)'
 
-for i=45L, n_elements(name)-1L do begin
-    splog, i
-    prefix=name[i]
+for i=0L, n_elements(name)-1L do begin
+    if(name[i] eq 'ngc4192' OR $
+       name[i] eq 'ngc4254' OR $
+       name[i] eq 'ngc4501' OR $
+       name[i] eq 'ngc4548') then begin
+        splog, i
+        prefix=name[i]
+        
+        spawn, 'mkdir -p '+prefix
+        cd, prefix
+        smosaic_dimage, ra[i], dec[i], sz=sz, prefix=prefix, /raw, $
+          run=run, scales=scales, /nocl, /jpg, minscore=0.
+        gmosaic_make, ra[i], dec[i], sz, prefix=prefix, /sky, /nocl
+        
+        detect, /cen, glim=20., gsmooth=10., seed=iseed, /nocl
+        
+        sdss_detect_html
+        cd, '../'
+    endif
     
-    spawn, 'mkdir -p '+prefix
-    cd, prefix
-    smosaic_dimage, ra[i], dec[i], sz=sz, prefix=prefix, /raw, $
-      run=run, scales=scales, /nocl, /jpg
-    gmosaic_make, ra[i], dec[i], sz, prefix=prefix, /sky, /nocl
-    
-    detect, /cen, glim=20., gsmooth=10., seed=iseed, /nocl
-    
-    sdss_detect_html
-    cd, '../'
-
 endfor
 
 end

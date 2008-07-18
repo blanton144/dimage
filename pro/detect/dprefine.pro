@@ -59,7 +59,7 @@ common com_prefine
 
 
 ; defaults, etc.
-nn=21L
+nn=13L
 nx=(size(in_image,/dim))[0]
 ny=(size(in_image,/dim))[1]
 npx=(size(in_psf,/dim))[0]

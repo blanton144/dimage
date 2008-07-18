@@ -15,7 +15,7 @@
 ;   /sersic - fit template with Sersic profile to constrain better
 ;   /aset - use [base]-aset.fits file for parameter setting
 ;   /sgset - use [base]-aset.fits file for star and galaxy locations
-;   /gbig - treat galaxies as "big": resample smoothed image
+;   gbig - treat galaxies as "big": resample smoothed image
 ;           to save memory and ignore the small stuff
 ; OPTIONAL INPUTS:
 ;   psf - [npx, npy] PSF to assume (if none, doesn't search for stars)
@@ -36,12 +36,36 @@
 ;; internal function: smooth for big galaxy treatment
 function gbig_smooth, image, nxsub, nysub, subpix
 
-tmp_image= dsmooth(image, subpix*2.2)
-tmp_image= rebin(tmp_image[0:nxsub*subpix-1, $
-                           0:nysub*subpix-1], $
-                 nxsub, nysub)
+if(subpix eq 1) then return, image
 
-return, tmp_image
+nx=(size(image,/dim))[0]
+ny=(size(image,/dim))[1]
+
+ii=where(image ne 0., nii)
+ix=ii mod nx
+iy=ii / nx
+
+subminx=(min(ix)/subpix-5)>0L
+submaxx=(max(ix)/subpix+5)<(nxsub-1L)
+subminy=(min(iy)/subpix-5)>0L
+submaxy=(max(iy)/subpix+5)<(nysub-1L)
+
+minx=subminx*subpix
+maxx=((submaxx+1L)*subpix-1L)
+miny=subminy*subpix
+maxy=((submaxy+1L)*subpix-1L)
+
+subimage=image[minx:maxx, miny:maxy]
+
+tmp_image= dsmooth(subimage, subpix*2.2)
+tmp_image= rebin(tmp_image, $
+                 submaxx-subminx+1L, $
+                 submaxy-subminy+1L)
+
+simage=fltarr(nxsub, nysub)
+simage[subminx:submaxx, subminy:submaxy]= tmp_image
+
+return, simage
 
 end
 ;
@@ -50,7 +74,7 @@ pro dchildren, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                sersic=in_sersic, aset=in_aset, sgset=in_sgset, $
                sdss=sdss, puse=puse, tuse=tuse, gbig=gbig, $
-               gsaddle=gsaddle
+               gsaddle=gsaddle, nostarim=nostarim
 
 maxnstar=2000L
 if(NOT keyword_set(plim)) then plim=5.
@@ -124,7 +148,7 @@ endelse
 
 ;; read in images and ivars
 ;; (have simages and ivars point to same data
-;; by default --- if /gbig is set this will be 
+;; by default --- if gbig is set this will be 
 ;; changed below)
 for k=0L, nim-1L do begin
     images[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
@@ -272,8 +296,8 @@ endif
 ;; now set things up so that we can transparently use 
 ;; subsampled images if necessary, by creating nxsub, nysub,
 ;; and subhdrs. these are identical to the original full-res
-;; image if /gbig is not set, but are made into a version for
-;; the low-res image if /gbig IS set.
+;; image if gbig is not set, but are made into a version for
+;; the low-res image if gbig IS set.
 nxsub=lonarr(nim)
 nysub=lonarr(nim)
 subpix=lonarr(nim)
@@ -289,7 +313,7 @@ for k=0L, nim-1L do begin
         spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
         pixscale[k]=(d12/float(ntest)*3600.)[0]
         
-        subpix[k]=(long(gsmooth/pixscale[k]/3.) > 1L)[0]
+        subpix[k]=(long(gbig) > 1L)[0]
         help,subpix[k]
         if(subpix[k] gt 1) then begin
             nxsub[k]=nx[k]/subpix[k]
@@ -329,6 +353,7 @@ for k=0L, nim-1L do begin
     if(k eq 0) then first=1 else first=0
     kuse=tuse[k]
     
+    splog, 'Making stellar templates ...'
     spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
 
     model=fltarr(nx[kuse],ny[kuse])
@@ -348,12 +373,15 @@ for k=0L, nim-1L do begin
                 endif else begin
                     psf=dvpsf(xstars[i], ystars[i], psf=psfs[kuse])
                 endelse
+
                 dprefine, fimage, psf, xstars[i], ystars[i], xr=xr, yr=yr
+
                 tmp_model=fltarr(nx[kuse],ny[kuse])
                 embed_stamp, tmp_model, psf, $
                   xr-float(pnx/2L), $
                   yr-float(pny/2L)
                 ifit=where(tmp_model ne 0.)
+
                 scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
                   total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
                 
@@ -382,6 +410,7 @@ for k=0L, nim-1L do begin
         nivar=fltarr(nxsub[kuse], nysub[kuse])+1./ssig^2
     endelse
     
+    splog, 'Making galaxy templates ...'
     if(ngals gt 0) then begin
         ;; make galaxy templates
         adxy, *subhdrs[kuse], ra_gals, dec_gals, xgals, ygals
@@ -418,6 +447,7 @@ for k=0L, nim-1L do begin
     
     if(nxsub[k] ne nxsub[kuse] OR $
        nysub[k] ne nysub[kuse]) then begin
+        splog, 'Mapping templates ...'
         extast, *subhdrs[k], k_ast
         extast, *subhdrs[kuse], kuse_ast
         use_templates=fltarr(nxsub[k], nysub[k], nchild)
@@ -444,8 +474,10 @@ for k=0L, nim-1L do begin
         endif
     endelse 
     
+    splog, 'Finding weights ...'
     dweights, *simages[k], *sivars[k], templates, weights=weights, /nonneg
 
+    splog, 'Finding fluxes ...'
     dfluxes, *simages[k], templates, weights, xcen, ycen, children=children
 
     use_child=lindgen(nstars+ngals)
@@ -456,7 +488,12 @@ for k=0L, nim-1L do begin
           use_child[ngals:ngals+nstars-1]=nkept+lindgen(nstars)
     endif
 
-    for i=0L, nstars+ngals-1L do begin
+    splog, 'Outputting results ...'
+    if(NOT keyword_set(nostarim)) then $
+      lastchild=nstars+ngals-1L $ 
+    else $
+      lastchild=ngals-1L  
+    for i=0L, lastchild do begin
         aid=acat[i].aid
         if(use_child[i] ge 0) then begin
             if(total(children[*,*,use_child[i]]) gt 0) then begin

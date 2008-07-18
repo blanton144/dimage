@@ -9,7 +9,8 @@ common com_dexplore_widget, $
   pcat, acat, ig, is, igstr, isstr, ng, ns, lsb, $
   fix_stretch, hand, show_templates, gsmooth, glim, gsaddle, atset, $
   subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
-  curr_nx, curr_ny, curr_nx_2, curr_ny_2, hidestars, bandnames
+  curr_nx, curr_ny, curr_nx_2, curr_ny_2, hidestars, bandnames, $
+  extra_for_detect
 
 curr_nx=0
 curr_ny=0
@@ -149,8 +150,10 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
     atset_hand.glim=glim
     atset_hand.gsaddle=gsaddle
     mwrfits, atset_hand, atsetfile, /create
+    help,extra_for_detect,/st
     detect, basename, imagenames, ref=atset.ref, $
-      single=parent, /aset, /hand, /noclobber, /pset
+      single=parent, /aset, /hand, /noclobber, /pset, $
+      _EXTRA=extra_for_detect
     dexplore_parent_display
     dexplore_child_list
     dexplore_mark_children
@@ -563,13 +566,15 @@ end
 ;; main
 pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb, $
                      twomass=in_twomass, eyeball_name=in_eyeball_name, $
-                     hidestars=in_hidestars, parent=in_parent
+                     hidestars=in_hidestars, parent=in_parent, $
+                     _EXTRA=_extra_for_detect
 
 common com_dexplore_widget
 
 if(keyword_set(in_lsb)) then lsb=1
 if(keyword_set(in_eyeball_name)) then eyeball_name=in_eyeball_name
 if(keyword_set(in_hidestars)) then hidestars=in_hidestars
+if(keyword_set(_extra_for_detect)) then extra_for_detect=_extra_for_detect
 
 ;; clean up before starting
 dexplore_clean

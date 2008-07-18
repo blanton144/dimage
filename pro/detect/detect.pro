@@ -49,7 +49,7 @@ pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             noclobber=noclobber, glim=glim, all=all, single=single, $
             aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
             center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
-            gsaddle=gsaddle
+            gsaddle=gsaddle, nostarim=nostarim
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
@@ -119,7 +119,7 @@ if(keyword_set(all)) then begin
         dchildren, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
-                   gsaddle=gsaddle
+                   gsaddle=gsaddle, nostarim=nostarim
     endfor
 endif
 
@@ -137,7 +137,7 @@ if(n_elements(single) gt 0) then begin
         dchildren, base, single, psfs=psfs, $
           ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
-                   gsaddle=gsaddle
+                   gsaddle=gsaddle, nostarim=nostarim
     endif
 endif
 

@@ -4,7 +4,7 @@ pro smosaic_dimage, ra, dec, sz=sz, prefix=prefix, noclobber=noclobber, $
                     satvalue=satvalue, nonlinearity=nonlinearity, $
                     rerun=rerun
 
-if(NOT keyword_set(rerun)) then rerun=[137, 648]
+if(NOT keyword_set(rerun)) then rerun=[137]
 if(NOT keyword_set(scales)) then scales=[20.,20.,20.]
 if(NOT keyword_set(satvalue)) then satvalue=30.
 if(NOT keyword_set(nonlinearity)) then nonlinearity=3.

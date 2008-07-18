@@ -9,34 +9,37 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro lowz_dexplore, indx, sort=sort, ran=ran
+pro lowz_dexplore, indx
 
-common com_lowz_dexplore, cand
+common com_lowz_dexplore, lowz
 
-if(n_tags(cand) eq 0) then $
-  cand=mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_candidates.dr7.fits', 1)
+if(NOT keyword_set(sample)) then sample='dr6'
+if(NOT keyword_set(start)) then start=0L
 
-lowzdir=getenv('VAGC_REDUX')+'/lowz/'
-
-rootdir=lowzdir
-
-isort=lindgen(n_elements(cand))
-if(keyword_set(sort)) then $
-  isort=sort(cand.mag)
-
-if(keyword_set(ran)) then begin
-    ii=lindgen(137)
-    iin=where(long(cand[isort[ii]].ra/15.) eq 11L, nin)
-    help,iin
-    indx=ii[iin[shuffle_indx(nin, num_sub=1)]]
+if(n_elements(indx) gt 1) then begin
+    for i=0L, n_elements(indx)-1L do $
+      lowz_dexplore, indx[i]
+    return
 endif
 
-subdir=image_subdir(cand[isort[indx]].ra, cand[isort[indx]].dec, $
+if(n_tags(lowz) eq 0) then $
+  lowz=gz_mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_plus_ned.fits', 1)
+
+rootdir=getenv('DATA')+'/lowz-sdss'
+
+isort=lindgen(n_elements(lowz))
+iexclude=-1
+
+subdir=image_subdir(lowz[isort[indx]].ra, lowz[isort[indx]].dec, $
                     prefix=prefix, rootdir=rootdir)
 
 print, subdir
 
-cd, subdir
-dexplore
+if(file_test(subdir)) then begin
+    cd, subdir
+    dexplore, /cen, /hidestars, /nogalex
+endif else begin
+    splog, 'no such dir: '+subdir
+endelse
 
 end
