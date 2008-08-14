@@ -24,7 +24,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber, $
-             cmap=cmap, base=base, seed=seed0
+             cmap=cmap, base=base, seed=seed0, novpsf=novpsf
 
 if(NOT keyword_set(natlas)) then natlas=41L
 if(NOT keyword_set(seed0)) then seed0=108L
@@ -50,7 +50,7 @@ ny=(size(image,/dim))[1]
 
 ;; set a bunch of parameters
 plim=15.
-box=natlas
+box=natlas*2L
 small=(natlas-1L)/2L
 ;nc=1L
 ;np=1L
@@ -88,7 +88,6 @@ if(nx lt box OR ny lt box) then begin
     splog, 'image too small!'
     return
 endif
-
 
 ;; median smooth the image and find and extract objects
 msimage=dmedsmooth(image, invvar, box=box)
@@ -146,14 +145,15 @@ endfor
 atlas=extract.atlas
 bpsf= reform(total(reform(atlas, natlas*natlas, n_elements(extract)),2), $
              natlas,natlas)
-bpsf=bpsf/total(bpsf)
+dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model ; jm07may01nyu
+bpsf=bpsf/total(model)
 
 pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model ; jm07may01nyu
 mm=max(model)
 gpsf=(model/mm) > 0.0001
-gpsf=fltarr(pnx,pny)+1.
+if(keyword_set(novpsf)) then gpsf=fltarr(pnx,pny)+1.
 
 ; output basic PSF
 mkhdr, hdr, 4, [41,41], /extend

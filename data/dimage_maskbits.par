@@ -7,6 +7,12 @@ typedef struct {
 
 #------------------------------------------------------------------------------
 
+maskbits DFLAGS 0 ZERO_IMAGE
+maskbits DFLAGS 1 ZERO_PROFILE
+maskbits DFLAGS 2 ZERO_IVAR
+maskbits DFLAGS 3 NOPIX_IN_ASYMMETRY
+maskbits DFLAGS 4 NOPIX_IN_CLUMPY
+
 maskbits DEBLEND_EYEBALL_MERGER 0 QUESTIONABLE 
 maskbits DEBLEND_EYEBALL_MERGER 1 MERGING
 maskbits DEBLEND_EYEBALL_MERGER 2 RING

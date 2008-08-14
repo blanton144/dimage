@@ -49,7 +49,7 @@ pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             noclobber=noclobber, glim=glim, all=all, single=single, $
             aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
             center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
-            gsaddle=gsaddle, nostarim=nostarim
+            gsaddle=gsaddle, nostarim=nostarim, novpsf=novpsf
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
@@ -99,7 +99,8 @@ seed_psf=seed0+1L+lindgen(nim)
 
 for k=0L, nim-1L do $
   if(pset.dopsf[k]) then $
-  dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas, seed=seed_psf[k]
+  dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas, seed=seed_psf[k], $
+  novpsf=novpsf
 
 for k=0L, nim-1L do begin
     bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]

@@ -26,11 +26,12 @@ rootdir=getenv('DATA')+'/lowz-sdss'
 if(NOT keyword_set(nd)) then nd=n_elements(lowz)-1L
 
 isort=lindgen(n_elements(lowz))
-iexclude=-1
+iexclude=[8601, 140408, 141293, 18279]
 
 ;; set maximum and minimum sizes
 pixscale=0.396/3600.
 minsz=100.*pixscale
+minnedsz=300.*pixscale
 maxsz=3000.*pixscale
 
 for istep=start, nd do begin
@@ -46,15 +47,17 @@ for istep=start, nd do begin
 	      ldiam=0.
 	      ndiam=0.
         if(lowz[i].lowz eq 1) then ldiam= lowz[i].petroth90[2]*3.5 
-        if(lowz[i].ned eq 1) then ndiam= lowz[i].ned_major*3.5 
+        if(lowz[i].ned eq 1) then ndiam= lowz[i].ned_major*6.0 
         diam=max([ldiam, ndiam])/3600. 
         
         ;; set size of image to be a bit bigger
 				sz= ((1.5*diam) > minsz)<maxsz
+        if(lowz[i].ned eq 1) then $
+          sz= sz > minnedsz
         
         cd, subdir
         smosaic_dimage, lowz[i].ra, lowz[i].dec, sz=sz, prefix=prefix, $
-          noclobber=noclobber, minscore=0.
+          noclobber=noclobber, minscore=0.001, /dontcrash
 
         rim=mrdfits(subdir+'/'+prefix+'-r.fits.gz',0,hdr)
         if(keyword_set(rim)) then begin
@@ -73,7 +76,7 @@ for istep=start, nd do begin
                 iseed=i
                 detect, noclobber=(keyword_set(redetect) eq 0), /cen, $
                   glim=10., gsmooth=4., seed=iseed, /gbig, /nogalex, $
-                  /nostarim
+                  /nostarim, /novpsf
             endif
         endif
     endif
