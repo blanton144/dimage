@@ -69,6 +69,13 @@ if(total(image) eq 0.) then begin
     return
 endif
 
+;; recenter
+tmp_xc=measure.xcen
+tmp_yc=measure.ycen
+drecenter, image, ivar, tmp_xc, tmp_yc
+measure.xcen=tmp_xc
+measure.ycen=tmp_yc
+
 ;; get profmean
 extract_profmean, image, long([xcen, ycen]), tmp_profmean, $
   tmp_profmean_ivar, nprof=tmp_nprof, profradius=profradius, cache=cache, $
@@ -115,10 +122,10 @@ measure.asymmetry= tmp_asymmetry
 
 ;; find clumpiness
 dflags=0
-smooth=(0.3*measure.petror50)>2.
+smooth=(0.7*measure.petror50)>2.
 dclumpy, image, ivar, measure.xcen, measure.ycen, $
   [smooth, measure.petror90], smooth, clumpy=tmp_clumpy, $
-  dflags=dflags
+  dflags=dflags, ba=measure.ba90, phi=measure.phi90
 measure.dflags= measure.dflags OR dflags
 measure.clumpy= tmp_clumpy
 

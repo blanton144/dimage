@@ -47,18 +47,18 @@ rr= sqrt(xx^2+yy^2)
 rrsquash= sqrt(xx^2+(yy/ba)^2)
 rrrot= polywarp_rotate(rrsquash, phi, center=[xcen, ycen])
 
-simage= dsmooth(image, smooth)
-snimage= dsmooth(nimage, smooth)
+simage= dmedsmooth(image, box=smooth)
+snimage= dmedsmooth(nimage, box=smooth)
 imeas= where(rrrot lt annulus[1] and rrrot gt annulus[0] AND ivar gt 0, nmeas)
 if(nmeas gt 0) then begin
     totimage= total(image[imeas])
     if(totimage gt 0.) then begin
-        clumpy_raw= $
-          total((image[imeas]-simage[imeas])>0.)/ $
-          (2.*totimage)
-        clumpy_noise= $
-          total((nimage[imeas]-snimage[imeas])>0.)/ $
-          (2.*totimage)
+        diff_raw=fltarr(nx,ny)
+        diff_raw[imeas]=image[imeas]-simage[imeas]
+        clumpy_raw= total(abs(diff_raw>0.))/(totimage)
+        diff_noise=fltarr(nx,ny)
+        diff_noise[imeas]=nimage[imeas]-snimage[imeas]
+        clumpy_noise= total(abs(diff_noise>0.))/(totimage)
         clumpy= clumpy_raw-clumpy_noise
     endif else begin
         dflags= dflags OR dimage_flagval('DFLAGS', 'NOPIX_IN_CLUMPY')
