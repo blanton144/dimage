@@ -42,8 +42,6 @@ int dtemplates(float *image,
   int i,j,k,ip,jp,di,dj,kp, tmpnt;
   float v1,v2,cross;
 
-	printf("%d %d %d\n", nx, ny, *ntemplates);
-
   /* 2. construct templates */
   for(k=0;k<(*ntemplates);k++) {
 
