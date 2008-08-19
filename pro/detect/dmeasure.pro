@@ -45,6 +45,7 @@ measure= {xcen:xcen[0], $
           nprof:0L, $
           profmean:fltarr(15), $
           profmean_ivar:fltarr(15), $
+          profradius:fltarr(15), $
           qstokes:fltarr(15), $
           ustokes:fltarr(15), $
           bastokes:fltarr(15), $
@@ -78,8 +79,9 @@ measure.ycen=tmp_yc
 
 ;; get profmean
 extract_profmean, image, long([xcen, ycen]), tmp_profmean, $
-  tmp_profmean_ivar, nprof=tmp_nprof, profradius=profradius, cache=cache, $
+  tmp_profmean_ivar, nprof=tmp_nprof, profradius=tmp_profradius, cache=cache, $
   qstokes=tmp_qstokes, ustokes=tmp_ustokes
+measure.profradius= tmp_profradius
 
 mmp= minmax(tmp_profmean)
 if(mmp[0] eq 0. AND mmp[1] eq 0.) then begin
@@ -108,10 +110,10 @@ measure.petror90= tmp_petror90
 measure.petroflux= tmp_petroflux
 
 ;; evaluate BA and PHI at 50 and 90% light radii
-measure.ba50= interpol(measure.bastokes, profradius, measure.petror50)
-measure.phi50= interpol(measure.phistokes, profradius, measure.petror50)
-measure.ba90= interpol(measure.bastokes, profradius, measure.petror90)
-measure.phi90= interpol(measure.phistokes, profradius, measure.petror90)
+measure.ba50= interpol(measure.bastokes, measure.profradius, measure.petror50)
+measure.phi50= interpol(measure.phistokes, measure.profradius, measure.petror50)
+measure.ba90= interpol(measure.bastokes, measure.profradius, measure.petror90)
+measure.phi90= interpol(measure.phistokes, measure.profradius, measure.petror90)
 
 ;; find asymmetry
 dasymmetry, image, ivar, measure.xcen, measure.ycen, measure.petror90, $
