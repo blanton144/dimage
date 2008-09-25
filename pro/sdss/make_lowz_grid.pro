@@ -8,7 +8,7 @@ if(NOT keyword_set(nonlinearity)) then nonlinearity=3.
 if(n_tags(lowz) eq 0) then begin
     lowz= mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_plus_ned.fits',1)
     il= lindgen(n_elements(lowz))
-    indx= where(il lt 20000L OR (il gt 77153 and lowz.icomb ge 0))
+    indx= where(il lt 30000L OR (il gt 77153 and lowz.icomb ge 0))
     lowz=lowz[indx]
     help,lowz
     ;;measure= mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_measure.'+sample+'.fits',1)

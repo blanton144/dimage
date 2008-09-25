@@ -9,7 +9,8 @@
 ;------------------------------------------------------------------------------
 pro lowz_dimage_measure, sample=sample, dnearest=dnearest, $
                          start=start, nd=nd, noclobber=noclobber, $
-                         check=check, gather=gather, ref=ref
+                         check=check, gather=gather, ref=ref, $
+                         hand=hand, ned=ned
 
 common com_ldm, lowz
 
@@ -28,8 +29,8 @@ if(NOT keyword_set(nd)) then nd=n_elements(lowz)-1L
 isort=lindgen(n_elements(lowz))
 iexclude=lowz_iexclude()
 
-nband=5
-
+bands=['u', 'g', 'r', 'i', 'z']
+nbands=n_elements(bands)
 
 if(NOT keyword_set(nd)) then nd=n_elements(lowz)-1L
 for istep=start, nd do begin
@@ -50,10 +51,15 @@ for istep=start, nd do begin
             pstr=strtrim(string(pid),2)
             
             sub='atlases'
-            if(gz_file_test('hand/'+pstr)) then $
-              sub='hand'
+            postfix=''
+            if(gz_file_test('hand/'+pstr) gt 0 AND $
+               keyword_set(hand) gt 0) then begin
+                sub='hand'
+                postfix='-hand'
+            endif
             
-            mfile=subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+pstr+'-measure.fits'
+            mfile=subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+pstr+ $
+              '-measure'+postfix+'.fits'
             if(keyword_set(noclobber) eq 0 OR $
                gz_file_test(mfile) eq 0 OR $
                keyword_set(check) gt 0 OR $
@@ -77,9 +83,9 @@ for istep=start, nd do begin
                     astr=strtrim(string(aid),2)
                     
                     rimage=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
-                                  pstr+'-atlas-'+astr+'.fits', ref, hdr)
+                                      pstr+'-atlas-'+astr+'.fits', ref, hdr)
                     rinvvar=gz_mrdfits(subdir+'/parents/'+prefix+'-parent-'+ $
-                                   pstr+'.fits', ref*2L+1L, hdr)
+                                       pstr+'.fits', ref*2L+1L, hdr)
                     rinvvar=rinvvar>0.
 
                     if(keyword_set(noclobber) eq 0 OR $
@@ -88,11 +94,60 @@ for istep=start, nd do begin
                         adxy, hdr, acat[m2].racen, acat[m2].deccen, xcen, ycen
                         
                         dmeasure, rimage, rinvvar, xcen=xcen, ycen=ycen, $
-                          measure=measure
+                          measure=r_measure
                         
-                        help,/st,measure
+                        help,/st,r_measure
                         
-                        mall= create_struct(measure, 'aid', aid)
+                        mall= {xcen:r_measure.xcen, $
+                               ycen:r_measure.ycen, $
+                               nprof:fltarr(nbands), $
+                               profmean:fltarr(nbands, 15), $
+                               profmean_ivar:fltarr(nbands, 15), $
+                               profradius:r_measure.profradius, $
+                               qstokes:fltarr(nbands, 15), $
+                               ustokes:fltarr(nbands, 15), $
+                               bastokes:fltarr(nbands, 15), $
+                               phistokes:fltarr(nbands, 15), $
+                               petroflux:fltarr(nbands), $
+                               petrorad:r_measure.petrorad, $
+                               petror50:r_measure.petror50, $
+                               petror90:r_measure.petror90, $
+                               ba50:r_measure.ba50, $
+                               phi50:r_measure.phi50, $
+                               ba90:r_measure.ba90, $
+                               phi90:r_measure.phi90, $
+                               asymmetry:fltarr(5), $
+                               clumpy:fltarr(5), $
+                               dflags:lonarr(5), $
+                               aid:aid}
+
+                        for iband=0L, nbands-1L do begin
+                            image=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+ $
+                                             prefix+'-'+pstr+'-atlas-'+ $
+                                              astr+'.fits', iband, hdr)
+                            invvar=gz_mrdfits(subdir+'/parents/'+prefix+ $
+                                              '-parent-'+pstr+'.fits', $
+                                              iband*2L+1L, hdr)
+                            invvar=invvar>0.
+
+                            dmeasure, image, invvar, xcen=mall.xcen, $
+                              ycen=mall.ycen, /fixcen, measure=tmp_measure, $
+                              cpetrorad= mall.petrorad
+                            
+                            mall.nprof[iband]= tmp_measure.nprof
+                            mall.profmean[iband,*]= $
+                              tmp_measure.profmean
+                            mall.profmean_ivar[iband,*]= $
+                              tmp_measure.profmean_ivar
+                            mall.qstokes[iband,*]= tmp_measure.qstokes
+                            mall.ustokes[iband,*]= tmp_measure.ustokes
+                            mall.bastokes[iband,*]= tmp_measure.bastokes
+                            mall.phistokes[iband,*]= tmp_measure.phistokes
+                            mall.petroflux[iband]= tmp_measure.petroflux
+                            mall.asymmetry[iband]= tmp_measure.asymmetry
+                            mall.clumpy[iband]= tmp_measure.clumpy
+                            mall.dflags[iband]= tmp_measure.dflags
+                        endfor
                         
                         mwrfits, mall, mfile, /create
                         spawn, 'gzip -vf '+mfile
@@ -112,6 +167,7 @@ for istep=start, nd do begin
                                                  'pid', 0L, $
                                                  'ra', 0.D, $
                                                  'dec', 0.D)
+                            struct_assign, {junk:0}, full0
                             full= replicate(full0, nd+1L)
                         endif
                         struct_assign, mall[0], full0
@@ -128,9 +184,12 @@ for istep=start, nd do begin
     endif
 endfor
 
-bands=['u', 'g', 'r', 'i', 'z']
-
-outfile=getenv('VAGC_REDUX')+'/lowz/lowz_measure_'+bands[ref]+'.'+sample+'.fits' 
+postfix=''
+if(keyword_set(hand) gt 0) then $
+  postfix=postfix+'.hand'
+if(keyword_set(ned) gt 0) then $
+  postfix=postfix+'.ned'
+outfile=getenv('VAGC_REDUX')+'/lowz/lowz_measure.'+sample+postfix+'.fits' 
 mwrfits, full, outfile, /create
     
 end
