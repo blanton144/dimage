@@ -21,7 +21,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dmeasure, image, ivar, xcen=in_xcen, ycen=in_ycen, measure=measure, $
-              check=check, cpetrorad=cpetrorad
+              check=check, cpetrorad=cpetrorad, fixcen=fixcen
 
 common com_dmeasure, cache
 
@@ -71,11 +71,13 @@ if(total(image) eq 0.) then begin
 endif
 
 ;; recenter
-tmp_xc=measure.xcen
-tmp_yc=measure.ycen
-drecenter, image, ivar, tmp_xc, tmp_yc
-measure.xcen=tmp_xc
-measure.ycen=tmp_yc
+if(NOT keyword_set(fixcen)) then begin
+    tmp_xc=measure.xcen
+    tmp_yc=measure.ycen
+    drecenter, image, ivar, tmp_xc, tmp_yc
+    measure.xcen=tmp_xc
+    measure.ycen=tmp_yc
+endif
 
 ;; get profmean
 extract_profmean, image, long([xcen, ycen]), tmp_profmean, $
@@ -110,10 +112,25 @@ measure.petror90= tmp_petror90
 measure.petroflux= tmp_petroflux
 
 ;; evaluate BA and PHI at 50 and 90% light radii
-measure.ba50= interpol(measure.bastokes, measure.profradius, measure.petror50)
-measure.phi50= interpol(measure.phistokes, measure.profradius, measure.petror50)
-measure.ba90= interpol(measure.bastokes, measure.profradius, measure.petror90)
-measure.phi90= interpol(measure.phistokes, measure.profradius, measure.petror90)
+measure.ba50= interpol(measure.bastokes, measure.profradius, $
+                       measure.petror50)
+measure.phi50= interpol(measure.phistokes, measure.profradius, $
+                        measure.petror50)
+measure.ba90= interpol(measure.bastokes, measure.profradius, $
+                       measure.petror90)
+measure.phi90= interpol(measure.phistokes, measure.profradius, $
+                        measure.petror90)
+
+if(measure.petrorad NE measure.petrorad OR $
+   measure.petroflux NE measure.petroflux OR $
+   measure.petroflux EQ 0 OR $
+   measure.ba90 NE measure.ba90 OR $
+   measure.phi90 NE measure.phi90 OR $
+   measure.ba50 NE measure.ba50 OR $
+   measure.phi50 NE measure.phi50) then begin
+    measure.dflags= measure.dflags OR dimage_flagval('DFLAGS', 'BAD_PETRO')
+    return
+endif
 
 ;; find asymmetry
 dasymmetry, image, ivar, measure.xcen, measure.ycen, measure.petror90, $

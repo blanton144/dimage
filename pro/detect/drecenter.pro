@@ -43,7 +43,7 @@ while(xchange ne 0L OR ychange ne 0L) do begin
     yst= (ycurr-box)>0L
     xnd= (xcurr+box)<(nx-1L)
     ynd= (ycurr+box)<(ny-1L)
-    scalearray= fltarr(ynd-yst+1L, xnd-xst+1L)
+    scalearray= fltarr(xnd-xst+1L, ynd-yst+1L)
     for i=xst, xnd do begin
         for j=yst, ynd do begin
             scalearray[i-xst, j-yst]= drecenter_func(image,ivar,i,j)
