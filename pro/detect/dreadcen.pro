@@ -7,10 +7,11 @@
 ;   31-July-2008
 ;-
 ;------------------------------------------------------------------------------
-pro dreadcen, image, invvar, band=band
+pro dreadcen, image, invvar, psf=psf, band=band
 
 if(NOT keyword_set(band)) then band=2
 if(NOT keyword_set(subdir)) then subdir='.'
+bandnames=['u', 'g', 'r', 'i', 'z']
 
 spawn, 'pwd', cwd
 words=strsplit(cwd[0], '/',/extr)
@@ -24,6 +25,11 @@ if(keyword_set(pim)) then begin
     ny=(size(pim,/dim))[1]
     pid=pim[nx/2L, ny/2L]
     pstr=strtrim(string(pid),2)
+
+    if(arg_present(psf)) then begin
+        psffile= prefix+'-'+bandnames[band]+'-vpsf.fits'
+        psf= dvpsf(float(nx/2L), float(ny/2L), psfsrc=psffile)
+    endif
     
     sub='atlases'
     if(gz_file_test('hand/'+pstr)) then $
