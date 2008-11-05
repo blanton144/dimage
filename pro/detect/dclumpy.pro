@@ -45,8 +45,8 @@ xx= findgen(nx)#replicate(1.,ny)-xcen
 yy= (replicate(1.,nx)#findgen(ny)-ycen)
 rr= sqrt(xx^2+yy^2)
 rrsquash= sqrt(xx^2+(yy/ba)^2)
-rrrot= polywarp_rotate(rrsquash, phi, center=[xcen, ycen])
-
+rrrot= polywarp_rotate(rrsquash, phi, center=[xcen, ycen]) 
+  
 simage= dmedsmooth(image, box=smooth)
 snimage= dmedsmooth(nimage, box=smooth)
 imeas= where(rrrot lt annulus[1] and rrrot gt annulus[0] AND ivar gt 0, nmeas)
