@@ -10,7 +10,7 @@
 pro lowz_dimage_measure, sample=sample, dnearest=dnearest, $
                          start=start, nd=nd, noclobber=noclobber, $
                          check=check, gather=gather, ref=ref, $
-                         hand=hand, ned=ned
+                         hand=hand, ned=ned, nomeasure=nomeasure
 
 common com_ldm, lowz
 
@@ -88,8 +88,9 @@ for istep=start, nd do begin
                                        pstr+'.fits', ref*2L+1L, hdr)
                     rinvvar=rinvvar>0.
 
-                    if(keyword_set(noclobber) eq 0 OR $
-                       gz_file_test(mfile) eq 0) then begin
+                    if((keyword_set(noclobber) eq 0 OR $
+                        gz_file_test(mfile) eq 0) AND $
+											 keyword_set(nomeasure) eq 0) then begin
                         
                         adxy, hdr, acat[m2].racen, acat[m2].deccen, xcen, ycen
                         
@@ -160,23 +161,25 @@ for istep=start, nd do begin
 
                     if(keyword_set(gather)) then begin
                         mall= gz_mrdfits(mfile,1)
-                        if(n_tags(full) eq 0) then begin
-                            full0= create_struct(mall[0], $
-                                                 'subdir', ' ', $
-                                                 'prefix', ' ', $
-                                                 'pid', 0L, $
-                                                 'ra', 0.D, $
-                                                 'dec', 0.D)
-                            struct_assign, {junk:0}, full0
-                            full= replicate(full0, nd+1L)
+												if(n_tags(mall) gt 0) then begin
+                          if(n_tags(full) eq 0) then begin
+                              full0= create_struct(mall[0], $
+                                                   'subdir', ' ', $
+                                                   'prefix', ' ', $
+                                                   'pid', 0L, $
+                                                   'ra', 0.D, $
+                                                   'dec', 0.D)
+                              struct_assign, {junk:0}, full0
+                              full= replicate(full0, nd+1L)
+                          endif
+                          struct_assign, mall[0], full0
+                          full0.subdir=subdir
+                          full0.prefix=prefix
+                          full0.pid=pid
+                          full0.ra=lowz[i].ra
+                          full0.dec=lowz[i].dec
+                          full[i]=full0
                         endif
-                        struct_assign, mall[0], full0
-                        full0.subdir=subdir
-                        full0.prefix=prefix
-                        full0.pid=pid
-                        full0.ra=lowz[i].ra
-                        full0.dec=lowz[i].dec
-                        full[i]=full0
                     endif
                 endif
             endif 
