@@ -54,7 +54,6 @@ box=natlas*2L
 small=(natlas-1L)/2L
 ;nc=1L
 ;np=1L
-stardiff=100.
 if (n_elements(maxnstar) eq 0L) then maxnstar=200L
 
 ; Set source object name
