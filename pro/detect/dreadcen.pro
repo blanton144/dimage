@@ -7,7 +7,8 @@
 ;   31-July-2008
 ;-
 ;------------------------------------------------------------------------------
-pro dreadcen, image, invvar, psf=psf, band=band
+pro dreadcen, image, invvar, psf=psf, band=band, measure=measure, $
+              hand=hand
 
 if(NOT keyword_set(band)) then band=2
 if(NOT keyword_set(subdir)) then subdir='.'
@@ -28,12 +29,17 @@ if(keyword_set(pim)) then begin
 
     if(arg_present(psf)) then begin
         psffile= prefix+'-'+bandnames[band]+'-vpsf.fits'
-        psf= dvpsf(float(nx/2L), float(ny/2L), psfsrc=psffile)
+        if(file_test(psffile)) then $
+          psf= dvpsf(float(nx/2L), float(ny/2L), psfsrc=psffile)
     endif
     
     sub='atlases'
-    if(gz_file_test('hand/'+pstr)) then $
-      sub='hand'
+    postfix=''
+    if(gz_file_test('hand/'+pstr) gt 0 AND $
+       keyword_set(hand) gt 0) then begin
+        sub='hand'
+        postfix='-hand'
+    endif
     
     acat=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+pstr+ $
                     '-acat.fits',1)
@@ -53,13 +59,21 @@ if(keyword_set(pim)) then begin
         aid=acat[m2].aid
         astr=strtrim(string(aid),2)
         
-        image=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
-                         pstr+'-atlas-'+astr+'.fits', band, hdr)
-        invvar=gz_mrdfits(subdir+'/parents/'+prefix+'-parent-'+ $
-                          pstr+'.fits', band*2L+1L, hdr)
-        invvar=invvar>0.
+        if(arg_present(image)) then $
+          image=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
+                           pstr+'-atlas-'+astr+'.fits', band, hdr)
+        if(arg_present(invvar)) then begin
+            invvar=gz_mrdfits(subdir+'/parents/'+prefix+'-parent-'+ $
+                              pstr+'.fits', band*2L+1L, hdr)
+            invvar=invvar>0.
+        endif
+
+        if(arg_present(measure)) then begin
+            measure=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
+                               pstr+'-measure'+postfix+'.fits',1)
+        endif
     endif
 endif
-        
+
     
 end
