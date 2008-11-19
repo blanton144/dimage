@@ -120,6 +120,8 @@ for k=0L, nim-1L do begin
       *hdrs[k], /create
 endfor
 
+if(max(fobject) eq -1) then return
+
 pcat=replicate({xst:lonarr(nim), yst:lonarr(nim), $
                 xnd:lonarr(nim), ynd:lonarr(nim), $
                 xc:fltarr(nim), yc:fltarr(nim), $
