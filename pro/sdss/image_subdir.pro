@@ -24,14 +24,17 @@
 ;   23-June-2007  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function image_subdir, ra, dec, prefix=prefix, rootdir=rootdir
+function image_subdir, ra, dec, prefix=prefix, rootdir=rootdir, $
+                       subname=subname
+
+if(keyword_set(subname) eq 0) then subname='dimages'
 
 ihr=long(ra/15.)
 idec=long(abs(dec)/2.)*2.
 dsign='p'
 if(dec lt 0.) then dsign='m'
 if(NOT keyword_set(rootdir)) then rootdir=getenv('DATA')
-outdir=rootdir+'/dimages/'+string(ihr,f='(i2.2)')+'h'
+outdir=rootdir+'/'+subname+'/'+string(ihr,f='(i2.2)')+'h'
 outdir=outdir+'/'+dsign+strtrim(string(idec, f='(i2.2)'),2)
 prefix=(strtrim(hogg_iau_name(ra, dec,''),2))[0]
 outdir=outdir+'/'+prefix
