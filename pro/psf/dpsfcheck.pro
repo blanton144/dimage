@@ -23,7 +23,7 @@
 ;-
 ;------------------------------------------------------------------------------
 function dpsfcheck, image, ivar, x, y, amp=amp, psf=psf, vpsf=vpsf, $
-                    flux=flux, sdss=sdss
+                    flux=flux
 
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
@@ -34,9 +34,9 @@ if(keyword_set(psf)) then begin
     fwhm=psfsig*2.*sqrt(2.*alog(2.))
 endif
 
-if(n_tags(vpsf) gt 0 OR n_tags(sdss) gt 0) then begin
+if(n_tags(vpsf) gt 0) then begin
     havevar=1
-    psf=dvpsf(nx*0.5, ny*0.5, psfsrc=vpsf, sdss=sdss)
+    psf=dvpsf(nx*0.5, ny*0.5, psfsrc=vpsf)
     dfit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet ; jm07may01nyu
     fwhm=psfsig*2.*sqrt(2.*alog(2.))
 endif
@@ -65,7 +65,7 @@ for i=0L, n_elements(x)-1L do begin
     cutout_ivar=cutout_ivar>0.
     
     if(keyword_set(havevar)) then begin
-        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf, sdss=sdss)
+        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
         scale=total(currpsf)/max(currpsf)
         cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
     endif else begin
@@ -86,7 +86,7 @@ endfor
 model=fltarr(nx,ny)
 for i=0L, n_elements(x)-1L do begin 
     if(keyword_set(havevar)) then begin
-        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf, sdss=sdss)
+        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
         cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
     endif else begin
         currpsf=psf
