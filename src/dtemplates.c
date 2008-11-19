@@ -73,10 +73,12 @@ int dtemplates(float *image,
       for(i=0;i<nx;i++) 
         if(templates[i+j*nx+k*nx*ny]>peak[k])
           peak[k]=templates[i+j*nx+k*nx*ny];
-    for(j=0;j<ny;j++) 
-      for(i=0;i<nx;i++) 
-        templates[i+j*nx+k*nx*ny]/=peak[k];
-  }
+		if(peak[k]!=0.) {
+			for(j=0;j<ny;j++) 
+				for(i=0;i<nx;i++) 
+					templates[i+j*nx+k*nx*ny]/=peak[k];
+		}
+	}
 	
   /* 4. check for very parallel templates and get rid */
   sqnorms=(float *) malloc(sizeof(float)*(*ntemplates));
