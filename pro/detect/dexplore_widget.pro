@@ -365,7 +365,10 @@ if(file_test(asetfile) OR $
     atset=gz_mrdfits(asetfile,1)
     gsmooth=atset.gsmooth
     glim=atset.glim
-    gsaddle=atset.gsaddle
+    if(tag_exist(atset, 'GSADDLE')) then $
+       gsaddle=atset.gsaddle $
+       else $
+       gsaddle=0.
     w_gsmooth = CW_FIELD(w_base, TITLE = "gsmooth", $
                          /FLOAT, /FRAME, /return_events, $
                          value=gsmooth)  
