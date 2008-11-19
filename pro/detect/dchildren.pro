@@ -74,7 +74,7 @@ pro dchildren, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                sersic=in_sersic, aset=in_aset, sgset=in_sgset, $
                sdss=sdss, puse=puse, tuse=tuse, gbig=gbig, $
-               gsaddle=gsaddle, nostarim=nostarim
+               gsaddle=gsaddle, nostarim=nostarim, noclobber=noclobber
 
 maxnstar=2000L
 if(NOT keyword_set(plim)) then plim=5.
@@ -86,10 +86,19 @@ if(keyword_set(xstars)) then nstars=n_elements(xstars)
 if(keyword_set(xgals)) then ngals=n_elements(xgals)
 if(keyword_set(in_sersic)) then sersic=in_sersic else sersic=0
 
+
 ;; pick directory (auto or hand)
 subdir='atlases'
 if(keyword_set(hand)) then subdir='hand'
 spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
+
+acatfile=subdir+'/'+strtrim(string(iparent),2)+ $
+      '/'+base+'-'+strtrim(string(iparent),2)+ $
+      '-acat.fits'
+
+if(gz_file_test(acatfile) gt 0 AND $
+   keyword_set(noclobber) gt 0) then $
+  return
 
 ;; read in images and psfs
 hdr=gz_headfits('parents/'+base+'-parent-'+ $
@@ -531,9 +540,7 @@ endfor
 
 if(n_tags(acat) gt 0) then begin
     acat.good= total(acat.bgood, 1) gt 0
-    mwrfits, acat, subdir+'/'+strtrim(string(iparent),2)+ $
-      '/'+base+'-'+strtrim(string(iparent),2)+ $
-      '-acat.fits', /create
+    mwrfits, acat, acatfile, /create
 endif
 
 end
