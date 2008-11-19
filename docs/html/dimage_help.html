@@ -14,7 +14,7 @@ this routine, refer to the IDL Online Help Navigator
 or type: <P>
 <PRE>     ? make_html_help</PRE><P>
 at the IDL command line prompt.<P>
-<STRONG>Last modified: </STRONG>Thu Dec  6 14:18:12 2007.<P>
+<STRONG>Last modified: </STRONG>Wed Nov 19 11:00:57 2008.<P>
  
 <HR>
  
@@ -23,10 +23,12 @@ at the IDL command line prompt.<P>
 <UL>
 <LI><A HREF="#ATV2">ATV2</A>-- Interactive display of 2-D images.
 <LI><A HREF="#ATV3">ATV3</A>-- Interactive display of 2-D images.
+<LI><A HREF="#DASYMMETRY">DASYMMETRY</A>-- measure asymmetry in the image
 <LI><A HREF="#DCEN3X3">DCEN3X3</A>-- 
 fit center to a 3x3 image with a peak in the center
 <LI><A HREF="#DCHILDREN">DCHILDREN</A>-- 
 deblend children of a parent, in multi-band, multi-res images
+<LI><A HREF="#DCLUMPY">DCLUMPY</A>-- measure clumpiness of a galaxy image
 <LI><A HREF="#DETECT">DETECT</A>-- 
 detect objects in multi-band, multi-res images
 <LI><A HREF="#DEXPLORE">DEXPLORE</A>-- interactive explorer of dimage results
@@ -35,7 +37,10 @@ extract objects in an image based on object image
 <LI><A HREF="#DFAKEGAL">DFAKEGAL</A>-- 
 get parameters associated with sersic settings
 <LI><A HREF="#DFIND">DFIND</A>-- identify objects in a boolean image
+<LI><A HREF="#DFITELLIPSE">DFITELLIPSE</A>-- Fit an ellipse to a mask image
 <LI><A HREF="#DFITPSF">DFITPSF</A>-- fit a PSF model to an image
+<LI><A HREF="#DFLOODFILL">DFLOODFILL</A>-- 
+starting at x,y, flood identical, connected pixels to same value
 <LI><A HREF="#DFLUXES">DFLUXES</A>-- 
 get pixel fluxes of children, given weights and templates
 <LI><A HREF="#DGALS">DGALS</A>-- 
@@ -44,17 +49,24 @@ find galaxies in multi-band, multi-res images (called by dchildren)
 Return bitmask labels corresponding to bit numbers.
 <LI><A HREF="#DIMAGE_FLAGVAL">DIMAGE_FLAGVAL</A>-- 
 Return bitmask values corresponding to labels.
+<LI><A HREF="#DMEASURE">DMEASURE</A>-- measure a deblended image
+<LI><A HREF="#DMEASURE_CHECK">DMEASURE_CHECK</A>-- 
+visual check of measurements of deblended image
 <LI><A HREF="#DMEDSMOOTH">DMEDSMOOTH</A>-- median smooth
 <LI><A HREF="#DOBJECTS">DOBJECTS</A>-- 
 detect objects in multi-band, multi-res images
 <LI><A HREF="#DPARENTS">DPARENTS</A>-- 
 find parent objects in multi-band, multi-res images
 <LI><A HREF="#DPEAKS">DPEAKS</A>-- find peaks in an image
+<LI><A HREF="#DPETRO">DPETRO</A>-- Measure Petrosian properties of a profile
 <LI><A HREF="#DPREFINE">DPREFINE</A>-- refine a psf center
 <LI><A HREF="#DPSFCHECK">DPSFCHECK</A>-- check how well a PSF fits some data
 <LI><A HREF="#DPSFREAD">DPSFREAD</A>-- read a PSF structure from a file
 <LI><A HREF="#DPSFSUB">DPSFSUB</A>-- 
 return an attempt at subtracting the fit PSF from some image
+<LI><A HREF="#DREADCEN">DREADCEN</A>-- read central image
+<LI><A HREF="#DRECENTER">DRECENTER</A>-- 
+find a better galaxy center using symmetric templates
 <LI><A HREF="#DREFINE">DREFINE</A>-- refine some approximate centers
 <LI><A HREF="#DSERSIC">DSERSIC</A>-- run 2d sersic fitting on an image
 <LI><A HREF="#DSERSIC2">DSERSIC2</A>-- 
@@ -72,6 +84,12 @@ given a PSF structure, return the PSF at a particular point
 <LI><A HREF="#DWEIGHTS">DWEIGHTS</A>-- fit templates to image
 <LI><A HREF="#FIT_MULT_GAUSS">FIT_MULT_GAUSS</A>-- 
 fit multiple gaussians centered at center to an image
+<LI><A HREF="#GZ_FILE_TEST">GZ_FILE_TEST</A>-- 
+file_test, but if it fails, try reading in .gz version
+<LI><A HREF="#GZ_HEADFITS">GZ_HEADFITS</A>-- 
+headfits, but if it fails, try reading in .gz version
+<LI><A HREF="#GZ_MRDFITS">GZ_MRDFITS</A>-- 
+mrdfits, but if it fails, try reading in .gz version
 <LI><A HREF="#SIMPLEXY">SIMPLEXY</A>-- 
 get basic X and Y for brightish sources away from edge of an image
 <LI><A HREF="#TWOMASS_CONVERT">TWOMASS_CONVERT</A>-- 
@@ -167,7 +185,7 @@ convert twomass images to sky-subtracted versions with nice names
 <A NAME="ATV3">
 <H2>ATV3</H2></A>
 <A HREF="#ATV2">[Previous Routine]</A>
-<A HREF="#DCEN3X3">[Next Routine]</A>
+<A HREF="#DASYMMETRY">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -248,9 +266,40 @@ convert twomass images to sky-subtracted versions with nice names
 <STRONG>(See /home/users/mb144/dimage/pro/utils/atv3.pro)</STRONG><P>
 <HR>
  
+<A NAME="DASYMMETRY">
+<H2>DASYMMETRY</H2></A>
+<A HREF="#ATV3">[Previous Routine]</A>
+<A HREF="#DCEN3X3">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dasymmetry
+ PURPOSE:
+   measure asymmetry in the image
+ CALLING SEQUENCE:
+   dasymmetry, image, ivar, xcen, ycen, radius, [ axcen=, aycen=, $
+     asymmetry=, ba=, phi= ]
+ INPUTS:
+   image - [nx,ny] input image
+   ivar - [nx,ny] inverse variance of input image
+   xcen, ycen - initial x,y center
+   radius - radius of measurement
+ OPTIONAL INPUTS:
+   axcen - best asymmetry center of image 
+   aycen - best asymmetry center of image 
+   ba, phi - use elliptical region (radius is major axis)
+ OUTPUTS:
+   asymmetry - asymmetry of image
+   dflags - flags with results
+ REVISION HISTORY:
+   10-Aug-2008  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/dasymmetry.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="DCEN3X3">
 <H2>DCEN3X3</H2></A>
-<A HREF="#ATV3">[Previous Routine]</A>
+<A HREF="#DASYMMETRY">[Previous Routine]</A>
 <A HREF="#DCHILDREN">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
@@ -273,7 +322,7 @@ convert twomass images to sky-subtracted versions with nice names
 <A NAME="DCHILDREN">
 <H2>DCHILDREN</H2></A>
 <A HREF="#DCEN3X3">[Previous Routine]</A>
-<A HREF="#DETECT">[Next Routine]</A>
+<A HREF="#DCLUMPY">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -292,6 +341,8 @@ convert twomass images to sky-subtracted versions with nice names
    /sersic - fit template with Sersic profile to constrain better
    /aset - use [base]-aset.fits file for parameter setting
    /sgset - use [base]-aset.fits file for star and galaxy locations
+   gbig - treat galaxies as &quot;big&quot;: resample smoothed image
+           to save memory and ignore the small stuff
  OPTIONAL INPUTS:
    psf - [npx, npy] PSF to assume (if none, doesn't search for stars)
    plim - nsigma limit for point source detection (default 5.)
@@ -310,9 +361,38 @@ convert twomass images to sky-subtracted versions with nice names
 <STRONG>(See /home/users/mb144/dimage/pro/detect/dchildren.pro)</STRONG><P>
 <HR>
  
+<A NAME="DCLUMPY">
+<H2>DCLUMPY</H2></A>
+<A HREF="#DCHILDREN">[Previous Routine]</A>
+<A HREF="#DETECT">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dclumpy
+ PURPOSE:
+   measure clumpiness of a galaxy image
+ CALLING SEQUENCE:
+   dclumpy, image, xcen, ycen, annulus, smooth [, ba=, phi=, $
+      clumpy=, dflags= ]
+ INPUTS:
+   image - [nx,ny] input image
+   xcen, ycen - initial x,y center
+   annulus - [inner, outer] annulus of measurement
+   smooth - gaussian smoothing sigma
+ OPTIONAL INPUTS:
+   ba, phi - use elliptical region (annuli are major axis)
+ OUTPUTS:
+   clumpy - clumpiness of image
+   dflags - flags with results
+ REVISION HISTORY:
+   10-Aug-2008  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/dclumpy.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="DETECT">
 <H2>DETECT</H2></A>
-<A HREF="#DCHILDREN">[Previous Routine]</A>
+<A HREF="#DCLUMPY">[Previous Routine]</A>
 <A HREF="#DEXPLORE">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
@@ -340,6 +420,8 @@ convert twomass images to sky-subtracted versions with nice names
    /sgset - get locations of stars and galaxies from base-sgset.fits file
    /hand - for children, put results in &quot;hand&quot; subdir (used by dexplore)
    /noclobber - do not overwrite previously created files
+   /gbig - treat galaxies as &quot;big&quot;: resample smoothed image
+           to save memory and ignore the small stuff
  COMMENTS:
    When calling automatically, it is best not to use the /hand
      option; reserve that for when dexplore calls this function and you
@@ -454,7 +536,7 @@ convert twomass images to sky-subtracted versions with nice names
 <A NAME="DFIND">
 <H2>DFIND</H2></A>
 <A HREF="#DFAKEGAL">[Previous Routine]</A>
-<A HREF="#DFITPSF">[Next Routine]</A>
+<A HREF="#DFITELLIPSE">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -473,10 +555,37 @@ convert twomass images to sky-subtracted versions with nice names
 <STRONG>(See /home/users/mb144/dimage/pro/detect/dfind.pro)</STRONG><P>
 <HR>
  
+<A NAME="DFITELLIPSE">
+<H2>DFITELLIPSE</H2></A>
+<A HREF="#DFIND">[Previous Routine]</A>
+<A HREF="#DFITPSF">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dfitellipse
+ PURPOSE:
+   Fit an ellipse to a mask image
+ CALLING SEQUENCE:
+   dfitellipse, mask, xcen, ycen, ellipse=ellipse
+ INPUTS:
+   mask - [nx,ny] input mask image (0 or 1)
+   xcen, ycen - x,y center
+ OUTPUTS:
+   iso - structure with results
+ COMMENTS:
+   Smoothes (mask gt 0) with a 1 pixel Gaussian; then subtracts
+   -0.5. Then fits for an ellipse by maximizing the sum of the
+   pixels within it.
+ REVISION HISTORY:
+   10-Aug-2008  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/dfitellipse.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="DFITPSF">
 <H2>DFITPSF</H2></A>
-<A HREF="#DFIND">[Previous Routine]</A>
-<A HREF="#DFLUXES">[Next Routine]</A>
+<A HREF="#DFITELLIPSE">[Previous Routine]</A>
+<A HREF="#DFLOODFILL">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -505,9 +614,36 @@ convert twomass images to sky-subtracted versions with nice names
 <STRONG>(See /home/users/mb144/dimage/pro/psf/dfitpsf.pro)</STRONG><P>
 <HR>
  
+<A NAME="DFLOODFILL">
+<H2>DFLOODFILL</H2></A>
+<A HREF="#DFITPSF">[Previous Routine]</A>
+<A HREF="#DFLUXES">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dfloodfill
+ PURPOSE:
+   starting at x,y, flood identical, connected pixels to same value
+ CALLING SEQUENCE:
+   newim= dfloodfill(im, x, y, newval [, xst=, yst=, xnd=, ynd=])
+ INPUTS:
+   im- [nx, ny] input image
+   x, y - pixel value to start flood at
+   newval - value to set new pixels to
+ OPTIONAL INPUTS:
+   xst, xnd, yst, ynd - boundaries of floodable region 
+                        [defaults of 0, nx-1, 0, ny-1, respectively]
+ OUTPUTS:
+   newim - [nx, ny] output image with flooded pixels replaced with newval
+ REVISION HISTORY:
+   11-Jan-2006  Written by Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/utils/dfloodfill.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="DFLUXES">
 <H2>DFLUXES</H2></A>
-<A HREF="#DFITPSF">[Previous Routine]</A>
+<A HREF="#DFLOODFILL">[Previous Routine]</A>
 <A HREF="#DGALS">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
@@ -603,7 +739,7 @@ convert twomass images to sky-subtracted versions with nice names
 <A NAME="DIMAGE_FLAGVAL">
 <H2>DIMAGE_FLAGVAL</H2></A>
 <A HREF="#DIMAGE_FLAGNAME">[Previous Routine]</A>
-<A HREF="#DMEDSMOOTH">[Next Routine]</A>
+<A HREF="#DMEASURE">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -639,9 +775,61 @@ convert twomass images to sky-subtracted versions with nice names
 <STRONG>(See /home/users/mb144/dimage/pro/utils/dimage_flagval.pro)</STRONG><P>
 <HR>
  
+<A NAME="DMEASURE">
+<H2>DMEASURE</H2></A>
+<A HREF="#DIMAGE_FLAGVAL">[Previous Routine]</A>
+<A HREF="#DMEASURE_CHECK">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dmeasure
+ PURPOSE:
+   measure a deblended image
+ CALLING SEQUENCE:
+   dmeasure, image, ivar [, xcen=, ycen=, measure=, /check ]
+ INPUTS:
+   image - [nx,ny] input image
+ OPTIONAL INPUTS:
+   invvar - [nx,ny] input inverse variance [default to unity everywhere]
+   xcen - center of image [default to maximum of image]
+   ycen - center of image [default to maximum of image]
+   cpetrorad - fixed petrosian radius to assume
+ OPTIONAL KEYWORDS:
+   /check - display image and overplot checks
+ OUTPUTS:
+   measure - parameters of measurements
+ REVISION HISTORY:
+   10-Aug-2008  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/dmeasure.pro)</STRONG><P>
+<HR>
+ 
+<A NAME="DMEASURE_CHECK">
+<H2>DMEASURE_CHECK</H2></A>
+<A HREF="#DMEASURE">[Previous Routine]</A>
+<A HREF="#DMEDSMOOTH">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dmeasure_check
+ PURPOSE:
+   visual check of measurements of deblended image
+ CALLING SEQUENCE:
+   dmeasure_check, image, ivar, measure=measure
+ INPUTS:
+   image - [nx,ny] input image
+   measure - parameters of measurements
+ OPTIONAL INPUTS:
+   invvar - [nx,ny] input inverse variance [default to unity everywhere]
+ REVISION HISTORY:
+   10-Aug-2008  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/dmeasure_check.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="DMEDSMOOTH">
 <H2>DMEDSMOOTH</H2></A>
-<A HREF="#DIMAGE_FLAGVAL">[Previous Routine]</A>
+<A HREF="#DMEASURE_CHECK">[Previous Routine]</A>
 <A HREF="#DOBJECTS">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
@@ -734,7 +922,7 @@ convert twomass images to sky-subtracted versions with nice names
 <A NAME="DPEAKS">
 <H2>DPEAKS</H2></A>
 <A HREF="#DPARENTS">[Previous Routine]</A>
-<A HREF="#DPREFINE">[Next Routine]</A>
+<A HREF="#DPETRO">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -743,7 +931,8 @@ convert twomass images to sky-subtracted versions with nice names
    find peaks in an image
  CALLING SEQUENCE:
    dpeaks, image [, xcen=, ycen=, sigma=, dlim=, maxnpeaks=, $
-      saddle=, minpeak=, npeaks=, /smooth, /checkpeaks, /refine ]
+      saddle=, minpeak=, npeaks=, /smooth, /checkpeaks, /refine, $
+      /abssaddle ]
  INPUTS:
    image - [nx, ny] input image
  OPTIONAL INPUTS:
@@ -757,6 +946,7 @@ convert twomass images to sky-subtracted versions with nice names
    /smooth - smooth a bit before finding
    /checkpeaks - check for peaks which are too connected to each other
    /refine - refines peak estimates
+   /abssaddle - use absolue saddle point, not relative to peak
  OUTPUTS:
    xcen, ycen - [npeaks] positions of peaks
    npeaks - number of peaks
@@ -765,15 +955,51 @@ convert twomass images to sky-subtracted versions with nice names
      pairs are &gt; peak-saddle*sigma; if so, those peaks are joined.
    When /refine is not set, just finds to nearest pixel; when /refine
      is set, uses gaussian approximation to guess peak center.
+   When /abssaddle is set, &quot;saddle&quot; yields the actual value the
+     saddle point needs to exceed, not the number of sigma less than
+     the peak
  REVISION HISTORY:
    11-Jan-2006  Written by Blanton, NYU
 </PRE><P>
 <STRONG>(See /home/users/mb144/dimage/pro/detect/dpeaks.pro)</STRONG><P>
 <HR>
  
+<A NAME="DPETRO">
+<H2>DPETRO</H2></A>
+<A HREF="#DPEAKS">[Previous Routine]</A>
+<A HREF="#DPREFINE">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dpetro
+ PURPOSE:
+   Measure Petrosian properties of a profile
+ CALLING SEQUENCE:
+   dpetro, nprof, profmean [, petrorad=, petroflux=, petror50=, $
+     petror90=, petroratiolimit=, npetrorad= ]
+ INPUTS:
+   nprof - number of usable elements in profmean
+   profmean - [nprof] profmean values
+ OPTIONAL INPUTS:
+   petroratiolimit - limit for Petrosian Ratio (default 0.2)
+   npetrorad - number of Petrosian Radii out (default 2)
+   cpetrorad - fixed petrosian radius to assume
+ OUTPUTS:
+   petrorad - Petrosian Radius (where Petrosian Ratio equals 
+              petroratiolimit)
+   petroflux - total Petrosian flux (within npetrorad*petrorad)
+   petror90 - 90% light radius 
+   petror50 - 50% light radius 
+ REVISION HISTORY:
+   28-Mar-2002  Written by Mike Blanton, NYU
+   10-Aug-2008  Revised for new interp_profmean
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/dpetro.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="DPREFINE">
 <H2>DPREFINE</H2></A>
-<A HREF="#DPEAKS">[Previous Routine]</A>
+<A HREF="#DPETRO">[Previous Routine]</A>
 <A HREF="#DPSFCHECK">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
@@ -855,7 +1081,7 @@ convert twomass images to sky-subtracted versions with nice names
 <A NAME="DPSFSUB">
 <H2>DPSFSUB</H2></A>
 <A HREF="#DPSFREAD">[Previous Routine]</A>
-<A HREF="#DREFINE">[Next Routine]</A>
+<A HREF="#DREADCEN">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -874,9 +1100,46 @@ convert twomass images to sky-subtracted versions with nice names
 <STRONG>(See /home/users/mb144/dimage/pro/psf/dpsfsub.pro)</STRONG><P>
 <HR>
  
+<A NAME="DREADCEN">
+<H2>DREADCEN</H2></A>
+<A HREF="#DPSFSUB">[Previous Routine]</A>
+<A HREF="#DRECENTER">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   dreadcen
+ PURPOSE:
+   read central image
+ REVISION HISTORY:
+   31-July-2008
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/dreadcen.pro)</STRONG><P>
+<HR>
+ 
+<A NAME="DRECENTER">
+<H2>DRECENTER</H2></A>
+<A HREF="#DREADCEN">[Previous Routine]</A>
+<A HREF="#DREFINE">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   drecenter
+ PURPOSE:
+   find a better galaxy center using symmetric templates
+ CALLING SEQUENCE:
+   drecenter, image, xc, yc
+ COMMENTS:
+   Iterates starting with initial center to find one that maximizes
+   flux associated with a symmetric template. 
+ REVISION HISTORY:
+   11-Aug-2008  Written by Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/detect/drecenter.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="DREFINE">
 <H2>DREFINE</H2></A>
-<A HREF="#DPSFSUB">[Previous Routine]</A>
+<A HREF="#DRECENTER">[Previous Routine]</A>
 <A HREF="#DSERSIC">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
@@ -914,7 +1177,7 @@ convert twomass images to sky-subtracted versions with nice names
    run 2d sersic fitting on an image
  CALLING SEQUENCE:
    dsersic,image [,invvar,xcen=,ycen=,psf=,sersicfit=, $
-      model=, /reinit, fixsky, /fixcen]
+      model=, /reinit, /fixsky, /fixcen]
  INPUTS:
    image - [nx,ny] input image
  OPTIONAL INPUTS:
@@ -924,15 +1187,13 @@ convert twomass images to sky-subtracted versions with nice names
    psf - [nxpsf,nypsf] estimated psf [default to just pixel convolution]
    /reinit - don't use given sersicfit (if it exists) as initial conditions
    /fixcen - fix the center at the input xcen, ycen
+   /fixsky - fix the sky to zero
  OUTPUTS:
    sersicfit - sersic parameters fit
    model - image of best fit model
- OPTIONAL INPUT/OUTPUTS:
- DATA DEPENDENCIES:
  COMMENTS:
    The input psf should be interpreted as an image of a delta
    function source (pixel- and seeing-convolved)
- EXAMPLES:
  BUGS:
    sersic fitting by dsersic currently fails fake data tests
  PROCEDURES CALLED:
@@ -1194,7 +1455,7 @@ convert twomass images to sky-subtracted versions with nice names
 <A NAME="FIT_MULT_GAUSS">
 <H2>FIT_MULT_GAUSS</H2></A>
 <A HREF="#DWEIGHTS">[Previous Routine]</A>
-<A HREF="#SIMPLEXY">[Next Routine]</A>
+<A HREF="#GZ_FILE_TEST">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
  NAME:
@@ -1221,9 +1482,63 @@ convert twomass images to sky-subtracted versions with nice names
 <STRONG>(See /home/users/mb144/dimage/pro/detect/dfit_mult_gauss.pro)</STRONG><P>
 <HR>
  
+<A NAME="GZ_FILE_TEST">
+<H2>GZ_FILE_TEST</H2></A>
+<A HREF="#FIT_MULT_GAUSS">[Previous Routine]</A>
+<A HREF="#GZ_HEADFITS">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   gz_file_test
+ PURPOSE:
+   file_test, but if it fails, try reading in .gz version
+ CALLING SEQUENCE:
+   res= gz_file_test(file)
+ REVISION HISTORY:
+   27-Sep-2006  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/utils/gz_file_test.pro)</STRONG><P>
+<HR>
+ 
+<A NAME="GZ_HEADFITS">
+<H2>GZ_HEADFITS</H2></A>
+<A HREF="#GZ_FILE_TEST">[Previous Routine]</A>
+<A HREF="#GZ_MRDFITS">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   gz_headfits
+ PURPOSE:
+   headfits, but if it fails, try reading in .gz version
+ CALLING SEQUENCE:
+   str= gz_headfits([params for headfits])
+ REVISION HISTORY:
+   27-Sep-2006  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/utils/gz_headfits.pro)</STRONG><P>
+<HR>
+ 
+<A NAME="GZ_MRDFITS">
+<H2>GZ_MRDFITS</H2></A>
+<A HREF="#GZ_HEADFITS">[Previous Routine]</A>
+<A HREF="#SIMPLEXY">[Next Routine]</A>
+<A HREF="#ROUTINELIST">[List of Routines]</A>
+<PRE>
+ NAME:
+   gz_mrdfits
+ PURPOSE:
+   mrdfits, but if it fails, try reading in .gz version
+ CALLING SEQUENCE:
+   str= gz_mrdfits([params for mrdfits])
+ REVISION HISTORY:
+   27-Sep-2006  Written by Mike Blanton, NYU
+</PRE><P>
+<STRONG>(See /home/users/mb144/dimage/pro/utils/gz_mrdfits.pro)</STRONG><P>
+<HR>
+ 
 <A NAME="SIMPLEXY">
 <H2>SIMPLEXY</H2></A>
-<A HREF="#FIT_MULT_GAUSS">[Previous Routine]</A>
+<A HREF="#GZ_MRDFITS">[Previous Routine]</A>
 <A HREF="#TWOMASS_CONVERT">[Next Routine]</A>
 <A HREF="#ROUTINELIST">[List of Routines]</A>
 <PRE>
