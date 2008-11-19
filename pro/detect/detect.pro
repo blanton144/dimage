@@ -120,7 +120,8 @@ if(keyword_set(all)) then begin
         dchildren, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
-                   gsaddle=gsaddle, nostarim=nostarim
+                   gsaddle=gsaddle, nostarim=nostarim, $
+          noclobber=noclobber
     endfor
 endif
 
@@ -138,7 +139,8 @@ if(n_elements(single) gt 0) then begin
         dchildren, base, single, psfs=psfs, $
           ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
-                   gsaddle=gsaddle, nostarim=nostarim
+                   gsaddle=gsaddle, nostarim=nostarim, $
+          noclobber=noclobber
     endif
 endif
 
