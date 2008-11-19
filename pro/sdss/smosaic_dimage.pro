@@ -2,9 +2,9 @@ pro smosaic_dimage, ra, dec, sz=sz, prefix=prefix, noclobber=noclobber, $
                     iau_name=iau_name, scales=scales, sub=sub, $
                     raw=raw, jpg=jpg, _EXTRA=extra_for_smosaic, $
                     satvalue=satvalue, nonlinearity=nonlinearity, $
-                    rerun=rerun
+                    rerun=rerun, redoempty=redoempty
 
-if(NOT keyword_set(rerun)) then rerun=[137]
+if(NOT keyword_set(rerun)) then rerun=[137, 161, 648]
 if(NOT keyword_set(scales)) then scales=[20.,20.,20.]
 if(NOT keyword_set(satvalue)) then satvalue=30.
 if(NOT keyword_set(nonlinearity)) then nonlinearity=3.
@@ -30,14 +30,22 @@ redo=1
 if(keyword_set(noclobber)) then begin
     redo=0
     filters=['u', 'g', 'r', 'i', 'z']
-    for i=0L, n_elements(filters)-1L do $
-      if(NOT file_test(prefix+'-'+filters[i]+'.fits.gz')) then $
-      redo=1
+    for i=0L, n_elements(filters)-1L do begin
+      if(NOT file_test(prefix+'-'+filters[i]+'.fits.gz')) then begin
+         redo=1
+      endif else begin
+         if(redo eq 0) then begin
+	         im= mrdfits(prefix+'-'+filters[i]+'.fits.gz')
+				   if(min(im) eq 0. and max(im) eq 0) then $
+              redo=1 
+         endif
+      endelse
+    endfor
 endif
 
 if(redo) then $
   smosaic_make, ra, dec, sz, sz, fpbin=fpbin, /global, rerun=rerun, $
-  /dropweights, /ivarout, prefix=prefix, $
+  /dontcrash, /dropweights, /ivarout, prefix=prefix, $
   _EXTRA=extra_for_smosaic
 
 redo=1
