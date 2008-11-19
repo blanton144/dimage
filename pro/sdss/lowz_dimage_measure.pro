@@ -43,7 +43,7 @@ for istep=start, nd do begin
                             prefix=prefix, rootdir=rootdir)
         spawn, 'mkdir -p '+subdir
         
-        pim= gz_mrdfits(subdir+'/'+prefix+'-pimage.fits')
+        pim= gz_mrdfits(subdir+'/'+prefix+'-pimage.fits', /silent)
         if(keyword_set(pim)) then begin
             nx=(size(pim,/dim))[0]
             ny=(size(pim,/dim))[1]
@@ -160,7 +160,7 @@ for istep=start, nd do begin
                     endif
 
                     if(keyword_set(gather)) then begin
-                        mall= gz_mrdfits(mfile,1)
+                        mall= gz_mrdfits(mfile,1, /silent)
 												if(n_tags(mall) gt 0) then begin
                           if(n_tags(full) eq 0) then begin
                               full0= create_struct(mall[0], $

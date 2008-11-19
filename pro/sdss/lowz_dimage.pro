@@ -11,14 +11,17 @@
 ;------------------------------------------------------------------------------
 pro lowz_dimage, sample=sample, clobber=clobber, $
                  nodetect=nodetect, redetect=redetect, start=start, $
-                 nd=nd, sort=sort
+                 nd=nd, sort=sort, redoempty=redoempty
+
+common com_lzd, lowz
 
 noclobber=keyword_set(clobber) eq 0
 
 if(NOT keyword_set(sample)) then sample='dr6'
 if(NOT keyword_set(start)) then start=0L
 
-lowz=gz_mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_plus_ned.fits', 1)
+if(n_tags(lowz) eq 0) then $
+  lowz=gz_mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_plus_ned.fits', 1)
 
 lowzdir=getenv('VAGC_REDUX')+'/lowz/'
 rootdir=getenv('DATA')+'/lowz-sdss'
@@ -26,7 +29,7 @@ rootdir=getenv('DATA')+'/lowz-sdss'
 if(NOT keyword_set(nd)) then nd=n_elements(lowz)-1L
 
 isort=lindgen(n_elements(lowz))
-iexclude=[8601, 140408, 141293, 18279]
+iexclude=lowz_iexclude()
 
 ;; set maximum and minimum sizes
 pixscale=0.396/3600.
@@ -57,7 +60,8 @@ for istep=start, nd do begin
         
         cd, subdir
         smosaic_dimage, lowz[i].ra, lowz[i].dec, sz=sz, prefix=prefix, $
-          noclobber=noclobber, minscore=0.001, /dontcrash
+          noclobber=noclobber, minscore=0.001, /dontcrash, /makeanyway, $
+					redoempty=redoempty
 
         rim=mrdfits(subdir+'/'+prefix+'-r.fits.gz',0,hdr)
         if(keyword_set(rim)) then begin
