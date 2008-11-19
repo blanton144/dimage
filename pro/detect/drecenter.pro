@@ -15,9 +15,14 @@
 function drecenter_func, image, ivar, x, y
 
 dtemplates, image, x, y, template=template
-scale= total(template*image*ivar)/total(template*template*ivar)
 
-dtemplates, image, x, y, template=template
+numer=total(template*image*ivar)
+denom=total(template*template*ivar)
+
+if(denom eq 0.) then $
+  scale=0. $
+else $
+  scale= numer/denom
 
 return, scale
 
