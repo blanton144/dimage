@@ -22,13 +22,21 @@
 pro dtemplates, image, xc, yc, templates=templates, parallel=parallel, $
                 sigma=sigma, sersic=sersic, ikept=ikept
 
-if(NOT keyword_set(parallel)) then parallel=0.5
-if(NOT keyword_set(sigma)) then sigma=dsigma(image, sp=5)
-
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 nt=n_elements(xc)
 templates=fltarr(nx,ny,nt)
+
+if(NOT keyword_set(parallel)) then parallel=0.5
+if(NOT keyword_set(sigma)) then sigma=dsigma(image, sp=5)
+if(sigma le 0.) then begin
+    inot= where(image ne 0., nnot)
+    if(nnot eq 0) then begin
+        return
+    endif else begin
+        sigma= djsig(image[inot])
+    endelse
+endif
 
 soname=filepath('libdimage.'+idlutils_so_ext(), $
                 root_dir=getenv('DIMAGE_DIR'), subdirectory='lib')

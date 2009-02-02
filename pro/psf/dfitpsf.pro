@@ -77,11 +77,20 @@ if(sigma eq 0) then begin
     ynd=max(ii / nx)
     image=image[xst:xnd, yst:ynd]
     if (n_elements(invvar) ne 0L) then invvar = invvar[xst:xnd,yst:ynd]
+    if((size(image))[0] eq 2) then begin
+        nx=(size(image,/dim))[0]
+        ny=(size(image,/dim))[1]
+    endif else begin
+        splog, 'image too full of zeroes'
+        return
+    endelse
     sigma=dsigma(image)
-    nx=(size(image,/dim))[0]
-    ny=(size(image,/dim))[1]
 endif
 if (n_elements(invvar) eq 0L) then invvar=fltarr(nx,ny)+1./sigma^2
+if(nx lt box OR ny lt box) then begin
+    splog, 'image too small!'
+    return
+endif
 
 if(nx lt box OR ny lt box) then begin
     splog, 'image too small!'

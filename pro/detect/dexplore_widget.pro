@@ -484,7 +484,7 @@ w_label = WIDGET_LABEL(w_eyeball, VALUE='Flag values')
 
 group1=0
 for i=0L, 31L do begin
-    tmp_group1=dimage_flagname('DEBLEND_EYEBALL_'+eyeball_name, 2L^i)
+    tmp_group1=dimage_flagname('DEBLEND_EYEBALL_'+eyeball_name, 2L^i, /silent)
     if(keyword_set(tmp_group1)) then begin
         if(NOT keyword_set(group1)) then $
           group1=tmp_group1 $
