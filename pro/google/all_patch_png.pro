@@ -15,16 +15,18 @@
 ; REVISION HISTORY:
 ;   25-Oct-2007 MRB, NYU
 ;-
-pro all_patch_png
+pro all_patch_png, start=start
 
 patch= mrdfits(getenv('GOOGLE_DIR')+'/sky-patches.fits',1)
 
-for i=0L, n_elements(patch)-1L do begin
+if(NOT keyword_set(start)) then start=0L
+for i=start, n_elements(patch)-1L do begin
     patchdir= image_subdir(patch[i].ra, patch[i].dec, $
                            root=getenv('GOOGLE_DIR'), subname='fits', $
                            prefix=prefix)
     pngdir= image_subdir(patch[i].ra, patch[i].dec, $
                          root=getenv('GOOGLE_DIR'), subname='png')
+    spawn, 'mkdir -p '+pngdir
     patch_png, prefix, patchpath=patchdir, pngpath=pngdir
 endfor
 

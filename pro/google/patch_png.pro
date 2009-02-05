@@ -26,16 +26,27 @@ if(NOT keyword_set(pngpath)) then pngpath='.'
 
 ;; read in images
 iim=mrdfits(patchpath+'/'+prefix+'-i.fits.gz',0)
-iim= reverse(iim, 2)
+if(NOT keyword_set(iim)) then begin
+    splog, 'No i-iimage!'
+    return
+endif
+
 rim=mrdfits(patchpath+'/'+prefix+'-r.fits.gz',0,hdr)
-rim= reverse(rim, 2)
+if(NOT keyword_set(rim)) then begin
+    splog, 'No r-iimage!'
+    return
+endif
+
 gim=mrdfits(patchpath+'/'+prefix+'-g.fits.gz',0)
-gim= reverse(gim, 2)
+if(NOT keyword_set(gim)) then begin
+    splog, 'No g-iimage!'
+    return
+endif
 
 ;; write out mask as TIFF
 maskname= pngpath+'/'+prefix+'_mask.tif'
 mask= iim ne 0. OR rim ne 0. AND gim ne 0.
-rmask= reverse(mask, 2)
+mask= reverse(mask, 2)
 write_tiff, maskname, mask, bits_per_sample=1, compression=2
 spawn, 'gzip -fv '+maskname
 
@@ -43,7 +54,7 @@ spawn, 'gzip -fv '+maskname
 pngname=pngpath+'/'+prefix+'.png'
 smosaic_make_jpg_scales, scales,nonlinearity
 nw_rgb_make, iim, rim, gim, scales=scales, $
-             nonlinearity=nonlinearity, quality=100, $
+             nonlinearity=nonlinearity, $
              /png, name=pngname
 spawn, 'gzip -fv '+pngname
 

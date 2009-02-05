@@ -28,6 +28,9 @@ common com_sdss_clip, patch
 if(n_elements(ra) ne 1 OR n_elements(dec) ne 1 or n_elements(sz) ne 1) then $
   message, 'RA, DEC, and Sz must all be set, and be scalars'
 
+if(NOT keyword_set(filter)) then $
+  message, 'must define filter'
+
 if(n_tags(patch) eq 0) then $
   patch= mrdfits(getenv('GOOGLE_DIR')+'/sky-patches.fits',1)
 maxsize= max(patch.size)+sz
@@ -42,12 +45,11 @@ patchdir= image_subdir(patch[m2[0]].ra, patch[m2[0]].dec, $
 patchfile= patchdir+'/'+prefix+'-'+filter+'.fits.gz'
 
 hdr= headfits(patchfile)
-extast, hdr, ast
 
 ;; get y ranges
-ad2xy, hdr, ra, dec, xcen, ycen
-ad2xy, hdr, ra, dec+0.5*sz, xtmp, yhi
-ad2xy, hdr, ra, dec-0.5*sz, xtmp, ylo
+adxy, hdr, ra, dec, xcen, ycen
+adxy, hdr, ra, dec+0.5*sz, xtmp, yhi
+adxy, hdr, ra, dec-0.5*sz, xtmp, ylo
 
 ;; convert to integer
 lxcen= long(xcen)
