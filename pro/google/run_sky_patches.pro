@@ -1,10 +1,10 @@
 ;+
 ; NAME:
-;   dr7_sky
+;   run_sky_patches
 ; PURPOSE:
 ;   driver to make FITS images for Google sky process
 ; CALLING SEQUENCE:
-;   dr7_sky
+;   run_sky_patches
 ; COMMENTS:
 ;   Requires that the following file have been produced:
 ;     $GOOGLE_DIR/sky-patches.fits
@@ -23,7 +23,7 @@
 ;------------------------------------------------------------------------------
 function get_patch
 
-common com_dr7_sky, processid, patchfile 
+common com_run_sky_patches, processid, patchfile 
 
 dopatch=0
 keepchecking=1
@@ -63,9 +63,9 @@ return, dopatch
 
 end
 ;
-pro dr7_sky
+pro run_sky_patches
 
-common com_dr7_sky
+common com_run_sky_patches
 
 patchfile= getenv('GOOGLE_DIR')+'/sky-patches.fits'
 rerun=[137, 161]
