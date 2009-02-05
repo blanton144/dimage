@@ -28,7 +28,7 @@ common com_sdss_clip, patch
 if(n_elements(ra) ne 1 OR n_elements(dec) ne 1 or n_elements(sz) ne 1) then $
   message, 'RA, DEC, and Sz must all be set, and be scalars'
 
-if(n_tags(patch) gt 0) then $
+if(n_tags(patch) eq 0) then $
   patch= mrdfits(getenv('GOOGLE_DIR')+'/sky-patches.fits',1)
 maxsize= max(patch.size)+sz
 
@@ -70,10 +70,10 @@ if(lxhi le lxlo OR lyhi le lylo) then $
   return, 0
 
 ;; read patch files
-patch= mrdfits(patchfile, range=[lylo, lyhi])
-patch=patch[lxlo:lxhi,*]
+image= mrdfits(patchfile, range=[lylo, lyhi])
+image=image[lxlo:lxhi,*]
 
-return, patch
+return, image
 
 end
 ;------------------------------------------------------------------------------
