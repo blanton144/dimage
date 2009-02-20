@@ -56,7 +56,6 @@ smosaic_make_jpg_scales, scales,nonlinearity
 nw_rgb_make, iim, rim, gim, scales=scales, $
              nonlinearity=nonlinearity, $
              /png, name=pngname
-spawn, 'gzip -fv '+pngname
 
 ;; write out hdr to an other empty fits file
 wcsname= pngpath+'/'+prefix+'_wcs.fits'
