@@ -85,7 +85,8 @@ while(n_tags(dopatch) gt 0) do begin
 
     ;; perform the smosaicking
     smosaic_make, dopatch.ra, dopatch.dec, dopatch.size, dopatch.size, $
-      /global, rerun=rerun, /dropweights, /dontcrash, prefix=prefix
+      /global, rerun=rerun, /dropweights, /dontcrash, prefix=prefix, $
+      minscore=0.5, /ignoreframesstatus
 
     ;; report to patch file that we are done
     patch=0
