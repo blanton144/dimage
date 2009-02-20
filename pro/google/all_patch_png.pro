@@ -4,7 +4,11 @@
 ; PURPOSE:
 ;   Loop over all tiles and make PNG for each
 ; CALLING SEQUENCE:
-;   all_patch_png
+;   all_patch_png [, start=, /clobber ]
+; OPTIONAL INPUTS:
+;   start - index number to start on (default 0)
+; OPTIONAL KEYWORDS:
+;   /clobber - clobber already-created PNGs
 ; COMMENTS:
 ;    Reads FITS files from:
 ;      $GOOGLE_DIR/fits/[..]/JNAME/JNAME-[ugriz].fits.gz
@@ -15,7 +19,7 @@
 ; REVISION HISTORY:
 ;   25-Oct-2007 MRB, NYU
 ;-
-pro all_patch_png, start=start
+pro all_patch_png, start=start, clobber=clobber
 
 patch= mrdfits(getenv('GOOGLE_DIR')+'/sky-patches.fits',1)
 
@@ -27,7 +31,7 @@ for i=start, n_elements(patch)-1L do begin
     pngdir= image_subdir(patch[i].ra, patch[i].dec, $
                          root=getenv('GOOGLE_DIR'), subname='png')
     spawn, 'mkdir -p '+pngdir
-    patch_png, prefix, patchpath=patchdir, pngpath=pngdir
+    patch_png, prefix, patchpath=patchdir, pngpath=pngdir, clobber=clobber
 endfor
 
 end
