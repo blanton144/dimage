@@ -1,12 +1,5 @@
-###############################################################################
-# Sloan Digital Sky Survey (SDSS)
-# IDL support code for products: idlmapper, idlspec2d
 #
-# S. Burles & D. Schlegel
-###############################################################################
-
-#
-# IDL support utilities for spectro2d and the fibermapper
+# IDL support utilities for dimage 
 #
 SHELL = /bin/sh
 #
