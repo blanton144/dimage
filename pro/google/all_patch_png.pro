@@ -30,7 +30,7 @@ for i=start, n_elements(patch)-1L do begin
                            prefix=prefix)
     pngdir= image_subdir(patch[i].ra, patch[i].dec, $
                          root=getenv('GOOGLE_DIR'), subname='png')
-    spawn, 'mkdir -p '+pngdir
+    if(file_test(pngdir) eq 0) then spawn, 'mkdir -p '+pngdir
     patch_png, prefix, patchpath=patchdir, pngpath=pngdir, clobber=clobber
 endfor
 
