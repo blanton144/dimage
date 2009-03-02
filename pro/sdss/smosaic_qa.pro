@@ -21,7 +21,8 @@
 ;   Writes out file:
 ;     ./prefix-qa.fits
 ;   with a structure with one element per star, with tags:
-;     .SDSS[5] - SDSS PSF flux in each band
+;     .SDSS[5] - SDSS aperflux[6,*] flux in each band
+;     .SDSSIVAR[5] - SDSS aperflux[6,*] flux in each band
 ;     .FLUX[5] - our aperture flux in each band
 ;     .FLERR[5] - our aperture flux in each band
 ;     .X - X position in image
@@ -37,6 +38,7 @@ if(keyword_set(path) eq 0) then path='.'
 bands=['u', 'g', 'r', 'i', 'z']
 
 qastr1={sdss:fltarr(5), $
+        sdssivar:fltarr(5), $
         flux:fltarr(5), $
         flerr:fltarr(5), $
         x:0., $
@@ -52,7 +54,12 @@ qastr=replicate(qastr1, n_elements(obj))
 adxy, hdr, obj.ra, obj.dec, x, y
 qastr.x=x
 qastr.y=y
-qastr.sdss= obj.psfflux
+
+extraobj= sdss_readobjlist(inlist=obj, select_tags=['aperflux', $
+                          'aperflux_ivar'])
+
+qastr.sdss= reform(extraobj.aperflux[6,*], 5, n_elements(obj))
+qastr.sdssivar= reform(extraobj.aperflux_ivar[6,*], 5, n_elements(obj))
 
 for ifilter=0L, n_elements(bands)-1L do begin
     image= mrdfits(path+'/'+prefix+'-'+bands[ifilter]+'.fits.gz',0, hdr)
