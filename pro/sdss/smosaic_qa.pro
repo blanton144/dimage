@@ -32,7 +32,7 @@
 ;------------------------------------------------------------------------------
 pro smosaic_qa, prefix, path=path
 
-if(NOT keyword_set(path)) then path='.'
+if(keyword_set(path) eq 0) then path='.'
 
 bands=['u', 'g', 'r', 'i', 'z']
 
