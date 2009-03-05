@@ -3,6 +3,16 @@ pro compare_lowz_sdss
 lowz= lowz_read(sample='dr6')
 measure= mrdfits(getenv('VAGC_REDUX')+'/lowz/lowz_measure.dr6.fits',1)
 measure=measure[0:n_elements(lowz)-1L]
+gmr gt 0.75 and gmr lt 0.9 and conc gt 2.6)
+
+gmr=-2.5*alog10(measure.petroflux[1]/measure.petroflux[2])
+conc= measure.petror90/ measure.petror50
+
+ii=where(gmr gt 0.75 and gmr lt 0.9 and conc gt 2.6)
+measure=measure[ii]
+lowz=lowz[ii]
+
+xx=findgen(100)
 
 k_print, filename=getenv('DIMAGE_DIR')+'/tex/compare_petroflux.ps'
 !P.MULTI=[0,2,3]

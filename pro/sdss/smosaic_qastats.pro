@@ -42,23 +42,43 @@ pro smosaic_qastats, prefix, path=path, notitle=notitle
 
 if(NOT keyword_set(path)) then path='.'
 
-qa= mrdfits(prefix+'-qa.fits', 1)
-
-k_print, filename=path+'/'+prefix+'-qastats.ps'
-
-!P.MULTI=[5,1,5]
-!Y.MARGIN=0
-
-mag=22.5-2.5*alog10(qa.sdss)
-ratio= qa.flux/qa.sdss
-diff= (qa.flux-qa.sdss)*sqrt(qa.sdssivar)
-
 bands=['u', 'g', 'r', 'i', 'z']
 limits=[[15., 17.], $
         [15., 18.], $
         [15., 18.], $
         [15., 17.], $
         [14., 16]]
+
+qa= mrdfits(prefix+'-qa.fits', 1)
+
+mag=22.5-2.5*alog10(qa.sdss)
+ratio= qa.flux/qa.sdss
+
+;; impose minimum relevant error
+minerr=0.005
+for i=0L, 4L do begin
+    inz= where(qa.sdssivar[i] ne 0, nnz)
+    if(nnz gt 0) then begin
+        err=1./sqrt(qa[inz].sdssivar[i])
+        err=sqrt(err^2+ (qa[inz].sdss[i]*minerr)^2)
+        qa[inz].sdssivar[i]= 1./err^2
+    endif
+endfor
+
+;; get differences scaled to sigma
+diff= (qa.flux-qa.sdss)*sqrt(qa.sdssivar)
+scaled_diff=diff*0.
+for i=0, 4L do begin
+    ii=where(mag[i,*] gt limits[0,i] and $
+             mag[i,*] lt limits[1,i])
+    scale= 1./median(ratio[i,ii])
+    scaled_diff[i,*]= (scale*qa.flux[i]-qa.sdss[i])*sqrt(qa.sdssivar[i])
+endfor
+
+k_print, filename=path+'/'+prefix+'-qastats-magdiff.ps'
+
+!P.MULTI=[5,1,5]
+!Y.MARGIN=0
 
 hogg_usersym, 10, /fill
 for i=0L, 4L do begin
@@ -84,7 +104,7 @@ for i=0L, 4L do begin
     med=median(ratio[i,ii])
 
     djs_plot, mag[i,*], ratio[i,*], psym=8, symsize=0.25, $
-              xra=[14.1, 22.1], yra=[0.71, 1.29], xcharsize=xcharsize, $
+              xra=[14.1, 22.1], yra=[0.86, 1.14], xcharsize=xcharsize, $
               ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $
               title=title, charsize=2.5
 
@@ -104,6 +124,9 @@ for i=0L, 4L do begin
     djs_oplot, xx, yylo
     djs_oplot, xx, yyhi
 endfor
+k_end_print
+
+k_print, filename=path+'/'+prefix+'-qastats-scaled-diff.ps'
 
 !P.MULTI=0
 hogg_usersym, 10, /fill
@@ -132,7 +155,7 @@ for i=0L, 4L do begin
 
     !P.POSITION=[pxst, pyst, pxnd, pynd]
 
-    djs_plot, mag[i,*], diff[i,*], psym=8, symsize=0.25, $
+    djs_plot, mag[i,*], scaled_diff[i,*], psym=8, symsize=0.25, $
               xra=[14.1, 22.1], yra=[-5.9, 5.9], xcharsize=xcharsize, $
               ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $
               title=title, charsize=charsize, noerase=noerase
@@ -142,8 +165,9 @@ for i=0L, 4L do begin
     nbin=30L
     minhist=-6.
     maxhist=6.
-    ii=where(diff[i,*] ne 0., nii)
-    diffhist= histogram(diff[i,ii], min=minhist, max=maxhist, nbin=nbin+1)
+    ii=where(scaled_diff[i,*] ne 0., nii)
+    diffhist= histogram(scaled_diff[i,ii], min=minhist, max=maxhist, $
+                        nbin=nbin+1)
     xhist= minhist+(maxhist-minhist)*(findgen(nbin)+0.5)/float(nbin)
     djs_plot, xhist, diffhist, xra=[-5.9, 5.9], $
               yra=[-0.02, 1.05]*max(diffhist), ycharsize=0.0001, $
@@ -158,6 +182,9 @@ for i=0L, 4L do begin
     yst= !Y.CRANGE[0]+0.82*(!Y.CRANGE[1]-!Y.CRANGE[0])
     djs_xyouts, xst, yst, '!8'+bands[i]+'!6'
 endfor
+k_end_print
+
+k_print, filename=path+'/'+prefix+'-qastats-xdep.ps'
 
 !P.POSITION=0
 !P.MULTI=[0,1,5]
@@ -183,7 +210,7 @@ for i=0L, 4L do begin
 
     ii=where(mag[2,*] gt 15. and mag[2,*] lt 18.)
     djs_plot, qa[ii].x, ratio[i,ii], psym=8, symsize=0.25, $
-              xra=[min(qa.x), max(qa.x)], yra=[0.71, 1.29], $
+              xra=[min(qa.x), max(qa.x)], yra=[0.86, 1.14], $
               xcharsize=xcharsize, $
               ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $
               title=title, charsize=2.5
@@ -195,6 +222,12 @@ for i=0L, 4L do begin
     djs_oplot, xx, yylo
     djs_oplot, xx, yyhi
 endfor
+k_end_print
+
+k_print, filename=path+'/'+prefix+'-qastats-ydep.ps'
+
+!P.POSITION=0
+!P.MULTI=[0,1,5]
 
 hogg_usersym, 10, /fill
 for i=0L, 4L do begin
@@ -217,7 +250,7 @@ for i=0L, 4L do begin
 
     ii=where(mag[2,*] gt 15. and mag[2,*] lt 18.)
     djs_plot, qa[ii].y, ratio[i,ii], psym=8, symsize=0.25, $
-              xra=[min(qa.y), max(qa.y)], yra=[0.71, 1.29], $
+              xra=[min(qa.y), max(qa.y)], yra=[0.86, 1.14], $
               xcharsize=xcharsize, $
               ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $
               title=title, charsize=2.5
