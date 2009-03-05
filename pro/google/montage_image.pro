@@ -43,7 +43,9 @@ for i=0L, n_elements(indx)-1L do begin
         spawn, 'getMontage '+filename+' '+bands[iband]+' '+ $
                rastr+' '+decstr+' '+sizestr
         spawn, 'gzip -v '+filename
-     endfor
+    endfor
+
+    montage_recal, prefix
 endfor
 
 end

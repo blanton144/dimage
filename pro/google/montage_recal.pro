@@ -24,8 +24,8 @@ for iband=0L, n_elements(bands)-1L do begin
     magzp= float(sxpar(hdr, 'MAGZP'))
     img=img*10.^(0.4*(22.5-magzp))
     img= img-median(img)
-    mwrfits, img, filename, /create
-    spawn, 'gzip -v '+filename
+    mwrfits, img, filename, hdr, /create
+    spawn, 'gzip -vf '+filename
 endfor
 
 end
