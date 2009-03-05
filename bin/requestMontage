@@ -1,0 +1,127 @@
+#!/usr/bin/python 
+
+#
+# Code to request a Montage mosaic automagically.
+#
+# Usage:
+#   requestMontage <filter> <ra> <dec> <size>
+#
+# Issues a request to the Montage web site. It is pretty
+#   fragile to changes in the way that site works. 
+#
+# It prints the "Request ID" that Montage assigns (which
+#   is the appropriate input to checkMontage)
+#
+# RA/Dec are assumed to be J2000 deg, size is in deg.
+# Filter is one of u, g, r, i, z, J, H, K
+# Montage outputs 0.4 arcsec/pixel for ugriz, 1 arcsec/pixel for JHK
+#
+# MRB 2009-03-04 (based on getWiki)
+# 
+
+import urllib, urllib2, sys, ClientForm, getopt, cookielib
+import datetime
+
+# Cookies are necessary to maintain connection during script.
+def SetupCookies():
+    "Enable cookies"
+    # taken from: http://www.voidspace.org.uk/python/articles/cookielib.shtml
+    cj = cookielib.LWPCookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    urllib2.install_opener(opener)
+
+# Logs into the Montage site
+def LoginMontage():
+    "Login the user."
+    SetupCookies()
+    url_login = "http://hachi.ipac.caltech.edu:8080/montage/mosaicLogin.html"
+    user = "mb144@nyu.edu"
+    passwd = "ooo2taf"
+    response = urllib2.urlopen(url_login)
+    forms = ClientForm.ParseResponse(response, backwards_compat=False)
+    form = forms[0]
+    form["user"] = user
+    form["passwd"] = passwd
+    urllib2.urlopen(form.click()).read()
+    response.close()
+
+# Main program
+def main(argv):
+    usage = "usage: " + sys.argv[0] + " <filter> <ra> <dec> <size>"
+    try:
+        opts, (filter, ra, dec, size) = getopt.getopt(argv, "")
+    except:
+        print "Incorrect parameters."
+        print usage
+        sys.exit(2)
+
+#   Translate band choice into drop-down position
+    iband=-1
+    if filter == 'J':
+        iband=0
+        ires=0
+    if filter == 'H':
+        iband=1
+        ires=0
+    if filter == 'K':
+        iband=2
+        ires=0
+    if filter == 'u':
+        iband=6
+        ires=1
+    if filter == 'g':
+        iband=7
+        ires=1
+    if filter == 'r':
+        iband=8
+        ires=1
+    if filter == 'i':
+        iband=9
+        ires=1
+    if filter == 'z':
+        iband=10
+        ires=1
+    if iband == -1:
+        print "No such band allowed in requestMontage!"
+        sys.exit(2)
+
+    LoginMontage()
+
+    url_request="http://hachi.ipac.caltech.edu:8080/montage/index.html"
+
+#   Gets the form with the text of the page, grabs existing text
+    response = urllib2.urlopen(url_request)
+    forms = ClientForm.ParseResponse(response, backwards_compat=False)
+    form = forms[0]
+
+#   define the size in deg
+    sz=form.find_control("size")
+    sz._value=size
+
+#   define the coordinates
+    locstr=form.find_control("locstr")
+    locstr._value=ra+" "+dec
+
+#   define the band and pixel size
+    band=form.find_control("band", kind="singlelist")
+    resolution=form.find_control("resolution")
+    band.items[0].selected=False
+    band.items[iband].selected=True
+    resolution.items[0].selected=False
+    resolution.items[ires].selected=True
+
+#   now submit and read output
+    form.find_control(label="Submit")
+    response= urllib2.urlopen(form.click())
+
+#   finally, grab the request id to print
+    forms = ClientForm.ParseResponse(response, backwards_compat=False)
+    form= forms[0]
+    txt=form.find_control(name="reqid")
+    print txt._value
+
+#   Closes up shop
+    response.close()
+
+if __name__ == "__main__": 
+    main(sys.argv[1:])

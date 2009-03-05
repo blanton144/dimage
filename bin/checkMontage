@@ -1,0 +1,87 @@
+#!/usr/bin/python 
+
+#
+# Code to check if a Montage mosaic is available
+#
+# Usage:
+#   checkMontage
+#
+# MRB 2009-03-04 (based on getWiki)
+# 
+
+from TableParse import *
+import urllib, urllib2, sys, ClientForm, getopt, cookielib
+import datetime
+
+# Cookies are necessary to maintain connection during script.
+def SetupCookies():
+    "Enable cookies"
+    # taken from: http://www.voidspace.org.uk/python/articles/cookielib.shtml
+    cj = cookielib.LWPCookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    urllib2.install_opener(opener)
+
+# Logs into the Montage site
+def LoginMontage():
+    "Login the user."
+    SetupCookies()
+    url_login = "http://hachi.ipac.caltech.edu:8080/montage/mosaicLogin.html"
+    user = "mb144@nyu.edu"
+    passwd = "ooo2taf"
+    response = urllib2.urlopen(url_login)
+    forms = ClientForm.ParseResponse(response, backwards_compat=False)
+    form = forms[0]
+    form["user"] = user
+    form["passwd"] = passwd
+    urllib2.urlopen(form.click()).read()
+    response.close()
+
+# Main program
+def main(argv):
+    usage = "usage: " + sys.argv[0] + " <reqid>\n   reqid - request ID of mosaic call"
+    try:
+        opts, (reqid) = getopt.getopt(argv, "")
+    except:
+        print "Incorrect parameters."
+        print usage
+        sys.exit(2)
+
+    reqid=reqid[0]
+
+    LoginMontage()
+
+    url_request="http://hachi.ipac.caltech.edu:8080/montage/mosaicJobStatus.html"
+
+#   Gets the form with the text of the page, grabs existing text
+    response = urllib2.urlopen(url_request)
+    forms = ClientForm.ParseResponse(response, backwards_compat=False)
+    form = forms[0]
+
+#   ask about a particular request
+    txt=form.find_control("reqid")
+    txt._value= reqid
+
+#   now send the request for info
+    form.find_control(label="Show Job List")
+    response= urllib2.urlopen(form.click())
+
+#   now parse it
+    html= response.read()
+    lists= parse(html)
+
+    #   if it is complete, print out the full html file
+    if len(lists) > 5:
+        if lists[4][1] == "COMPLETED":
+            print html 
+        else:
+            # if not, print the status
+            print "MONTAGE STATUS: "+lists[4][1]
+    else:
+        # if no information, claim it isn't submitted
+        print "MONTAGE STATUS: NOT SUBMITTED"
+        
+#   Closes up shop
+    response.close()
+
+if __name__ == "__main__": 
+    main(sys.argv[1:])
