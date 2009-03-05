@@ -56,7 +56,7 @@ while(idstr ne '-1') do begin
     ;; perform the smosaicking
     smosaic_make, ra, dec, size, size, $
       /global, rerun=rerun, /dropweights, /dontcrash, prefix=prefix, $
-      minscore=0.5, /ignoreframesstatus
+      minscore=0.5, /ignoreframesstatus, /processed
     
     spawn, psqlstr+'"select completed_sky('+idstr+')"'
 
