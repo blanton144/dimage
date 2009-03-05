@@ -25,7 +25,7 @@ patches= mrdfits(patchfile,1)
 bands=['u', 'g', 'r', 'i', 'z']
 
 for i=0L, n_elements(indx)-1L do begin
-    dopatch= patch[indx[i]]
+    dopatch= patches[indx[i]]
 
     ;; make the output dir and go there
     subdir= image_subdir(dopatch[i].ra, dopatch[i].dec, $
