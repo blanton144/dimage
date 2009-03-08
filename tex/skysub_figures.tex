@@ -1,0 +1,81 @@
+\clearpage
+
+\setcounter{thefigs}{0}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{0.60}
+\plotone{Sky-fpbin.ps}
+\caption{\label{fig:rawrun} Data that our sky model is fit to, for
+part of an SDSS drift scan run.  The vertical direction is the scan
+direction ($y$), the horizontal direction is perpendicular to the scan
+direction ($x$). This image is the 8$\times$8 binned flat-fielded SDSS
+data. Areas where no objects were detected show the original data.
+Areas where objects were detected are replaced by the background sky
+estimate plus noise. Each of the six vertical stripes represents a
+``camcol'' and the black areas in between are not covered by a
+CCD. The units of the image are raw counts, which therefore reflect
+the relative gains of the different CCDs. }
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{0.60}
+\plotone{Sky-mask.ps} 
+\caption{\label{fig:mask} Mask applied to the data, for the same area
+of sky as shown in Figure \ref{fig:rawrun}. White areas contribute to
+the fit, black areas do not.}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{0.60}
+\plotone{Sky-model.ps} 
+\caption{\label{fig:model} Final model sky fit, for the same area of
+sky as shown in Figure \ref{fig:rawrun}. This model represents an
+evaluation of Equation \ref{skyspline}.}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{0.60}
+\plotone{Sky-subtracted.ps} 
+\caption{\label{fig:resid} The residuals of the data from the model
+(literally Figure \ref{fig:rawrun} minus Figure \ref{fig:model}).}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{1.00}
+%\plotone{mosaic-examples.ps} 
+\caption{\label{fig:examples} {\bf make some examples here}}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{1.00}
+\plotone{J115852.49+051634.6-qastats-scaled-diff.ps} 
+\caption{\label{fig:montageqa} {\bf montage QA plot}}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{1.00}
+\plotone{J115852.49+051634.6-qastats-scaled-diff.ps} 
+\caption{\label{fig:montageqa} {\bf montage QA plot}}
+\end{figure}
+

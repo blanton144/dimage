@@ -1,0 +1,16 @@
+NAME= skysub
+
+all: $(NAME).pdf 
+
+%.pdf : %.dvi
+	dvips -Ppdf -N0 -o $*.ps $*.dvi
+	ps2pdf $*.ps
+	rm $*.ps
+
+%.dvi: %_figures.tex %.tex ../../ccpp-latex/ccpp.bib
+	latex $*; bibtex $*; latex $*; latex $*
+
+fullclean:
+	rm *.pdf *.log *.dvi *.aux *.bbl *.blg
+
+dummy:
