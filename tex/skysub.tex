@@ -102,10 +102,12 @@ studies of the local Universe.
 
 \section{ To-do list}
 
-{\bf mrb: run montage\_image on a few patches and make QA}
+{\bf mrb: final QA for us and montage}
 
 {\bf mrb: run montage\_image on a few patches with large galaxies and
 compare to us}
+
+{\bf mrb: test local sky subtraction in QA}
 
 {\bf mrb: create residual qa test for each run}
 
@@ -509,22 +511,84 @@ photometric our images are, we compare aperture photometry of
 point sources in our mosaics to that reported by the standard SDSS
 pipeline. 
 
-We choose a 7.3 arcsec aperture (the standard aperture used by the
-ubercalibration pipline) for this comparison. From the SDSS catalog
-results, we choose unsaturated stars with no neighboring stars within
-15 arcsec. 
+From the SDSS catalog results, we choose unsaturated stars with no
+neighbors within 15 arcsec.  We measure a circular aperture flux
+within a 7.3 arcsec radius (the standard aperture used by the
+ubercalibration pipline), without any further sky subtraction {\bf
+should we do any}. Then, we compare this flux to that reported within
+the same aperture by the standard SDSS pipeline.
 
+Figure \ref{fig:sdss_qa_magdiff} shows (as a function of magnitude)
+the flux ratios between the 7.3 arcsec aperture flux measured from a
+random set of twenty of our mosaic images {\bf actually only 1 right
+now}, and that reported by the SDSS catalog, for each SDSS band. The
+overall scale of the magnitudes is close to correct, with less than a
+1\% difference between our results and SDSS at bright magnitudes.
+However, for faint objects we err on the bright side, probably a sign
+that we have not subtracted the local sky. {\bf but maybe we should
+for this comparison?}
 
-{\bf comparison of PSF photometry to SDSS results}
+Figure \ref{fig:sdss_qa_scaled} shows the distribution of flux
+differences, scaled to the expected error distribution. This
+distribution is close to the normal distribution, an indication that
+our mosaicking procedure does not degrade the image very badly (though
+of course it does to some degree).
 
-{\bf how does Montage do?}
+We perform the same pair of tests on Montage images in Figures
+\ref{fig:montage_qa_magdiff} and \ref{fig:montage_qa_scaled}.  The
+flux ratios reveal a scale difference between the Montage
+images and the SDSS catalog of 2--3\%. This difference is suspiciously
+close to the fractional difference between the solid angle of a native
+SDSS pixel (0.396 arcsec) and the solid angle of the pixels output by
+Montage by default (0.4 arcsec).  The sense and magnitude of the error
+is similar to that which would result if the Montage images were
+output in units of flux per native SDSS pixel instead of flux per
+Montage-sized pixel. However, we have not investigated their procedure
+thoroughly enough to diagnose the actual cause of the error.  In any
+case, as an overall flux error this problem is relatively minor for
+our purposes here.
+
+In Figure \ref{fig:montage_qa_scaled}, we have first accounted for the
+scale error before considering the flux differences. Having done so,
+the error distribution clusters around zero but with a much broader
+distribution than that expected from the SDSS photometric errors.  We
+suspect that this broad distribution is due to the degradation of the
+image caused by the drizzling procedure. As we see below, however,
+these errors appear to be less important when considering larger,
+brighter objects.
 
 \subsection{ Galaxy photometry: isolating the effect of the background}
 \label{sec:simplegal}
 
-{\bf how much does sky subtraction affect the photometry}
+In the previous section, we considered the effects of our procedures
+on point source photometry, to verify that our images did reasonably
+well relative to the ``ground truth'' established by the SDSS standard
+photometry.  In the case of galaxy photometry, we do not trust the
+SDSS standard results --- in fact, it is our goal to improve that
+photometry substantially.  Therefore, we must use a different tactic
+to test our results.
 
-{\bf direct comparison to Montage for some bright galaxies}
+Our procedure is to insert fake galaxies into the raw data, using the
+same tools developed by \citet{blanton05b} and used by several other
+investigators since (\citealt{blanton04b, mandelbaum06a, masjedi06a}).
+We distribute fake galaxy images onto a random set of locations on the
+sky covered by SDSS fields. For each observation of an object in an
+SDSS field in each band, we convert the fake stamps to SDSS raw data
+units, convolve with the estimated seeing from the SDSS photometric
+pipeline, and add Poisson noise using the estimates of the gain. We
+add the resulting image to the real SDSS raw data, including the tiny
+effects of nonlinearity in the response and the less tiny flat-field
+variation as a function of column on the chip. We then run the SDSS
+photometric pipeline {\tt photo} as well as our sky subtraction
+procedure. Then, around each fake galaxy that we insert, we create a
+mosaic using the tools described above.
+
+{\bf describe here what exactly the fake sample is}
+
+{\bf plots of flux differences between fake and stamps}
+
+{\bf another test: direct comparison to Montage for some bright
+galaxies}
 
 \subsection{ Deblended galaxy photometry}
 \label{sec:deblendgal}
@@ -540,7 +604,6 @@ results, we choose unsaturated stars with no neighboring stars within
 {\bf outline of tests}
 
 {\bf better than Montage: but Montage method a good idea}
-
 
 \acknowledgments
 
