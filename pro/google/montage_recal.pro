@@ -21,11 +21,13 @@ bands=['u', 'g', 'r', 'i', 'z']
 for iband=0L, n_elements(bands)-1L do begin
     filename= prefix+'-'+bands[iband]+'.fits'
     img= mrdfits(filename+'.gz', 0, hdr)
-    magzp= float(sxpar(hdr, 'MAGZP'))
-    img=img*10.^(0.4*(22.5-magzp))
-    img= img-median(img)
-    mwrfits, img, filename, hdr, /create
-    spawn, 'gzip -vf '+filename
+    if(keyword_set(img) gt 0) then begin
+     magzp= float(sxpar(hdr, 'MAGZP'))
+     img=img*10.^(0.4*(22.5-magzp))
+     img= img-median(img)
+     mwrfits, img, filename, hdr, /create
+     spawn, 'gzip -vf '+filename
+    endif
 endfor
 
 end
