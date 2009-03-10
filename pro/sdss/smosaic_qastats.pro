@@ -121,6 +121,9 @@ for i=0L, 4L do begin
     djs_xyouts, xst, yst, '!8\Delta'+limitstr+' = '+ $
                 strtrim(string(f='(f40.3)', med),2)
 
+    quantplot, mag[i,*], ratio[i,*], minx=14., maxx=21.5, npix=15, $
+               thick=5, color='red'
+
     djs_oplot, xx, yylo
     djs_oplot, xx, yyhi
 endfor
