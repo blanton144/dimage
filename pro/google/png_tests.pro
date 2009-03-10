@@ -53,9 +53,7 @@ if(NOT keyword_set(gim)) then begin
     return
 endif
 
-
-
-for irb=0L, 3L do begin
+for irb=0L, 7L do begin
     binname=prefix+'-'+'rb'+strtrim(string(irb),2)
     htmlname= binname+'.html'
     
