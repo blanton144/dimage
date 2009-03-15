@@ -91,8 +91,8 @@ for i=0L, 4L do begin
     xcharsize=0.0001
     if(i eq 4) then xcharsize=ycharsize
 
-    xtitle='!6Magnitude'
-    ytitle='!8f_{!6us}/!8f_{!6SDSS}!6'
+    xtitle=textoidl('!6Magnitude')
+    ytitle=textoidl('!8f_{!6us}/!8f_{!6SDSS}!6')
 
     if(keyword_set(notitle) eq 0 and i eq 0) then $
       title= prefix $
@@ -103,10 +103,11 @@ for i=0L, 4L do begin
     sig=djsig(ratio[i,ii])
     med=median(ratio[i,ii])
 
-    djs_plot, mag[i,*], ratio[i,*], psym=8, symsize=0.25, $
-              xra=[14.1, 22.1], yra=[0.86, 1.14], xcharsize=xcharsize, $
-              ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $
-              title=title, charsize=2.5
+    hogg_scatterplot, mag[i,*], ratio[i,*], xnpix=50, ynpix=20, $
+              xra=[13.6, 22.1], yra=[0.79, 1.21], xcharsize=xcharsize, $
+              ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $ 
+              title=title, charsize=2.5, /cond, quant=[0.16, 0.5, 0.84], $
+              exp=0.45, satfrac=0.001
 
     xst= !X.CRANGE[0]+0.04*(!X.CRANGE[1]-!X.CRANGE[0])
     yst= !Y.CRANGE[0]+0.82*(!Y.CRANGE[1]-!Y.CRANGE[0])
@@ -121,11 +122,11 @@ for i=0L, 4L do begin
     djs_xyouts, xst, yst, '!8\Delta'+limitstr+' = '+ $
                 strtrim(string(f='(f40.3)', med),2)
 
-    quantplot, mag[i,*], ratio[i,*], minx=14., maxx=21.5, npix=15, $
-               thick=5, color='red'
+    ;;quantplot, mag[i,*], ratio[i,*], minx=14., maxx=21.5, npix=15, $
+               ;;thick=5, color='red'
 
-    djs_oplot, xx, yylo
-    djs_oplot, xx, yyhi
+    ;;djs_oplot, xx, yylo
+    ;;djs_oplot, xx, yyhi
 endfor
 k_end_print
 
@@ -145,8 +146,8 @@ for i=0L, 4L do begin
     if(i eq 4) then xcharsize=1.2*ycharsize
     noerase=i gt 0
 
-    xtitle='!6Magnitude'
-    ytitle='!8(f_{!6us}-!8f_{!6SDSS})/\sigma!6'
+    xtitle=textoidl('!6Magnitude')
+    ytitle=textoidl('!8(f_{!6us}-!8f_{!6SDSS})/\sigma!6')
 
     if(keyword_set(notitle) eq 0 and i eq 0) then $
       title= prefix $
@@ -158,10 +159,11 @@ for i=0L, 4L do begin
 
     !P.POSITION=[pxst, pyst, pxnd, pynd]
 
-    djs_plot, mag[i,*], scaled_diff[i,*], psym=8, symsize=0.25, $
-              xra=[14.1, 22.1], yra=[-5.9, 5.9], xcharsize=xcharsize, $
-              ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $
-              title=title, charsize=charsize, noerase=noerase
+    hogg_scatterplot, mag[i,*], scaled_diff[i,*], xnpix=40, ynpix=20, $
+              xra=[13.6, 22.1], yra=[-5.9, 5.9], xcharsize=xcharsize, $
+              ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $ 
+              title=title, charsize=1.5, /cond, quant=[0.16, 0.5, 0.84], $
+              exp=0.45, satfrac=0.001, noerase=noerase, /internal_weight
 
     !P.POSITION=[pxnd, pyst, pxnd2, pynd]
 
