@@ -4,11 +4,13 @@
 ; PURPOSE:
 ;   Make qa file and plot for a smosiac'ed SDSS image
 ; CALLING SEQUENCE:
-;   smosaic_qa, prefix [, path=]
+;   smosaic_qa, prefix [, path=, /localsky ]
 ; INPUTS:
 ;   prefix - prefix of file names (expect prefix-u.fits.gz ...)
 ; OPTIONAL INPUTS;
 ;   path - path to file [default '.']
+; OPTIONAL KEYWORDS:
+;   /localsky - subtract local sky first (256x256 pixel median smoothed)
 ; COMMENTS:
 ;   Reads in files from:
 ;     path/prefix-u.fits.gz
@@ -31,7 +33,7 @@
 ;   2-Mar-2009  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro smosaic_qa, prefix, path=path
+pro smosaic_qa, prefix, path=path, localsky=localsky
 
 if(keyword_set(path) eq 0) then path='.'
 
@@ -63,12 +65,19 @@ qastr.sdssivar= reform(extraobj.aperflux_ivar[6,*], 5, n_elements(obj))
 
 for ifilter=0L, n_elements(bands)-1L do begin
     image= mrdfits(path+'/'+prefix+'-'+bands[ifilter]+'.fits.gz',0, hdr)
+    if(keyword_set(localsky) gt 0) then begin
+		  medsmooth= dmedsmooth(image, box=256)
+      image= image-medsmooth
+    endif
     smosaic_starcheck, image, hdr, obj, flux=flux, flerr=flerr, x=x, y=y
     qastr.flux[ifilter]=flux
     qastr.flerr[ifilter]=flerr
 endfor
 
-mwrfits, qastr, prefix+'-qa.fits', /create
+outfile= prefix+'-qa.fits'
+if(keyword_set(localsky) gt 0) then $
+  outfile= prefix+'-local-qa.fits'
+mwrfits, qastr, outfile, /create
 
 return
 end
