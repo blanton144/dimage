@@ -67,6 +67,7 @@ for irb=0L, 7L do begin
     printf, unit, '<hr>'
     width    = '300'
 
+
     if(irb gt 0) then begin
         nx=(size(iim,/dim))[0]
         ny=(size(iim,/dim))[1]
@@ -78,6 +79,14 @@ for irb=0L, 7L do begin
         gim= dsmooth(gim, 1.3)
         gim= rebin(gim, nx/2L, ny/2L)
     endif
+
+    nx=(size(iim,/dim))[0]
+    ny=(size(iim,/dim))[1]
+    nxsub= nx<800L
+    nysub= ny<800L
+    isubim= iim[0:nxsub-1L, 0L:nysub-1L]
+    rsubim= rim[0:nxsub-1L, 0L:nysub-1L]
+    gsubim= gim[0:nxsub-1L, 0L:nysub-1L]
 
     for j=0L, n_elements(rescale)-1L do begin
         printf, unit, '<table border=0 cellspacing=30>'
@@ -96,7 +105,7 @@ for irb=0L, 7L do begin
                   name=name+'-rb'+strtrim(string(irb),2)
 
                 pngname=pngpath+'/'+prefix+'-'+name+'.png'
-                djs_rgb_make, iim, rim, gim, scales=scales, $
+                djs_rgb_make, isubim, rsubim, gsubim, scales=scales, $
                               nonlinearity=nonlinearity, $
                               satvalue=100., /png, name=pngname
 
