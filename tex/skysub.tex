@@ -1,7 +1,7 @@
 \documentclass[10pt,preprint]{aastex}
 \usepackage{psboxit}
 
-\newcommand{\kms}{\,km~s$^{-1}$} 
+\newcommand{\kms}{\,km~s$^{-1}$}
 \def\squig{\sim\!\!}
 \newcommand{\Msun}{\mbox{\,$M_{\odot}$}}
 \newcommand{\Lsun}{\mbox{\,$L_{\odot}$}}
@@ -29,13 +29,13 @@
 \newcommand{\avg}[1]{{\langle{#1}\rangle}}
 \newcommand{\Avg}[1]{{\left\langle{#1}\right\rangle}}
 \def\simless{\mathbin{\lower 3pt\hbox
-	{$\,\rlap{\raise 5pt\hbox{$\char'074$}}\mathchar"7218\,$}}} % < or of order
+    {$\,\rlap{\raise 5pt\hbox{$\char'074$}}\mathchar"7218\,$}}} % < or of order
 \def\simgreat{\mathbin{\lower 3pt\hbox
-	{$\,\rlap{\raise 5pt\hbox{$\char'076$}}\mathchar"7218\,$}}} % > or of order
+    {$\,\rlap{\raise 5pt\hbox{$\char'076$}}\mathchar"7218\,$}}} % > or of order
 \newcommand{\iras}{{\sl IRAS\/}}
 \newcommand{\petroratio}{{{\mathcal{R}}_P}}
 \newcommand{\petroradius}{{{r}_P}}
-\newcommand{\petronumber}{{{N}_P}}	
+\newcommand{\petronumber}{{{N}_P}}
 \newcommand{\petroratiolim}{{{\mathcal{R}}_{P,\mathrm{lim}}}}
 \newcommand{\band}[2]{\ensuremath{^{#1}\!{#2}}}
 \newcommand{\Vmax}{\ensuremath{V_\mmax}}
@@ -62,25 +62,25 @@
 
 \begin{document}
 
-\title{ Improved background subtraction for the Sloan Digital Sky Survey}
+\title{Improved background subtraction for the Sloan Digital Sky Survey}
 
 
 \author{
 Michael R. Blanton\altaffilmark{\ref{NYU}},
 Eyal Kazin\altaffilmark{\ref{NYU}},
 Demitri Muna\altaffilmark{\ref{NYU}}, \and
-Benjamin Weaver\altaffilmark{\ref{NYU}}
+Benjamin A. Weaver\altaffilmark{\ref{NYU}}
 }
 
 %\altaffiltext{1}{Based on observations obtained with the
-%Sloan Digital Sky Survey\label{SDSS}} 
+%Sloan Digital Sky Survey\label{SDSS}}
 \setcounter{address}{1}
 \altaffiltext{\theaddress}{
-	\stepcounter{address}
-	Center for Cosmology and Particle Physics, Department of Physics, New
-	York University, 4 Washington Place, New
-	York, NY 10003
-	\label{NYU}}
+    \stepcounter{address}
+    Center for Cosmology and Particle Physics, Department of Physics, New
+    York University, 4 Washington Place, New
+    York, NY 10003
+    \label{NYU}}
 
 \begin{abstract}
 We describe a procedure for background-subtracting Sloan Digital Sky
@@ -125,7 +125,7 @@ compare to us}
 
 {\bf eak: photo v5\_6 comparison of fake nearby to us}
 
-\section{ Why improve the sky-subtraction?}
+\section{Why improve the sky-subtraction?}
 \label{sec:intro}
 
 Background subtraction of astronomical images is probably a formally
@@ -134,11 +134,11 @@ detector would be to explain (at reasonable $\chi^2$) the counts in
 each pixel, using a physical model of the sky brightness and its
 gradients, the telescopic optics and scattered light properties, the
 astronomical and other sources of light, and the sensitivity, noise
-and other properties of the detector. 
+and other properties of the detector.
 %For such a model to be useful,
 %it would have to successfully partition light among the individual
 %astronomical sources as well, so that they could be photometered
-%individually.  
+%individually.
 However, this task is impractical and likely intractable as well,
 given the detail needed in such a model, the time variability of
 conditions and instruments, and the probable necessity of treating all
@@ -169,9 +169,9 @@ troublesome.  While galaxies of small enough angular extent are
 treated similarly to the stars, larger galaxies can be substantially
 affected. For typical galaxies this method of sky subtraction causes
 an underestimate in their flux, size, and concentration
-(\cite{blanton05b}). This problem becomes particularly evident for the
+(\citealt{blanton05b}). This problem becomes particularly evident for the
 nearby brightest cluster galaxies (\citealt{bernardi07a,
-lauer07a}). 
+lauer07a}).
 
 In \S\ref{sec:model} below we present a different method for sky
 subtraction that is more accurate for large galaxies (while retaining
@@ -180,13 +180,13 @@ estimate of the sky background from a processed SDSS imaging run.  It
 builds masks around all bright detected sources, and any known sources
 close to but outside the edge of the imaging run. Then it fits a
 smooth spline to the unmasked data, applying appropriate constraints
-to regularize the problem in the presence of the heavy masking. 
+to regularize the problem in the presence of the heavy masking.
 
 In \S\ref{sec:mosaic} we describe how we take sky subtracted SDSS
 fields and mosaic them into single image. We have produced 1~deg by
 1~deg FITS format mosaics over the entire Northern Galactic Cap
 covered by the SDSS, and provide access to snap-shots up this area on
-the web.  
+the web.
 
 In \S\ref{sec:endtoend}, we test the resulting photometry of these images
 in two ways.  First, we compare aperture photometry of point sources
@@ -215,7 +215,7 @@ from Montage images, {\bf finding what?}  As we describe below, these
 problems are likely not fundamental to the Montage background
 subtraction method.
 
-\section{ A model fit to the SDSS sky background}
+\section{A model fit to the SDSS sky background}
 \label{sec:model}
 
 \subsection{The SDSS imaging data}
@@ -318,13 +318,13 @@ In order to fit the data, we first further bin it from 8$\times$8 to
 8$\times$680 --- that is, we heavily bin it in the pixel row
 direction.  We keep the resolution in the pixel column direction
 because the sky ends up tracking some residual flat-fielding
-errors. When rebinning, we account for the weights. 
+errors. When rebinning, we account for the weights.
 
 The spline model that we fit to the final binned data is as follows:
 \begin{equation}
 \label{skyspline}
-	f(\mathrm{camcol}, x, y) = S(\mathrm{camcol}) \times
-	Y(\mathrm{camcol}, y) \times X(\mathrm{camcol}, x, y),
+    f(\mathrm{camcol}, x, y) = S(\mathrm{camcol}) \times
+    Y(\mathrm{camcol}, y) \times X(\mathrm{camcol}, x, y),
 \end{equation}
 where $x$ and $y$ are the pixel column and row positions.
 $S(\mathrm{camcol})$ is an overall scaling factor for each
@@ -340,7 +340,7 @@ slowly over time.
 
 To fit the data, we (approximately) perform $\chi^2$ minimization of
 the data with respect to the model. In detail, we first determine $S$
-by taking a median across each camcol. 
+by taking a median across each camcol.
 
 Second, we divide each camcol by $S$ and perform $\chi^2$ minimization
 to fit $Y$ alone. We quadratically couple the spline parameters
@@ -368,14 +368,18 @@ Finally, given a fit function $f(\mathrm{camcol}, x, y)$ we estimate
 an rms dispersion $\sigma$ around the fit, and then mask all regions
 that are greater than 2$\sigma$ from the fit (in addition to the
 initial mask described in \S\ref{sec:mask}). We then iterate the fit
-four more times. 
+four more times.
 
 An example final fit is shown in Figure \ref{fig:model}. This model is
 a non-parametric, not physical --- consequently, for sufficiently
 diffuse features (many arcminutes in size) our method will by design
-oversubtract the light.  However, Section
+oversubtract the light.  {\bf BAW: This wording seems a bit awkward.
+I think what you mean here is that real, diffuse objects will
+still be oversubtracted.} However, Section
 \S\ref{sec:simplegal} below shows that it is sufficiently good to
 allow accurate measurements of most nearby galaxies.
+
+
 
 \subsection{Residual tests}
 \label{sec:residuals}
@@ -392,7 +396,7 @@ estimate of the effects of sky subtraction errors on the resulting
 galaxy photometry.  We will test that more thoroughly in
 \S\ref{sec:simplegal}.
 
-\section{ Mosaicking the SDSS}
+\section{Mosaicking the SDSS}
 \label{sec:mosaic}
 
 \subsection{Generating mosaics}
@@ -453,7 +457,7 @@ extract sections of these mosaics.
 
 {\bf how to access data}
 
-\subsection{Comparison to Montage} 
+\subsection{Comparison to Montage}
 
 The only other publicly available mosaicking and background
 subtraction facility for SDSS that we are aware of is the results of
@@ -488,10 +492,13 @@ performance in those tests is due to their drizzling
 procedure. However, it is unlikely that these issues affect our main
 interest here, which is large galaxies on the sky.
 
-\section{ End-to-end tests of the sky background}
+\section{End-to-end tests of the sky background}
 \label{sec:endtoend}
 
-The residual tests of \S\ref{residuals} are fine as far as they go,
+\subsection{Evaluating photometry}
+\label{sec:e2eintro}
+
+The residual tests of \S\ref{sec:residuals} are fine as far as they go,
 but are of little use in evaluating the quality of the photometry of
 objects in the masked regions.  In order to do that, we need to
 compare to ground truth (possible to some extent for point sources;
@@ -499,7 +506,7 @@ compare to ground truth (possible to some extent for point sources;
 those we are interested in (necessary for galaxies;
 \S\ref{sec:simplegal} and \S\ref{sec:deblendgal}).
 
-\subsection{ PSF photometry}
+\subsection{PSF photometry}
 \label{sec:psfs}
 
 The standard SDSS analysis should be at its finest for point sources.
@@ -509,7 +516,7 @@ than anything that our background-subtracted mosaics could
 produce. Therefore, as a quality assurance tool to demonstrate how
 photometric our images are, we compare aperture photometry of
 point sources in our mosaics to that reported by the standard SDSS
-pipeline. 
+pipeline.
 
 From the SDSS catalog results, we choose unsaturated stars with no
 neighbors within 15 arcsec.  We measure a circular aperture flux
@@ -556,7 +563,7 @@ image caused by the drizzling procedure. As we see below, however,
 these errors appear to be less important when considering larger,
 brighter objects.
 
-\subsection{ Galaxy photometry: isolating the effect of the background}
+\subsection{Galaxy photometry: isolating the effect of the background}
 \label{sec:simplegal}
 
 In the previous section, we considered the effects of our procedures
@@ -589,7 +596,7 @@ mosaic using the tools described above.
 {\bf another test: direct comparison to Montage for some bright
 galaxies}
 
-\subsection{ Deblended galaxy photometry}
+\subsection{Deblended galaxy photometry}
 \label{sec:deblendgal}
 
 {\bf Comparisons of mock data to dimage measurements}
