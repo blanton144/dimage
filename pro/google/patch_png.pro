@@ -64,7 +64,9 @@ write_tiff, maskname, mask, bits_per_sample=1, compression=2
 spawn, 'gzip -fv '+maskname
 
 ;; write out PNG
-smosaic_make_jpg_scales, scales,nonlinearity
+rescale= 0.4 ;; hardish
+scales= rescale*[5., 6.5, 9.] ;; "normal"
+nonlinearity= 2.25 ;; less than default nonlinearity
 nw_rgb_make, iim, rim, gim, scales=scales, $
              nonlinearity=nonlinearity, $
              /png, name=pngname
