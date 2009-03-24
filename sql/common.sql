@@ -12,3 +12,10 @@ update png set timestamp_requested = NULL where not done;
 
 # to create a dump file
 pg_dump -h hercules -U postgres sky -s >! $DIMAGE_DIR/sql/sky_schema.sql
+
+
+# checking what is in progress
+select * from png where in_progress_png(id);
+
+# checking what is done
+select * from png where done;
