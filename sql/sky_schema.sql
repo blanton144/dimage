@@ -29,8 +29,8 @@ SET search_path = public, pg_catalog;
 CREATE FUNCTION completed_png(integer) RETURNS void
     AS $_$
 BEGIN
-   UPDATE png SET timestamp_completed = CURRENT_TIMESTAMP WHERE id = $1;
-   UPDATE png SET done = true WHERE id = $1;
+   UPDATE png SET timestamp_completed = CURRENT_TIMESTAMP WHERE sky_id = $1;
+   UPDATE png SET done = true WHERE sky_id = $1;
    RETURN;
 END;
 
