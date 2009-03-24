@@ -24,15 +24,15 @@ if(NOT keyword_set(pngpath)) then pngpath='.'
 
 origscales=[5., 6.5, 10.]
 
-nonlin= [1.5, 3., 5.]
-rescale= [1., 0.5, 0.25, 0.15, 0.10]
+nonlin= [1.5, 2.25, 3.]
+rescale= [0.5, 0.4, 0.32, 0.25]
 
 colornames=['redder', $
             'normal', $
             'bluer']
-colors= [[7., 6.5, 8.], $
+colors= [[6., 6.5, 9.], $
          [5., 6.5, 10.], $
-         [4., 6.5, 12.]]
+         [4.5, 6.5, 11.]]
 
 ;; read in images
 iim=mrdfits(patchpath+'/'+prefix+'-i.fits.gz',0)
@@ -72,6 +72,9 @@ for irb=0L, 7L do begin
         nx=(size(iim,/dim))[0]
         ny=(size(iim,/dim))[1]
         
+				if(nx/2L ne float(nx)/2.) then $
+				 	return
+	
         iim= dsmooth(iim, 1.3)
         iim= rebin(iim, nx/2L, ny/2L)
         rim= dsmooth(rim, 1.3)
