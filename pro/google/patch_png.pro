@@ -61,6 +61,7 @@ endif
 mask= iim ne 0. OR rim ne 0. AND gim ne 0.
 mask= reverse(mask, 2)
 write_tiff, maskname, mask, bits_per_sample=1, compression=2
+mask=0
 spawn, 'gzip -fv '+maskname
 
 ;; write out PNG
