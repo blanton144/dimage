@@ -37,13 +37,8 @@ common com_run_sky_patches
 
 psqlstr='psql -t -q -h hercules -U postgres sky -c '
 
-patchfile= getenv('GOOGLE_DIR')+'/sky-patches.fits'
 rerun=[137, 161]
 
-;; randomly pick an id
-processid= long(randomu(seed)*1000000.)
-
-keepgoing=1
 get_patch, idstr, ra, dec, size
 while(idstr ne '-1') do begin
 
