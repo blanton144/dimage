@@ -66,18 +66,16 @@ evaluation of Equation \ref{skyspline}.}
 \begin{figure}
 \figurenum{\fignum}
 \epsscale{1.00}
-\plotone{J110246.60+114710.6-qastats-scaled-diff.ps}
+\plotone{smosaic-local-qastats-magdiff.ps}
 \caption{\label{fig:sdss_qa_magdiff} Magnitude differences between
 the 7.3 arcsec aperture flux measured from our mosaic images, and that
 reported by the SDSS catalog, for each SDSS band. The lines are the
 16\%, 50\% and 84\% quantiles of the differences. The grey scale is
 proportional to the conditional distribution of the flux ratio on the
 magnitude At bright magnitudes, the differences are small, indicating
-that these images have retained their overall photometricity. However,
-at faint magnitudes our aperture fluxes are overestimates relative to
-the SDSS magnitudes, almost certainly due to the fact that we are not
-performing any local sky subtraction. {\bf should we be for this
-plot??} }
+that these images have retained their overall photometricity. In each
+panel, we list the mean value and dispersion of the differences in the
+indicated magnitude range. }
 \end{figure}
 
 \clearpage
@@ -85,7 +83,7 @@ plot??} }
 \begin{figure}
 \figurenum{\fignum}
 \epsscale{1.00}
-\plotone{J110246.60+114710.6-qastats-scaled-diff.ps}
+\plotone{smosaic-local-qastats-scaled-diff.ps}
 \caption{\label{fig:sdss_qa_scaled} Similar to Figure
 \ref{fig:sdss_qa_magdiff}, but now showing flux differences scaled to
 the SDSS aperture flux uncertainty. In the right-hand panels we show
@@ -101,7 +99,7 @@ images are not much degraded relative to the original images.}
 \begin{figure}
 \figurenum{\fignum}
 \epsscale{1.00}
-\plotone{J115852.49+051634.6-qastats-magdiff.ps} 
+\plotone{montage-local-qastats-magdiff.ps}
 \caption{\label{fig:montage_qa_magdiff} Similar to Figure
 \ref{fig:sdss_qa_magdiff}, but using Montage images instead of our
 mosaics. There is an overall scale difference in all bands of about
@@ -113,10 +111,10 @@ mosaics. There is an overall scale difference in all bands of about
 \begin{figure}
 \figurenum{\fignum}
 \epsscale{1.00}
-\plotone{J115852.49+051634.6-qastats-scaled-diff.ps} 
+\plotone{montage-local-qastats-scaled-diff.ps}
 \caption{\label{fig:montage_qa_scaled} Similar to Figure
 \ref{fig:sdss_qa_scaled}, but using Montage images instead of our
-mosaics. We account for the overall scale difference in each band
+mosaics. We account for the overall scale difference found in in each band
 before making these plots. The distribution of differences is much
 broader than the SDSS uncertainties, indicating that for point sources
 Montage images are significantly degraded.}

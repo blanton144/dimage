@@ -478,7 +478,7 @@ question. We compare our results to theirs for large galaxies in
 
 The second major difference is in their method for ``resampling'' of
 images. They do not perform a normal resampling but instead use a
-generalized version of the ``Drizzle'' algorithm. This algorithm
+generalized version of the ``drizzle'' algorithm. This algorithm
 computes the fraction of each original pixel that overlaps each output
 pixel, and distributes the original pixel's flux accordingly. Relative
 to properly resampling a Nyquist-sampled image, such methods do a poor
@@ -487,8 +487,8 @@ with a well-defined PSF). {\bf refs??} They are also clearly
 irreversible operations even in the noiseless case, demonstrating that
 information is lost and the image is consequently degraded. We compare
 our results to the Montage results for point sources in
-\S\ref{sec:psfs} below, and believe that Montage's relatively poor
-performance in those tests is due to their drizzling
+\S\ref{sec:psfs} below, and believe that Montage's less good
+at the bright end in those tests is due to their drizzling
 procedure. However, it is unlikely that these issues affect our main
 interest here, which is large galaxies on the sky.
 
@@ -514,54 +514,63 @@ In fact, because that analysis avoids interpolation, regridding or
 stacking of the data we expect that its performance will be superior
 than anything that our background-subtracted mosaics could
 produce. Therefore, as a quality assurance tool to demonstrate how
-photometric our images are, we compare aperture photometry of
-point sources in our mosaics to that reported by the standard SDSS
-pipeline.
+photometric our images are, we compare aperture photometry of point
+sources in our mosaics to that reported by the standard SDSS
+pipeline. The main goal here is to verify that the overall scale of
+the mosaicked images is correct and that the signal-to-noise has not
+been degraded.
 
-From the SDSS catalog results, we choose unsaturated stars with no
-neighbors within 15 arcsec.  We measure a circular aperture flux
-within a 7.3 arcsec radius (the standard aperture used by the
-ubercalibration pipline), without any further sky subtraction {\bf
-should we do any}. Then, we compare this flux to that reported within
-the same aperture by the standard SDSS pipeline.
+We randomly choose twenty 1 degree square mosaics. Because we are here
+interested in point source photometry, before analysis we perform a
+local sky subtraction, on the same scales as SDSS uses (100 arcsec
+median smoothed).  We of course will not do so in the analysis of
+large galaxies. From the overlapping SDSS catalog, we choose
+unsaturated stars with no neighbors within 15 arcsec.  For each we
+measure a circular aperture flux within a 7.3 arcsec radius (the
+standard aperture used by the ubercalibration pipline).  Then, we
+compare this flux to that reported within the same aperture by the
+standard SDSS pipeline.
 
 Figure \ref{fig:sdss_qa_magdiff} shows (as a function of magnitude)
 the flux ratios between the 7.3 arcsec aperture flux measured from a
 random set of twenty of our mosaic images, and that reported by the
 SDSS catalog, for each SDSS band. The overall scale of the magnitudes
 is close to correct, with less than a 1\% difference between our
-results and SDSS at bright magnitudes.  However, for faint objects we
-err on the bright side, probably a sign that we have not subtracted
-the local sky. {\bf but maybe we should for this comparison?}
+results and SDSS at bright magnitudes.  
 
 Figure \ref{fig:sdss_qa_scaled} shows the distribution of flux
-differences, scaled to the expected error distribution. This
-distribution is close to the normal distribution, an indication that
-our mosaicking procedure does not degrade the image very badly (though
-of course it does to some degree).
+differences, scaled to the expected error distribution. The lines are
+the 16\%, 50\% and 84\% quantiles. This distribution is close to the
+normal distribution, an indication that our mosaicking procedure does
+not degrade the image very badly.  Of course it does degrade to some
+degree, an effect particularly noticeable at the faintest magnitudes,
+where the median difference becomes almost 0.5$\sigma$ and the
+distribution is significantly wider then the normal distribution.
 
-We perform the same pair of tests on Montage images in Figures
+We perform the same pair of tests on twenty Montage mosaics of the
+same regions; results are shown in Figures
 \ref{fig:montage_qa_magdiff} and \ref{fig:montage_qa_scaled}.  The
 flux ratios reveal a scale difference between the Montage
-images and the SDSS catalog of 2--3\%. This difference is suspiciously
-close to the fractional difference between the solid angle of a native
-SDSS pixel (0.396 arcsec) and the solid angle of the pixels output by
-Montage by default (0.4 arcsec).  The sense and magnitude of the error
-is similar to that which would result if the Montage images were
-output in units of flux per native SDSS pixel instead of flux per
-Montage-sized pixel. However, we have not investigated their procedure
-thoroughly enough to diagnose the actual cause of the error.  In any
-case, as an overall flux error this problem is relatively minor for
-our purposes here.
+images and the SDSS catalog of 3--5\%. 
+%This difference is suspiciously
+%close to the fractional difference between the solid angle of a native
+%SDSS pixel (0.396 arcsec) and the solid angle of the pixels output by
+%Montage by default (0.4 arcsec).  The sense and magnitude of the error
+%is similar to that which would result if the Montage images were
+%output in units of flux per native SDSS pixel instead of flux per
+%Montage-sized pixel. However, 
+We have not investigated their procedure thoroughly enough to diagnose
+the cause of this error.  In any case, as an overall flux error this
+problem is relatively minor for our purposes here.
 
 In Figure \ref{fig:montage_qa_scaled}, we have first accounted for the
 scale error before considering the flux differences. Having done so,
-the error distribution clusters around zero but with a much broader
-distribution than that expected from the SDSS photometric errors.  We
-suspect that this broad distribution is due to the degradation of the
-image caused by the drizzling procedure. As we see below, however,
-these errors appear to be less important when considering larger,
-brighter objects.
+the error distribution clusters around zero.  At faint magnitudes the
+distribution is similar to ours; at bright magnitudes it is
+considerably broader. We suspect that this broad distribution is due
+to the degradation of the image caused by the drizzling procedure. As
+we see below, however, these errors appear to be less important when
+considering larger, brighter objects. {\bf make sure this is true}
 
 \subsection{Galaxy photometry: isolating the effect of the background}
 \label{sec:simplegal}
