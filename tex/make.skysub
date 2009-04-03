@@ -1,4 +1,11 @@
-NAME= skysub
+#
+# Run make -f make.skysub all
+#
+# $Id$
+#
+NAME = skysub
+
+BIB = $(shell echo $(BIBINPUTS) | tr -s '/:' '/\n' | grep ccpp-latex)
 
 all: $(NAME).pdf 
 
@@ -7,10 +14,14 @@ all: $(NAME).pdf
 	ps2pdf $*.ps
 	rm $*.ps
 
-%.dvi: %_figures.tex %.tex ../../ccpp-latex/ccpp.bib
+%.dvi: %_figures.tex %.tex $(BIB)ccpp.bib
 	latex $*; bibtex $*; latex $*; latex $*
 
 fullclean:
 	rm *.pdf *.log *.dvi *.aux *.bbl *.blg
+
+test:
+	@echo "This should be the correct path to the ccpp.bib file:"
+	@echo $(BIB)ccpp.bib
 
 dummy:
