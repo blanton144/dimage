@@ -18,7 +18,7 @@ all: $(NAME).pdf
 	latex $*; bibtex $*; latex $*; latex $*
 
 fullclean:
-	rm *.pdf *.log *.dvi *.aux *.bbl *.blg
+	rm -f *.pdf *.log *.dvi *.aux *.bbl *.blg
 
 test:
 	@echo "This should be the correct path to the ccpp.bib file:"
