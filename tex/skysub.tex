@@ -459,7 +459,7 @@ extract sections of these mosaics.
 
 The only other publicly available mosaicking and background
 subtraction facility for SDSS that we are aware of is the results of
-the Montage package distributed by IRSA {\bf cite}. We will describe
+the Montage package distributed by IRSA \citep{berriman03a,berriman04a}. We will describe
 the quantitative differences between their results and ours below.
 Here we discuss methodological differences.
 
@@ -534,7 +534,7 @@ the flux ratios between the 7.3 arcsec aperture flux measured from a
 random set of twenty of our mosaic images, and that reported by the
 SDSS catalog, for each SDSS band. The overall scale of the magnitudes
 is close to correct, with less than a 1\% difference between our
-results and SDSS at bright magnitudes.  
+results and SDSS at bright magnitudes.
 
 Figure \ref{fig:sdss_qa_scaled} shows the distribution of flux
 differences, scaled to the expected error distribution. The lines are
@@ -549,14 +549,14 @@ We perform the same pair of tests on twenty Montage mosaics of the
 same regions; results are shown in Figures
 \ref{fig:montage_qa_magdiff} and \ref{fig:montage_qa_scaled}.  The
 flux ratios reveal a scale difference between the Montage
-images and the SDSS catalog of 3--5\%. 
+images and the SDSS catalog of 3--5\%.
 %This difference is suspiciously
 %close to the fractional difference between the solid angle of a native
 %SDSS pixel (0.396 arcsec) and the solid angle of the pixels output by
 %Montage by default (0.4 arcsec).  The sense and magnitude of the error
 %is similar to that which would result if the Montage images were
 %output in units of flux per native SDSS pixel instead of flux per
-%Montage-sized pixel. However, 
+%Montage-sized pixel. However,
 We have not investigated their procedure thoroughly enough to diagnose
 the cause of this error.  In any case, as an overall flux error this
 problem is relatively minor for our purposes here.
@@ -636,6 +636,12 @@ Max-Planck-Institute for Astronomy (MPIA), the Max-Planck-Institute
 for Astrophysics (MPA), New Mexico State University, University of
 Pittsburgh, University of Portsmouth, Princeton University, the United
 States Naval Observatory, and the University of Washington.
+
+This research made use of Montage, funded by the National Aeronautics and
+Space Administration's Earth Science Technology Office, Computation
+Technologies Project, under Cooperative Agreement Number NCC5-626 between
+NASA and the California Institute of Technology. Montage is maintained by
+the NASA/IPAC Infrared Science Archive.
 
 \bibliographystyle{apj}
 \bibliography{apj-jour,ccpp}
