@@ -75,12 +75,12 @@ for irb=0L, 7L do begin
 				if(nx/2L ne float(nx)/2.) then $
 				 	return
 	
-        iim= dsmooth(iim, 1.3)
-        iim= rebin(iim, nx/2L, ny/2L)
-        rim= dsmooth(rim, 1.3)
-        rim= rebin(rim, nx/2L, ny/2L)
-        gim= dsmooth(gim, 1.3)
-        gim= rebin(gim, nx/2L, ny/2L)
+        iim= dsmooth(iim, 2.)
+        iim= rebin(iim, nx/2L, ny/2L, /sample)
+        rim= dsmooth(rim, 2.)
+        rim= rebin(rim, nx/2L, ny/2L, /sample)
+        gim= dsmooth(gim, 2.)
+        gim= rebin(gim, nx/2L, ny/2L, /sample)
     endif
 
     nx=(size(iim,/dim))[0]
