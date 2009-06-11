@@ -31,10 +31,10 @@ for i=0L, n_elements(names)-1L do begin
     spawn, 'mkdir -p '+currdir
     cd, currdir
     
-    smosaic_make, ra[i], dec[i], 0.18, 0.18, $
-                  /global, rerun=rerun, /dropweights, /dontcrash, $
-                  prefix=names[i], minscore=0.5, /ignoreframesstatus, $
-                  /processed
+    ;;smosaic_make, ra[i], dec[i], 0.18, 0.18, $
+     ;;             /global, rerun=rerun, /dropweights, /dontcrash, $
+     ;;             prefix=names[i], minscore=0.5, /ignoreframesstatus, $
+     ;;             /processed
     
     png_tests, names[i]    
 endfor
