@@ -9,13 +9,13 @@ BIB = $(shell echo $(BIBINPUTS) | tr -s '/:' '/\n' | grep ccpp-latex)
 
 all: $(NAME).pdf 
 
+%.dvi: %.tex %_figures.tex $(BIB)ccpp.bib
+	latex $*; bibtex $*; latex $*; latex $*
+
 %.pdf : %.dvi
 	dvips -Ppdf -N0 -o $*.ps $*.dvi
 	ps2pdf $*.ps
 	rm $*.ps
-
-%.dvi: %_figures.tex %.tex $(BIB)ccpp.bib
-	latex $*; bibtex $*; latex $*; latex $*
 
 fullclean:
 	rm -f *.pdf *.log *.dvi *.aux *.bbl *.blg

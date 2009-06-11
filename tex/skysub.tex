@@ -102,12 +102,8 @@ studies of the local Universe.
 
 \section{ To-do list}
 
-{\bf mrb: final QA for us and montage}
-
 {\bf mrb: run montage\_image on a few patches with large galaxies and
 compare to us}
-
-{\bf mrb: test local sky subtraction in QA}
 
 {\bf mrb: create residual qa test for each run}
 
@@ -369,15 +365,11 @@ initial mask described in \S\ref{sec:mask}). We then iterate the fit
 four more times.
 
 An example final fit is shown in Figure \ref{fig:model}. This model is
-a non-parametric, not physical --- consequently, for sufficiently
-diffuse features (many arcminutes in size) our method will by design
-oversubtract the light.  {\bf BAW: This wording seems a bit awkward.
-I think what you mean here is that real, diffuse objects will
-still be oversubtracted.} However, Section
+non-parametric and not physical --- consequently, for diffuse, but
+real, sources many arcminutes in size, our method will by design
+oversubtract the light.  However, Section
 \S\ref{sec:simplegal} below shows that it is sufficiently good to
 allow accurate measurements of most nearby galaxies.
-
-
 
 \subsection{Residual tests}
 \label{sec:residuals}
