@@ -75,6 +75,14 @@ if(lxhi le lxlo OR lyhi le lylo) then $
 image= mrdfits(patchfile, range=[lylo, lyhi])
 image=image[lxlo:lxhi,*]
 
+;; adjust header
+crpix1= float(sxpar(hdr, 'CRPIX1'))
+crpix2= float(sxpar(hdr, 'CRPIX2'))
+crpix1= crpix1- float(lxlo)
+crpix2= crpix2- float(lylo)
+sxaddpar, hdr, 'CRPIX1', crpix1, 'Reference Pixel in X'
+sxaddpar, hdr, 'CRPIX2', crpix2, 'Reference Pixel in Y'
+
 return, image
 
 end
