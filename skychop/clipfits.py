@@ -4,7 +4,7 @@
 
 import sys
 import os
-os.environ['HOME'] = '/var/www/html/sdss3/apw235/sdss-tmp/'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp/'
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
