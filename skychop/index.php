@@ -82,10 +82,10 @@ function getTBVal(strURL,raOrDec) {
 		$u = $_POST['u'];
 		$z = $_POST['z'];
 		$all = $_POST['all'];
-		$apw235 = "/var/www/html/sdss3/apw235";
+		$skychop = "/var/www/html/sdss3/skychop";
 		$pid = rand(1000,99999);
 		
-		$dir = opendir("$apw235/sdss-tmp");
+		$dir = opendir("$skychop/sdss-tmp");
 		while($entry = readdir($dir)) {
 			if ($entry == $pid) {
 				$pid = rand(1000,99999);
@@ -154,19 +154,19 @@ function getTBVal(strURL,raOrDec) {
 					$flag = 3;
 				}
 				
-				$fileDir_and_fileName = exec("/usr/local/epd/bin/python $apw235/find_image.py $RA $dec");
+				$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
 				list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
 				
 				foreach($bands as $let) {
-					$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $apw235/sdss-tmp/$fileName-$let.fits");
-					$clip = exec("/usr/local/epd/bin/python $apw235/clipfits.py $apw235/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
-					$rmOld = unlink("/var/www/html/sdss3/apw235/sdss-tmp/$fileName-$let.fits");
+					$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
+					$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
+					$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
 				}
 				$tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
 				$gz = exec("gzip sdss-tmp/$pid.tar");
 				$chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
 				foreach($bands as $let) {
-					$rmOld = unlink("/var/www/html/sdss3/apw235/sdss-tmp/$fileName-$let-$size.fits");
+					$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
 				}
 			}
 		}		
@@ -254,6 +254,19 @@ function getTBVal(strURL,raOrDec) {
 					</td>
 				</tr>
 				<tr>
+					<td>u:</td>
+					<td>
+						<?php 
+							if ($_POST['u'] == 'on') {
+								print '<input type="checkbox" name="u" id="u" checked="yes" />'; 
+							}
+							else { 
+								print '<input type="checkbox" name="u" id="u" />'; 
+							}
+						?>
+					</td>
+				</tr>
+				<tr>
 					<td>g:</td>
 					<td>
 						<?php 
@@ -288,19 +301,6 @@ function getTBVal(strURL,raOrDec) {
 							}
 							else { 
 								print '<input type="checkbox" name="r" id="r" />'; 
-							}
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td>u:</td>
-					<td>
-						<?php 
-							if ($_POST['u'] == 'on') {
-								print '<input type="checkbox" name="u" id="u" checked="yes" />'; 
-							}
-							else { 
-								print '<input type="checkbox" name="u" id="u" />'; 
 							}
 						?>
 					</td>
