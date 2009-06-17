@@ -1,0 +1,62 @@
+.errorText {
+	text-align: center;
+	color: red;
+	font-family: Courier;
+	font-size: 16pt;
+}
+
+.errorTB {
+	color: red;
+}
+
+.notifyText {
+	font-style: italic;
+	font-family: lucida;
+	font-size: 12pt;
+}
+
+.theLabels {
+	font-weight: bold;
+	font-family: 'lucida console';
+	font-size: 14pt;
+}
+
+a:link {
+	font-family: Courier;
+	font-size: 14pt;
+	color: #AA0202;
+	text-decoration: none;
+}
+
+a:visited {
+	font-family: Courier;
+	font-size: 14pt;
+	color: #AA0202;
+	text-decoration: none;
+}
+
+a:hover {
+	font-family: Courier;
+	font-size: 14pt;
+	color: #FF0000;
+	text-decoration: none;
+}
+
+a.reDLink:link {
+	font-family: lucida;
+	font-size: 12pt;
+	color: #AA0202;
+	text-decoration: none;
+}
+a.reDLink:visited {
+	font-family: lucida;
+	font-size: 12pt;
+	color: #AA0202;
+	text-decoration: none;
+}
+a.reDLink:hover{
+	font-family: lucida;
+	font-size: 12pt;
+	color: #FF0000;
+	text-decoration: none;
+}
