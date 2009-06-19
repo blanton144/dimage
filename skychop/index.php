@@ -322,8 +322,8 @@ function getTBVal(strURL,raOrDec) {
 			</td>
 		</tr>
 		<tr>
-			<td><font class='notifyText'>(optional)</font><font class='theLabels'>Output Filename:</font></td>
-			<td><input type='text' name='fname' id='fname' size='10' value='$fname' /></td>
+			<td><font class='theLabels'>Output Filename:</font></td>
+			<td><input type='text' name='fname' id='fname' size='10' value='$fname' /><font class='notifyText'>(optional)</font></td>
 		</tr
 		<tr>
 			<td align='center' colspan='2' valign='bottom'><br />
