@@ -15,10 +15,3 @@ decDeg = float(sys.argv[2])
 
 fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
 print fileDir + " " + fileName
-
-"""
-os.system("mkdir /var/www/html/sdss3/apw235/tmp/" + str(thisPID) + "/")
-
-for i in os.listdir(fileDir + fileName):
-	os.system("gunzip -c " + fileDir + fileName + "/" + i + " > /var/www/html/sdss3/apw235/tmp/" + str(thisPID) + "/" + i[0:26])
-"""

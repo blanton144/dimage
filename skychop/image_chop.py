@@ -7,9 +7,6 @@
 
 import sys
 import os
-#from astLib import astCoords
-#from astLib import astImages
-#from astLib import astWCS
 import pyfits
 from math import fabs, sqrt
 
@@ -50,7 +47,7 @@ def findDec(x):
 #
 # CURRENTLY ASSUMES UNITS OF DEGREE
 #
-def findClosestCenter(RADeg, decDeg, RAUnits=None, decUnits=None):
+def findClosestCenter(RADeg, decDeg):
 	# Navigate to the correct directory
 	fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
 	RAHour = RADeg / 15.0
@@ -73,27 +70,3 @@ def findClosestCenter(RADeg, decDeg, RAUnits=None, decUnits=None):
 	
 	a = os.listdir(RADecPath)
 	return a[minOffsetIndex], RADecPath
-	
-def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
-	# Turn on error messages
-	#astImages.REPORT_ERRORS=True
-	
-	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
-	# So here we search through the extensions until we find 2D image data
-	fitsExtension=None
-	for i in range(len(img)):
-		if img[i].header['naxis']==2:
-			fitsExtension=i
-			break
-			
-	if fitsExtension==None:
-		print "ERROR: ", inFileName, "contains no image data. Skipping ..." 
-		
-	else:
-		imgData=img[fitsExtension].data
-		imgWCS=astWCS.WCS(inFileName, fitsExtension)
-		
-		clipped=astImages.clipImageSectionWCS(imgData, imgWCS, RADeg, decDeg, clipSizeDeg)
-		
-		astImages.saveFITS(outFileName, clipped['clippedData'], clipped['clippedWCS'])
-
