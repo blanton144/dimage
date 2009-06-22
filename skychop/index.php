@@ -127,10 +127,7 @@ function getTBVal(strURL,raOrDec) {
 		
 		if ($submitSuccess) {
 			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
-			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
-			print "$fileDir";
-			print "$fileName";
-			
+			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);			
 			foreach($bands as $let) {
 				$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
 				if (isset($_POST['fname'])) {
