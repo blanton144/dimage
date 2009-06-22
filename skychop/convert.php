@@ -21,7 +21,7 @@ if (isset($_POST['submit2'])) {
 <br /><br />
 <form method='post' name='degminsiecDecDeg'>
 <input type='text' name='dd' id='dd' size='2' />DD<input type='text' name='amam' id='amam' size='2' />MM<input type='text' name='asas' id='asas' size='2' />SS.SS
-<br /><input type='submit2' name='submit2' value='Submit' />
+<br /><input type='submit' name='submit2' value='Submit' />
 </form>
 <?php
 if (isset($_POST['submit'])) {
