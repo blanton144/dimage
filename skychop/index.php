@@ -131,17 +131,19 @@ function getTBVal(strURL,raOrDec) {
 			
 			foreach($bands as $let) {
 				$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
-				if (empty($fname) == False) {
-					$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fname.fits 2>&1");
-				}
-				else {
-					$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
-				}
+				$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
 				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
 			}
-			$tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
-			$gz = exec("gzip sdss-tmp/$pid.tar");
-			$chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
+			if (empty($fname) == False) {
+				$tar = exec("tar -cvvf sdss-tmp/$fname.tar sdss-tmp/*.fits");
+				$gz = exec("gzip sdss-tmp/$fname.tar");
+				$chmod_tar = chmod("sdss-tmp/$fname.tar.gz", 0777);
+			}
+			else {
+				$tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
+				$gz = exec("gzip sdss-tmp/$pid.tar");
+				$chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
+			}
 			foreach($bands as $let) {
 				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
 			}
@@ -279,7 +281,7 @@ function getTBVal(strURL,raOrDec) {
 		</tr>
 		<tr>
 			<td><font class='theLabels'>Output Filename:</font></td>
-			<td><input type='text' name='fname' id='fname' size='10' />.fits <font class='notifyText'>(optional)</font></td>
+			<td><input type='text' name='fname' id='fname' size='10' />.tar.gz <font class='notifyText'>(optional)</font></td>
 		</tr
 		><tr>
 			<td align='center' colspan='2' valign='bottom'><br />
