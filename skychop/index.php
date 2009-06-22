@@ -68,6 +68,7 @@ function getTBVal(strURL,raOrDec) {
 	ini_Set('display_errors',1); // turn on error reporting while developing
 	
 	if (isset($_POST['submit'])) {
+		$submitSuccess = True;
 		// Get variables from form POST
 		$RA = $_POST['ra'];
 		$dec = $_POST['dec'];
@@ -106,26 +107,26 @@ function getTBVal(strURL,raOrDec) {
 		// Validate input
 		if (count($bands) == 0) {
 			print "<font class='errorText'><center>Please select a band!</center></font>";
-			submitSuccess = False;
+			$submitSuccess = False;
 		}
 		if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($size))) {
 			print "<font class='errorText'><center>Please correct your input.</center></font>";
-			submitSuccess = False;
+			$submitSuccess = False;
 		}
 		if (empty($fname)) {
 			print "<font class='notifyText'><center>No filename entered, using default name.</center></font>";
 		}
 		if (strlen($fname) > 20) {
 			print "<font class='errorText'><center>Custom filename must be < 20 characters.</center></font>";
-			submitSuccess = False;
+			$submitSuccess = False;
 		}
-		if (($RA > 270.0 || $RA < 105.0) || ($dec > 70.3 || $dec < -4.0)) {
+		if ($RA > 270.0 || $RA < 105.0 || $dec > 70.3 || $dec < -4.0) {
 			print "<font class='errorText'><center>Please correct your input: <br />";
 			print "105 < RA < 270, -4.0 < Dec < 70.3</center></font>";
-			submitSuccess = False;
+			$submitSuccess = False;
 		}
 		
-		if (!submitSuccess) {
+		if (!$submitSuccess) {
 			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
 			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
 			
@@ -281,7 +282,7 @@ function getTBVal(strURL,raOrDec) {
 			<td><font class='theLabels'>Output Filename:</font></td>
 			<td><input type='text' name='fname' id='fname' size='10' />.fits <font class='notifyText'>(optional)</font></td>
 		</tr
-		<tr>
+		><tr>
 			<td align='center' colspan='2' valign='bottom'><br />
 			<input type='submit' name='submit' value='Submit' />
 		</tr>
@@ -290,7 +291,7 @@ function getTBVal(strURL,raOrDec) {
 
 <?php
 	if (isset($_POST['submit'])) {
-		if (!submitSuccess) {
+		if (!$submitSuccess) {
 			print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
 		}
