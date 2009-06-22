@@ -170,10 +170,10 @@ function getTBVal(strURL,raOrDec) {
 			<td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
 			<?php
 				if ($submitSuccess) {
-					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' /></td>";
+					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
 				}
 				else {
-					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' /></td>";
+					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
 				}
 			?>
 				<font class='notifyText'>degrees</font>
