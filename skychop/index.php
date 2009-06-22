@@ -79,6 +79,7 @@ function getTBVal(strURL,raOrDec) {
 			$dec = "54.34917";
 		}
 		else { $dec = $_POST['dec']; }
+		
 		$size = $_POST['size'];
 		$g = $_POST['g'];
 		$i = $_POST['i'];
@@ -178,7 +179,7 @@ function getTBVal(strURL,raOrDec) {
 					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
 				}
 				else {
-					print '<td valign="middle"><input type="text" name="ra" id="ra" size="10" value="$RA" />';
+					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
 				}
 			?>
 				<font class='notifyText'>degrees</font>
