@@ -72,6 +72,7 @@ function getTBVal(strURL,raOrDec) {
 
 <?php
 	if (isset($_POST['submit'])) {
+		$fNameFlag = 0;
 		# Test to make sure we have integers here;
 		$RA = $_POST['ra'];
 		$dec = $_POST['dec'];
@@ -82,7 +83,13 @@ function getTBVal(strURL,raOrDec) {
 		$u = $_POST['u'];
 		$z = $_POST['z'];
 		$all = $_POST['all'];
-		$fname = $_POST['fname'];
+		if (isset($_POST['fname'])) {
+			$fname = $_POST['fname'];
+			stripslashes($fname);
+			if (strlen($fname) > 20) {
+				$fNameFlag = 1;
+			}
+		}
 		$skychop = "/var/www/html/sdss3/skychop";
 		$pid = rand(1000,99999);
 		
@@ -126,8 +133,8 @@ function getTBVal(strURL,raOrDec) {
 			$bandFlag = 1;
 		}
 		else {
-			if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($size))) {
-				print "<font class='errorText'><center>Please enter only numbers!</center></font>";
+			if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($size)) || $fNameFlag == 1) {
+				print "<font class='errorText'><center>Please correct your input.</center></font>";
 			}
 			else {
 				if ($_POST['unitsRA'] == "degsRA") {
@@ -160,7 +167,12 @@ function getTBVal(strURL,raOrDec) {
 				
 				foreach($bands as $let) {
 					$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
-					$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
+					if (isset($_POST['fname'])) {
+						$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fname.fits 2>&1");
+					}
+					else {
+						$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
+					}
 					$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
 				}
 				$tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
@@ -324,7 +336,7 @@ function getTBVal(strURL,raOrDec) {
 		</tr>
 		<tr>
 			<td><font class='theLabels'>Output Filename:</font></td>
-			<td><input type='text' name='fname' id='fname' size='10' /><font class='notifyText'>(optional)</font></td>
+			<td><input type='text' name='fname' id='fname' size='10' />.fits <font class='notifyText'>(optional)</font></td>
 		</tr
 		<tr>
 			<td align='center' colspan='2' valign='bottom'><br />
