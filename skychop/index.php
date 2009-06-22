@@ -144,6 +144,7 @@ function getTBVal(strURL,raOrDec) {
 			$chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
 			foreach($bands as $let) {
 				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
+			}
 		}
 	}
 ?>
