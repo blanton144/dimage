@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<link href="style.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Convert</title>
 <?php
@@ -13,22 +14,32 @@ if (isset($_POST['submit2'])) {
 ?>
 </head>
 <body>
-<center>
+<center><font class="regText">
+<font class="theLabels">Convert Sexagesimal Time --> Decimal Degrees</font>
 <form method='post' name='hrminsDecDeg'>
-<input type='text' name='hh' id='hh' size='2' />HH<input type='text' name='mm' id='mm' size='2' />MM<input type='text' name='ss' id='ss' size='2' />SS.SS
+<input type='text' name='hh' id='hh' size='4' />hr
+<input type='text' name='mm' id='mm' size='4' />'
+<input type='text' name='ss' id='ss' size='4' />"
 <br /><input type='submit' name='submit' value='Submit' />
-</form>
-<br /><br />
-<form method='post' name='degminsiecDecDeg'>
-<input type='text' name='dd' id='dd' size='2' />DD<input type='text' name='amam' id='amam' size='2' />MM<input type='text' name='asas' id='asas' size='2' />SS.SS
-<br /><input type='submit' name='submit2' value='Submit' />
 </form>
 <?php
 if (isset($_POST['submit'])) {
-	print "$decDeg";
+	print "<font class='errorText'>$decDeg</font>";
 }
+?>
+<br />
+
+<font class="theLabels">Convert Sexagesimal Degrees --> Decimal Degrees</font>
+<form method='post' name='degminsiecDecDeg'>
+<input type='text' name='dd' id='dd' size='4' />&deg;
+<input type='text' name='amam' id='amam' size='4' />'
+<input type='text' name='asas' id='asas' size='4' />"
+<br /><input type='submit' name='submit2' value='Submit' />
+</form>
+</font>
+<?php
 if (isset($_POST['submit2'])) {
-	print "$decDeg";
+	print "<font class='errorText'>$decDeg</font>";
 }
 ?>
 </center>

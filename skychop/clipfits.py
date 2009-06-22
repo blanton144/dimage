@@ -37,7 +37,7 @@ else:
 		print "ERROR: ", subDir + "/" + inFileName, "contains no image data. Skipping ..." 
 
 	else:
-		imgData=img[fitsExtension].data
+		imgData = img[fitsExtension].data
 		imgWCS=astWCS.WCS(subDir + "/" + inFileName, fitsExtension)
 
 		clipped = astImages.clipImageSectionWCS(imgData, imgWCS, RADeg, decDeg, clipSizeDeg)
