@@ -114,9 +114,6 @@ function getTBVal(strURL,raOrDec) {
 			print "<font class='errorText'><center>Please correct your input.</center></font>";
 			$submitSuccess = False;
 		}
-		if (empty($fname)) {
-			print "<font class='notifyText'><center>No filename entered, using default name.</center></font>";
-		}
 		if (strlen($fname) > 20) {
 			print "<font class='errorText'><center>Custom filename must be < 20 characters.</center></font>";
 			$submitSuccess = False;
@@ -154,6 +151,11 @@ function getTBVal(strURL,raOrDec) {
 			foreach($bands as $let) {
 				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
 			}
+			print "$unzip<br />";
+			print "$clip<br />";
+			print "$rmOld<br />";
+			print "$tar<br />";
+			print "$gz<br />";
 		}
 	}
 ?>
@@ -300,8 +302,15 @@ function getTBVal(strURL,raOrDec) {
 <?php
 	if (isset($_POST['submit'])) {
 		if ($submitSuccess) {
-			print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
-			print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+			if (empty($fname)) {
+				print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
+				print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+			}
+			else {
+				print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
+				print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+
+			}
 		}
 	}	
 ?>
