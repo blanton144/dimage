@@ -66,20 +66,14 @@ function getTBVal(strURL,raOrDec) {
 
 <?php
 	ini_Set('display_errors',1); // turn on error reporting while developing
+	$RA = "210.80415";
+	$dec = "54.34917";
 	
 	if (isset($_POST['submit'])) {
 		$submitSuccess = True;
 		// Get variables from form POST
-		if (empty($_POST['ra'])) {
-			$RA = "210.80415";
-		}
-		else { $RA = $_POST['ra']; }
-		
-		if (empty($_POST['dec'])) {
-			$dec = "54.34917";
-		}
-		else { $dec = $_POST['dec']; }
-		
+		$RA = $_POST['ra'];
+		$dec = $_POST['dec'];
 		$size = $_POST['size'];
 		$g = $_POST['g'];
 		$i = $_POST['i'];
@@ -176,10 +170,10 @@ function getTBVal(strURL,raOrDec) {
 			<td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
 			<?php
 				if ($submitSuccess) {
-					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
+					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' /></td>";
 				}
 				else {
-					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
+					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' /></td>";
 				}
 			?>
 				<font class='notifyText'>degrees</font>
@@ -193,7 +187,7 @@ function getTBVal(strURL,raOrDec) {
 					print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
 				}
 				else {
-					print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='54.34917' />";
+					print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
 				}
 			?>
 				<font class='notifyText'>degrees</font>
