@@ -151,11 +151,14 @@ function getTBVal(strURL,raOrDec) {
 			foreach($bands as $let) {
 				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
 			}
+			
+			/*
 			print "$unzip<br />";
 			print "$clip<br />";
 			print "$rmOld<br />";
 			print "$tar<br />";
 			print "$gz<br />";
+			*/
 		}
 	}
 ?>
