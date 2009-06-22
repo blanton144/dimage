@@ -3,7 +3,6 @@ if (isset($_POST['submit'])) {
 	session_start(); 
 }
 ?>
-
 <html>
 <head>
 <title>
@@ -22,10 +21,8 @@ SDSS Sky Chop - Enter your session ID
 		// Test to make sure we have a number here;
 		$sid = $_POST['sid'];
 	
-		if (!(is_numeric($sid) )) {
-				print "<center><font class='errorText'>Enter only your session ID!</font><br /><font class='theLabels'>Session ID:</font>";
-				print "<input type='text' class='errorTB' name='sid' id='sid' size='10' value='$sid' />";
-				print "<br /><input type='submit' name='submit' value='Submit' /></center>";
+		if (!(is_numeric($sid))) {
+				$sid = stripslashes($sid);
 		}
 		else {
 				// Check to see if it is a valid SID
