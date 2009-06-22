@@ -84,7 +84,6 @@ function getTBVal(strURL,raOrDec) {
 		// Other variable declarations
 		$skychop = "/var/www/html/sdss3/skychop";
 		$pid = rand(1000,99999);
-		$fNameFlag = 0;
 		$dir = opendir("$skychop/sdss-tmp");
 		
 		// Check to make sure the PID is not already the name of a directory
