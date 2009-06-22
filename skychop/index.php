@@ -82,6 +82,7 @@ function getTBVal(strURL,raOrDec) {
 		$u = $_POST['u'];
 		$z = $_POST['z'];
 		$all = $_POST['all'];
+		$fname = $_POST['fname'];
 		$skychop = "/var/www/html/sdss3/skychop";
 		$pid = rand(1000,99999);
 		
@@ -323,7 +324,7 @@ function getTBVal(strURL,raOrDec) {
 		</tr>
 		<tr>
 			<td><font class='theLabels'>Output Filename:</font></td>
-			<td><input type='text' name='fname' id='fname' size='10' value='$fname' /><font class='notifyText'>(optional)</font></td>
+			<td><input type='text' name='fname' id='fname' size='10' /><font class='notifyText'>(optional)</font></td>
 		</tr
 		<tr>
 			<td align='center' colspan='2' valign='bottom'><br />

@@ -38,15 +38,6 @@ def findDec(x):
 			else: 
 				return "m0%i" % (round(x))
 
-# Soon:
-# RAUnits:	0 is Degrees
-#			1 is Hours:Minutes:Seconds
-#
-# DecUnits:	0 is Degrees
-#			1 is Hours:Minutes:Seconds
-#
-# CURRENTLY ASSUMES UNITS OF DEGREE
-#
 def findClosestCenter(RADeg, decDeg):
 	# Navigate to the correct directory
 	fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
@@ -58,10 +49,11 @@ def findClosestCenter(RADeg, decDeg):
 		if int(i[0:2]) == int(round(RAHour)):
 			RAPath = fitsPath + i[0:2] + "h/"
 	RADecPath = RAPath + findDec(decDeg) + "/"
+	
 	offsetList = []
 	for fileName in os.listdir(RADecPath):
-		RA = float(fileName[1:10]) / 10000.0
-		DEC = float(fileName[11:19]) / 10000.0
+		RA = float(fileName[1:3]) + (float(fileName[3:5]) / 60.0) + (float(fileName[5:7]) + float(fileName[8:10] / 100.0)) / 3600.0
+		DEC = float(fileName[11:13]) + float(fileName[13:15]) / 60.0 + (float(fileName[15:17]) + float(fileName[18]/10.0)) / 3600.0
 		offsetList.append(sqrt((RA - RAHour)**2.0 + (DEC - decDeg)**2.0))
 	
 	for i in range(len(offsetList)):
