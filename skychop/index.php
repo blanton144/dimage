@@ -297,7 +297,7 @@ function getTBVal(strURL,raOrDec) {
 		</tr
 		><tr>
 			<td align='center' colspan='2' valign='bottom'><br />
-			<input type='submit' name='submit' value='Submit' oneMouseUp='alert("This may take some time"' />
+			<input type='submit' name='submit' value='Submit' onMouseUp='alert("This may take some time"' />
 		</tr>
 	</table>
 </form>
