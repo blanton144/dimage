@@ -118,38 +118,32 @@ function getTBVal(strURL,raOrDec) {
 			print "<font class='errorText'><center>Custom filename must be < 20 characters.</center></font>";
 			$submitSuccess = False;
 		}
-		/*
-		if ($RA > 270.0 || $RA < 105.0 || $dec > 70.3 || $dec < -4.0) {
-			print "<font class='errorText'><center>Please correct your input: <br />";
-			print "105 < RA < 270, -4.0 < Dec < 70.3</center></font>";
-			$submitSuccess = False;
-		}
-		*/
-		
 		if ($submitSuccess) {
 			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
 			if (empty($fileDir_and_fileName)) {
 				print "<font class='errorText'><center>Coordinates not within range.</center></font>";
 			}
-			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
-			
-			foreach($bands as $let) {
-				$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
-				$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
-				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
-			}
-			if (empty($fname) == False) {
-				$tar = exec("tar -cvvf sdss-tmp/$fname.tar sdss-tmp/*.fits");
-				$gz = exec("gzip sdss-tmp/$fname.tar");
-				$chmod_tar = chmod("sdss-tmp/$fname.tar.gz", 0777);
-			}
 			else {
-				$tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
-				$gz = exec("gzip sdss-tmp/$pid.tar");
-				$chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
-			}
-			foreach($bands as $let) {
-				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
+			  list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
+			  
+			  foreach($bands as $let) {
+				  $unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
+				  $clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
+				  $rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
+			  }
+			  if (empty($fname) == False) {
+				  $tar = exec("tar -cvvf sdss-tmp/$fname.tar sdss-tmp/*.fits");
+				  $gz = exec("gzip sdss-tmp/$fname.tar");
+				  $chmod_tar = chmod("sdss-tmp/$fname.tar.gz", 0777);
+			  }
+			  else {
+				  $tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
+				  $gz = exec("gzip sdss-tmp/$pid.tar");
+				  $chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
+			  }
+			  foreach($bands as $let) {
+				  $rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
+			  }
 			}
 			
 			/*
@@ -297,7 +291,7 @@ function getTBVal(strURL,raOrDec) {
 		</tr
 		><tr>
 			<td align='center' colspan='2' valign='bottom'><br />
-			<input type='submit' name='submit' value='Submit' onMouseUp='alert("This may take some time"' />
+			<input type='submit' name='submit' value='Submit' />
 		</tr>
 	</table>
 </form>
