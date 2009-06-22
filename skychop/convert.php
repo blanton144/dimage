@@ -24,7 +24,7 @@ if (isset($_POST['submit2'])) {
 </form>
 <?php
 if (isset($_POST['submit'])) {
-	print "<font class='errorText'>$decDeg</font>";
+	print "<font class='errorText'>$decDeg&deg;</font>";
 }
 ?>
 <br />
@@ -39,7 +39,7 @@ if (isset($_POST['submit'])) {
 </font>
 <?php
 if (isset($_POST['submit2'])) {
-	print "<font class='errorText'>$decDeg</font>";
+	print "<font class='errorText'>$decDeg&deg;</font>";
 }
 ?>
 </center>
