@@ -70,8 +70,15 @@ function getTBVal(strURL,raOrDec) {
 	if (isset($_POST['submit'])) {
 		$submitSuccess = True;
 		// Get variables from form POST
-		$RA = $_POST['ra'];
-		$dec = $_POST['dec'];
+		if (empty($_POST['ra'])) {
+			$RA = "210.80415";
+		}
+		else { $RA = $_POST['ra']; }
+		
+		if (empty($_POST['dec'])) {
+			$dec = "54.34917";
+		}
+		else { $dec = $_POST['dec']; }
 		$size = $_POST['size'];
 		$g = $_POST['g'];
 		$i = $_POST['i'];
@@ -119,16 +126,18 @@ function getTBVal(strURL,raOrDec) {
 			print "<font class='errorText'><center>Custom filename must be < 20 characters.</center></font>";
 			$submitSuccess = False;
 		}
+		/*
 		if ($RA > 270.0 || $RA < 105.0 || $dec > 70.3 || $dec < -4.0) {
 			print "<font class='errorText'><center>Please correct your input: <br />";
 			print "105 < RA < 270, -4.0 < Dec < 70.3</center></font>";
 			$submitSuccess = False;
 		}
+		*/
 		
 		if ($submitSuccess) {
 			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
 			if (empty($fileDir_and_fileName)) {
-				print "WHO";
+				print "<font class='errorText'><center>Coordinates not within range.</center></font>";
 			}
 			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
 			
@@ -169,7 +178,7 @@ function getTBVal(strURL,raOrDec) {
 					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
 				}
 				else {
-					print '<td valign="middle"><input type="text" name="ra" id="ra" size="10" value="210.80415" />';
+					print '<td valign="middle"><input type="text" name="ra" id="ra" size="10" value="$RA" />';
 				}
 			?>
 				<font class='notifyText'>degrees</font>
