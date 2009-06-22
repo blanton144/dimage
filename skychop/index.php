@@ -1,9 +1,3 @@
-<?php
-if (isset($_POST['submit'])) {
-	session_start(); 
-}
-?>
-
 <html>
 <head>
 <title>
@@ -71,9 +65,10 @@ function getTBVal(strURL,raOrDec) {
 </script>
 
 <?php
+	ini_Set('display_errors',1); // turn on error reporting while developing
+	
 	if (isset($_POST['submit'])) {
-		$fNameFlag = 0;
-		# Test to make sure we have integers here;
+		// Get variables from form POST
 		$RA = $_POST['ra'];
 		$dec = $_POST['dec'];
 		$size = $_POST['size'];
@@ -83,17 +78,15 @@ function getTBVal(strURL,raOrDec) {
 		$u = $_POST['u'];
 		$z = $_POST['z'];
 		$all = $_POST['all'];
-		if (isset($_POST['fname'])) {
-			$fname = $_POST['fname'];
-			stripslashes($fname);
-			if (strlen($fname) > 20) {
-				$fNameFlag = 1;
-			}
-		}
+		$fname = stripslashes($_POST['fname']);
+		
+		// Other variable declarations
 		$skychop = "/var/www/html/sdss3/skychop";
 		$pid = rand(1000,99999);
-		
+		$fNameFlag = 0;
 		$dir = opendir("$skychop/sdss-tmp");
+		
+		// Check to make sure the PID is not already the name of a directory
 		while($entry = readdir($dir)) {
 			if ($entry == $pid) {
 				$pid = rand(1000,99999);
@@ -103,86 +96,55 @@ function getTBVal(strURL,raOrDec) {
 		}
 		closedir($dir);
 		
-		$_SESSION['ra'] = $RA;
-		$_SESSION['dec'] = $dec;
-		$_SESSION['size'] = $size;
+		// Figure out which bands are on and add the letters to an array
+		if ($g == 'on') { $bands[] = 'g';}
+		if ($i == 'on') { $bands[] = 'i';}
+		if ($r == 'on') { $bands[] = 'r';}
+		if ($u == 'on') { $bands[] = 'u';}
+		if ($z == 'on') { $bands[] = 'z';}
 		
-		if ($all == 'on') {
-			$bands = array('g', 'i', 'r', 'u', 'z');
-		}
-		else {
-			if ($g == 'on') {
-				$bands[] = 'g';
-			}
-			if ($i == 'on') {
-				$bands[] = 'i';
-			}
-			if ($r == 'on') {
-				$bands[] = 'r';
-			}
-			if ($u == 'on') {
-				$bands[] = 'u';
-			}
-			if ($z == 'on') {
-				$bands[] = 'z';
-			}
-		}
-		
-		if ($all != 'on' && $g != 'on' && $i != 'on' && $r != 'on' && $u != 'on' && $z != 'on') {
+		// Validate input
+		if (count($bands) == 0) {
 			print "<font class='errorText'><center>Please select a band!</center></font>";
-			$bandFlag = 1;
+			submitSuccess = False;
 		}
-		else {
-			if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($size)) || $fNameFlag == 1) {
-				print "<font class='errorText'><center>Please correct your input.</center></font>";
+		if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($size))) {
+			print "<font class='errorText'><center>Please correct your input.</center></font>";
+			submitSuccess = False;
+		}
+		if (empty($fname)) {
+			print "<font class='notifyText'><center>No filename entered, using default name.</center></font>";
+		}
+		if (strlen($fname) > 20) {
+			print "<font class='errorText'><center>Custom filename must be < 20 characters.</center></font>";
+			submitSuccess = False;
+		}
+		if (($RA > 270.0 || $RA < 105.0) || ($dec > 70.3 || $dec < -4.0)) {
+			print "<font class='errorText'><center>Please correct your input: <br />";
+			print "105 < RA < 270, -4.0 < Dec < 70.3</center></font>";
+			submitSuccess = False;
+		}
+		
+		if (!submitSuccess) {
+			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
+			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
+			
+			foreach($bands as $let) {
+				$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
+				if (isset($_POST['fname'])) {
+					$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fname.fits 2>&1");
+				}
+				else {
+					$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
+				}
+				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
 			}
-			else {
-				if ($_POST['unitsRA'] == "degsRA") {
-					$_SESSION['unitsRA'] = "deg";
-				}
-				elseif ($_POST['unitsRA'] == "hrsRA") {
-					$_SESSION['unitsRA'] = "hr";
-				}
-				
-				if ($_POST['unitsDec'] == "degsDec") {
-					$_SESSION['unitsDec'] = "deg";
-				}
-				elseif ($_POST['unitsDec'] == "hrsDec") {
-					$_SESSION['unitsDec'] = "hr";
-				}
-				
-				$flag = 0;
-				if ($RA > 270.0 || $RA < 105.0) {
-					$flag = 1;
-				}
-				if ($dec > 70.3 || $dec < -4.0) {
-					$flag = 2;
-				}
-				if (($dec > 70.3 || $dec < -4.0) && ($RA > 270 || $RA < 105)) {
-					$flag = 3;
-				}
-				
-				$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
-				list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
-				
-				foreach($bands as $let) {
-					$unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
-					if (isset($_POST['fname'])) {
-						$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fname.fits 2>&1");
-					}
-					else {
-						$clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
-					}
-					$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
-				}
-				$tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
-				$gz = exec("gzip sdss-tmp/$pid.tar");
-				$chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
-				foreach($bands as $let) {
-					$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
-				}
-			}
-		}		
+			$tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
+			$gz = exec("gzip sdss-tmp/$pid.tar");
+			$chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
+			foreach($bands as $let) {
+				$rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
+		}
 	}
 ?>
 </head>
@@ -197,23 +159,13 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
 			<?php
-				if (isset($_POST['submit'])) {
-					if ($flag == 1 || $flag == 3) {
-						print "<td valign='middle'><input type='text' class='errorTB' name='ra' id='ra' size='10' value='$RA' />";
-					}
-					else {
-						print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
-					}
+				if (submitSuccess) {
+					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
 				}
 				else {
 					print '<td valign="middle"><input type="text" name="ra" id="ra" size="10" value="210.80415" />';
 				}
 			?>
-			<!--Below is an option to select what coordinates to give to our program-->
-				<!---<select name='unitsRA' onChange='getTBVal("find_tbvalue.php?unitsRA="+this.value,"ra")'>
-					<option value='degsRA'>degrees</option>
-					<option value='hrsRA'>hours:min:sec</option>
-				</select>-->
 				<font class='notifyText'>degrees</font>
 			</td>
 		</tr>
@@ -221,23 +173,13 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>Dec:</font></td>
 			<?php
-				if (isset($_POST['submit'])) {
-					if ($flag == 2 || $flag == 3) {
-						print "<td valign='middle'><input type='text' class='errorTB' name='dec' id='dec' size='10' value='$dec' />";
-					}
-					else {
-						print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
-					}
+				if (submitSuccess) {
+					print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
 				}
 				else {
 					print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='54.34917' />";
 				}
 			?>
-			<!--Below is an option to select what coordinates to give to our program-->
-				<!--<select name='unitsDec' onChange='getTBVal("find_tbvalue.php?unitsDec="+this.value,"dec")'>
-					<option value='degsDec'>degrees</option>
-					<option value='hrsDec'>hours:min:sec</option>
-				</select>-->
 				<font class='notifyText'>degrees</font>
 			</td>
 		</tr>
@@ -347,24 +289,10 @@ function getTBVal(strURL,raOrDec) {
 
 <?php
 	if (isset($_POST['submit'])) {
-		if ($bandFlag != 1) {
-			if ($flag == 1) {
-				print "<center><font class='errorText'>Error: RA must be between 105 and 270 degrees!</font></center>";
-			}
-			elseif ($flag == 2) {
-				print "<center><font class='errorText'>Error: Dec must be between -4.0 and 70.3 degrees!</font></center>";
-			}
-			elseif ($flag == 3) {
-				print "<center><font class='errorText'>Error: RA must be between 105 and 270 degrees!</font></center>";
-				print "<center><font class='errorText'>Error: Dec must be between -4.0 and 70.3 degrees!</font></center>";
-			}
-			else {
-				print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
-				print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
-			}
+		if (!submitSuccess) {
+			print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
+			print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
 		}
-		unset($_SESSION);
-		session_destroy();
 	}	
 ?>
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
