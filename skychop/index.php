@@ -126,7 +126,7 @@ function getTBVal(strURL,raOrDec) {
 			$submitSuccess = False;
 		}
 		
-		if (!$submitSuccess) {
+		if ($submitSuccess) {
 			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
 			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
 			
@@ -291,7 +291,7 @@ function getTBVal(strURL,raOrDec) {
 
 <?php
 	if (isset($_POST['submit'])) {
-		if (!$submitSuccess) {
+		if ($submitSuccess) {
 			print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
 		}
