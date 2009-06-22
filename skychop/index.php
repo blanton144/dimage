@@ -127,6 +127,9 @@ function getTBVal(strURL,raOrDec) {
 		
 		if ($submitSuccess) {
 			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
+			if (empty($fileDir_and_fileName)) {
+				print "WHO";
+			}
 			list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
 			
 			foreach($bands as $let) {
