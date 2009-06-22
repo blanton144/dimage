@@ -24,34 +24,32 @@ SDSS Sky Chop - Enter your session ID
 		if (!(is_numeric($sid))) {
 				$sid = stripslashes($sid);
 		}
+
+		// Check to see if it is a valid SID
+		$flag = '0';
+		$dir = opendir("sdss-tmp");
+		
+		while($entry = readdir($dir)) {
+			if ($entry == "$sid.tar.gz") {
+				$flag = '1';
+				break;
+			}
+			else {
+				continue;
+			}
+		}
+		closedir($dir);
+
+		if ($flag == '1') {
+			print "<center><font class='theLabels'>Session ID:</font><input type='text' name='sid' id='sid' size='10' value='$sid' />";
+			print "<br /><input type='submit' name='submit' value='Submit' /></center>";
+			print "<br /><center><a href='sdss-tmp/$sid.tar.gz'>Download Files</a></center>";
+		}
 		else {
-				// Check to see if it is a valid SID
-				$flag = '0';
-				$dir = opendir("sdss-tmp");
-				
-				while($entry = readdir($dir)) {
-					if ($entry == "$sid.tar.gz") {
-						$flag = '1';
-						break;
-					}
-					else {
-						continue;
-					}
-				}
-				closedir($dir);
-
-				if ($flag == '1') {
-					print "<center><font class='theLabels'>Session ID:</font><input type='text' name='sid' id='sid' size='10' value='$sid' />";
-					print "<br /><input type='submit' name='submit' value='Submit' /></center>";
-					print "<br /><center><a href='sdss-tmp/$sid.tar.gz'>Download Files</a></center>";
-				}
-				else {
-					print "<center><font class='theLabels'>Session ID:</font><input type='text' name='sid' id='sid' size='10' value='$sid' />";
-					print "<br /><input type='submit' name='submit' value='Submit' /></center>";
-					print "<center><font class='errorText'>Your session has expired or session ID is invalid!</font></center>";
-				}
-
-			}	
+			print "<center><font class='theLabels'>Session ID:</font><input type='text' name='sid' id='sid' size='10' value='$sid' />";
+			print "<br /><input type='submit' name='submit' value='Submit' /></center>";
+			print "<center><font class='errorText'>Your session has expired or session ID is invalid!</font></center>";
+		}
 	}
 	
 	else {
