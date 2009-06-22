@@ -161,7 +161,7 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
 			<?php
-				if (submitSuccess) {
+				if ($submitSuccess) {
 					print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
 				}
 				else {
@@ -175,7 +175,7 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>Dec:</font></td>
 			<?php
-				if (submitSuccess) {
+				if ($submitSuccess) {
 					print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
 				}
 				else {
