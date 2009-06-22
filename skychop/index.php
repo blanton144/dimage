@@ -298,7 +298,7 @@ function getTBVal(strURL,raOrDec) {
 
 <?php
 	if (isset($_POST['submit'])) {
-		if ($submitSuccess) {
+		if ($submitSuccess && !empty($fileDir_and_fileName)) {) {
 			if (empty($fname)) {
 				print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
 				print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
