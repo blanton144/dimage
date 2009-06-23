@@ -127,6 +127,7 @@ function getTBVal(strURL,raOrDec) {
 			}
 			if ($pysuccess == 0) {
 				print "<font class='errorText'><center>Coordinates out of range.</center></font>";
+			}
 		}
 	}
 ?>
