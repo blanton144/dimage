@@ -100,11 +100,11 @@ def clipFits(inFileName, RAdeg, decDeg, clipSizeDeg, outFileName):
 			break
 
 	if fitsExtension==None:
-		print "ERROR: ", subDir + "/" + inFileName, "contains no image data. Skipping ..." 
+		print "ERROR: ",inFileName, "contains no image data. Skipping ..." 
 
 	else:
 		imgData = img[fitsExtension].data
-		imgWCS=astWCS.WCS(subDir + "/" + inFileName, fitsExtension)
+		imgWCS=astWCS.WCS(inFileName, fitsExtension)
 
 		clipped = astImages.clipImageSectionWCS(imgData, imgWCS, RADeg, decDeg, clipSizeDeg)
-		astImages.saveFITS(subDir + "/" + outFileName, clipped['data'], clipped['wcs'])
+		astImages.saveFITS(outFileName, clipped['data'], clipped['wcs'])
