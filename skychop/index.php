@@ -120,10 +120,11 @@ function getTBVal(strURL,raOrDec) {
 		}
 		if ($submitSuccess) {
 			if (empty($fname)) {
-				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid");
+				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid 2>&1");
+				print "$pysuccess";
 			}
 			else {
-				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $fname");
+				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $fname 2>&1");
 			}
 			if ($pysuccess == 0) {
 				print "<font class='errorText'><center>Coordinates out of range.</center></font>";
