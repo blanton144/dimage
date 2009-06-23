@@ -119,12 +119,13 @@ function getTBVal(strURL,raOrDec) {
 			$submitSuccess = False;
 		}
 		if ($submitSuccess) {
-			print "AHH";
 			if (empty($fname)) {
+				print "Empty";
 				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid");
 				print $pysuccess;
 			}
 			else {
+				print "Not Empty";
 				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $fname");
 			}
 		}
