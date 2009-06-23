@@ -88,7 +88,7 @@ def gunzipIt(file, fileDir, outDir):
 	move(write_file,outDir + file[:-3])
 	return None
 
-def clipFits(inFileName, RAdeg, decDeg, clipSizeDeg, outFileName):
+def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 	img = pyfits.open(inFileName)
 
 	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
