@@ -9,6 +9,8 @@
 
 import image_chop as ic
 import sys
+import gzip
+import string
 
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])

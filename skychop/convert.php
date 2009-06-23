@@ -41,6 +41,9 @@ if (isset($_POST['submit'])) {
 if (isset($_POST['submit2'])) {
 	print "<font class='errorText'>$decDeg&deg;</font>";
 }
+$boob .= 'a'
+$boob .= 'b'
+print "$boob";
 ?>
 </center>
 </body>
