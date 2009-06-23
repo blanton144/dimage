@@ -125,12 +125,6 @@ function getTBVal(strURL,raOrDec) {
 			else {
 				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $fname");
 			}
-			if ($pysuccess == 1) {
-				print "YAYYYYY";
-			}
-			else {
-				print "NOOOOOOO";
-			}
 		}
 	}
 ?>
