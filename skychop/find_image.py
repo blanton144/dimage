@@ -32,15 +32,15 @@ for letter in bands:
 	os.unlink(outDir + fileName + "-" + letter + ".fits")
 	arcFileList.append(outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
 
-tar = tarfile.open(tarNAme+".tar", "w")
+tar = tarfile.open(tarName+".tar", "w")
 for name in arcFileList:
     tar.add(name)
 tar.close()
 
-ic.gzipIt(tarNAme+".tar")
-os.chmod(outDir+tarNAme+".tar.gz",0777)
+ic.gzipIt(tarName+".tar")
+os.chmod(outDir+tarName+".tar.gz",0777)
 
-if os.path.isfile(outDir+tarNAme+".tar.gz"):
+if os.path.isfile(outDir+tarName+".tar.gz"):
 	print 1
 else: 
 	print 0
