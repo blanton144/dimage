@@ -37,7 +37,7 @@ for name in arcFileList:
     tar.add(name)
 tar.close()
 
-ic.gzipIt(outDir+tarName+".tar")
+ic.gzipIt(tarName+".tar", outDir)
 os.chmod(outDir+tarName+".tar.gz",0777)
 
 if os.path.isfile(outDir+tarName+".tar.gz"):

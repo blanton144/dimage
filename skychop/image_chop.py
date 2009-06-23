@@ -13,7 +13,7 @@ from shutil import move
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp/'
 
 def findDec(x):
 	if fabs(x) == x:
@@ -68,18 +68,18 @@ def findClosestCenter(RADeg, decDeg):
 	a = os.listdir(RADecPath)
 	return a[minOffsetIndex], RADecPath
 
-def gzipIt(file):
-	r_file = open(file, 'r')
-	w_file = gzip.GzipFile(file + '.gz', 'w', 9)
+def gzipIt(file, outDir):
+	r_file = open(outDir+file, 'r')
+	w_file = gzip.GzipFile(outDir+file + '.gz', 'w', 9)
 	w_file.write(r_file.read())
 	w_file.flush()
 	w_file.close()
 	r_file.close()
-	os.unlink(file)
+	os.unlink(outDir+file)
 	return None
 
 def gunzipIt(file, fileDir, outDir):
-	r_file = gzip.GzipFile(fileDir + "/"+file, 'r')
+	r_file = gzip.GzipFile(fileDir + "/" + file, 'r')
 	write_file = fileDir + file[:-3]
 	w_file = open(write_file, 'w')
 	w_file.write(r_file.read())
