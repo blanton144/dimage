@@ -19,7 +19,11 @@ size = float(sys.argv[3])
 bands = sys.argv[4]
 tarName = sys.argv[5]
 
-fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
+try:
+	fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
+except OSError:
+	print 0
+	os._exit(0)
 outDir = '/var/www/html/sdss3/skychop/sdss-tmp/'
 
 if fileDir[len(fileDir) - 1] != "/":
