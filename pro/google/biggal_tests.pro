@@ -22,7 +22,7 @@ pro biggal_tests, seed=seed, ngal=ngal
 common com_biggal_tests, lowz
 
 if(NOT keyword_set(ngal)) then ngal= 20L
-if(NOT keyword_set(seed)) then seed= -10L
+if(NOT keyword_set(seed)) then seed= -14L
 
 if(n_tags(lowz) eq 0) then begin
     lowz= mrdfits(getenv('DATA')+'/lowz-sdss/lowz_plus_ned.dr6.fits',1)
@@ -61,6 +61,7 @@ for i=0L, ngal-1L do begin
           rastr+' '+decstr+' '+sizestr
         spawn, 'gzip -v '+outfile
     endfor
+    montage_recal,  outdir+'/'+name
 endfor
 
 end
