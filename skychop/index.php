@@ -120,12 +120,10 @@ function getTBVal(strURL,raOrDec) {
 		}
 		if ($submitSuccess) {
 			if (empty($fname)) {
-				print "Empty";
+				print "/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid";
 				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid");
-				print $pysuccess;
 			}
 			else {
-				print "Not Empty";
 				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $fname");
 			}
 		}
