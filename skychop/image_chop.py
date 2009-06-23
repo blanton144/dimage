@@ -68,7 +68,7 @@ def findClosestCenter(RADeg, decDeg):
 	a = os.listdir(RADecPath)
 	return a[minOffsetIndex], RADecPath
 
-def gzip(file):
+def gzipIt(file):
 	r_file = open(file, 'r')
 	w_file = gzip.GzipFile(file + '.gz', 'w', 9)
 	w_file.write(r_file.read())
@@ -78,7 +78,7 @@ def gzip(file):
 	os.unlink(file)
 	return None
 
-def gunzip(file, fileDir, outDir):
+def gunzipIt(file, fileDir, outDir):
 	r_file = gzip.GzipFile(fileDir + file, 'r')
 	write_file = fileDir + file[:-3]
 	w_file = open(write_file, 'w')

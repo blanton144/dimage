@@ -27,7 +27,7 @@ if fileDir[len(fileDir) - 1] != "/":
 
 arcFileList = []
 for letter in bands:
-	ic.gunzip(fileName + "-" + letter + ".fits.gz", fileDir, outDir)
+	ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir, outDir)
 	ic.clipFits(outDir + fileName + "-" + letter + ".fits", RAdeg, decDeg, size, outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
 	os.unlink(outDir + fileName + "-" + letter + ".fits")
 	arcFileList.append(outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
@@ -37,7 +37,7 @@ for name in arcFileList:
     tar.add(name)
 tar.close()
 
-ic.gzip(tarNAme+".tar")
+ic.gzipIt(tarNAme+".tar")
 os.chmod(outDir+tarNAme+".tar.gz",0777)
 
 if os.path.isfile(outDir+tarNAme+".tar.gz"):
