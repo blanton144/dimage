@@ -7,11 +7,11 @@
 #  Copyright (c) 2009. All rights reserved.
 #
 
+import os
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
-import os
 import tarfile
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])

@@ -6,6 +6,7 @@
 #
 
 import os
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import pyfits
 from math import fabs, sqrt
 import gzip
@@ -13,7 +14,6 @@ from shutil import move
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 
 def findDec(x):
 	if fabs(x) == x:
