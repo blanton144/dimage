@@ -91,7 +91,7 @@ function getTBVal(strURL,raOrDec) {
 		// Check to make sure the PID is not already the name of a directory
 		while($entry = readdir($dir)) {
 			if ($entry == $pid) {
-				$pid = rand(1000,99999);
+				$pid = rand(1000,999999);
 				break;
 			}
 			else { continue; }
@@ -99,14 +99,14 @@ function getTBVal(strURL,raOrDec) {
 		closedir($dir);
 		
 		// Figure out which bands are on and add the letters to an array
-		if ($g == 'on') { $bands[] = 'g';}
-		if ($i == 'on') { $bands[] = 'i';}
-		if ($r == 'on') { $bands[] = 'r';}
-		if ($u == 'on') { $bands[] = 'u';}
-		if ($z == 'on') { $bands[] = 'z';}
+		if ($g == 'on') { $bands .= 'g';}
+		if ($i == 'on') { $bands .= 'i';}
+		if ($r == 'on') { $bands .= 'r';}
+		if ($u == 'on') { $bands .= 'u';}
+		if ($z == 'on') { $bands .= 'z';}
 		
 		// Validate input
-		if (count($bands) == 0) {
+		if (strlen($bands) == 0) {
 			print "<font class='errorText'><center>Please select a band!</center></font>";
 			$submitSuccess = False;
 		}
@@ -119,40 +119,18 @@ function getTBVal(strURL,raOrDec) {
 			$submitSuccess = False;
 		}
 		if ($submitSuccess) {
-			$fileDir_and_fileName = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec");
-			if (empty($fileDir_and_fileName)) {
-				print "<font class='errorText'><center>Coordinates not within range.</center></font>";
+			if (empty($fname)) {
+				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid");
 			}
 			else {
-			  list($fileDir, $fileName) = split('[ ]', $fileDir_and_fileName);
-			  
-			  foreach($bands as $let) {
-				  $unzip = exec("gunzip -c $fileDir$fileName/$fileName-$let.fits.gz > $skychop/sdss-tmp/$fileName-$let.fits");
-				  $clip = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $fileName-$let.fits $RA $dec $size $fileName-$let-$size.fits 2>&1");
-				  $rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let.fits");
-			  }
-			  if (empty($fname) == False) {
-				  $tar = exec("tar -cvvf sdss-tmp/$fname.tar sdss-tmp/*.fits");
-				  $gz = exec("gzip sdss-tmp/$fname.tar");
-				  $chmod_tar = chmod("sdss-tmp/$fname.tar.gz", 0777);
-			  }
-			  else {
-				  $tar = exec("tar -cvvf sdss-tmp/$pid.tar sdss-tmp/*.fits");
-				  $gz = exec("gzip sdss-tmp/$pid.tar");
-				  $chmod_tar = chmod("sdss-tmp/$pid.tar.gz", 0777);
-			  }
-			  foreach($bands as $let) {
-				  $rmOld = unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fileName-$let-$size.fits");
-			  }
+				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $fname");
 			}
-			
-			/*
-			print "$unzip<br />";
-			print "$clip<br />";
-			print "$rmOld<br />";
-			print "$tar<br />";
-			print "$gz<br />";
-			*/
+			if ($pysuccess == 1) {
+				print "YAYYYYY";
+			}
+			else {
+				print "NOOOOOOO";
+			}
 		}
 	}
 ?>

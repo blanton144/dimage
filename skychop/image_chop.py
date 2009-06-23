@@ -5,10 +5,15 @@
 # Cuts out a square region from a .fits file and saves it out as a .fits file
 #
 
-import sys
 import os
 import pyfits
 from math import fabs, sqrt
+import gzip
+from shutil import move
+from astLib import astCoords
+from astLib import astImages
+from astLib import astWCS
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 
 def findDec(x):
 	if fabs(x) == x:
@@ -63,11 +68,43 @@ def findClosestCenter(RADeg, decDeg):
 	a = os.listdir(RADecPath)
 	return a[minOffsetIndex], RADecPath
 
-def gunzip(file):
-	r_file = gzip.GzipFile(file, 'r')
-	write_file = string.rstrip(file, '.gz')
+def gzip(file):
+	r_file = open(file, 'r')
+	w_file = gzip.GzipFile(file + '.gz', 'w', 9)
+	w_file.write(r_file.read())
+	w_file.flush()
+	w_file.close()
+	r_file.close()
+	os.unlink(file)
+	return None
+
+def gunzip(file, fileDir, outDir):
+	r_file = gzip.GzipFile(fileDir + file, 'r')
+	write_file = fileDir + file[:-3]
 	w_file = open(write_file, 'w')
 	w_file.write(r_file.read())
 	w_file.close()
 	r_file.close()
-	os.unlink(file) # Yes this one too.
+	move(write_file,outDir + file[:-3])
+	return None
+
+def clipFits(inFileName, RAdeg, decDeg, clipSizeDeg, outFileName):
+	img = pyfits.open(inFileName)
+
+	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
+	# So here we search through the extensions until we find 2D image data
+	fitsExtension=None
+	for i in range(len(img)):
+		if img[i].header['naxis']==2:
+			fitsExtension=i
+			break
+
+	if fitsExtension==None:
+		print "ERROR: ", subDir + "/" + inFileName, "contains no image data. Skipping ..." 
+
+	else:
+		imgData = img[fitsExtension].data
+		imgWCS=astWCS.WCS(subDir + "/" + inFileName, fitsExtension)
+
+		clipped = astImages.clipImageSectionWCS(imgData, imgWCS, RADeg, decDeg, clipSizeDeg)
+		astImages.saveFITS(subDir + "/" + outFileName, clipped['data'], clipped['wcs'])

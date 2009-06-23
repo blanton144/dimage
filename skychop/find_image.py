@@ -9,11 +9,38 @@
 
 import image_chop as ic
 import sys
-import gzip
-import string
+import os
+import tarfile
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
+size = float(sys.argv[3])
+bands = sys.argv[4]
+tarName = sys.argv[5]
 
 fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
-print fileDir + " " + fileName
+outDir = '/var/www/html/sdss3/skychop/sdss-tmp/'
+
+if fileDir[len(fileDir) - 1] != "/":
+	fileDir = fileDir + "/"
+
+arcFileList = []
+for letter in bands:
+	ic.gunzip(fileName + "-" + letter + ".fits.gz", fileDir, outDir)
+	ic.clipFits(outDir + fileName + "-" + letter + ".fits", RAdeg, decDeg, size, outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
+	os.unlink(outDir + fileName + "-" + letter + ".fits")
+	arcFileList.append(outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
+
+tar = tarfile.open(tarNAme+".tar", "w")
+for name in arcFileList:
+    tar.add(name)
+tar.close()
+
+ic.gzip(tarNAme+".tar")
+os.chmod(outDir+tarNAme+".tar.gz",0777)
+
+if os.path.isfile(outDir+tarNAme+".tar.gz"):
+	print 1
+else: 
+	print 0
