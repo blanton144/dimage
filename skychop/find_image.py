@@ -34,7 +34,7 @@ for letter in bands:
 
 tar = tarfile.open(outDir+tarName+".tar", "w")
 for name in arcFileList:
-    tar.add(name)
+	tar.add(name)
 	os.unlink(name)
 tar.close()
 
