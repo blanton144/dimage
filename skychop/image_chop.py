@@ -80,7 +80,7 @@ def gzipIt(file, outDir):
 
 def gunzipIt(file, fileDir, outDir):
 	r_file = gzip.GzipFile(fileDir + "/" + file, 'r')
-	write_file = fileDir + file[:-3]
+	write_file = outDir + file[:-3]
 	w_file = open(write_file, 'w')
 	w_file.write(r_file.read())
 	w_file.close()
