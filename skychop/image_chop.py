@@ -13,7 +13,7 @@ from shutil import move
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp/'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 
 def findDec(x):
 	if fabs(x) == x:
