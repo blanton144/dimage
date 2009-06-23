@@ -28,7 +28,7 @@ if fileDir[len(fileDir) - 1] != "/":
 arcFileList = []
 for letter in bands:
 	ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir+fileName+"/", outDir)
-	ic.clipFits(outDir + fileName + "-" + letter + ".fits", RAdeg, decDeg, size, outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
+	ic.clipFits(outDir + fileName + "-" + letter + ".fits", RADeg, decDeg, size, outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
 	os.unlink(outDir + fileName + "-" + letter + ".fits")
 	arcFileList.append(outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
 
