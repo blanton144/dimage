@@ -11,7 +11,7 @@
 ;------------------------------------------------------------------------------
 pro skyqaplot
 
-if(1) then begin
+if(0) then begin
 skyqafiles= file_search(getenv('GOOGLE_DIR')+'/skyqa/137/*/skyvals-*.fits')
 
 qa0= {run:0L, $
@@ -41,33 +41,47 @@ for i=0L, n_elements(skyqafiles)-1L do begin
     endif
 endfor
 
-;; 211 - nasty Galactic emission
-;; 250 - weather?
-;; 1659 - brightening at end
-;; 1739 - brightening at end
-;; 2589 - u4 fit goes haywire (associated with missing field?)
-;; 3563 - u1 fit goes haywire!
-;; 3600 - brightening at end
-;; 4552 - u2, u3 fits go haywire!
-ii= where(qa.run ne 0 AND $
-          (qa.run ne 211 OR qa.field lt 250 OR qa.field gt 350) AND $
-          qa.run ne 250 AND $
-          (qa.run ne 1659 OR qa.field lt 305) AND $
-          (qa.run ne 1739 OR qa.field lt 315) AND $
-          (qa.run ne 2589 OR qa.camcol ne 4) AND $
-          (qa.run ne 3563 OR qa.camcol ne 1) AND $
-          (qa.run ne 3600 OR qa.field lt 112) AND $
-          (qa.run ne 4552 OR (qa.camcol ne 2 and qa.camcol ne 3))  $
-         )
-qa=qa[ii]
 
 score= sdss_score(qa.run, qa.camcol, qa.field, rerun=qa.rerun)
 save
 endif
 restore
-
+help,score,qa
 jj= where(score gt 0.8)
 qa=qa[jj]
+
+;; 211 - nasty Galactic emission
+;; 250 - weather?
+;; 259 - light source at r-field 133, ISM past 500
+;; 1659 - brightening at end
+;; 1739 - brightening at end
+;; 2589 - u4 fit goes haywire (associated with missing field?)
+;; 2711 - wacky camcol 1, and weather throughout, glitch @ 107,
+;;               star @ 53
+;; 2825 - massively bright star
+;; 3563 - u1 fit goes haywire!
+;; 3629 - bad field 11, ISM near end
+;; 3600 - brightening at end
+;; 3628 - ISM at end
+;; 4552 - u2, u3 fits go haywire!
+
+ii= where(qa.run ne 0 AND $
+          (qa.run ne 211 OR qa.field lt 250 OR qa.field gt 350) AND $
+          qa.run ne 250 AND $
+          (qa.run ne 259 OR (qa.field gt 140 AND qa.field lt 500)) AND $
+          (qa.run ne 1659 OR qa.field lt 305) AND $
+          (qa.run ne 3628 OR qa.field lt 150) AND $
+          (qa.run ne 1739 OR qa.field lt 315) AND $
+          (qa.run ne 2589 OR qa.camcol ne 4) AND $
+          (qa.run ne 2711) AND $
+          (qa.run ne 2825 OR qa.field lt 40 or qa.field gt 50) AND $
+          (qa.run ne 3563 OR qa.camcol ne 1) AND $
+          (qa.run ne 3629 OR (qa.field gt 15 and qa.field lt 110)) AND $
+          (qa.run ne 3600 OR qa.field lt 112) AND $
+          (qa.run ne 4552 OR (qa.camcol ne 2 and qa.camcol ne 3))  $
+         )
+qa=qa[ii]
+
 
 k_print, filename=getenv('DIMAGE_DIR')+'/tex/skyqa.ps'
 
@@ -76,7 +90,7 @@ k_print, filename=getenv('DIMAGE_DIR')+'/tex/skyqa.ps'
 
 for i=0L, 4L do begin 
     fmin= -0.4 
-    fmax= 2.99 
+    fmax= 1.99 
     nbin=200L 
     xx= fmin+(fmax-fmin)*(findgen(nbin)+0.5)/float(nbin) 
     yy= alog10(histogram(qa.skyval[i], min=fmin, max=fmax, nbin=nbin)>1.e-1) 
@@ -100,10 +114,12 @@ for i=0L, 4L do begin
     help, qa, nout, fout
     
     xst= !X.CRANGE[0]+0.7*(!X.CRANGE[1]-!X.CRANGE[0])
-    yst= !X.CRANGE[0]+0.85*(!X.CRANGE[1]-!X.CRANGE[0])
+    yst= !Y.CRANGE[0]+0.85*(!Y.CRANGE[1]-!Y.CRANGE[0])
+    djs_xyouts, xst, yst, '!8'+filtername(i)+'!6-band residuals'
+    yst= !Y.CRANGE[0]+0.73*(!Y.CRANGE[1]-!Y.CRANGE[0])
     djs_xyouts, xst, yst, '!8\sigma = '+sigstr+' !6nmgy'
-    yst= !X.CRANGE[0]+0.75*(!X.CRANGE[1]-!X.CRANGE[0])
-    djs_xyouts, xst, yst, '!8f_{!6out!8}!8 = '+foutstr+'!6'
+    yst= !Y.CRANGE[0]+0.61*(!Y.CRANGE[1]-!Y.CRANGE[0])
+    djs_xyouts, xst, yst, '!8f_{!6out!8}!6 = '+foutstr+'!6'
 endfor
 
 
