@@ -17,8 +17,8 @@ if (isset($_POST['submit3'])) {
 	$sec = ( (($_POST['dd'] - (float)((int) ($_POST['dd']))) * 60.0) - (int) (($_POST['dd'] - (float) ((int)($_POST['dd']))) * 60.0) ) * 60.0;
 }
 if (isset($_POST['submit4'])) {
-	$decTime = $_POST['dd'] / 15.0
-	$hr = (int) $decTime
+	$decTime = $_POST['dd'] / 15.0;
+	$hr = (int) $decTime;
 	$min = (int) ( ($decTime - (float)((int)$decTime)) * 60.0 );
 	$sec = ( (($decTime - (float)((int) $decTime)) * 60.0) - (int) (($decTime - (float) ((int)$decTime)) * 60.0) ) * 60.0;
 }
