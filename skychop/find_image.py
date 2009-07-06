@@ -20,6 +20,8 @@ bands = sys.argv[4]
 tarName = sys.argv[5]
 
 fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
+print "Found Closest Mosaic Center at: ("+str(RADeg)+","+str(decDeg)+")"
+"""
 outDir = '/var/www/html/sdss3/skychop/sdss-tmp/'
 
 if fileDir[len(fileDir) - 1] != "/":
@@ -45,3 +47,4 @@ if os.path.isfile(outDir+tarName+".tar.gz"):
 	print 1
 else: 
 	print 0
+"""
