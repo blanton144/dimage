@@ -68,14 +68,15 @@ function getTBVal(strURL,raOrDec) {
 	ini_Set('display_errors',1); // turn on error reporting while developing
 	$RA = 210.80415;
 	$dec = 54.34917;
-	$size = 0.5;
+	$size = 0.25;
 	
 	if (isset($_POST['submit'])) {
 		$submitSuccess = True;
 		// Get variables from form POST
 		$RA = $_POST['ra'];
 		$dec = $_POST['dec'];
-		$size = $_POST['size'];
+		$sizeX = $_POST['sizex'];
+		$sizeY = $_POST['sizey'];
 		$g = $_POST['g'];
 		$i = $_POST['i'];
 		$r = $_POST['r'];
@@ -119,6 +120,14 @@ function getTBVal(strURL,raOrDec) {
 			print "<font class='errorText'><center>Custom filename must be < 20 characters.</center></font>";
 			$submitSuccess = False;
 		}
+		if ($sizeX > 1.0) {
+			print "<font class='errorText'><center>Size must be 0 < X <= 1.0 and 0 < Y <= 1.0</center></font>";
+			$submitSuccess = False;
+		}
+		if ($sizeY > 1.0) {
+			print "<font class='errorText'><center>Size must be 0 < X <= 1.0 and 0 < Y <= 1.0</center></font>";
+			$submitSuccess = False;
+		}
 		if ($submitSuccess) {
 			if (empty($fname)) {
 				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid 2>&1");
@@ -128,6 +137,9 @@ function getTBVal(strURL,raOrDec) {
 			}
 			if ($pysuccess == 0) {
 				print "<font class='errorText'><center>Coordinates out of range.</center></font>";
+			}
+			if ($pysuccess != 1 && $pysuccess != 0) {
+				print $pysuccess;
 			}
 		}
 	}
@@ -162,7 +174,7 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
 			<?php
-				print "<td valign='middle'><input type='text' name='size' id='size' size='10' value='$size' />"
+				print "<td valign='middle'>x:<input type='text' name='sizex' id='sizex' size='10' value='$sizeX' /><br />y:<input type='text' name='sizey' id='sizey' size='10' value='$sizeY' /></td>"
 			?>
 			<font class='notifyText'>degrees squared</font>
 			</td>

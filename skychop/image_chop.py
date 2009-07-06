@@ -46,15 +46,6 @@ def findDec(x):
 			else: 
 				return "m0%i" % (round(x))
 
-def tostr(theNum):
-	if theNum < 10 or theNum < 10.0:
-		if len(theNum) > 2:
-			return "0"+str(theNum[0:4])
-		else:
-			return "0"+str(theNum)
-	else:
-		return str(theNum)
-
 def findClosestCenter(RADeg, decDeg):
 	tableData = pf.open("sky-patches.fits")[1].data
 	oldOffset = None
