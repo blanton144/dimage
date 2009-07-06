@@ -16,6 +16,12 @@ if (isset($_POST['submit3'])) {
 	$min = (int) ( ($_POST['dd'] - (float)((int)($_POST['dd']))) * 60.0 );
 	$sec = ( (($_POST['dd'] - (float)((int) ($_POST['dd']))) * 60.0) - (int) (($_POST['dd'] - (float) ((int)($_POST['dd']))) * 60.0) ) * 60.0;
 }
+if (isset($_POST['submit4'])) {
+	$decTime = $_POST['dd'] / 15.0
+	$hr = (int) $decTime
+	$min = (int) ( ($decTime - (float)((int)$decTime)) * 60.0 );
+	$sec = ( (($decTime - (float)((int) $decTime)) * 60.0) - (int) (($decTime - (float) ((int)$decTime)) * 60.0) ) * 60.0;
+}
 ?>
 </head>
 <body>
@@ -57,6 +63,18 @@ if (isset($_POST['submit2'])) {
 <?php
 if (isset($_POST['submit3'])) {
 	print "<font class='errorText'>$deg&deg;:$min:$sec</font>";
+}
+?>
+
+<font class="theLabels">Convert Decimal Degrees --> Sexagesimal Time</font>
+<form method='post' name='decDegtoSexTime'>
+<input type='text' name='dd' id='dd' size='4' />&deg;
+<br /><input type='submit' name='submit4' value='Submit' />
+</form>
+</font>
+<?php
+if (isset($_POST['submit4'])) {
+	print "<font class='errorText'>$hr&deg;:$min:$sec</font>";
 }
 ?>
 </center>
