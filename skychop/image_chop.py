@@ -7,7 +7,7 @@
 
 import os
 os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
-import pyfits
+import pyfits as pf
 from math import fabs, sqrt
 import gzip
 from shutil import move
@@ -44,6 +44,18 @@ def findDec(x):
 				return "m0%i" % (round(x))
 
 def findClosestCenter(RADeg, decDeg):
+	tableData = pf.open("sky-patches.fits")[1].data
+	oldOffset = None
+	for i in range(np.shape(tableData)[0]):
+		newOffset = np.sqrt( (RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2 )
+		if oldOffset == None:
+			oldOffset = np.sqrt( (RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2 )
+			index = i
+		else:
+			if newOffset < oldOffset:
+				oldOffset = newOffset
+				index = i
+	print "RA:",tableData[index][0], "Dec:", tableData[index][1]		
 	# Navigate to the correct directory
 	fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
 	RAHour = RADeg / 15.0
@@ -89,7 +101,7 @@ def gunzipIt(file, fileDir, outDir):
 	return None
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
-	img = pyfits.open(inFileName)
+	img = pf.open(inFileName)
 	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
 	# So here we search through the extensions until we find 2D image data
 	fitsExtension=None
