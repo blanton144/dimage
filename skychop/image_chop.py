@@ -73,10 +73,7 @@ def findClosestCenter(RADeg, decDeg):
 		raise IndexError('<font class="errorText" align="center">RA Out of Range</font>')
 		os._exit(0)
 	
-	if RAIntHour < 10:
-		RADecPath = fitsPath + "0" + str(RAIntHour) + "/"  + findDec(decDeg) + "/"
-	else:
-		RADecPath = fitsPath + str(RAIntHour) + "/"  + findDec(decDeg) + "/"
+	RADecPath = fitsPath + "%(RAIntHour)02d" + "h/"  + findDec(decDeg) + "/" % {"RAIntHour":RAIntHour}
 	
 	decTime = tableData[index][0] / 15.0
 	decDecl = tableData[index][1]
