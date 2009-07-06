@@ -6,8 +6,9 @@
 #
 
 import os
-os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+# Enable this line for testing
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
 from math import fabs, sqrt
