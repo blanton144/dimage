@@ -7,6 +7,7 @@
 
 import os
 os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+import numpy as np
 import pyfits as pf
 from math import fabs, sqrt
 import gzip
@@ -43,6 +44,15 @@ def findDec(x):
 			else: 
 				return "m0%i" % (round(x))
 
+def tostr(theNum):
+	if theNum < 10 or theNum < 10.0:
+		if len(theNum) > 2:
+			return "0"+str(theNum[0:4])
+		else:
+			return "0"+str(theNum)
+	else:
+		return str(theNum)
+
 def findClosestCenter(RADeg, decDeg):
 	tableData = pf.open("sky-patches.fits")[1].data
 	oldOffset = None
@@ -55,30 +65,36 @@ def findClosestCenter(RADeg, decDeg):
 			if newOffset < oldOffset:
 				oldOffset = newOffset
 				index = i
-	print "RA:",tableData[index][0], "Dec:", tableData[index][1]		
+	
 	# Navigate to the correct directory
 	fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
-	RAHour = RADeg / 15.0
-	RAStr = os.listdir(fitsPath)
+	RAIntHour = int(tableData[index][0] / 15.0)
+	if RAIntHour > 19 or RAIntHour < 7:
+		raise IndexError('<font class="errorText" align="center">RA Out of Range</font>')
+		os._exit(0)
 	
-	for i in RAStr:
-		if i == "07h-tmp": pass
-		if int(i[0:2]) == int(round(RAHour)):
-			RAPath = fitsPath + i[0:2] + "h/"
-	RADecPath = RAPath + findDec(decDeg) + "/"
+	if RAIntHour < 10:
+		RADecPath = fitsPath + "0" + str(RAIntHour) + "/"  + findDec(decDeg) + "/"
+	else:
+		RADecPath = fitsPath + str(RAIntHour) + "/"  + findDec(decDeg) + "/"
 	
-	offsetList = []
-	for fileName in os.listdir(RADecPath):
-		RA = float(fileName[1:3]) + (float(fileName[3:5]) / 60.0) + (float(fileName[5:7]) + float(fileName[8:10]) / 100.0) / 3600.0
-		DEC = float(fileName[11:13]) + float(fileName[13:15]) / 60.0 + (float(fileName[15:17]) + float(fileName[18]) / 10.0) / 3600.0
-		offsetList.append(sqrt((RA - RAHour)**2.0 + (DEC - decDeg)**2.0))
+	decTime = tableData[index][0] / 15.0
+	decDecl = tableData[index][1]
 	
-	for i in range(len(offsetList)):
-		if offsetList[i] == min(offsetList):
-			minOffsetIndex = i
+	hr = decTime
+	min = (decTime - float(int(decTime))) * 60.0
+	secINT = int(( ((decTime - float(int(decTime))) * 60.0) - int((decTime - float(int(decTime))) * 60.0) ) * 60.0)
+	secDECIMAL = ( ( ((decTime - float(int(decTime))) * 60.0) - int((decTime - float(int(decTime))) * 60.0) ) * 60.0 - secINT) * 100.0
 	
-	a = os.listdir(RADecPath)
-	return a[minOffsetIndex], RADecPath
+	degDec = int(decDecl)
+	minDec = int( (decDecl - float(int(decDecl))) * 60.0 )
+	secDecINT = int(( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0)
+	secDecDECIMAL = (( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0 - secDecINT) * 10.0
+	
+	fileName = "J%(hr)02d%(min)02d%(secINT)02d.%(secDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
+		{"hr":hr,"min":min,"secINT":secINT,"secDECIMAL":secDECIMAL,"degDec":degDec,"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
+
+	return fileName, RADecPath
 
 def gzipIt(file, outDir):
 	r_file = open(outDir+file, 'r')
