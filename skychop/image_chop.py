@@ -7,6 +7,7 @@
 
 import os
 os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
 from math import fabs, sqrt
@@ -73,7 +74,7 @@ def findClosestCenter(RADeg, decDeg):
 		raise IndexError('<font class="errorText" align="center">RA Out of Range</font>')
 		os._exit(0)
 	
-	RADecPath = fitsPath + "%(RAIntHour)02d" + "h/"  + findDec(decDeg) + "/" % {"RAIntHour":RAIntHour}
+	RADecPath = "%(path)s%(RAIntHour)02dh/%(degg)s/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":findDec(decDeg)}
 	
 	decTime = tableData[index][0] / 15.0
 	decDecl = tableData[index][1]

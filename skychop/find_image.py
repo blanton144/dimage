@@ -9,6 +9,7 @@
 
 import os
 os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
 import tarfile
