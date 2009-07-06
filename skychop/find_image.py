@@ -17,9 +17,11 @@ import tarfile
 
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
-size = float(sys.argv[3])
-bands = sys.argv[4]
-tarName = sys.argv[5]
+size = [float(sys.argv[3]),float(sys.argv[3])]
+bands = sys.argv[5]
+tarName = sys.argv[6]
+sizeX = size[0]
+sizeY = size[1]
 
 fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
 outDir = '/var/www/html/sdss3/skychop/sdss-tmp/'
@@ -30,9 +32,9 @@ if fileDir[len(fileDir) - 1] != "/":
 arcFileList = []
 for letter in bands:
 	ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir+fileName, outDir)
-	ic.clipFits(outDir + fileName + "-" + letter + ".fits", RADeg, decDeg, size, outDir + fileName + "-" + letter + "-" + str(size) + ".fits")
+	ic.clipFits(outDir + fileName + "-" + letter + ".fits", RADeg, decDeg, size, outDir + fileName + "-" + letter + "-" + str(sizeX) +"x"+ str(sizeY) + ".fits")
 	os.unlink(outDir + fileName + "-" + letter + ".fits")
-	arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(size) + ".fits")
+	arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(sizeX) +"x"+ str(sizeY) + ".fits")
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for name in arcFileList:

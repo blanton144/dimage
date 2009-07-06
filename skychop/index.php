@@ -130,10 +130,10 @@ function getTBVal(strURL,raOrDec) {
 		}
 		if ($submitSuccess) {
 			if (empty($fname)) {
-				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $pid 2>&1");
+				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $pid 2>&1");
 			}
 			else {
-				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $size $bands $fname 2>&1");
+				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1");
 			}
 			if ($pysuccess == 0) {
 				print "<font class='errorText'><center>Coordinates out of range.</center></font>";
@@ -174,7 +174,7 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
 			<?php
-				print "<td valign='middle'>x:<input type='text' name='sizex' id='sizex' size='10' value='$sizeX' /><font class='notifyText'>degrees</font><br />y:<input type='text' name='sizey' id='sizey' size='10' value='$sizeY' /><font class='notifyText'>degrees</font>"
+				print "<td valign='middle'>x:<input type='text' name='sizex' id='sizex' size='5' value='$sizeX' /><font class='notifyText'>degrees</font><br />y:<input type='text' name='sizey' id='sizey' size='5' value='$sizeY' /><font class='notifyText'>degrees</font>"
 			?>
 			</td>
 		</tr>
