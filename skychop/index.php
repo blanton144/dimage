@@ -171,7 +171,7 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
 			<td valign='middle'><input type='text' name='size' id='size' size='10' value='0.5' />
-			<font class='notifyText'>max. value = 1.0</font>
+			<font class='notifyText'>degrees squared</font>
 			</td>
 		</tr>
 		

@@ -90,7 +90,6 @@ def gunzipIt(file, fileDir, outDir):
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 	img = pyfits.open(inFileName)
-
 	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
 	# So here we search through the extensions until we find 2D image data
 	fitsExtension=None

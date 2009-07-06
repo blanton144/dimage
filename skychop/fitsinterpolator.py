@@ -6,25 +6,13 @@
 
 import pyfits as pf
 import numpy as np
-import Image as im
+#import Image as im
+import scipy.interpolate as sci
 
-def sincInterpolate(data, xSh, ySh):
-	return data
+x,y = np.mgrid[0:25, 0:25]
+imgDataZ = x*y
 
-# Globals
-subImageSize = (25,25)
-subImageCenter = (60,60)
-shiftX = 0.5
-shiftY = 0.5
+#interData = sci.interp2d(shImX, shImY, imgDataZ, kind='cubic')
+interData = sci.interp2d(x, y,imgDataZ)
 
-imgData = np.random.rand(100,100)
-interData = sincInterpolate(imgData, shiftX, shiftY)
-
-print "-------------------"
-print "-------------------"
-print "-------------------"
-print "Original Data:"
-print imgData[5:8,5:8]
-print ""
-print "Interpolated Data:"
-print interData[5:8,5:8]
+print interData(2.6,7.4)
