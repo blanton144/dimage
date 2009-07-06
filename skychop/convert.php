@@ -12,7 +12,7 @@ if (isset($_POST['submit2'])) {
 	$decDeg = $_POST['dd'] + $_POST['amam'] / 60.0 + $_POST['asas'] / 3600.0;
 }
 if (isset($_POST['submit3'])) {
-	$deg = int($_POST['dd']);
+	#$deg = int($_POST['dd']);
 	#$min = int( ($_POST['dd'] - float(int($_POST['dd']))) * 60.0 );
 	#$sec = ( (($_POST['dd'] - float(int($_POST['dd']))) * 60.0) - int(($_POST['dd'] - float(int($_POST['dd']))) * 60.0) ) * 60.0;
 }
