@@ -56,8 +56,7 @@ if (isset($_POST['submit2'])) {
 </font>
 <?php
 if (isset($_POST['submit3'])) {
-	print "Done";
-	#print "<font class='errorText'>$deg&deg;" + ":" + "$min" + ":" + "$sec</font>";
+	print "<font class='errorText'>$deg&deg;" + ":" + "$min" + ":" + "$sec</font>";
 }
 ?>
 </center>
