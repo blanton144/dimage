@@ -53,7 +53,7 @@ if (isset($_POST['submit2'])) {
 	print "<font class='errorText'>$decDeg&deg;</font>";
 }
 ?>
-
+<br />
 <font class="theLabels">Convert Decimal Degrees --> Sexagesimal Degrees</font>
 <form method='post' name='decDegtoSexDeg'>
 <input type='text' name='dd' id='dd' size='4' />&deg;
@@ -62,10 +62,10 @@ if (isset($_POST['submit2'])) {
 </font>
 <?php
 if (isset($_POST['submit3'])) {
-	print "<font class='errorText'>$deg&deg; : $min\' : $sec\"</font>";
+	print "<font class='errorText'>$deg&deg; : $min&#39; : $sec\"</font>";
 }
 ?>
-
+<br />
 <font class="theLabels">Convert Decimal Degrees --> Sexagesimal Time</font>
 <form method='post' name='decDegtoSexTime'>
 <input type='text' name='dd' id='dd' size='4' />&deg;
@@ -74,7 +74,7 @@ if (isset($_POST['submit3'])) {
 </font>
 <?php
 if (isset($_POST['submit4'])) {
-	print "<font class='errorText'>$hr hr : $min\' : $sec\"</font>";
+	print "<font class='errorText'>$hr hr : $min&#39; : $sec\"</font>";
 }
 ?>
 </center>
