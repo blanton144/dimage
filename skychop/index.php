@@ -174,9 +174,8 @@ function getTBVal(strURL,raOrDec) {
 		<tr>
 			<td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
 			<?php
-				print "<td valign='middle'>x:<input type='text' name='sizex' id='sizex' size='10' value='$sizeX' /><br />y:<input type='text' name='sizey' id='sizey' size='10' value='$sizeY' /></td>"
+				print "<td valign='middle'>x:<input type='text' name='sizex' id='sizex' size='10' value='$sizeX' /><font class='notifyText'>degrees</font><br />y:<input type='text' name='sizey' id='sizey' size='10' value='$sizeY' /><font class='notifyText'>degrees</font>"
 			?>
-			<font class='notifyText'>degrees squared</font>
 			</td>
 		</tr>
 		
