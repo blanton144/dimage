@@ -51,9 +51,9 @@ def findClosestCenter(RADeg, decDeg):
 	secDecINT = int(( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0)
 	secDecDECIMAL = (( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0 - secDecINT) * 10.0
 	
-	if degDec > 0.0: RADecPath = "%(path)s%(RAIntHour)02dh/p%(degg)s/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":degDec}
-	else: RADecPath = "%(path)s%(RAIntHour)02dh/m%(degg)s/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":degDec}
-		
+	if degDec > 0.0: RADecPath = "%(path)s%(RAIntHour)02dh/p%(degg)02d/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":fabs(degDec)}
+	else: RADecPath = "%(path)s%(RAIntHour)02dh/m%(degg)02d/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":fabs(degDec)}
+	print fabs(degDec), degDec, decDecl
 	
 	fileName = "J%(hr)02d%(min)02d%(secINT)02d.%(secDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
 		{"hr":hr,"min":min,"secINT":secINT,"secDECIMAL":secDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
