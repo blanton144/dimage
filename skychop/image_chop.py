@@ -18,34 +18,6 @@ from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
 
-def findDec(x):
-	if fabs(x) == x:
-		if int(round(x)) != int(x):
-			if int(round(x)) % 2 == 1:
-				if (round(x) - 1.0) < 10: return "p0%i" % (round(x) - 1.0)
-				else: return "p%i" % (round(x) - 1.0)
-			else: 
-				if (round(x) - 2.0) < 10: return "p0%i" % (round(x) - 2.0)
-				else: return "p%i" % (round(x) - 2.0)
-		else:
-			if int(round(x)) % 2 == 1:
-				if (round(x) - 1.0) < 10: return "p0%i" % (round(x) - 1.0)
-				else: return "p%i" % (round(x) - 1.0)
-			else: 
-				if round(x) < 10: return "p0%i" % round(x)
-				else: return "p%i" % round(x)
-	else:
-		if int(round(x)) != int(x):
-			if int(round(x)) % 2 == 1:
-				return "m0%i" % (round(x) + 1.0)
-			else: 
-				return int(round(x) + 2.0)
-		else:
-			if int(round(x)) % 2 == 1:
-				return "m0%i" % (round(x) + 1.0)
-			else: 
-				return "m0%i" % (round(x))
-
 def findClosestCenter(RADeg, decDeg):
 	tableData = pf.open("sky-patches.fits")[1].data
 	oldOffset = None
@@ -66,8 +38,6 @@ def findClosestCenter(RADeg, decDeg):
 		raise IndexError('<font class="errorText" align="center">RA Out of Range</font>')
 		os._exit(0)
 	
-	RADecPath = "%(path)s%(RAIntHour)02dh/%(degg)s/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":findDec(decDeg)}
-	
 	decTime = tableData[index][0] / 15.0
 	decDecl = tableData[index][1]
 	
@@ -81,8 +51,12 @@ def findClosestCenter(RADeg, decDeg):
 	secDecINT = int(( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0)
 	secDecDECIMAL = (( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0 - secDecINT) * 10.0
 	
+	if degDec > 0.0: RADecPath = "%(path)s%(RAIntHour)02dh/p%(degg)s/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":degDec}
+	else: RADecPath = "%(path)s%(RAIntHour)02dh/m%(degg)s/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":degDec}
+		
+	
 	fileName = "J%(hr)02d%(min)02d%(secINT)02d.%(secDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
-		{"hr":hr,"min":min,"secINT":secINT,"secDECIMAL":secDECIMAL,"degDec":degDec,"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
+		{"hr":hr,"min":min,"secINT":secINT,"secDECIMAL":secDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
 
 	return fileName, RADecPath
 
