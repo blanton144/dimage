@@ -40,7 +40,7 @@ def findClosestCenter(RADeg, decDeg, fitsPath, dataFile):
 	degDec = tableData[index][1]
 	minDec = (degDec - int(degDec)) * 60.0
 	secDecINT = int((minDec - int(minDec)) * 60.0)
-	secDecDECIMAL = ((minDec - int(minDec))*60.0 - secDecINT) * 100.0
+	secDecDECIMAL = ((minDec - int(minDec))*60.0 - secDecINT) * 10.0
 	
 	if hrRa > 19 or hrRa < 7:
 		raise IndexError('<font class="errorText" align="center">RA Out of range</font>')
