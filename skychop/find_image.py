@@ -9,15 +9,15 @@
 
 import os
 # Enable this line for testing
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
 import tarfile
 
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
-size = [float(sys.argv[3]),float(sys.argv[3])]
+size = [float(sys.argv[3]),float(sys.argv[4])]
 bands = sys.argv[5]
 tarName = sys.argv[6]
 sizeX = size[0]
