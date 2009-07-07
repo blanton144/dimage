@@ -8,18 +8,18 @@
 import os
 # Enable this line for testing
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
-from math import fabs, sqrt
+from math import fabs
 import gzip
 from shutil import move
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
 
-def findClosestCenter(RADeg, decDeg):
-	tableData = pf.open("sky-patches.fits")[1].data
+def findClosestCenter(RADeg, decDeg, fitsPath, dataFile):
+	tableData = pf.open(dataFile)[1].data
 	oldOffset = None
 	for i in range(np.shape(tableData)[0]):
 		newOffset = np.sqrt( (RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2 )
@@ -31,25 +31,27 @@ def findClosestCenter(RADeg, decDeg):
 				oldOffset = newOffset
 				index = i
 	
-	# Navigate to the correct directory
-	fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
-	RAIntHour = int(tableData[index][0] / 15.0)
+	hrRa = tableData[index][0] / 15.0
+	degDec = tableData[index][1]
+	RAIntHour = int(hrRa)
 	if RAIntHour > 19 or RAIntHour < 7:
-		raise IndexError('<font class="errorText" align="center">RA Out of Range</font>')
+		raise IndexError('<font class="errorText" align="center">RA Out of range</font>')
+		os._exit(0)
+	if degDec < -4.0 or degDec > 70.0:
+		raise IndexError('<font class="errorText" align="center">Dec out of range</font>')
 		os._exit(0)
 	
-	decTime = tableData[index][0] / 15.0
-	decDecl = tableData[index][1]
-	
-	hr = decTime
-	min = (decTime - float(int(decTime))) * 60.0
-	secINT = int(( ((decTime - float(int(decTime))) * 60.0) - int((decTime - float(int(decTime))) * 60.0) ) * 60.0)
-	secDECIMAL = ( ( ((decTime - float(int(decTime))) * 60.0) - int((decTime - float(int(decTime))) * 60.0) ) * 60.0 - secINT) * 100.0
+	minRa = (hrRa - RAIntHour) * 60.0
+	secRaINT = int( (minRa - int(minRa)) * 60.0)
+	secRaDECIMAL = ((minRa - int(minRa))*60.0 - secRaINT) * 100.0
+	print int(hrRa), int(minRa), secRaINT, secRaDECIMAL
 	
 	degDec = int(decDecl)
 	minDec = int( (decDecl - float(int(decDecl))) * 60.0 )
 	secDecINT = int(( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0)
 	secDecDECIMAL = (( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0 - secDecINT) * 10.0
+	
+	os._exit(0)
 	
 	if degDec > 0.0: RADecPath = "%(path)s%(RAIntHour)02dh/p%(degg)02d/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":fabs(degDec)}
 	else: RADecPath = "%(path)s%(RAIntHour)02dh/m%(degg)02d/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":fabs(degDec)}

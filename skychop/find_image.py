@@ -15,13 +15,15 @@ import image_chop as ic
 import sys
 import tarfile
 
+### Collect user input in the form of shell arguments
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
-size = [float(sys.argv[3]),float(sys.argv[4])]
+sizeX, sizeY = float(sys.argv[3]),float(sys.argv[4])
 bands = sys.argv[5]
 tarName = sys.argv[6]
-sizeX = size[0]
-sizeY = size[1]
+size = sizeX,sizeY
+fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
+tableData = "sky-patches.fits"
 
 fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
 outDir = '/var/www/html/sdss3/skychop/sdss-tmp/'
