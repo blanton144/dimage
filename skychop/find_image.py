@@ -23,9 +23,9 @@ bands = sys.argv[5]
 tarName = sys.argv[6]
 size = sizeX,sizeY
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
-tableData = "sky-patches.fits"
+dataFile = "sky-patches.fits"
 
-fileName, fileDir = ic.findClosestCenter(RADeg, decDeg)
+fileName, fileDir = ic.findClosestCenter(RADeg, decDeg, fitsPath, dataFile)
 outDir = '/var/www/html/sdss3/skychop/sdss-tmp/'
 
 if fileDir[len(fileDir) - 1] != "/":
