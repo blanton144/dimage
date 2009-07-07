@@ -7,8 +7,8 @@
 
 import os
 # Enable this line for testing
-os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
 from math import fabs
@@ -38,7 +38,7 @@ def findClosestCenter(RADeg, decDeg, fitsPath, dataFile):
 	secRaDECIMAL = ((minRa - int(minRa))*60.0 - secRaINT) * 100.0
 	
 	degDec = tableData[index][1]
-	minDec = int((decDeg - int(decDeg)) * 60.0)
+	minDec = (degDec - int(degDec)) * 60.0
 	secDecINT = int((minDec - int(minDec)) * 60.0)
 	secDecDECIMAL = ((minDec - int(minDec))*60.0 - secDecINT) * 100.0
 	
