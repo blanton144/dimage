@@ -8,7 +8,7 @@
 import os
 # Enable this line for testing
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
 from math import fabs
@@ -31,33 +31,29 @@ def findClosestCenter(RADeg, decDeg, fitsPath, dataFile):
 				oldOffset = newOffset
 				index = i
 	
-	hrRa = tableData[index][0] / 15.0
+	degRa = tableData[index][0] / 15.0
+	hrRa = int(degRa)
+	minRa = (degRa - hrRa) * 60.0
+	secRaINT = int((minRa - int(minRa)) * 60.0)
+	secRaDECIMAL = ((minRa - int(minRa))*60.0 - secRaINT) * 100.0
+	
 	degDec = tableData[index][1]
-	RAIntHour = int(hrRa)
-	if RAIntHour > 19 or RAIntHour < 7:
+	minDec = int((decDeg - int(decDeg)) * 60.0)
+	secDecINT = int(minDec - int(minDec)) * 60.0)
+	secDecDECIMAL = ((minDec - int(minDec))*60.0 - secDecINT) * 100.0
+	
+	if hrRa > 19 or hrRa < 7:
 		raise IndexError('<font class="errorText" align="center">RA Out of range</font>')
 		os._exit(0)
 	if degDec < -4.0 or degDec > 70.0:
 		raise IndexError('<font class="errorText" align="center">Dec out of range</font>')
 		os._exit(0)
 	
-	minRa = (hrRa - RAIntHour) * 60.0
-	secRaINT = int( (minRa - int(minRa)) * 60.0)
-	secRaDECIMAL = ((minRa - int(minRa))*60.0 - secRaINT) * 100.0
-	print int(hrRa), int(minRa), secRaINT, secRaDECIMAL
+	if degDec > 0.0: RADecPath = "%(path)s%(hrRa)02dh/p%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"deg":fabs(degDec)}
+	else: RADecPath = "%(path)s%(hrRa)02dh/m%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"deg":fabs(degDec)}
 	
-	degDec = int(decDecl)
-	minDec = int( (decDecl - float(int(decDecl))) * 60.0 )
-	secDecINT = int(( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0)
-	secDecDECIMAL = (( ((decDecl - float(int(decDecl))) * 60.0) - int((decDecl - float(int(decDecl))) * 60.0) ) * 60.0 - secDecINT) * 10.0
-	
-	os._exit(0)
-	
-	if degDec > 0.0: RADecPath = "%(path)s%(RAIntHour)02dh/p%(degg)02d/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":fabs(degDec)}
-	else: RADecPath = "%(path)s%(RAIntHour)02dh/m%(degg)02d/" % {"path":fitsPath,"RAIntHour":RAIntHour,"degg":fabs(degDec)}
-	
-	fileName = "J%(hr)02d%(min)02d%(secINT)02d.%(secDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
-		{"hr":hr,"min":min,"secINT":secINT,"secDECIMAL":secDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
+	fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
+		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secDECIMAL":secRaDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
 
 	return fileName, RADecPath
 
