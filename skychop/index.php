@@ -68,7 +68,8 @@ function getTBVal(strURL,raOrDec) {
 	ini_Set('display_errors',1); // turn on error reporting while developing
 	$RA = 210.80415;
 	$dec = 54.34917;
-	$size = 0.25;
+	$sizeX = 0.25;
+	$sizeY = 0.25;
 	
 	if (isset($_POST['submit'])) {
 		$submitSuccess = True;

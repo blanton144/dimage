@@ -8,7 +8,7 @@
 import os
 # Enable this line for testing
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
 from math import fabs
@@ -17,27 +17,37 @@ from shutil import move
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
+import operator
 
-def findClosestCenter(RADeg, decDeg, fitsPath, dataFile):
-	tableData = pf.open(dataFile)[1].data
-	oldOffset = None
+def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
+	RADEC_list = []
 	for i in range(np.shape(tableData)[0]):
-		newOffset = np.sqrt( (RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2 )
-		if oldOffset == None:
-			oldOffset = np.sqrt( (RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2 )
-			index = i
-		else:
-			if newOffset < oldOffset:
-				oldOffset = newOffset
-				index = i
+		offset = np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2)
+		if offset <= (np.sqrt((xSize/2.0)**2.0+(ySize/2.0)**2.0)+0.5):
+			RADEC_list.append((tableData[i][0],tableData[i][1],offset))
 	
-	degRa = tableData[index][0] / 15.0
+	sortedList = sorted(RADEC_list, key=operator.itemgetter(2))
+	return sortedList
+	
+def findClosestCenter(RADeg, decDeg, tableData):
+	offList = []
+	for i in range(np.shape(tableData)[0]):
+		offList.append(np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2))
+	theMin = min(offList)
+	for j in range(len(offList)):
+		if offList[j] == theMin:
+			index = j
+	print offList[index-1],offList[index],offList[index+1]
+	return tableData[index][0], tableData[index][1]
+
+def getFileName(theRA, theDec, fitsPath):
+	degRa = theRA / 15.0
 	hrRa = int(degRa)
 	minRa = (degRa - hrRa) * 60.0
 	secRaINT = int((minRa - int(minRa)) * 60.0)
 	secRaDECIMAL = ((minRa - int(minRa))*60.0 - secRaINT) * 100.0
 	
-	degDec = tableData[index][1]
+	degDec = theDec
 	minDec = (degDec - int(degDec)) * 60.0
 	secDecINT = int((minDec - int(minDec)) * 60.0)
 	secDecDECIMAL = ((minDec - int(minDec))*60.0 - secDecINT) * 10.0

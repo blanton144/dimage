@@ -10,10 +10,12 @@
 import os
 # Enable this line for testing
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
 import tarfile
+import pyfits as pf
+from math import sqrt
 
 ### Collect user input in the form of shell arguments
 RADeg = float(sys.argv[1])
@@ -24,10 +26,16 @@ tarName = sys.argv[6]
 size = sizeX,sizeY
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"
 dataFile = "sky-patches.fits"
+outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"
+tableData = pf.open(dataFile)[1].data
 
-fileName, fileDir = ic.findClosestCenter(RADeg, decDeg, fitsPath, dataFile)
-outDir = '/var/www/html/sdss3/skychop/sdss-tmp/'
+RADEC_list = ic.findClosestCenters(RADeg, decDeg, tableData)
+cenRA,cenDEC,cenOff = RADEC_list[0]
+closestFileName, closestFileDir = ic.getFileName(cenRA, cenDEC, fitsPath) # THE MAIN FILE AND PATH TO IT
 
+for i in range(len(RADEC_list)):
+	
+	
 if fileDir[len(fileDir) - 1] != "/":
 	fileDir = fileDir + "/"
 
