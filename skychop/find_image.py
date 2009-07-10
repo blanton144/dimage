@@ -32,31 +32,23 @@ dataFile = "sky-patches.fits"
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"
 tableData = pf.open(dataFile)[1].data
 clipXYCen = []
-
-RADEC_list = ic.findClosestCenters(RADeg, decDeg, tableData, xSize, ySize)
-#closestRA,closestDEC,closestOff = RADEC_list[0]
-#closestFileName, closestFileDir = ic.getFileName(closestRA, closestDEC, fitsPath)
-
 rectListx,rectListy = [],[]
-for cutPt in [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg-ySize/2.0)]:
-	mCen1,mCen2,off = ic.findClosestCenters(RADeg, decDeg, tableData, xSize, ySize)[0]
-	imName = "turd"
-	rectCenter, width, height = ic.cutCorner(cutPt, (mCen1,mCen2), (RADeg, decDeg), imName)
-	rectListx.append(rectCenter[0])
-	rectListy.append(rectCenter[1])
-plt.plot(rectListx,rectListx,'.')
-plt.show()
+targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg-ySize/2.0)]
+oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg+ySize/2.0)]
+
+for i in range(len(targetImgCorners)):
+	imName = "test"
+	rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
+		ic.findClosestCenter(targetImgCorners[i][0],targetImgCorners[i][1],tableData),(RADeg,decDeg), (xSize, ySize), tableData)
+	fileName, fileDir = ic.getFileName(targetImgCorners[i][0],targetImgCorners[i][1], fitsPath)
+	arcFileList = []
+	for letter in bands:
+		ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir+fileName, outDir)
+		ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
+			outDir + fileName + "-clipped-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
+	#arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(xSize) +"x"+ str(ySize) + ".fits")
+
 os._exit(0)
-
-if fileDir[len(fileDir) - 1] != "/":
-	fileDir = fileDir + "/"
-
-arcFileList = []
-for letter in bands:
-	ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir+fileName, outDir)
-	ic.clipFits(outDir + fileName + "-" + letter + ".fits", RADeg, decDeg, size, outDir + fileName + "-" + letter + "-" + str(xSize) +"x"+ str(ySize) + ".fits")
-	os.unlink(outDir + fileName + "-" + letter + ".fits")
-	arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(xSize) +"x"+ str(ySize) + ".fits")
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for name in arcFileList:

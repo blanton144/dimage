@@ -86,24 +86,6 @@ def gunzipIt(file, fileDir, outDir):
 	move(write_file,outDir + file[:-3])
 	return None
 
-def cutCorner(cutPt, mCen, imCen, imName):
-	# cutPt:	corner point
-	# mCen:		containg mosaic's center (u,v)
-	# imCen:	wanter image center (alpha,delta)
-	imCenRpt = [imCen,imCen,imCen,imCen]
-	mCorners = [(mCen[0]+0.5,mCen[1]+0.5),(mCen[0]+0.5,mCen[1]-0.5),(mCen[0]-0.5,mCen[1]+0.5),(mCen[0]-0.5,mCen[1]-0.5)]
-	offList = map(dist,imCenRpt,mCorners)
-	for i in range(4):
-		if offList[i] == min(offList):
-			index = i
-		else: pass
-	closestCorner = mCorners[index]
-	rectCenter = midpt(closestCorner, cutPt)
-	width = fabs(cutPt[0] - closestCorner[0])
-	height = fabs(cutPt[1] - closestCorner[1])
-	#clipFits(imName, rectCenter[0], rectCenter[1], [width,height], "RA%.4fDEC%.4f_%sx%s.fits" % (rectCenter[0], rectCenter[1],width,height))
-	return rectCenter, width, height
-	
 def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
 	# A,B = targetCorner
 	# C,D = oppositeCorner
@@ -123,7 +105,7 @@ def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
 	xInd = XDs.index(min(XDs))
 	yInd = YDs.index(min(YDs))
 	rectCenter = midpt((A,B),(Xs[xInd],Ys[yInd]))
-	return rectCenter, (Xs[xInd],Ys[yInd])
+	return rectCenter, (fabs(Xs[xInd]-A),fabs(Ys[yInd]-B))
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 	img = pf.open(inFileName)
