@@ -104,20 +104,26 @@ def cutCorner(cutPt, mCen, imCen, imName):
 	#clipFits(imName, rectCenter[0], rectCenter[1], [width,height], "RA%.4fDEC%.4f_%sx%s.fits" % (rectCenter[0], rectCenter[1],width,height))
 	return rectCenter, width, height
 	
-def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), mosaicFName, xSize, ySize, tableData):
+def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
 	# A,B = targetCorner
 	# C,D = oppositeCorner
 	# U,V = closestMosaicCenter
 	# ALPH,DELT = targetCenter
+	A,B = (float(A),float(B))
+	C,D = (float(C),float(D))
+	U,V = (float(U),float(V))
+	ALPH,DELT = (float(ALPH),float(DELT))
+	xSz,ySz = (float(xSz),float(ySz))
+	
 	KAPPA,BETA = ((C-A)/fabs(C-A),(D-B)/fabs(D-B))
-	X = A
-	while (X != U + KAPPA/2.0 and X != ALPH + (KAPPA*xSize/2.0)):
-		X += KAPPA*0.5
-	Y = B
-	while (Y != V + BETA/2.0 and Y != DELT + (BETA*ySize/2.0)):
-		Y += BETA*0.5
-	rectCenter = midpt((A,B),(X,Y))
-	return rectCenter
+	Xs = [U + KAPPA/2.0,ALPH + (KAPPA*xSz/2.0)]
+	Ys = [V + BETA/2.0,DELT + (BETA*ySz/2.0)]
+	XDs = [fabs(A-(U + KAPPA/2.0)),fabs(A-(ALPH + (KAPPA*xSz/2.0)))]
+	YDs = [fabs(B-(V + BETA/2.0)),fabs(B-(DELT + (BETA*ySz/2.0)))]
+	xInd = XDs.index(min(XDs))
+	yInd = YDs.index(min(YDs))
+	rectCenter = midpt((A,B),(Xs[xInd],Ys[yInd]))
+	return rectCenter, (Xs[xInd],Ys[yInd])
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 	img = pf.open(inFileName)
@@ -142,4 +148,4 @@ def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 def midpt((x,y),(u,v)):
 	return ((x+u)/2.0,(y+v)/2.0)
 def dist((x,y),(u,v)):
-	return sqrt((x+u)**2+(y+v)**2)
+	return sqrt((x-u)**2+(y-v)**2)
