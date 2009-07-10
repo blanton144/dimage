@@ -11,7 +11,7 @@ import os
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
-from math import fabs
+from math import fabs, sqrt
 import gzip
 from shutil import move
 from astLib import astCoords
@@ -37,7 +37,6 @@ def findClosestCenter(RADeg, decDeg, tableData):
 	for j in range(len(offList)):
 		if offList[j] == theMin:
 			index = j
-	print offList[index-1],offList[index],offList[index+1]
 	return tableData[index][0], tableData[index][1]
 
 def getFileName(theRA, theDec, fitsPath):
@@ -87,6 +86,39 @@ def gunzipIt(file, fileDir, outDir):
 	move(write_file,outDir + file[:-3])
 	return None
 
+def cutCorner(cutPt, mCen, imCen, imName):
+	# cutPt:	corner point
+	# mCen:		containg mosaic's center (u,v)
+	# imCen:	wanter image center (alpha,delta)
+	imCenRpt = [imCen,imCen,imCen,imCen]
+	mCorners = [(mCen[0]+0.5,mCen[1]+0.5),(mCen[0]+0.5,mCen[1]-0.5),(mCen[0]-0.5,mCen[1]+0.5),(mCen[0]-0.5,mCen[1]-0.5)]
+	offList = map(dist,imCenRpt,mCorners)
+	for i in range(4):
+		if offList[i] == min(offList):
+			index = i
+		else: pass
+	closestCorner = mCorners[index]
+	rectCenter = midpt(closestCorner, cutPt)
+	width = fabs(cutPt[0] - closestCorner[0])
+	height = fabs(cutPt[1] - closestCorner[1])
+	#clipFits(imName, rectCenter[0], rectCenter[1], [width,height], "RA%.4fDEC%.4f_%sx%s.fits" % (rectCenter[0], rectCenter[1],width,height))
+	return rectCenter, width, height
+	
+def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), mosaicFName, xSize, ySize, tableData):
+	# A,B = targetCorner
+	# C,D = oppositeCorner
+	# U,V = closestMosaicCenter
+	# ALPH,DELT = targetCenter
+	KAPPA,BETA = ((C-A)/fabs(C-A),(D-B)/fabs(D-B))
+	X = A
+	while (X != U + KAPPA/2.0 and X != ALPH + (KAPPA*xSize/2.0)):
+		X += KAPPA*0.5
+	Y = B
+	while (Y != V + BETA/2.0 and Y != DELT + (BETA*ySize/2.0)):
+		Y += BETA*0.5
+	rectCenter = midpt((A,B),(X,Y))
+	return rectCenter
+
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 	img = pf.open(inFileName)
 	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
@@ -106,3 +138,8 @@ def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 
 		clipped = astImages.clipImageSectionWCS(imgData, imgWCS, RADeg, decDeg, clipSizeDeg)
 		astImages.saveFITS(outFileName, clipped['data'], clipped['wcs'])
+
+def midpt((x,y),(u,v)):
+	return ((x+u)/2.0,(y+v)/2.0)
+def dist((x,y),(u,v)):
+	return sqrt((x+u)**2+(y+v)**2)
