@@ -9,7 +9,7 @@
 
 import os
 # Enable this line for testing
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
@@ -46,6 +46,7 @@ for i in range(len(targetImgCorners)):
 		ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir+fileName, outDir)
 		ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
 			outDir + fileName + "-clipped-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
+	os.unlink(outDir + fileName + "-" + letter + ".fits")
 	#arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(xSize) +"x"+ str(ySize) + ".fits")
 
 os._exit(0)
