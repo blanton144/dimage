@@ -7,7 +7,7 @@
 
 import os
 # Enable this line for testing
-os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
@@ -50,7 +50,6 @@ def getFileName(theRA, theDec, fitsPath):
 	minDec = (degDec - int(degDec)) * 60.0
 	secDecINT = int((minDec - int(minDec)) * 60.0)
 	secDecDECIMAL = ((minDec - int(minDec)) * 60.0 - secDecINT) * 10.0
-	print secDecINT, secDecDECIMAL, (minDec - int(minDec)) * 60.0
 	
 	if hrRa > 19 or hrRa < 7:
 		raise IndexError('<font class="errorText" align="center">RA Out of range</font>')

@@ -9,7 +9,7 @@
 
 import os
 # Enable this line for testing
-os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
@@ -38,9 +38,10 @@ oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg
 
 for i in range(len(targetImgCorners)):
 	imName = "test"
+	closestCenter = ic.findClosestCenter(targetImgCorners[i][0],targetImgCorners[i][1],tableData)
 	rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
-		ic.findClosestCenter(targetImgCorners[i][0],targetImgCorners[i][1],tableData),(RADeg,decDeg), (xSize, ySize), tableData)
-	fileName, fileDir = ic.getFileName(targetImgCorners[i][0],targetImgCorners[i][1], fitsPath)
+		closestCenter,(RADeg,decDeg), (xSize, ySize), tableData)
+	fileName, fileDir = ic.getFileName(closestCenter[0],closestCenter[1], fitsPath)
 	arcFileList = []
 	for letter in bands:
 		ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir+fileName, outDir)
