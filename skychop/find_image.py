@@ -36,21 +36,35 @@ rectListx,rectListy = [],[]
 targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg-ySize/2.0)]
 oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg+ySize/2.0)]
 
+arcFileList = []
+allFileNames = None
 for i in range(len(targetImgCorners)):
-	imName = "test"
+	oneImEachBand = []
 	closestCenter = ic.findClosestCenter(targetImgCorners[i][0],targetImgCorners[i][1],tableData)
 	rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
 		closestCenter,(RADeg,decDeg), (xSize, ySize), tableData)
 	fileName, fileDir = ic.getFileName(closestCenter[0],closestCenter[1], fitsPath)
-	arcFileList = []
 	for letter in bands:
 		ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
 		ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
 			outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
 		os.unlink(outDir + fileName + "-" + letter + ".fits")
-		#os.system("swarp " + 
-		#arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(xSize) +"x"+ str(ySize) + ".fits")
+		oneImEachBand.append(outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
+	
+	if allFileNames == None:
+		allFileNames = np.array([oneImEachBand])
+	else:
+		allFileNames = np.append(a,np.reshape([oneImEachBand],(1,len(bands))),axis=0)
 
+allFileNamesT = allFileNames.transpose()
+for k in range(np.shape(allFileNamesT)[1]):
+	swarpArg =""
+	for name in allFileNamesT[k]:
+		swarpArg += " %s" % name
+	coaddFname = ic.getIAUFname(RADeg,decDeg,letter) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) ".fits"
+	os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME="+coaddFname)
+	arcFileList.append("sdss-tmp/" + coaddFname)
+print arcFileList
 os._exit(0)
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
