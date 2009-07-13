@@ -46,10 +46,10 @@ for i in range(len(targetImgCorners)):
 		closestCenter,(RADeg,decDeg), (xSize, ySize), tableData)
 	fileName, fileDir = ic.getFileName(closestCenter[0],closestCenter[1], fitsPath)
 	for letter in bands:
-		#ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
-		#ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
-		#	outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
-		#os.unlink(outDir + fileName + "-" + letter + ".fits")
+		ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
+		ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
+			outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
+		os.unlink(outDir + fileName + "-" + letter + ".fits")
 		oneImEachBand.append(outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
 	
 	if allFileNames == None:
@@ -64,10 +64,8 @@ for k in range(np.shape(allFileNamesT)[0]):
 	for name in allFileNamesT[k]:
 		swarpArg += " %s" % name
 	coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
-	#os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME="+coaddFname))
+	os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME="+coaddFname))
 	arcFileList.append("sdss-tmp/" + coaddFname)
-print arcFileList
-os._exit(0)
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for name in arcFileList:
