@@ -59,7 +59,7 @@ for i in range(len(targetImgCorners)):
 
 allFileNamesT = allFileNames.transpose()
 print allFileNamesT
-for k in range(np.shape(allFileNamesT)[1]):
+for k in range(np.shape(allFileNamesT)[0]):
 	swarpArg =""
 	for name in allFileNamesT[k]:
 		swarpArg += " %s" % name
