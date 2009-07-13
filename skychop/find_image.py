@@ -55,7 +55,7 @@ for i in range(len(targetImgCorners)):
 	if allFileNames == None:
 		allFileNames = np.array([oneImEachBand])
 	else:
-		allFileNames = np.append(a,np.reshape([oneImEachBand],(1,len(bands))),axis=0)
+		allFileNames = np.append(allFileNames,np.reshape([oneImEachBand],(1,len(bands))),axis=0)
 
 allFileNamesT = allFileNames.transpose()
 for k in range(np.shape(allFileNamesT)[1]):
