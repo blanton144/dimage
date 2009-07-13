@@ -16,6 +16,7 @@ import sys
 import tarfile
 import pyfits as pf
 from math import sqrt, fabs
+import numpy as np
 
 ### FOR TESTING ###
 import matplotlib.pyplot as plt
