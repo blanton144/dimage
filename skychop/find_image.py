@@ -44,11 +44,12 @@ for i in range(len(targetImgCorners)):
 	fileName, fileDir = ic.getFileName(closestCenter[0],closestCenter[1], fitsPath)
 	arcFileList = []
 	for letter in bands:
-		ic.gunzipIt(fileName + "-" + letter + ".fits.gz", fileDir+fileName, outDir)
+		ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
 		ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
-			outDir + fileName + "-clipped-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
-	os.unlink(outDir + fileName + "-" + letter + ".fits")
-	#arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(xSize) +"x"+ str(ySize) + ".fits")
+			outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
+		os.unlink(outDir + fileName + "-" + letter + ".fits")
+		#os.system("swarp " + 
+		#arcFileList.append("sdss-tmp/" + fileName + "-" + letter + "-" + str(xSize) +"x"+ str(ySize) + ".fits")
 
 os._exit(0)
 
