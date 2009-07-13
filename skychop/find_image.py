@@ -58,6 +58,7 @@ for i in range(len(targetImgCorners)):
 		allFileNames = np.append(allFileNames,np.reshape([oneImEachBand],(1,len(bands))),axis=0)
 
 allFileNamesT = allFileNames.transpose()
+print allFileNamesT
 for k in range(np.shape(allFileNamesT)[1]):
 	swarpArg =""
 	for name in allFileNamesT[k]:
