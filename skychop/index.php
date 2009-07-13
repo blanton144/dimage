@@ -113,7 +113,7 @@ function getTBVal(strURL,raOrDec) {
 			print "<font class='errorText'><center>Please select a band!</center></font>";
 			$submitSuccess = False;
 		}
-		if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($size))) {
+		if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($sizeX)) || !(is_numeric($sizeY))) {
 			print "<font class='errorText'><center>Please correct your input.</center></font>";
 			$submitSuccess = False;
 		}
