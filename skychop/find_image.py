@@ -46,10 +46,10 @@ for i in range(len(targetImgCorners)):
 		closestCenter,(RADeg,decDeg), (xSize, ySize), tableData)
 	fileName, fileDir = ic.getFileName(closestCenter[0],closestCenter[1], fitsPath)
 	for letter in bands:
-		ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
-		ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
+		#ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
+		#ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
 			outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
-		os.unlink(outDir + fileName + "-" + letter + ".fits")
+		#os.unlink(outDir + fileName + "-" + letter + ".fits")
 		oneImEachBand.append(outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
 	
 	if allFileNames == None:
