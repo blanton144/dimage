@@ -59,7 +59,8 @@ def getFileName(theRA, theDec, fitsPath):
 		os._exit(0)
 	
 	if degDec > 0.0:
-		if fabs(int(degDec)) % 2 == 0: degDec = fabs(int(degDec))
+		print degDec
+		if fabs(int(degDec)) % 2 == 0: degDec = fabs(int(degDec)); print "YES"
 		else: degDec = fabs(int(degDec)) - 1
 		RADecPath = "%(path)s%(hrRa)02dh/p%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"dec":degDec}
 		print degDec
