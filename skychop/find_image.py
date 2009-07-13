@@ -61,7 +61,7 @@ for k in range(np.shape(allFileNamesT)[1]):
 	swarpArg =""
 	for name in allFileNamesT[k]:
 		swarpArg += " %s" % name
-	coaddFname = ic.getIAUFname(RADeg,decDeg,letter) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) ".fits"
+	coaddFname = ic.getIAUFname(RADeg,decDeg,letter) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 	os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME="+coaddFname)
 	arcFileList.append("sdss-tmp/" + coaddFname)
 print arcFileList
