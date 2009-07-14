@@ -7,8 +7,8 @@
 
 import os
 # Enable this line for testing
-os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
 from math import fabs, sqrt
@@ -30,14 +30,29 @@ def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
 	return sortedList
 	
 def findClosestCenter(RADeg, decDeg, tableData):
-	offList = []
+	offsets = []
 	for i in range(np.shape(tableData)[0]):
-		offList.append(np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2))
-	theMin = min(offList)
-	for j in range(len(offList)):
-		if offList[j] == theMin:
-			index = j
+		offsets.append(np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2))
+	index = offsets.index(min(offsets))
 	return tableData[index][0], tableData[index][1]
+
+def remDupes(seq):
+    seen = set()
+    return [x for x in seq if x not in seen and not seen.add(x)]
+	
+def repDupesWithZero(seq): 
+	def idfun(x): return x
+	seen = {}
+	result = []
+	for item in seq:
+		marker = idfun(item)
+		if marker not in seen:
+			seen[marker] = 1
+			result.append(item)
+		else:
+			seen[marker] = 1
+			result.append(0)
+	return result
 
 def getFileName(theRA, theDec, fitsPath):
 	degRa = theRA / 15.0
