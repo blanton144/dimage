@@ -77,7 +77,7 @@ else:
 			swarpArg += " %s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 		#os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME=sdss-tmp/"+coaddFname + " -VERBOSE_TYPE=QUIET"))
-		os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME="+outDir+coaddFname+" -VERBOSE_TYPE=FULL -RESAMPLE_DIR=sdss-tmp"))
+		os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -VERBOSE_TYPE=FULL -RESAMPLE_DIR=sdss-tmp"))
 		arcFileList.append(outDir + coaddFname)
 		for name in allFileNamesT[k]:
 			os.unlink(name)
@@ -90,8 +90,9 @@ tar.close()
 
 ic.gzipIt(tarName+".tar", outDir)
 os.chmod(outDir+tarName+".tar.gz",0777)
-
+"""
 if os.path.isfile(outDir+tarName+".tar.gz"):
 	print 1
 else: 
 	print 0
+"""
