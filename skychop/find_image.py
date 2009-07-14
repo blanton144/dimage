@@ -6,8 +6,8 @@
 
 import os
 # Enable this line for testing
-os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
 import tarfile
@@ -85,7 +85,7 @@ else:
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
 	tar.add(fname)
-	#os.unlink(fname)
+	os.unlink(fname)
 tar.close()
 
 ic.gzipIt(tarName+".tar", outDir)
