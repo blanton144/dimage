@@ -76,16 +76,16 @@ else:
 		for name in allFileNamesT[k]:
 			swarpArg += " %s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
-		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -VERBOSE_TYPE=FULL -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits"
+		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -VERBOSE_TYPE=FULL -RESAMPLE_DIR=~ -WEIGHTOUT_NAME=~/weight.fits"
 		os.system("swarp%s %s" % (swarpArg,swarpKARGS))
-		arcFileList.append(outDir + coaddFname)
+		arcFileList.append(coaddFname)
 		for name in allFileNamesT[k]:
 			os.unlink(name)
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
-	tar.add(fname)
-	os.unlink(fname)
+	tar.add("~/"+fname)
+	os.unlink("~/"+fname)
 tar.close()
 
 ic.gzipIt(tarName+".tar", outDir)
