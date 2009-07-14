@@ -46,7 +46,7 @@ for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0]
 closestCenters = ic.repDupesWithZero(closestCenters)													# Replace any duplicates with a 0 to skip
 
 for i in range(len(closestCenters)):
-	if closestCenters[i] == 0: 
+	if closestCenters[i] == 0: pass
 	else:
 		oneImEachBand = []
 		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \				# For each subsection of the target image, find the center,x size,y size to give to clipfits
