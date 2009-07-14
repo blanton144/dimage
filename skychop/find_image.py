@@ -80,7 +80,7 @@ else:
 		#os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME=sdss-tmp/"+coaddFname))
 		arcFileList.append("sdss-tmp/" + coaddFname)
 		for name in allFileNamesT[k]:
-			os.unlink(outDir + name)
+			os.unlink(name)
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
