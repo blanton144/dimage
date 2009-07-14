@@ -76,8 +76,8 @@ else:
 		for name in allFileNamesT[k]:
 			swarpArg += " %s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
-		#os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME=sdss-tmp/"+coaddFname + " -VERBOSE_TYPE=QUIET"))
-		os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -VERBOSE_TYPE=FULL -RESAMPLE_DIR=sdss-tmp"))
+		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -VERBOSE_TYPE=FULL -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/coadd.fits"
+		os.system("swarp%s %s" % (swarpArg,swarpKARGS))
 		arcFileList.append(outDir + coaddFname)
 		for name in allFileNamesT[k]:
 			os.unlink(name)
