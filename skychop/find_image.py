@@ -49,8 +49,8 @@ for i in range(len(closestCenters)):
 	if closestCenters[i] == 0: pass
 	else:
 		oneImEachBand = []
-		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \				# For each subsection of the target image, find the center,x size,y size to give to clipfits
-			closestCenters[i],(RADeg,decDeg), (xSize, ySize), tableData)
+		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \				
+			closestCenters[i],(RADeg,decDeg), (xSize, ySize), tableData)					# For each subsection of the target image, find the center,x size,y size to give to clipfits
 		fileName, fileDir = ic.getFileName(closestCenters[i][0],closestCenters[i][1], fitsPath)			# Get the filename for the closest mosaic to the corner
 		
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
