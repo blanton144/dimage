@@ -6,8 +6,8 @@
 
 import os
 # Enable this line for testing
-os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
 import tarfile
@@ -77,13 +77,14 @@ else:
 			swarpArg += " %s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 		#os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME=sdss-tmp/"+coaddFname + " -VERBOSE_TYPE=QUIET"))
-		os.system("swarp%s %s" % (swarpArg," -IMAGEOUT_NAME=sdss-tmp/"+coaddFname))
+		os.system("swarp%s %s" % (swarpArg,"-IMAGEOUT_NAME=sdss-tmp/"+coaddFname))
 		arcFileList.append("sdss-tmp/" + coaddFname)
 		for name in allFileNamesT[k]:
 			os.unlink(name)
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
+	print fname
 	tar.add(fname)
 	os.unlink(fname)
 tar.close()
