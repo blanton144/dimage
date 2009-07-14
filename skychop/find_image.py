@@ -85,7 +85,7 @@ else:
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
 	tar.add(fname)
-	os.unlink(fname)
+	#os.unlink(fname)
 tar.close()
 
 ic.gzipIt(tarName+".tar", outDir)
