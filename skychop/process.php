@@ -21,6 +21,7 @@
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+			print "<center><br /><a href='index.php'>Make another request</a></center>";
 		}
 		else {
 			print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
