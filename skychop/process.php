@@ -8,6 +8,7 @@
 <body>
 <center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
+	$proc = $_GET['proc'];
 	$skychop = "/var/www/html/sdss3/skychop";
 	$RA = $_GET['ra'];
 	$dec = $_GET['dec'];
@@ -15,16 +16,21 @@
 	$sizeY = $_GET['ysize'];
 	$bands = $_GET['bands'];
 	$fname = $_GET['fname'];
-	$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
-	if ($pysuccess == 1) {
-		print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
-		print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+	if ($proc == 1) {
+		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
+		if ($pysuccess == 1) {
+			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
+			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+		}
+		else {
+			print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
+			print_r($output);
+		}
 	}
 	else {
-		print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
-		print_r($output);
+		$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&proc=1";
+		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 	}
-	
 	/*
 	print_r($_SESSION);
 	$skychop = $_SESSION['skychop'];

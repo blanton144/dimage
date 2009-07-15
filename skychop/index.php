@@ -73,7 +73,7 @@ function checkUncheckAll(theElement) {
 		}
 		
 		if ($submitSuccess) {
-			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname";
+			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&proc=0";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
 	}
