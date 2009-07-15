@@ -98,7 +98,8 @@ function checkUncheckAll(theElement) {
 		}
 		
 		if ($submitSuccess) {
-			echo('<meta http-equiv="Refresh" content="1;url=process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname">');
+			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname";
+			echo('<meta http-equiv="Refresh" content="1;url=".$site.">');
 			//$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $pid 2>&1 &");
 			//start_timer($pid);
 			
