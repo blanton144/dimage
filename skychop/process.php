@@ -22,7 +22,7 @@
 	print "File name = $fname";
 	*/
 	
-	$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$pid 2>&1 &");
+	$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
 	
 ?>
 </head>
