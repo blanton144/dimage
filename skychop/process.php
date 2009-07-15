@@ -29,11 +29,13 @@
 		$script_start = 1;
 	}
 	//if ($_GET['processing'] == 1) {
-	sleep(5);
-	$openfile = fopen("$skychop/sdss-tmp/$fname.txt","r") or exit("Unable to open file!");
-	$line = fgets($openfile);
-	fclose($openfile);
-	print "$line";
+	while ($line != "0") {
+		sleep(5);
+		$openfile = fopen("$skychop/sdss-tmp/$fname.txt","r") or exit("Unable to open file!");
+		$line = fgets($openfile);
+		fclose($openfile);
+		print "$line";
+	}
 	//}
 	/*
 	if ($new_line != "0") {
