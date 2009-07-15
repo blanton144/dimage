@@ -1,5 +1,6 @@
 <?php
 	// Get variables from form GET
+	ini_Set('display_errors',1); // turn on error reporting while developing
 	if (!(isset($_SESSION))) {
 		session_start();
 		$_SESSION['RA'] = $_GET['ra'];
