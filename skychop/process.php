@@ -34,10 +34,10 @@
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
 		$script_start = 1;
 	}
-	if ($_GET['processing'] == "1") {
+	if ($_GET['processing'] == 1) {
 		$new_line = wait_get_line("$fname");
-		print "$new_line";
 	}
+	print "$new_line";
 	
 	if ($new_line != "0") {
 		$site = "process.php?processing=1";
