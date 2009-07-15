@@ -18,4 +18,4 @@ print "This is the 3rd line"
 time.sleep(30)
 print "This is the last line"
 time.sleep(10)
-print 0;
+print 0
