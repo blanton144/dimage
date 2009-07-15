@@ -15,8 +15,7 @@
 		sleep(5);
 		$openfile = fopen("$dir$file","r");
 		$line = fread($openfile, 1024);
-		fclose($openfile);
-		print "$line";
+		//fclose($openfile);
 		return ($line);
 	}
 ?>
