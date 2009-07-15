@@ -26,18 +26,13 @@
 </head>
 <body>
 <?php
-	print "Hello, world!";
 	print_r($_SESSION);
-	/*
-	if (isset($script_start)) {
-		continue;
-	}
-	else {
+	if (!(isset($script_start))) {
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
 		$script_start = 1;
 		print "run script";
 	}
-	
+	/*
 	$new_line = wait_get_line("$_SESSION['fname']");
 	
 	if ($new_line != 0) {
