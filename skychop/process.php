@@ -15,6 +15,7 @@
 		sleep(5);
 		$openfile = fopen("$dir$file","r");
 		$line = fread($openfile, 1024);
+		fclose($openfile);
 		print "$line";
 		return ($line);
 	}
@@ -27,8 +28,6 @@
 </head>
 <body>
 <?php
-	$new_line = 0;
-	print_r($_SESSION);
 	$skychop = $_SESSION['skychop'];
 	$fname = $_SESSION['fname'];
 	if (!(isset($script_start))) {
