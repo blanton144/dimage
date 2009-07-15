@@ -84,16 +84,14 @@ else:
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
-	print fname
 	tar.add("sdss-tmp/"+fname)
 	os.unlink("sdss-tmp/"+fname)
 tar.close()
 
 ic.gzipIt(tarName+".tar", outDir)
 os.chmod(outDir+tarName+".tar.gz",0777)
-"""
+
 if os.path.isfile(outDir+tarName+".tar.gz"):
 	print 1
 else: 
 	print 0
-"""
