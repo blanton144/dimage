@@ -1,6 +1,6 @@
 <?php
 	// Get variables from form GET
-	if !(isset($_SESSION)) {
+	/*if !(isset($_SESSION)) {
 		session_start();
 		$_SESSION['RA'] = $_GET['ra'];
 		$_SESSION['dec'] = $_GET['dec'];
@@ -10,7 +10,7 @@
 		$_SESSION['fname'] = stripslashes($_GET['fname']);
 		$_SESSION['skychop'] = "/var/www/html/sdss3/skychop";
 	}
-	
+	*/
 	function wait_get_line($file) {
 		sleep(5);
 		$openfile = fopen("sdss-tmp/$file","r");
