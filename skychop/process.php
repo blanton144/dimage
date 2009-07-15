@@ -8,6 +8,13 @@
 <body>
 <center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
+	$skychop = "/var/www/html/sdss3/skychop";
+	$RA = $_GET['ra'];
+	$dec = $_GET['dec'];
+	$sizeX = $_GET['xsize'];
+	$sizeY = $_GET['ysize'];
+	$bands = $_GET['bands'];
+	$fname = $_GET['fname'];
 	$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 	if ($pysuccess == 1) {
 		print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
