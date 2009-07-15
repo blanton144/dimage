@@ -27,6 +27,8 @@
 <body>
 <?php
 	print_r($_SESSION);
+	$skychop = $_SESSION['skychop']
+	$fname = $_SESSION['fname']
 	if (!(isset($script_start))) {
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
 		$script_start = 1;
