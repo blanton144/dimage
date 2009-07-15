@@ -23,6 +23,7 @@
 	*/
 	
 	$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
+	print "$test";
 	
 ?>
 </head>
