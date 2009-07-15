@@ -1,10 +1,6 @@
 <?php
-	/*
 	// Get variables from form GET
-	if (isset($_SESSION)) {
-		continue;
-	}
-	else {
+	if !(isset($_SESSION)) {
 		session_start();
 		$_SESSION['RA'] = $_GET['ra'];
 		$_SESSION['dec'] = $_GET['dec'];
@@ -20,7 +16,7 @@
 		$openfile = fopen("sdss-tmp/$file","r");
 		$line = fread($openfile, 1024);
 		return ($line);
-	}*/
+	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
