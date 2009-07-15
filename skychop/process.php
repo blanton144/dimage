@@ -11,10 +11,11 @@
 		$_SESSION['skychop'] = "/var/www/html/sdss3/skychop";
 	}
 	
-	function wait_get_line($file) {
+	function wait_get_line($file,$dir) {
 		sleep(5);
-		$openfile = fopen("sdss-tmp/$file","r");
+		$openfile = fopen("$dir$file","r");
 		$line = fread($openfile, 1024);
+		print "$line";
 		return ($line);
 	}
 ?>
@@ -35,7 +36,7 @@
 		$script_start = 1;
 	}
 	if ($_GET['processing'] == 1) {
-		$new_line = wait_get_line("$fname");
+		$new_line = wait_get_line($fname,"$skychop/sdss-tmp/");
 	}
 	print "$new_line";
 	
