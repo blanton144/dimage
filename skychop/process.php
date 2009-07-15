@@ -39,12 +39,12 @@
 		print "$new_line";
 	}
 	
-	if ($new_line == "0") {
-		$site = "process.php?processing=0";
+	if ($new_line != "0") {
+		$site = "process.php?processing=1";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
 	}
 	else {
-		$site = "process.php?processing=1";
+		$site = "process.php?processing=0";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
 	}
 
