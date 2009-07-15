@@ -13,13 +13,6 @@
 		$_SESSION['skychop'] = "/var/www/html/sdss3/skychop";
 	}
 	
-	function wait_get_line($file,$dir) {
-		sleep(5);
-		$openfile = fopen("$dir$file.txt","r") or exit("Unable to open file!");
-		$line = fgets($openfile);
-		fclose($openfile);
-		return ($line);
-	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -35,11 +28,14 @@
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname.txt 2>&1 &");
 		$script_start = 1;
 	}
-	if ($_GET['processing'] == 1) {
-		$new_line = wait_get_line($fname,"$skychop/sdss-tmp/");
-	}
-	print "$new_line";
-	
+	//if ($_GET['processing'] == 1) {
+	sleep(5);
+	$openfile = fopen("$dir$file.txt","r") or exit("Unable to open file!");
+	$line = fgets($openfile);
+	fclose($openfile);
+	print "$line";
+	//}
+	/*
 	if ($new_line != "0") {
 		$site = "process.php?processing=1";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
@@ -47,7 +43,7 @@
 	else {
 		$site = "process.php?processing=1";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
-	}
+	}*/
 ?>
 </body>
 </html>
