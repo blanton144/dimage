@@ -22,6 +22,7 @@
 </head>
 <body>
 <?php
+	print_r($_SESSION);
 	$skychop = $_SESSION['skychop'];
 	$fname = $_SESSION['fname'];
 	if (!(isset($script_start))) {
