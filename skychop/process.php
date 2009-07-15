@@ -3,8 +3,25 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Untitled Document</title>
+<?php
+	// Get variables from form GET
+	$RA = $_GET['ra'];
+	$dec = $_GET['dec'];
+	$sizeX = $_GET['xsize'];
+	$sizeY = $_GET['ysize'];
+	$bands = $_GET['bands'];
+	$fname = stripslashes($_GET['fname']);
+	
+	// Other variable declarations
+	$skychop = "/var/www/html/sdss3/skychop";
+	
+	print "RA = $RA";
+	print "Dec = $dec";
+	print "Bands = $bands";
+	print "File name = $fname";
+	
+?>
 </head>
-
 <body>
 </body>
 </html>

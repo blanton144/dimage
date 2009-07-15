@@ -50,11 +50,11 @@ function checkUncheckAll(theElement) {
 		$z = $_POST['z'];
 		$all = $_POST['all'];
 		$fname = stripslashes($_POST['fname']);
-		
-		// Other variable declarations
-		$skychop = "/var/www/html/sdss3/skychop";
 		$pid = rand(1000,9999999999);
-		$dir = opendir("$skychop/sdss-tmp");
+		
+		if ($fname == "") {
+			$fname = $pid;
+		}
 		
 		// Check to make sure the PID is not already the name of a directory
 		/*
@@ -98,7 +98,7 @@ function checkUncheckAll(theElement) {
 		}
 		
 		if ($submitSuccess) {
-			echo('<meta http-equiv="Refresh" content="1;url=process.php">');
+			echo('<meta http-equiv="Refresh" content="1;url=process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname">');
 			//$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $pid 2>&1 &");
 			//start_timer($pid);
 			
