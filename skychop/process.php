@@ -34,6 +34,7 @@
 	else {
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
 		$script_start = 1;
+		print "run script";
 	}
 	
 	$new_line = wait_get_line("$_SESSION['fname']");
