@@ -34,7 +34,7 @@
 		$openfile = fopen("$skychop/sdss-tmp/$fname.txt","r") or exit("Unable to open file!");
 		$line = fgets($openfile);
 		fclose($openfile);
-		print "$line";
+		echo($line);
 	}
 	$site = "process.php?processing=1";
 	echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
