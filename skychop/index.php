@@ -14,57 +14,22 @@ function checkUncheckAll(theElement) {
 		}
 	}
 }
-
-function getXMLHTTP() { 
-		var xmlhttp=false;	
-		try{
-			xmlhttp=new XMLHttpRequest();
-		}
-		catch(e)	{		
-			try{			
-				xmlhttp= new ActiveXObject("Microsoft.XMLHTTP");
-			}
-			catch(e){
-				try{
-				xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-				}
-				catch(e1){
-					xmlhttp=false;
-				}
-			}
-		}
-		 	
-		return xmlhttp;
-	}
-	
-function getTBVal(strURL,raOrDec) {
-  var req = getXMLHTTP();
-  if (req)
-  {
-        //function to be called when state is changed
-        req.onreadystatechange = function()
-        {
-          //when state is completed i.e 4
-          if (req.readyState == 4)
-          {
-                // only if http status is "OK"
-                if (req.status == 200)
-                {
-                        document.getElementById(raOrDec).value=req.responseText;
-                }
-                else
-                {
-                        alert("There was a problem while using XMLHTTP:\n" + req.statusText);
-                }
-          }
-        }
-        req.open("GET", strURL, true);
-        req.send(null);
-  }
-}
 </script>
 
 <?php
+	function start_timer($filename, $old_line) {
+		$file = fopen($filename, 'r');
+		$line = fread($file, 1024);
+		if ($line != $old_line) {
+			$site = "http://sdss3.physics.nyu.edu/skychop/index.php?msg=$line";
+		}
+		else {
+			$site = "http://sdss3.physics.nyu.edu/skychop/index.php?msg=$old_line&timer=1";
+		}
+		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
+		
+	}
+	
 	ini_Set('display_errors',1); // turn on error reporting while developing
 	$RA = 210.80415;
 	$dec = 54.34917;
@@ -88,10 +53,11 @@ function getTBVal(strURL,raOrDec) {
 		
 		// Other variable declarations
 		$skychop = "/var/www/html/sdss3/skychop";
-		$pid = rand(1000,99999);
+		$pid = rand(1000,9999999999);
 		$dir = opendir("$skychop/sdss-tmp");
 		
 		// Check to make sure the PID is not already the name of a directory
+		/*
 		while($entry = readdir($dir)) {
 			if ($entry == $pid) {
 				$pid = rand(1000,999999);
@@ -100,6 +66,7 @@ function getTBVal(strURL,raOrDec) {
 			else { continue; }
 		}
 		closedir($dir);
+		*/
 		
 		// Figure out which bands are on and add the letters to an array
 		if ($g == 'on') { $bands .= 'g';}
@@ -129,7 +96,13 @@ function getTBVal(strURL,raOrDec) {
 			print "<font class='errorText'><center>Size must be 0 < X <= 1.0 and 0 < Y <= 1.0</center></font>";
 			$submitSuccess = False;
 		}
+		
 		if ($submitSuccess) {
+			echo('<meta http-equiv="Refresh" content="1;url=process.php">');
+			//$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $pid 2>&1 &");
+			//start_timer($pid);
+			
+			/* Old, pre-js timer check
 			if (empty($fname)) {
 				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $pid 2>&1",$output);
 			}
@@ -143,6 +116,7 @@ function getTBVal(strURL,raOrDec) {
 			if ($pysuccess != 1 && $pysuccess != 0) {
 				print $pysuccess;
 			}
+			*/
 		}
 	}
 ?>
