@@ -8,14 +8,12 @@
 
 import time
 
-print "Processing..."
+testfile = open("sdss-tmp/testfile.txt","w")
+print "Processing..." > testfile
 time.sleep(5)
-print "This is the 1st line"
+print "This is the 1st line" > testfile
 time.sleep(10)
-print "This is the 2nd line"
+print "This is the 2nd line" > testfile
 time.sleep(10)
-print "This is the 3rd line"
-time.sleep(30)
-print "This is the last line"
-time.sleep(10)
-print 0
+print 0 > testfile
+testfile.close()

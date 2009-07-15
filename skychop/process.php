@@ -26,12 +26,12 @@
 	$skychop = $_SESSION['skychop'];
 	$fname = $_SESSION['fname'];
 	if (!(isset($script_start))) {
-		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname.txt 2>&1 &");
+		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py 2>&1 &");
 		$script_start = 1;
 	}
 	if ($_GET['processing'] == 1) {
 		sleep(5);
-		$openfile = fopen("$skychop/sdss-tmp/$fname.txt","r") or exit("Unable to open file!");
+		$openfile = fopen("$skychop/sdss-tmp/testfile.txt","r") or exit("Unable to open file!");
 		$line = fgets($openfile);
 		fclose($openfile);
 		echo($line);
