@@ -1,29 +1,41 @@
+<?php
+	// Get variables from form GET
+	if !(isset($_SESSION)) {
+		session_start();
+		$_SESSION['RA'] = $_GET['ra'];
+		$_SESSION['dec'] = $_GET['dec'];
+		$_SESSION['sizeX'] = $_GET['xsize'];
+		$_SESSION['sizeY'] = $_GET['ysize'];
+		$_SESSION['bands'] = $_GET['bands'];
+		$_SESSION['fname'] = stripslashes($_GET['fname']);
+		$_SESSION['skychop'] = "/var/www/html/sdss3/skychop";
+	}
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Untitled Document</title>
 <?php
-	// Get variables from form GET
-	$RA = $_GET['ra'];
-	$dec = $_GET['dec'];
-	$sizeX = $_GET['xsize'];
-	$sizeY = $_GET['ysize'];
-	$bands = $_GET['bands'];
-	$fname = stripslashes($_GET['fname']);
-	
-	// Other variable declarations
-	$skychop = "/var/www/html/sdss3/skychop";
-	
-	/*
-	print "RA = $RA";
-	print "Dec = $dec";
-	print "Bands = $bands";
-	print "File name = $fname";
-	*/
-	
-	$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
-	print "$test";
+	function wait_get_line($file) {
+		sleep(5);
+		$openfile = fopen("sdss-tmp/$file",'r');
+		$line = fread($openfile, 1024);
+		return $line;
+	}
+	if !(isset($script_start)) {
+		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
+		$script_start = 1;
+	}
+	$new_line = wait_get_line($_SESSION['fname']);
+	if ($new_line != 0) {
+		print "$new_line";
+		$site = "process.php?processing=1";
+		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
+	}
+	else {
+		print "Finished";
+	}
 	
 ?>
 </head>
