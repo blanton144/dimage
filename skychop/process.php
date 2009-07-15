@@ -1,27 +1,24 @@
-<?php
-	session_start();
-	// Get variables from form GET
-	ini_Set('display_errors',1); // turn on error reporting while developing
-	error_reporting(E_ALL & ~E_NOTICE);
-	if (!(isset($_SESSION['RA']))) {
-		$_SESSION['RA'] = $_GET['ra'];
-		$_SESSION['dec'] = $_GET['dec'];
-		$_SESSION['sizeX'] = $_GET['xsize'];
-		$_SESSION['sizeY'] = $_GET['ysize'];
-		$_SESSION['bands'] = $_GET['bands'];
-		$_SESSION['fname'] = stripslashes($_GET['fname']);
-		$_SESSION['skychop'] = "/var/www/html/sdss3/skychop";
-	}
-	
-?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Untitled Document</title>
+<title>Processing Data...</title>
+<link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+<center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
+	$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
+	if ($pysuccess == 1) {
+		print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
+		print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+	}
+	else {
+		print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
+		print_r($output);
+	}
+	
+	/*
 	print_r($_SESSION);
 	$skychop = $_SESSION['skychop'];
 	$fname = $_SESSION['fname'];
@@ -39,7 +36,6 @@
 	$site = "process.php?processing=1";
 	echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 	//}
-	/*
 	if ($new_line != "0") {
 		$site = "process.php?processing=1";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	

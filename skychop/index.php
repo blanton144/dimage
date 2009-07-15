@@ -17,20 +17,7 @@ function checkUncheckAll(theElement) {
 </script>
 
 <?php
-	function start_timer($filename, $old_line) {
-		$file = fopen($filename, 'r');
-		$line = fread($file, 1024);
-		if ($line != $old_line) {
-			$site = "http://sdss3.physics.nyu.edu/skychop/index.php?msg=$line";
-		}
-		else {
-			$site = "http://sdss3.physics.nyu.edu/skychop/index.php?msg=$old_line&timer=1";
-		}
-		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
-		
-	}
-	
-	ini_Set('display_errors',1); // turn on error reporting while developing
+	//ini_Set('display_errors',1); // turn on error reporting while developing
 	$RA = 210.80415;
 	$dec = 54.34917;
 	$sizeX = 0.25;
@@ -55,18 +42,6 @@ function checkUncheckAll(theElement) {
 		if ($fname == "") {
 			$fname = $pid;
 		}
-		
-		// Check to make sure the PID is not already the name of a directory
-		/*
-		while($entry = readdir($dir)) {
-			if ($entry == $pid) {
-				$pid = rand(1000,999999);
-				break;
-			}
-			else { continue; }
-		}
-		closedir($dir);
-		*/
 		
 		// Figure out which bands are on and add the letters to an array
 		if ($g == 'on') { $bands .= 'g';}
@@ -100,29 +75,11 @@ function checkUncheckAll(theElement) {
 		if ($submitSuccess) {
 			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
-			//$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $pid 2>&1 &");
-			//start_timer($pid);
-			
-			/* Old, pre-js timer check
-			if (empty($fname)) {
-				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $pid 2>&1",$output);
-			}
-			else {
-				$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
-			}
-			if ($pysuccess == 0) {
-				print "<font class='errorText'><center>Coordinates out of range.</center></font>";
-				print_r($output);
-			}
-			if ($pysuccess != 1 && $pysuccess != 0) {
-				print $pysuccess;
-			}
-			*/
 		}
 	}
 ?>
 </head>
-<body bgcolor="#eeeeee">
+<body>
 
 <form method='post' name='imageChop'>
 	<table border='0' align='center'>
@@ -251,22 +208,6 @@ function checkUncheckAll(theElement) {
 		</tr>
 	</table>
 </form>
-
-<?php
-	if (isset($_POST['submit'])) {
-		if ($submitSuccess && ($pysuccess == 1)) {
-			if (empty($fname)) {
-				print "<center><a href='sdss-tmp/$pid.tar.gz'>Download Files</a></center>";
-				print "<center><font class='notifyText'>Your session ID is: <b>$pid</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
-			}
-			else {
-				print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
-				print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
-
-			}
-		}
-	}	
-?>
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
 </body>
 </html>
