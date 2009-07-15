@@ -1,6 +1,9 @@
 <?php
 	// Get variables from form GET
-	if !(isset($_SESSION)) {
+	if (isset($_SESSION)) {
+		continue;
+	}
+	else {
 		session_start();
 		$_SESSION['RA'] = $_GET['ra'];
 		$_SESSION['dec'] = $_GET['dec'];
@@ -24,11 +27,17 @@
 		$line = fread($openfile, 1024);
 		return ($line);
 	}
-	if !(isset($script_start)) {
+	
+	if (isset($script_start)) {
+		continue;
+	}
+	else {
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
 		$script_start = 1;
 	}
-	$new_line = wait_get_line($_SESSION['fname']);
+	
+	$new_line = wait_get_line("$_SESSION['fname']");
+	
 	if ($new_line != 0) {
 		print "$new_line";
 		$site = "process.php?processing=1";
