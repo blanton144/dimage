@@ -29,14 +29,15 @@
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname.txt 2>&1 &");
 		$script_start = 1;
 	}
-	//if ($_GET['processing'] == 1) {
-	while ($line != "0") {
+	if ($_GET['processing'] == 1) {
 		sleep(5);
 		$openfile = fopen("$skychop/sdss-tmp/$fname.txt","r") or exit("Unable to open file!");
 		$line = fgets($openfile);
 		fclose($openfile);
 		print "$line";
 	}
+	$site = "process.php?processing=1";
+	echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 	//}
 	/*
 	if ($new_line != "0") {
