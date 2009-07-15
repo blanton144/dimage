@@ -21,7 +21,7 @@
 		sleep(5);
 		$openfile = fopen("sdss-tmp/$file",'r');
 		$line = fread($openfile, 1024);
-		return $line;
+		return ($line);
 	}
 	if !(isset($script_start)) {
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
