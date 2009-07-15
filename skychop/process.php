@@ -1,6 +1,7 @@
 <?php
 	// Get variables from form GET
 	ini_Set('display_errors',1); // turn on error reporting while developing
+	error_reporting(E_ALL & ~E_NOTICE);
 	if (!(isset($_SESSION))) {
 		session_start();
 		$_SESSION['RA'] = $_GET['ra'];
@@ -14,9 +15,9 @@
 	
 	function wait_get_line($file,$dir) {
 		sleep(5);
-		$openfile = fopen("$dir$file","r");
-		$line = fread($openfile, 1024);
-		//fclose($openfile);
+		$openfile = fopen("$dir$file.txt","r") or exit("Unable to open file!");
+		$line = fgets($openfile);
+		fclose($openfile);
 		return ($line);
 	}
 ?>
@@ -31,7 +32,7 @@
 	$skychop = $_SESSION['skychop'];
 	$fname = $_SESSION['fname'];
 	if (!(isset($script_start))) {
-		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
+		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname.txt 2>&1 &");
 		$script_start = 1;
 	}
 	if ($_GET['processing'] == 1) {
@@ -47,7 +48,6 @@
 		$site = "process.php?processing=1";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
 	}
-
 ?>
 </body>
 </html>
