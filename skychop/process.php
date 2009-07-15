@@ -31,7 +31,7 @@
 <body>
 <?php
 	print "Hello, world!";
-	
+	/*
 	if (isset($script_start)) {
 		continue;
 	}
@@ -51,7 +51,7 @@
 	else {
 		print "Finished";
 	}
-	
+	*/
 ?>
 </body>
 </html>
