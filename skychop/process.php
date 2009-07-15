@@ -27,6 +27,7 @@
 <body>
 <?php
 	print "Hello, world!";
+	print "$_SESSION['RA']";
 	/*
 	if (isset($script_start)) {
 		continue;
