@@ -15,10 +15,14 @@
 	// Other variable declarations
 	$skychop = "/var/www/html/sdss3/skychop";
 	
+	/*
 	print "RA = $RA";
 	print "Dec = $dec";
 	print "Bands = $bands";
 	print "File name = $fname";
+	*/
+	
+	$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$pid 2>&1 &");
 	
 ?>
 </head>
