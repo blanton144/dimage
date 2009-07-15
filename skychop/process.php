@@ -1,9 +1,9 @@
 <?php
+	session_start();
 	// Get variables from form GET
 	ini_Set('display_errors',1); // turn on error reporting while developing
 	error_reporting(E_ALL & ~E_NOTICE);
-	if (!(isset($_SESSION))) {
-		session_start();
+	if (!(isset($_SESSION['RA']))) {
 		$_SESSION['RA'] = $_GET['ra'];
 		$_SESSION['dec'] = $_GET['dec'];
 		$_SESSION['sizeX'] = $_GET['xsize'];
@@ -30,7 +30,7 @@
 	}
 	//if ($_GET['processing'] == 1) {
 	sleep(5);
-	$openfile = fopen("$dir$file.txt","r") or exit("Unable to open file!");
+	$openfile = fopen("$skychop/sdss-tmp/$fname.txt","r") or exit("Unable to open file!");
 	$line = fgets($openfile);
 	fclose($openfile);
 	print "$line";
