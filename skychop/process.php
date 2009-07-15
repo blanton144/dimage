@@ -26,6 +26,7 @@
 </head>
 <body>
 <?php
+	$new_line = 0;
 	print_r($_SESSION);
 	$skychop = $_SESSION['skychop'];
 	$fname = $_SESSION['fname'];
@@ -33,15 +34,18 @@
 		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py > $skychop/sdss-tmp/$fname 2>&1 &");
 		$script_start = 1;
 	}
-	$new_line = wait_get_line("$fname");
-	
-	if ($new_line != 0) {
+	if ($_GET['processing'] == 1) {
+		$new_line = wait_get_line("$fname");
 		print "$new_line";
-		$site = "process.php?processing=1";
+	}
+	
+	if ($new_line == "0") {
+		$site = "process.php?processing=0";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
 	}
 	else {
-		print "Finished";
+		$site = "process.php?processing=1";
+		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
 	}
 
 ?>
