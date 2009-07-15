@@ -84,6 +84,7 @@ else:
 
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
+	print fname
 	tar.add("sdss-tmp/"+fname)
 	os.unlink("sdss-tmp/"+fname)
 tar.close()
