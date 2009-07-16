@@ -13,7 +13,7 @@ tmpFiles = os.listdir(home)
 
 tarFileList = []
 for file in tmpFiles:
-	if file[-6:] == 'tar.gz':
+	if (file[-6:] == 'tar.gz') or (file[-4:] == 'fits') or (file[-3:] == 'txt'):
 		tarFileList.append(file)
 	else: pass
 

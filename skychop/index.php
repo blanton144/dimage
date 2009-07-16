@@ -22,6 +22,7 @@ function checkUncheckAll(theElement) {
 	$dec = 54.34917;
 	$sizeX = 0.25;
 	$sizeY = 0.25;
+	$fname = "";
 	
 	if (isset($_POST['submit'])) {
 		$submitSuccess = True;
@@ -200,7 +201,7 @@ function checkUncheckAll(theElement) {
 		</tr>
 		<tr>
 			<td><font class='theLabels'>Output Filename:</font></td>
-			<td><input type='text' name='fname' id='fname' size='10' />.tar.gz <font class='notifyText'>(optional)</font></td>
+			<td><input type='text' name='fname' id='fname' size='10' value=<?php "$fname";?> />.tar.gz <font class='notifyText'>(optional)</font></td>
 		</tr
 		><tr>
 			<td align='center' colspan='2' valign='bottom'><br />
