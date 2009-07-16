@@ -8,6 +8,7 @@ import os
 # Enable this line for testing
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+os.system("ulimit -n 1024")
 import image_chop as ic
 import sys
 import tarfile
