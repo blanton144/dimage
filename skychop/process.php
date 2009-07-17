@@ -25,8 +25,9 @@
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "" . $output[$i * 2];
 			print "$swarp";
-			exec($swarp,$swarpout);
+			$outpu = exec("$swarp",$swarpout);
 			print_r($swarpout);
+			print "$outpu";
 			$tar_files .= $output[($i * 2) +1];
 		}
 
