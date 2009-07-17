@@ -23,9 +23,10 @@
 	if ($proc == 1) {
 		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		for ($i = 0; $i < strlen($bands); $i++) {
-			$swarp = "" . $output[$i * 2];
+			$swarp = "swarp " . $output[$i * 2];
+			print "$swarp";
 			//$outpu = system($swarp,$swarpout);
-			$outpu = system("swarp " . $output[$i * 2],$swarpout);
+			$outpu = system($swarp,$swarpout);
 			print_r($swarpout);
 			$tar_files .= $output[($i * 2) +1];
 		}
