@@ -24,13 +24,11 @@
 		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		for ($i = 0; $i < strlen($bands); $i++) {
 			exec($output[$i * 2],$swarpout);
-			print_r($swarpout);
 			$tar_files += " sdss-tmp/" + $output[($i * 2) +1];
-			echo($output[$i * 2]);
-			print "$tar_files";
 		}
-		exec("tar -cvvf sdss-tmp/$fname.tar$tar_files");
-		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
+		print "$tar_files";
+		//exec("tar -cvvf sdss-tmp/$fname.tar$tar_files");
+		//exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
 		/*
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";

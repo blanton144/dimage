@@ -88,8 +88,6 @@ else:
 		#for name in allFileNamesT[k]:
 		#	os.unlink(name)
 
-print 0
-
 """
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
