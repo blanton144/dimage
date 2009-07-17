@@ -21,7 +21,7 @@
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
-			print "<center><br /><a href='index.php'>Make another request</a></center>";
+			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
 		}
 		else {
 			print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
@@ -32,32 +32,6 @@
 		$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&proc=1";
 		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 	}
-	/*
-	print_r($_SESSION);
-	$skychop = $_SESSION['skychop'];
-	$fname = $_SESSION['fname'];
-	if (!(isset($script_start))) {
-		$test = exec("/usr/local/epd/bin/python $skychop/test_js_timer.py 2>&1 &");
-		$script_start = 1;
-	}
-	if ($_GET['processing'] == 1) {
-		sleep(5);
-		$openfile = fopen("$skychop/sdss-tmp/testfile.txt","r") or exit("Unable to open file!");
-		$line = fgets($openfile);
-		fclose($openfile);
-		echo($line);
-	}
-	$site = "process.php?processing=1";
-	echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
-	//}
-	if ($new_line != "0") {
-		$site = "process.php?processing=1";
-		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
-	}
-	else {
-		$site = "process.php?processing=1";
-		echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');	
-	}*/
 ?>
 </body>
 </html>

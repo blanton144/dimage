@@ -8,7 +8,6 @@ import os
 # Enable this line for testing
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
-os.system("ulimit -n 1024")
 import image_chop as ic
 import sys
 import tarfile
@@ -77,12 +76,16 @@ else:
 		for name in allFileNamesT[k]:
 			swarpArg += " sdss-tmp/%s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
-		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -VERBOSE_TYPE=FULL -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits"
-		os.system("swarp%s %s" % (swarpArg,swarpKARGS))
-		arcFileList.append(coaddFname)
-		for name in allFileNamesT[k]:
-			os.unlink(name)
+		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits"
+		swarpCmds.append("swarp%s %s" % (swarpArg,swarpKARGS))
+		#os.system("swarp%s %s" % (swarpArg,swarpKARGS))
+		arcFileList.append("sdss-tmp/"+coaddFname)
+		#for name in allFileNamesT[k]:
+		#	os.unlink(name)
 
+
+
+"""
 tar = tarfile.open(outDir + tarName+".tar", "w")
 for fname in arcFileList:
 	tar.add("sdss-tmp/"+fname)
@@ -96,3 +99,4 @@ if os.path.isfile(outDir+tarName+".tar.gz"):
 	print 1
 else: 
 	print 0
+"""
