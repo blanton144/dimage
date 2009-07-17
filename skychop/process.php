@@ -16,8 +16,18 @@
 	$sizeY = $_GET['ysize'];
 	$bands = $_GET['bands'];
 	$fname = $_GET['fname'];
+	$tar_files = "";
+	
 	if ($proc == 1) {
 		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
+		for ($i = 0; $i < strlen($bands); $i++) {
+			exec($output[$i * 2]);
+			$tar_files += " sdss-tmp/" + $output[($i * 2) +1];
+		}
+		
+		system("tar -cvvf sdss-tmp/$fname.tar$tar_files");
+		system("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
+		/*
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
@@ -27,6 +37,7 @@
 			print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
 			print_r($output);
 		}
+		*/
 	}
 	else {
 		$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&proc=1";
