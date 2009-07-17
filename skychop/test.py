@@ -45,4 +45,8 @@ def convertArray(arr):
 
 a = {0:"/ahh/ahhh/hahahaha/ls",1:"ohno/this/is/a/path",2:"dfgdfg"}
 
-print convertArray(a)
+#print convertArray(a)
+
+print "blah blah1"
+print "blah blah2"
+print "AHHHHH"

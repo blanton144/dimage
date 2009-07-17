@@ -7,7 +7,7 @@
 <body>
 <?php
 	$it = exec("python test.py 2>&1");
-	print "$it[0],$it[1]";
+	print_r($it);
 ?>
 </body>
 </html>
