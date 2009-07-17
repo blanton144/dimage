@@ -24,7 +24,8 @@
 		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "" . $output[$i * 2];
-			$outpu = system($swarp,$swarpout);
+			//$outpu = system($swarp,$swarpout);
+			$outpu = system("ls -a",$swarpout);
 			print_r($swarpout);
 			$tar_files .= $output[($i * 2) +1];
 		}
