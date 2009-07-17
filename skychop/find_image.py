@@ -34,7 +34,8 @@ oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg
 					  (RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg+ySize/2.0)]	# Respective opposite corners to the above
 clipXYCen = []
 rectListx,rectListy = [],[]
-arcFileList = []
+arcFileList = {}
+swarpCmds = {}
 closestCenters = []
 allFileNames = None
 
@@ -69,7 +70,8 @@ allFileNamesT = allFileNames.transpose()
 """ For each clipped subimage in each row (organized by BAND), SWarp the images together"""
 if np.shape(allFileNamesT)[1] == 1:
 	for k in range(np.shape(allFileNamesT)[0]):
-		arcFileList.append(allFileNamesT[k][0])
+		arcFileList[k] = allFileNamesT[k][0]
+		swarpCmds[k] = ""
 else:
 	for k in range(np.shape(allFileNamesT)[0]):
 		swarpArg =""
@@ -77,9 +79,9 @@ else:
 			swarpArg += " sdss-tmp/%s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits"
-		swarpCmds.append("swarp%s %s" % (swarpArg,swarpKARGS))
+		swarpCmds[k] = "swarp%s %s" % (swarpArg,swarpKARGS)
 		#os.system("swarp%s %s" % (swarpArg,swarpKARGS))
-		arcFileList.append("sdss-tmp/"+coaddFname)
+		arcFileList[k] = "sdss-tmp/"+coaddFname
 		#for name in allFileNamesT[k]:
 		#	os.unlink(name)
 
