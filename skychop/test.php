@@ -6,8 +6,8 @@
 </head>
 <body>
 <?php
-	$it = exec("ulimit -n");
-	echo($it);
+	$it = exec("python test.py 2>&1");
+	print_r($it);
 ?>
 </body>
 </html>
