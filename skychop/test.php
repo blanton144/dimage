@@ -6,8 +6,8 @@
 </head>
 <body>
 <?php
-	$it = exec("python test.py 2>&1");
-	print_r($it);
+	$it = exec("python test.py 2>&1",$output);
+	print_r($output);
 ?>
 </body>
 </html>
