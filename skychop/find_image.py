@@ -70,8 +70,9 @@ allFileNamesT = allFileNames.transpose()
 """ For each clipped subimage in each row (organized by BAND), SWarp the images together"""
 if np.shape(allFileNamesT)[1] == 1:
 	for k in range(np.shape(allFileNamesT)[0]):
-		arcFileList[k] = allFileNamesT[k][0]
-		swarpCmds[k] = ""
+		#arcFileList[k] = allFileNamesT[k][0]
+		print allFileNamesT[k][0]
+		print ""
 else:
 	for k in range(np.shape(allFileNamesT)[0]):
 		swarpArg =""
@@ -79,13 +80,15 @@ else:
 			swarpArg += " sdss-tmp/%s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits"
-		swarpCmds[k] = "swarp%s %s" % (swarpArg,swarpKARGS)
+		#swarpCmds[k] = "swarp%s %s" % (swarpArg,swarpKARGS)
+		print "swarp%s %s" % (swarpArg,swarpKARGS)
 		#os.system("swarp%s %s" % (swarpArg,swarpKARGS))
-		arcFileList[k] = "sdss-tmp/"+coaddFname
+		#arcFileList[k] = "sdss-tmp/"+coaddFname
+		print "sdss-tmp/"+coaddFname
 		#for name in allFileNamesT[k]:
 		#	os.unlink(name)
 
-
+print 0
 
 """
 tar = tarfile.open(outDir + tarName+".tar", "w")
