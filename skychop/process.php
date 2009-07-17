@@ -26,8 +26,9 @@
 			$swarp = "swarp " . $output[$i * 2];
 			print "$swarp";
 			//$outpu = system($swarp,$swarpout);
-			$outpu = system($swarp,$swarpout);
+			$outpu = system("swarp J090717.10+244822.6-clipped-r-137.300643615_24.7.fits J091122.99+244822.6-clipped-r-137.362909628_24.7.fits -IMAGEOUT_NAME=sdss-tmp/ARGH.fits -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits",$swarpout);
 			print_r($swarpout);
+			print "$outpu";
 			$tar_files .= $output[($i * 2) +1];
 		}
 
