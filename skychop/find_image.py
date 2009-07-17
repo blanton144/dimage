@@ -81,7 +81,7 @@ else:
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits"
 		#swarpCmds[k] = "swarp%s %s" % (swarpArg,swarpKARGS)
-		print "swarp%s %s" % (swarpArg,swarpKARGS)
+		print "%s %s" % (swarpArg,swarpKARGS)
 		#os.system("swarp%s %s" % (swarpArg,swarpKARGS))
 		#arcFileList[k] = "sdss-tmp/"+coaddFname
 		print "sdss-tmp/"+coaddFname
