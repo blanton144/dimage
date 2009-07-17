@@ -40,7 +40,7 @@ function checkUncheckAll(theElement) {
 		$fname = stripslashes($_POST['fname']);
 		$pid = rand(1000,9999999999);
 		
-		if ($fname == "") {
+		if ($fname == "" || $fname == "/") {
 			$fname = $pid;
 		}
 		

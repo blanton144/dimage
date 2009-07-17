@@ -27,7 +27,6 @@
 			print "$output[$i * 2]";
 			print "$tar_files";
 		}
-		
 		exec("tar -cvvf sdss-tmp/$fname.tar$tar_files");
 		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
 		/*
