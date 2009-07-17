@@ -8,6 +8,8 @@
 <body>
 <center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
+	ini_set("display_errors","2");
+	ERROR_REPORTING(E_ALL);
 	$proc = $_GET['proc'];
 	$skychop = "/var/www/html/sdss3/skychop";
 	$RA = $_GET['ra'];
