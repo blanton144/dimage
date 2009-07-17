@@ -25,7 +25,7 @@
 		for ($i = 0; $i < strlen($bands); $i++) {
 			exec($output[$i * 2],$swarpout);
 			print_r($swarpout);
-			$tar_files += " sdss-tmp/" + $output[($i * 2) +1];
+			$tar_files += " sdss-tmp/$output[($i * 2) +1]";
 			print "$output[$i * 2]";
 			print "$tar_files";
 		}
