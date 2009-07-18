@@ -8,7 +8,7 @@
 <?php
 	ini_set('display_errors',1);
 	error_reporting(E_ALL|E_STRICT);
-	$it = system("/usr/bin/swarp sdss-tmp/J125148.59+413246.5-clipped-u-192.721_41.1456388691.fits sdss-tmp/J125152.78+403658.5-clipped-u-192.721_41.0556387165.fits -IMAGEOUT_NAME=sdss-tmp/test.fits",$output);
+	$it = system("/usr/bin/swarp sdss-tmp/J125148.59+413246.5-clipped-u-192.721_41.1456388691.fits sdss-tmp/J125152.78+403658.5-clipped-u-192.721_41.0556387165.fits -IMAGEOUT_NAME=sdss-tmp/test.fits 2>&1",$output);
 	print_r($output);
 	print_r($it);
 ?>
