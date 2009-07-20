@@ -32,9 +32,10 @@
 			$tar_files .= $output[($i * 2) +1];
 		}
 
-		exec("tar -cvvf sdss-tmp/$fname.tar$tar_files");
-		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
-		chmod("sdss-tmp/$fname.tar.gz",0777);
+		print "tar -cvvf sdss-tmp/$fname.tar$tar_files";
+		//exec("tar -cvvf sdss-tmp/$fname.tar$tar_files");
+		//exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
+		//chmod("sdss-tmp/$fname.tar.gz",0777);
 		
 		/*
 		if ($pysuccess == 1) {
