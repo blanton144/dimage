@@ -24,7 +24,8 @@
 		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");	
 		$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/coadd.weight.fits");
 		$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/swarp.xml";
-		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
+		$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
+		
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp,$swarpout);
