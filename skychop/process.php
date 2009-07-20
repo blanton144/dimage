@@ -27,6 +27,7 @@
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp . " 2>&1",$swarpout);
 			//print_r($swarpout);
+			print "$swarp";
 			$tar_files .= $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/" . $output[($i * 2) +1];
 		}
@@ -36,8 +37,8 @@
 		chmod("sdss-tmp/$fname.tar.gz",0777);
 		
 		// Clean Up
-		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
-		
+		//unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
+		//unlink($filesToRmv);
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
@@ -45,7 +46,6 @@
 		}
 		else {
 			print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
-			print_r($output);
 		}
 	}
 	else {
