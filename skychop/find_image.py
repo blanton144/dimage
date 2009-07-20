@@ -77,14 +77,23 @@ else:
 	for k in range(np.shape(allFileNamesT)[0]):
 		swarpArg =""
 		for name in allFileNamesT[k]:
+			swarpArg += " %s" % name
+			"""
 			swarpArg += " sdss-tmp/%s" % name
+			"""
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
+		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight.fits"
+		"""
 		swarpKARGS = "-IMAGEOUT_NAME=sdss-tmp/" + coaddFname + " -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits"
+		"""
 		#swarpCmds[k] = "swarp%s %s" % (swarpArg,swarpKARGS)
 		print "%s %s" % (swarpArg,swarpKARGS)
 		#os.system("swarp%s %s" % (swarpArg,swarpKARGS))
 		#arcFileList[k] = "sdss-tmp/"+coaddFname
+		print coaddFname
+		"""
 		print "sdss-tmp/"+coaddFname
+		"""
 		#for name in allFileNamesT[k]:
 		#	os.unlink(name)
 
