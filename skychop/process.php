@@ -36,12 +36,13 @@
 		/*exec("tar -cvvf sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
 		chmod("sdss-tmp/$fname.tar.gz",0777); */
-		exec("tar -cvvf $fname.tar $tar_files");
-		exec("gzip -c $fname.tar > $fname.tar.gz");
-		chmod("$fname.tar.gz",0777);
+		print "$tar_files";
+		//exec("tar -cvvf $fname.tar $tar_files");
+		//exec("gzip -c $fname.tar > $fname.tar.gz");
+		//chmod("$fname.tar.gz",0777);
 		
 		// Clean Up
-		//unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
+		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
 		//unlink($filesToRmv);
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
