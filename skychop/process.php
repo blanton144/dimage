@@ -21,15 +21,14 @@
 	$tar_files = "";
 	
 	if ($proc == 1) {
+		$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits");
 		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
-			print "$swarp";
 			$outpu = system($swarp . " 2>&1",$swarpout);
-			//$outpu = system("/usr/bin/swarp sdss-tmp/J090717.10+244822.6-clipped-r-137.300643615_24.7.fits sdss-tmp/J091122.99+244822.6-clipped-r-137.362909628_24.7.fits -IMAGEOUT_NAME=sdss-tmp/ARGH.fits -RESAMPLE_DIR=sdss-tmp -WEIGHTOUT_NAME=sdss-tmp/weight.fits",$swarpout);
 			print_r($swarpout);
-			print "$outpu";
 			$tar_files .= $output[($i * 2) +1];
+			$filesToRmv[] = $output[($i * 2) +1];
 		}
 
 		exec("tar -cvvf sdss-tmp/$fname.tar $tar_files");
@@ -37,8 +36,13 @@
 		chmod("sdss-tmp/$fname.tar.gz",0777);
 		
 		// Clean Up
-		unlink("sdss-tmp/$fname.tar");
+		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
+		print_r($filesToRmv);
+		/*
 		unlink("$tar_files");
+		foreach ($filesToRmv as $f) {
+			unlink("");
+		}*/
 		
 		/*
 		if ($pysuccess == 1) {
