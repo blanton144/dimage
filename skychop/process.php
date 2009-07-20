@@ -26,10 +26,9 @@
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp . " 2>&1",$swarpout);
-			print_r($swarpout);
+			//print_r($swarpout);
 			$tar_files .= $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/" . $output[($i * 2) +1];
-			$filesToRmv[] = "/var/www/html/sdss3/skychop/"
 		}
 
 		exec("tar -cvvf sdss-tmp/$fname.tar $tar_files");
@@ -38,10 +37,6 @@
 		
 		// Clean Up
 		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
-		print_r($filesToRmv);
-		/*foreach ($filesToRmv as $f) {
-			unlink($f);
-		}*/
 		
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
