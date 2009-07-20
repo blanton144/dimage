@@ -12,13 +12,22 @@ home = '/var/www/html/sdss3/apw235/sdss-tmp/'
 tmpFiles = os.listdir(home)
 
 tarFileList = []
+fitstxtList = []
 for file in tmpFiles:
-	if (file[-6:] == 'tar.gz') or (file[-4:] == 'fits') or (file[-3:] == 'txt'):
-		tarFileList.append(file)
+	if (file[-6:] == 'tar.gz'):
+		fileList.append(file)
+	elif  (file[-4:] == 'fits') or (file[-3:] == 'txt'):
+		fitstxtList.append(file)
 	else: pass
 
-for tarFile in tarFileList:
-	cTime = os.stat(home+tarFile).st_ctime
+for file in fileList:
+	cTime = os.stat(home+file).st_ctime
 	if (t.time() - cTime) >= 1800.0:
-		os.remove(home+tarFile)
+		os.remove(home+file)
+	else: pass
+	
+for file in fitstxtList:
+	cTime = os.stat(home+file).st_ctime
+	if (t.time() - cTime) >= 300.0:
+		os.remove(home+file)
 	else: pass
