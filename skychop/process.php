@@ -31,7 +31,7 @@
 			//print_r($swarpout);
 			//print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
-			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp" . $output[($i * 2) +1];
+			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
 		}
 
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
