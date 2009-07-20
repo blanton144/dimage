@@ -8,6 +8,7 @@
 <?php
 	ini_set('display_errors',1);
 	error_reporting(E_ALL|E_STRICT);
+	$no = system("ulimit -n 1068",$outputt);
 	$it = system("ulimit -a",$output);
 	print_r($output);
 	print_r($it);
