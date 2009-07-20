@@ -36,6 +36,10 @@
 		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
 		chmod("sdss-tmp/$fname.tar.gz",0777);
 		
+		// Clean Up
+		unlink("sdss-tmp/$fname.tar");
+		unlink("$tar_files");
+		
 		/*
 		if ($pysuccess == 1) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
