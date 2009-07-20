@@ -21,26 +21,24 @@
 	$tar_files = "";
 	
 	if ($proc == 1) {
-		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
-		system("pwd");		
+		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");	
 		$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits");
 		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
-		print_r($output);
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp . " -VERBOSE_TYPE=FULL 2>&1",$swarpout);
-			print_r($swarpout);
-			print "$outpu";
+			//print_r($swarpout);
+			//print "$outpu";
 			$tar_files .= $output[($i * 2) +1];
-			$filesToRmv[] = "/var/www/html/sdss3/skychop/" . $output[($i * 2) +1];
+			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp" . $output[($i * 2) +1];
 		}
 
 		/*exec("tar -cvvf sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
 		chmod("sdss-tmp/$fname.tar.gz",0777); */
-		//exec("tar -cvvf $fname.tar $tar_files");
-		//exec("gzip -c $fname.tar > sdss-tmp/$fname.tar.gz");
-		//chmod("$fname.tar.gz",0777);
+		exec("tar -cvvf $fname.tar $tar_files");
+		exec("gzip -c $fname.tar > $fname.tar.gz");
+		chmod("$fname.tar.gz",0777);
 		
 		// Clean Up
 		//unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
