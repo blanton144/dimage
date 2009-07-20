@@ -29,15 +29,14 @@
 			$outpu = system($swarp,$swarpout);
 			//print_r($swarpout);
 			//print "$outpu";
-			$tar_files .= $output[($i * 2) +1];
+			$tar_files .= " " . $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp" . $output[($i * 2) +1];
 		}
 
 		/*exec("tar -cvvf sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
 		chmod("sdss-tmp/$fname.tar.gz",0777); */
-		print "tar -cvvf $skychop/sdss-tmp/$fname.tar $skychop/sdss-tmp/$tar_files";
-		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $skychop/sdss-tmp/$tar_files");
+		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
 		
