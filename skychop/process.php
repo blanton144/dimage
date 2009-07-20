@@ -26,8 +26,8 @@
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp . " 2>&1",$swarpout);
-			//print_r($swarpout);
-			print "$swarp";
+			print_r($swarpout);
+			//print "$swarp";
 			$tar_files .= $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/" . $output[($i * 2) +1];
 		}
