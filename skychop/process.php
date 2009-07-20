@@ -22,7 +22,8 @@
 	
 	if ($proc == 1) {
 		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");	
-		$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits");
+		$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/coadd.weight.fits");
+		$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/swarp.xml";
 		$pysuccess = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
@@ -33,18 +34,17 @@
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp" . $output[($i * 2) +1];
 		}
 
-		/*exec("tar -cvvf sdss-tmp/$fname.tar $tar_files");
-		exec("gzip -c sdss-tmp/$fname.tar > sdss-tmp/$fname.tar.gz");
-		chmod("sdss-tmp/$fname.tar.gz",0777); */
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
 		
 		// Clean Up
 		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
-		//unlink($filesToRmv);
+		foreach ($filesToRmv as $f) {
+			unlink($f);
+		}
 		
-		if ($pysuccess == 1) {
+		if (file_exists("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar.gz")) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
 			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
