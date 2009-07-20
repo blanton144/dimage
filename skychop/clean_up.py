@@ -11,7 +11,7 @@ import os
 home = '/var/www/html/sdss3/apw235/sdss-tmp/'
 tmpFiles = os.listdir(home)
 
-tarFileList = []
+fileList = []
 fitstxtList = []
 for file in tmpFiles:
 	if (file[-6:] == 'tar.gz'):
