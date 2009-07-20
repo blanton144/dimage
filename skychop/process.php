@@ -27,7 +27,7 @@
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp . " -VERBOSE_TYPE=FULL 2>&1",$swarpout);
 			print_r($swarpout);
-			//print "$swarp";
+			print "$outpu";
 			$tar_files .= $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/" . $output[($i * 2) +1];
 		}
