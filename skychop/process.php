@@ -29,6 +29,7 @@
 			print_r($swarpout);
 			$tar_files .= $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/" . $output[($i * 2) +1];
+			$filesToRmv[] = "/var/www/html/sdss3/skychop/" . $output[$i * 2];
 		}
 
 		exec("tar -cvvf sdss-tmp/$fname.tar $tar_files");
@@ -37,9 +38,10 @@
 		
 		// Clean Up
 		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
-		foreach ($filesToRmv as $f) {
+		print_r($filesToRmv);
+		/*foreach ($filesToRmv as $f) {
 			unlink($f);
-		}
+		}*/
 		
 		/*
 		if ($pysuccess == 1) {
