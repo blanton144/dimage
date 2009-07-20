@@ -25,7 +25,7 @@ size = xSize, ySize
 
 """Constants and other variable declarations"""
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"													# Server path to FITS data files
-dataFile = "sky-patches.fits"																	# FITS file to read SDSS mosaic center (RA, DEC)
+dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"																	# FITS file to read SDSS mosaic center (RA, DEC)
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
 tableData = pf.open(dataFile)[1].data															# Table of (RA, DEC) values from SDSS mosaics
 targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0), \
