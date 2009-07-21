@@ -157,6 +157,19 @@ function checkUncheckAll(theElement) {
 						?>
 					</td>
 				</tr>
+                <tr>
+					<td>r:</td>
+					<td>
+						<?php 
+							if ($_POST['r'] == 'on') {
+								print '<input type="checkbox" name="r" id="r" checked="yes" />'; 
+							}
+							else { 
+								print '<input type="checkbox" name="r" id="r" />'; 
+							}
+						?>
+					</td>
+				</tr>
 				<tr>
 					<td>i:</td>
 					<td>
@@ -166,19 +179,6 @@ function checkUncheckAll(theElement) {
 							}
 							else { 
 								print '<input type="checkbox" name="i" id="i" />'; 
-							}
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td>r:</td>
-					<td>
-						<?php 
-							if ($_POST['r'] == 'on') {
-								print '<input type="checkbox" name="r" id="r" checked="yes" />'; 
-							}
-							else { 
-								print '<input type="checkbox" name="r" id="r" />'; 
 							}
 						?>
 					</td>
@@ -201,7 +201,11 @@ function checkUncheckAll(theElement) {
 		</tr>
 		<tr>
 			<td><font class='theLabels'>Output Filename:</font></td>
-			<td><input type='text' name='fname' id='fname' size='10' value=<?php "$fname";?> />.tar.gz <font class='notifyText'>(optional)</font></td>
+			<td>
+            <?php
+            	print "<input type='text' name='fname' id='fname' size='10' value='$fname' />";
+			?> 
+            .tar.gz <font class='notifyText'>(optional)</font></td>
 		</tr
 		><tr>
 			<td align='center' colspan='2' valign='bottom'><br />
