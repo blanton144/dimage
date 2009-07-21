@@ -58,6 +58,7 @@
 			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
 			if ($thumbYN == 1) {
 				print "<br /><center><img src='$thumbName[0]'></center>";
+				print "$thumbName[0]";
 			}
 		}
 		else {
