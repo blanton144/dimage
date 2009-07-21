@@ -57,8 +57,7 @@
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
 			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
 			if ($thumbYN == 1) {
-				print "<br /><center><img src='$thumbName[0]'></center>";
-				print "$thumbName[0]";
+				print "<br /><center><img src='$skychop/sdss-tmp/$thumbName[0]'></center>";
 			}
 		}
 		else {
