@@ -77,6 +77,7 @@ function checkUncheckAll(theElement) {
 		
 		if ($submitSuccess) {
 			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&tyn=$tyn&proc=0";
+			print "$site";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
 	}
