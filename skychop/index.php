@@ -211,8 +211,21 @@ function checkUncheckAll(theElement) {
             	print "<input type='text' name='fname' id='fname' size='10' value='$fname' />";
 			?> 
             .tar.gz <font class='notifyText'>(optional)</font></td>
-		</tr
-		><tr>
+		</tr>
+        <tr>
+        	<td>Generate PNG thumbnail: </td>
+            <td>
+				<?php 
+                    if ($_POST['tyn'] == 'on') {
+                        print '<input type="checkbox" name="tyn" id="tyn" checked="yes" />'; 
+                    }
+                    else { 
+                        print '<input type="checkbox" name="tyn" id="tyn" />'; 
+                    }
+                ?>
+            </td>
+        </tr>
+        <tr>
 			<td align='center' colspan='2' valign='bottom'><br />
 			<input type='submit' name='submit' value='Submit' />
 		</tr>
@@ -222,7 +235,6 @@ function checkUncheckAll(theElement) {
 <br />
 <center><font class='notifyText'>Report bugs to <a class='reDLink' href='mailto:apw235@nyu.edu'>Adrian Price-Whelan</a></font>
 <br />
-<font class="regText" size="8">
 </center>
 </body>
 </html>
