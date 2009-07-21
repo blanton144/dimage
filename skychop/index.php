@@ -36,6 +36,8 @@ function checkUncheckAll(theElement) {
 		$r = $_POST['r'];
 		$u = $_POST['u'];
 		$z = $_POST['z'];
+		if ($_POST['tyn'] = 'on') { $tyn = 1; }
+		else { $tyn = 0; }
 		$all = $_POST['all'];
 		$fname = stripslashes($_POST['fname']);
 		$pid = rand(1000,9999999999);
@@ -74,12 +76,7 @@ function checkUncheckAll(theElement) {
 		}
 		
 		if ($submitSuccess) {
-			if ($tyn == 'on') {
-				$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&tyn=y&proc=0";
-			}
-			else {
-				$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&tyn=n&proc=0";
-			}
+			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&tyn=$tyn&proc=0";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
 	}

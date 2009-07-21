@@ -25,7 +25,6 @@
 	if ($proc == 1) {
 		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");	
 		$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits");
-		$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/swarp.xml";
 		$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		
 		for ($i = 0; $i < strlen($bands); $i++) {
