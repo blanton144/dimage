@@ -19,6 +19,7 @@
 	$bands = $_GET['bands'];
 	$fname = $_GET['fname'];
 	$thumb = $_GET['thumb'];
+	$thumbYN = $_GET['tyn'];
 	$tar_files = "";
 	
 	if ($proc == 1) {
@@ -34,12 +35,14 @@
 			//print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
-			if ($bands[$i] == $thumb) {
+			if ($bands[$i] == $thumb && $thumbYN == 'y') {
 				$im = $output[($i * 2) +1];
 			}
 		}
 		
-		exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname");		
+		if ($thumbYN == 'y') {
+			exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname", $thumbName);
+		}
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
@@ -54,6 +57,9 @@
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
 			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
+			if ($thumbYN == 'y') {
+				print "<br /><center><img src='$thumbName[0]'></center>";
+			}
 		}
 		else {
 			print "<font class='errorText'><center>An unknown error has occurred.</center></font>";

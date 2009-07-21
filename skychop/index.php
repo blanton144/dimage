@@ -74,7 +74,12 @@ function checkUncheckAll(theElement) {
 		}
 		
 		if ($submitSuccess) {
-			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&proc=0";
+			if ($tyn == 'on') {
+				$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&tyn=y&proc=0";
+			}
+			else {
+				$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&tyn=n&proc=0";
+			}
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
 	}

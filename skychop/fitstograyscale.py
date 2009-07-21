@@ -32,3 +32,4 @@ dataArray = pyfits.open(file)[0].data
 image = Image.fromarray((255.0*asinh(dataArray, non_linear=beta)).astype('UInt8'), 'L')
 image = image.resize((400,400),Image.BICUBIC)
 image.save("tmp-%s.png" % pid)
+print "tmp-%s.png" % pid
