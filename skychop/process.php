@@ -18,6 +18,7 @@
 	$sizeY = $_GET['ysize'];
 	$bands = $_GET['bands'];
 	$fname = $_GET['fname'];
+	$thumb = $_GET['thumb'];
 	$tar_files = "";
 	
 	if ($proc == 1) {
@@ -33,8 +34,12 @@
 			//print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
+			if ($bands[$i] == $thumb) {
+				$im = $output[($i * 2) +1];
+			}
 		}
-
+		
+		exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname");		
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);

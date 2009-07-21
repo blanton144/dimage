@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>
-SDSS Sky Chop
+SDSS Sky Chop - Alpha Version
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="style.css" rel="stylesheet" type="text/css">
@@ -37,7 +37,7 @@ function checkUncheckAll(theElement) {
 		$u = $_POST['u'];
 		$z = $_POST['z'];
 		$all = $_POST['all'];
-		$fname = $_POST['fname'];
+		$fname = stripslashes($_POST['fname']);
 		$pid = rand(1000,9999999999);
 		
 		if ($fname == "" || $fname == "/") {
@@ -45,11 +45,11 @@ function checkUncheckAll(theElement) {
 		}
 		
 		// Figure out which bands are on and add the letters to an array
-		if ($g == 'on') { $bands .= 'g';}
-		if ($i == 'on') { $bands .= 'i';}
-		if ($r == 'on') { $bands .= 'r';}
-		if ($u == 'on') { $bands .= 'u';}
-		if ($z == 'on') { $bands .= 'z';}
+		if ($z == 'on') { $bands .= 'z'; $thmb = 'z'; }
+		if ($u == 'on') { $bands .= 'u'; $thmb = 'u'; }
+		if ($g == 'on') { $bands .= 'g'; $thmb = 'g'; }
+		if ($i == 'on') { $bands .= 'i'; $thmb = 'i'; }
+		if ($r == 'on') { $bands .= 'r'; $thmb = 'r'; }
 		
 		// Validate input
 		if (strlen($bands) == 0) {
@@ -74,7 +74,7 @@ function checkUncheckAll(theElement) {
 		}
 		
 		if ($submitSuccess) {
-			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&proc=0";
+			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&proc=0";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
 	}
@@ -214,5 +214,10 @@ function checkUncheckAll(theElement) {
 	</table>
 </form>
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
+<br />
+<center><font class='notifyText'>Report bugs to <a class='reDLink' href='mailto:apw235@nyu.edu'>Adrian Price-Whelan</a></font>
+<br />
+<font class="regText" size="8">
+</center>
 </body>
 </html>
