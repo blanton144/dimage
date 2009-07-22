@@ -14,7 +14,7 @@ tmpFiles = os.listdir(home)
 fileList = []
 fitstxtList = []
 for file in tmpFiles:
-	if (file[-6:] == 'tar.gz'):
+	if (file[-6:] == 'tar.gz' or file[-3:] == 'png'):
 		fileList.append(file)
 	elif  (file[-4:] == 'fits') or (file[-3:] == 'txt'):
 		fitstxtList.append(file)
