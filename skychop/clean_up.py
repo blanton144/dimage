@@ -8,7 +8,7 @@
 import time as t
 import os
 
-home = '/var/www/html/sdss3/apw235/sdss-tmp/'
+home = '/var/www/html/sdss3/skychop/sdss-tmp/'
 tmpFiles = os.listdir(home)
 
 fileList = []
