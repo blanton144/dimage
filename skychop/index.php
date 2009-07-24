@@ -17,7 +17,7 @@ function checkUncheckAll(theElement) {
 </script>
 
 <?php
-	//ini_Set('display_errors',1); // turn on error reporting while developing
+	// Default settings for the Pinwheel Galaxy
 	$RA = 210.80415;
 	$dec = 54.34917;
 	$sizeX = 0.25;
@@ -39,11 +39,10 @@ function checkUncheckAll(theElement) {
 		if ($_POST['tyn'] = 'on') { $tyn = 1; }
 		else { $tyn = 0; }
 		$all = $_POST['all'];
-		$fname = stripslashes($_POST['fname']);
-		$pid = rand(1000,9999999999);
-		
+		$fname = str_replace(" ", "", stripslashes($_POST['fname'])); // Remove slashes and spaces from filename for security
+			
 		if ($fname == "" || $fname == "/") {
-			$fname = $pid;
+			$fname = rand(1000,9999999999);
 		}
 		
 		// Figure out which bands are on and add the letters to an array
@@ -59,7 +58,7 @@ function checkUncheckAll(theElement) {
 			$submitSuccess = False;
 		}
 		if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($sizeX)) || !(is_numeric($sizeY))) {
-			print "<font class='errorText'><center>Please correct your input.</center></font>";
+			print "<font class='errorText'><center>Enter only numbers into coordinates and size!</center></font>";
 			$submitSuccess = False;
 		}
 		if (strlen($fname) > 20) {
@@ -217,7 +216,7 @@ function checkUncheckAll(theElement) {
                         print '<input type="checkbox" name="tyn" id="tyn" checked="yes" />'; 
                     }
                     else { 
-                        print '<input type="checkbox" name="tyn" id="tyn" />'; 
+                        print '<input type="checkbox" name="tyn" id="tyn" checked="no" />'; 
                     }
                 ?>
             </td>
