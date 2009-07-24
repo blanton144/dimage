@@ -14,9 +14,6 @@ import pyfits as pf
 from math import fabs, sqrt
 import gzip
 from shutil import move
-from astLib import astCoords
-from astLib import astImages
-from astLib import astWCS
 import operator
 
 def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
@@ -153,6 +150,9 @@ def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
 	return rectCenter, (fabs(Xs[xInd]-A),fabs(Ys[yInd]-B))
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
+	from astLib import astCoords
+	from astLib import astImages
+	from astLib import astWCS
 	img = pf.open(inFileName)
 	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
 	# So here we search through the extensions until we find 2D image data
