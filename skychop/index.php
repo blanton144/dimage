@@ -47,8 +47,6 @@ function checkUncheckAll(theElement) {
 		
 		// Test to see if the coordinates are in range
 		$coord_test_out = exec("/usr/local/epd/bin/python test_the_coords.py $RA $dec 2>&1",$coord_test);
-		print "$coord_test_out";
-		print "$coord_test";
 		// Figure out which bands are on and add the letters to an array
 		if ($z == 'on') { $bands .= 'z'; $thmb = 'z'; }
 		if ($u == 'on') { $bands .= 'u'; $thmb = 'u'; }
@@ -61,7 +59,7 @@ function checkUncheckAll(theElement) {
 			print "<font class='errorText'><center>Please select a band!</center></font>";
 			$submitSuccess = False;
 		}
-		if ($coord_test == 0 || $coord_test == '0') {
+		if ($coord_test_out == 0 || $coord_test_out == '0') {
 			print "<font class='errorText'><center>Coordinates out of range!</center></font>";
 			$submitSuccess = False;
 		}
