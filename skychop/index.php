@@ -235,6 +235,8 @@ function checkUncheckAll(theElement) {
 </form>
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
 <br />
+<center><font class='notifyText'><a class='reDLink' href='faq.php'></a></font></center>
+<br />
 <center><font class='notifyText'>Report bugs to <a class='reDLink' href='mailto:apw235@nyu.edu'>Adrian Price-Whelan</a></font>
 <br />
 </center>

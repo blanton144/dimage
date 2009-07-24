@@ -5,14 +5,11 @@
 #
 
 import os
-# Enable this line for testing
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
 import tarfile
 import pyfits as pf
-from math import sqrt, fabs
 import numpy as np
 
 """Collect user input in the form of shell arguments"""
@@ -25,7 +22,7 @@ size = xSize, ySize
 
 """Constants and other variable declarations"""
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"													# Server path to FITS data files
-dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"																	# FITS file to read SDSS mosaic center (RA, DEC)
+dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"										# FITS file to read SDSS mosaic center (RA, DEC)
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
 tableData = pf.open(dataFile)[1].data															# Table of (RA, DEC) values from SDSS mosaics
 targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0), \
@@ -51,8 +48,8 @@ for i in range(len(closestCenters)):
 	else:
 		oneImEachBand = []
 		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
-			closestCenters[i],(RADeg,decDeg), (xSize, ySize), tableData)					# For each subsection of the target image, find the center,x size,y size to give to clipfits
-		fileName, fileDir = ic.getFileName(closestCenters[i][0],closestCenters[i][1], fitsPath)			# Get the filename for the closest mosaic to the corner
+			closestCenters[i],(RADeg,decDeg), (xSize, ySize), tableData)							# For each subsection of the target image, find the center, x size, y size to give to clipfits
+		fileName, fileDir = ic.getFileName(closestCenters[i][0],closestCenters[i][1], fitsPath)		# Get the filename for the closest mosaic to the corner
 		
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		
@@ -70,7 +67,6 @@ allFileNamesT = allFileNames.transpose()
 """ For each clipped subimage in each row (organized by BAND), SWarp the images together"""
 if np.shape(allFileNamesT)[1] == 1:
 	for k in range(np.shape(allFileNamesT)[0]):
-		#arcFileList[k] = allFileNamesT[k][0]
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight.fits"
 		print "%s %s" % (allFileNamesT[k][0], swarpKARGS)
@@ -82,26 +78,5 @@ else:
 			swarpArg += " %s" % name
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
 		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight.fits"
-		#swarpCmds[k] = "swarp%s %s" % (swarpArg,swarpKARGS)
 		print "%s %s" % (swarpArg,swarpKARGS)
-		#os.system("swarp%s %s" % (swarpArg,swarpKARGS))
-		#arcFileList[k] = "sdss-tmp/"+coaddFname
 		print coaddFname
-		#for name in allFileNamesT[k]:
-		#	os.unlink(name)
-
-"""
-tar = tarfile.open(outDir + tarName+".tar", "w")
-for fname in arcFileList:
-	tar.add("sdss-tmp/"+fname)
-	os.unlink("sdss-tmp/"+fname)
-tar.close()
-
-ic.gzipIt(tarName+".tar", outDir)
-os.chmod(outDir+tarName+".tar.gz",0777)
-
-if os.path.isfile(outDir+tarName+".tar.gz"):
-	print 1
-else: 
-	print 0
-"""

@@ -1,20 +1,16 @@
 #!/usr/local/epd/bin/python
 #
-# Made it a function, not a stand-alone module
-#
-# Cuts out a square region from a .fits file and saves it out as a .fits file
-#
 
 import os
-# Enable this line for testing
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
-from math import fabs, sqrt
 import gzip
 from shutil import move
 import operator
+from astLib import astCoords
+from astLib import astImages
+from astLib import astWCS
 
 def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
 	RADEC_list = []
@@ -22,7 +18,6 @@ def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
 		offset = np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2)
 		if offset <= (np.sqrt((xSize/2.0)**2.0+(ySize/2.0)**2.0)+0.5):
 			RADEC_list.append((tableData[i][0],tableData[i][1],offset))
-	
 	sortedList = sorted(RADEC_list, key=operator.itemgetter(2))
 	return sortedList
 	
@@ -71,16 +66,16 @@ def getFileName(theRA, theDec, fitsPath):
 		os._exit(0)
 	
 	if degDec > 0.0:
-		if fabs(int(degDec)) % 2 == 0: pathDec = fabs(int(degDec))
-		else: pathDec = fabs(int(degDec)) - 1
+		if np.fabs(int(degDec)) % 2 == 0: pathDec = np.fabs(int(degDec))
+		else: pathDec = np.fabs(int(degDec)) - 1
 		RADecPath = "%(path)s%(hrRa)02dh/p%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"dec":pathDec}
 	else:
-		if fabs(int(degDec)) % 2 == 0: pathDec = fabs(int(degDec))
-		else: pathDec = fabs(int(degDec)) + 1
+		if np.fabs(int(degDec)) % 2 == 0: pathDec = np.fabs(int(degDec))
+		else: pathDec = np.fabs(int(degDec)) + 1
 		RADecPath = "%(path)s%(hrRa)02dh/m%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"dec":pathDec}
 	
 	fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
-		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
+		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":np.fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
 
 	return fileName, RADecPath
 
@@ -104,7 +99,7 @@ def getIAUFname(theRA, theDec):
 		os._exit(0)
 
 	fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
-		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
+		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":np.fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
 
 	return fileName
 
@@ -139,20 +134,17 @@ def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
 	ALPH,DELT = (float(ALPH),float(DELT))
 	xSz,ySz = (float(xSz),float(ySz))
 	
-	KAPPA,BETA = ((C-A)/fabs(C-A),(D-B)/fabs(D-B))
+	KAPPA,BETA = ((C-A)/np.fabs(C-A),(D-B)/np.fabs(D-B))
 	Xs = [U + KAPPA/2.0,ALPH + (KAPPA*xSz/2.0)]
 	Ys = [V + BETA/2.0,DELT + (BETA*ySz/2.0)]
-	XDs = [fabs(A-(U + KAPPA/2.0)),fabs(A-(ALPH + (KAPPA*xSz/2.0)))]
-	YDs = [fabs(B-(V + BETA/2.0)),fabs(B-(DELT + (BETA*ySz/2.0)))]
+	XDs = [np.fabs(A-(U + KAPPA/2.0)),np.fabs(A-(ALPH + (KAPPA*xSz/2.0)))]
+	YDs = [np.fabs(B-(V + BETA/2.0)),np.fabs(B-(DELT + (BETA*ySz/2.0)))]
 	xInd = XDs.index(min(XDs))
 	yInd = YDs.index(min(YDs))
 	rectCenter = midpt((A,B),(Xs[xInd],Ys[yInd]))
-	return rectCenter, (fabs(Xs[xInd]-A),fabs(Ys[yInd]-B))
+	return rectCenter, (np.fabs(Xs[xInd]-A),np.fabs(Ys[yInd]-B))
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
-	from astLib import astCoords
-	from astLib import astImages
-	from astLib import astWCS
 	img = pf.open(inFileName)
 	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
 	# So here we search through the extensions until we find 2D image data
@@ -175,4 +167,4 @@ def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 def midpt((x,y),(u,v)):
 	return ((x+u)/2.0,(y+v)/2.0)
 def dist((x,y),(u,v)):
-	return sqrt((x-u)**2+(y-v)**2)
+	return np.sqrt((x-u)**2+(y-v)**2)
