@@ -11,8 +11,8 @@ homeDir = "/var/www/html/sdss3/skychop/sdss-tmp/"			# Path to output directory
 #############################################
 
 import os
-#os.environ['HOME'] = homeDir
-os.environ['HOME'] = "/var/www/html/sdss3/skychop/"
+os.environ['HOME'] = homeDir
+#os.environ['HOME'] = "/var/www/html/sdss3/skychop/"
 import image_chop as ic
 import apw_utils as apw
 import sys
