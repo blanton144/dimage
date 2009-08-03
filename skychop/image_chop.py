@@ -1,50 +1,22 @@
 #!/usr/local/epd/bin/python
 #
 
+homeDir = "/var/www/html/sdss3/skychop/sdss-tmp"
+
 import os
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
-import numpy as np
-import pyfits as pf
-import gzip
-from shutil import move
-import operator
+os.environ['HOME'] = homeDir
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
-
-def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
-	RADEC_list = []
-	for i in range(np.shape(tableData)[0]):
-		offset = np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2)
-		if offset <= (np.sqrt((xSize/2.0)**2.0+(ySize/2.0)**2.0)+0.5):
-			RADEC_list.append((tableData[i][0],tableData[i][1],offset))
-	sortedList = sorted(RADEC_list, key=operator.itemgetter(2))
-	return sortedList
+import apw_utils as apw
+from math import fabs
 	
-def findClosestCenter(RADeg, decDeg, tableData):
+def findClosestCenter(RADeg, decDeg, tableData, TBshape):
 	offsets = []
-	for i in range(np.shape(tableData)[0]):
-		offsets.append(np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2))
+	for i in range(TBshape):
+		offsets.append( apw.dist((RADeg,tableData[i][0]),(decDeg,tableData[i][1])) )
 	index = offsets.index(min(offsets))
 	return tableData[index][0], tableData[index][1]
-
-def remDupes(seq):
-    seen = set()
-    return [x for x in seq if x not in seen and not seen.add(x)]
-	
-def repDupesWithZero(seq): 
-	def idfun(x): return x
-	seen = {}
-	result = []
-	for item in seq:
-		marker = idfun(item)
-		if marker not in seen:
-			seen[marker] = 1
-			result.append(item)
-		else:
-			seen[marker] = 1
-			result.append(0)
-	return result
 
 def getFileName(theRA, theDec, fitsPath):
 	degRa = theRA / 15.0
@@ -66,16 +38,16 @@ def getFileName(theRA, theDec, fitsPath):
 		os._exit(0)
 	
 	if degDec > 0.0:
-		if np.fabs(int(degDec)) % 2 == 0: pathDec = np.fabs(int(degDec))
-		else: pathDec = np.fabs(int(degDec)) - 1
+		if fabs(int(degDec)) % 2 == 0: pathDec = fabs(int(degDec))
+		else: pathDec = fabs(int(degDec)) - 1
 		RADecPath = "%(path)s%(hrRa)02dh/p%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"dec":pathDec}
 	else:
-		if np.fabs(int(degDec)) % 2 == 0: pathDec = np.fabs(int(degDec))
-		else: pathDec = np.fabs(int(degDec)) + 1
+		if fabs(int(degDec)) % 2 == 0: pathDec = fabs(int(degDec))
+		else: pathDec = fabs(int(degDec)) + 1
 		RADecPath = "%(path)s%(hrRa)02dh/m%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"dec":pathDec}
 	
 	fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
-		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":np.fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
+		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
 
 	return fileName, RADecPath
 
@@ -99,29 +71,9 @@ def getIAUFname(theRA, theDec):
 		os._exit(0)
 
 	fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
-		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":np.fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
+		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
 
 	return fileName
-
-def gzipIt(file, outDir):
-	r_file = open(outDir+file, 'r')
-	w_file = gzip.GzipFile(outDir+file + '.gz', 'w', 9)
-	w_file.write(r_file.read())
-	w_file.flush()
-	w_file.close()
-	r_file.close()
-	os.unlink(outDir+file)
-	return None
-
-def gunzipIt(file, fileDir, outDir):
-	r_file = gzip.GzipFile(fileDir + "/" + file, 'r')
-	write_file = outDir + file[:-3]
-	w_file = open(write_file, 'w')
-	w_file.write(r_file.read())
-	w_file.close()
-	r_file.close()
-	move(write_file,outDir + file[:-3])
-	return None
 
 def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
 	# A,B = targetCorner
@@ -134,18 +86,17 @@ def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
 	ALPH,DELT = (float(ALPH),float(DELT))
 	xSz,ySz = (float(xSz),float(ySz))
 	
-	KAPPA,BETA = ((C-A)/np.fabs(C-A),(D-B)/np.fabs(D-B))
+	KAPPA,BETA = ((C-A)/fabs(C-A),(D-B)/fabs(D-B))
 	Xs = [U + KAPPA/2.0,ALPH + (KAPPA*xSz/2.0)]
 	Ys = [V + BETA/2.0,DELT + (BETA*ySz/2.0)]
-	XDs = [np.fabs(A-(U + KAPPA/2.0)),np.fabs(A-(ALPH + (KAPPA*xSz/2.0)))]
-	YDs = [np.fabs(B-(V + BETA/2.0)),np.fabs(B-(DELT + (BETA*ySz/2.0)))]
+	XDs = [fabs(A-(U + KAPPA/2.0)),fabs(A-(ALPH + (KAPPA*xSz/2.0)))]
+	YDs = [fabs(B-(V + BETA/2.0)),fabs(B-(DELT + (BETA*ySz/2.0)))]
 	xInd = XDs.index(min(XDs))
 	yInd = YDs.index(min(YDs))
-	rectCenter = midpt((A,B),(Xs[xInd],Ys[yInd]))
-	return rectCenter, (np.fabs(Xs[xInd]-A),np.fabs(Ys[yInd]-B))
+	rectCenter = apw.midpt((A,B),(Xs[xInd],Ys[yInd]))
+	return rectCenter, (fabs(Xs[xInd]-A),fabs(Ys[yInd]-B))
 
-def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
-	img = pf.open(inFileName)
+def clipFits(img, RADeg, decDeg, clipSizeDeg, outFileName):
 	# Sometimes images (like some in the INT-WFS) don't have the image data in extension [0]
 	# So here we search through the extensions until we find 2D image data
 	fitsExtension=None
@@ -163,8 +114,3 @@ def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 
 		clipped = astImages.clipImageSectionWCS(imgData, imgWCS, RADeg, decDeg, clipSizeDeg)
 		astImages.saveFITS(outFileName, clipped['data'], clipped['wcs'])
-
-def midpt((x,y),(u,v)):
-	return ((x+u)/2.0,(y+v)/2.0)
-def dist((x,y),(u,v)):
-	return np.sqrt((x-u)**2+(y-v)**2)
