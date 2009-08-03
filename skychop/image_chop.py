@@ -4,7 +4,8 @@
 homeDir = "/var/www/html/sdss3/skychop/sdss-tmp"
 
 import os
-os.environ['HOME'] = homeDir
+#os.environ['HOME'] = homeDir
+os.environ['HOME'] = "/var/www/html/sdss3/skychop/"
 from astLib import astCoords
 from astLib import astImages
 from astLib import astWCS
