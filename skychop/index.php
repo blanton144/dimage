@@ -92,7 +92,7 @@ function checkUncheckAll(theElement) {
 <form method='post' name='imageChop'>
 	<table border='0' align='center'>
 		<tr>
-			<td valign='middle' align='center' colspan='2'><font class='theLabels'>Coordinates:</font></td>
+			<td valign='middle' align='center' colspan='2'><font class='theLabels'><u>Coordinates</u></font></td>
 		</tr>
 	
 		<tr>
@@ -234,6 +234,8 @@ function checkUncheckAll(theElement) {
 	</table>
 </form>
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
+<br />
+<center><font class='notifyText'>Questions? Check the <a class='reDLink' href='FAQ.php'>FAQ.</a></font></center>
 <br />
 <center><font class='notifyText'>Report bugs to <a class='reDLink' href='mailto:apw235@nyu.edu'>Adrian Price-Whelan</a></font>
 <br />
