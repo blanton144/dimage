@@ -8,6 +8,8 @@
 <body>
 <center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
+	ini_set("display_errors","2");
+	ERROR_REPORTING(E_ALL);
 	$proc = $_GET['proc'];
 	$skychop = "/var/www/html/sdss3/skychop";
 	$RA = $_GET['ra'];
@@ -28,6 +30,8 @@
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp,$swarpout);
+			//print_r($swarpout);
+			//print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
 			if ($bands[$i] == $thumb && $thumbYN == 1) {
