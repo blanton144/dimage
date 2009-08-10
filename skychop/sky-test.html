@@ -31,9 +31,9 @@ function writeSize(map){
 	var bounds = map.getBounds();
 	var southWest = bounds.getSouthWest()
 	var northEast = bounds.getNorthEast()
-	var lngSpan = lon2ra(northEast.lng()) - lon2ra(southWest.lng());
+	var lngSpan = lon2ra(southWest.lng()) - lon2ra(northEast.lng());
 	var latSpan = northEast.lat() - southWest.lat();
-	document.getElementById("corners").innerHTML = "Size: " + lngSpan + " by " + (1.0 / Math.cos(latSpan));
+	document.getElementById("corners").innerHTML = "Size: " + lngSpan + " by " + latSpan;
 }
 function CenterVP(){
   var ra = document.getElementById("RA").value;
