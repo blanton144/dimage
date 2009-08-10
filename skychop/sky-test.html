@@ -27,11 +27,10 @@ function addImage(url, ramin, ramax, decmin, decmax, map){
 function writeCenter(map){
   document.getElementById("output").innerHTML = "RA: " + lon2ra(map.getCenter().lng()) + "<br>DEC: " + map.getCenter().lat();
 }
-/*
 function writeSize(map){
 	var bounds = map.getBounds();
 	document.getElementById("corners").innerHTML = "SW Corner: " + bounds.getSouthWest() + "<br>NE Corner: " + bounds.getNorthEast();
-}*/
+}
 function CenterVP(){
   var ra = document.getElementById("RA").value;
   var dec = document.getElementById("DEC").value;
@@ -51,7 +50,7 @@ function initialize() {
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
-	  //writeSize(map);
+	  writeSize(map);
     });
   }
 }
