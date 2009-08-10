@@ -29,7 +29,11 @@ function writeCenter(map){
 }
 function writeSize(map){
 	var bounds = map.getBounds();
-	document.getElementById("corners").innerHTML = "SW Corner: " + bounds.getSouthWest() + "<br>NE Corner: " + bounds.getNorthEast();
+	var southWest = bounds.getSouthWest()
+	var northEast = bounds.getNorthEast()
+	var lngSpan = northEast.lng() - southWest.lng();
+	var latSpan = northEast.lat() - southWest.lat();
+	document.getElementById("corners").innerHTML = "Size: " + lngSpan + " by " + latSpan;
 }
 function CenterVP(){
   var ra = document.getElementById("RA").value;
