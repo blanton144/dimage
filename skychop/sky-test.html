@@ -5,11 +5,6 @@
   type="text/javascript"></script>
 <script type="text/javascript">
 var map;
-function makeMark (ra, dec, description, map){
-  var mark = new GMarker(new GLatLng(dec, ra2lon(ra)), { title : description });
-  mark.bindInfoWindowHtml("Want to know more?<br><a href=\"http://www.google.com\">Google it!</a>");
-  map.addOverlay(mark);
-}
 function ra2lon(ra){
   var lon = 180 - ra;
   return lon;
@@ -18,14 +13,12 @@ function lon2ra(lon){
   var ra = 180 - lon;
   return ra;
 }
-function addImage(url, ramin, ramax, decmin, decmax, map){
-  var sw = new GLatLng(decmin, ra2lon(ramax));
-  var ne = new GLatLng(decmax, ra2lon(ramin));
-  var img = new GGroundOverlay(url, new GLatLngBounds(sw, ne));
-  map.addOverlay(img);
-}
 function writeCenter(map){
   document.getElementById("output").innerHTML = "RA: " + lon2ra(map.getCenter().lng()) + "<br>DEC: " + map.getCenter().lat();
+}
+function writeSize(map){
+	var bounds = new GLatLngBounds(sw, ne);
+	document.getElementById("corners").innerHTML = "SW Corner: " + bounds.getSouthWest() + "<br>NE Corner: " + bounds.getNorthEast();
 }
 function CenterVP(){
   var ra = document.getElementById("RA").value;
@@ -42,7 +35,7 @@ function initialize() {
     mt[0].getProjection = function() {return p;}
     mt[0].getMaximumResolution = function() {return 13;}
     mt[0].getMinimumResolution = function() {return 2;}
-    map.setCenter(new GLatLng(41.267, ra2lon(10.675)), 3);
+    map.setCenter(new GLatLng(210.80415, ra2lon(54.349)), 3);
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
@@ -67,9 +60,13 @@ function initialize() {
   </tr>
 </table>
 </div>
-<div id="sky_map" style="height:500px;width:800px">
+<center>
+<div id="sky_map" style="height:500px;width:500px">
 </div>
+</center>
 <div id="output">
+</div>
+<div id="corners">
 </div>
 </body>
 </html>
