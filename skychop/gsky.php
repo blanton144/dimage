@@ -28,7 +28,8 @@ function lon2ra(lon){
   return ra;
 }
 function writeCenter(map){
-  document.getElementById("output").innerHTML = "RA: " + lon2ra(map.getCenter().lng()) + "<br>DEC: " + map.getCenter().lat();
+  document.getElementById("ra").value = lon2ra(map.getCenter().lng());
+  document.getElementById("dec").value = map.getCenter().lat();
 }
 function getSize(map){
 	var bounds = map.getBounds();
@@ -73,8 +74,8 @@ function initialize() {
 	if (isset($_POST['submit'])) {
 		$submitSuccess = True;
 		// Get variables from form POST
-		$RA = $_POST['ra'];
-		$dec = $_POST['dec'];
+		$RA = $_GET['ra'];
+		$dec = $_GET['dec'];
 		$sizeX = $_POST['sizex'];
 		$sizeY = $_POST['sizey'];
 		$g = $_POST['g'];
