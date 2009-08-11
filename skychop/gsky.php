@@ -33,10 +33,10 @@ function writeCenter(map){
 }
 function getSize(map){
 	var bounds = map.getBounds();
-	var southWest = bounds.getSouthWest()
-	var northEast = bounds.getNorthEast()
+	var southWest = bounds.getSouthWest();
+	var northEast = bounds.getNorthEast();
 	var lngSpan = southWest.lng() - northEast.lng();
-	return lngSpan
+	return lngSpan;
 }
 function CenterVP(){
   var ra = document.getElementById("ra").value;
@@ -57,13 +57,7 @@ function initialize() {
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
-	  var bounds = map.getBounds();
-	  var southWest = bounds.getSouthWest()
-	  var northEast = bounds.getNorthEast()
-	  var lngSpan = southWest.lng() - northEast.lng();
-	  document.getElementById("sizex").value = lngSpan;
-	  print lngSpan;
-	  //document.getElementById("sizex").value = getSize(map);
+	  document.getElementById("sizex").value = getSize(map);
     });
   }
 }
