@@ -48,11 +48,11 @@ function initialize() {
     map = new GMap2(document.getElementById("sky_map"), {
       mapTypes : G_SKY_MAP_TYPES
       });
-    var p = new GMercatorProjection(30);
+    var p = new GMercatorProjection(20);
     var mt = map.getMapTypes();
     mt[0].getProjection = function() {return p;}
-    mt[0].getMaximumResolution = function() {return 13;}
-    mt[0].getMinimumResolution = function() {return 2;}
+    mt[0].getMaximumResolution = function() {return 14;}
+    mt[0].getMinimumResolution = function() {return 3;}	
     map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
@@ -178,7 +178,7 @@ function initialize() {
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
 				  <?php
-                          print "<td valign='middle'><input type='text' name='sizex' id='sizex' size='10' value='$sizeX' />";
+                          print "<td valign='middle'><input type='hidden' name='sizex' id='sizex' size='10' value='$sizeX' /> $sizeX by $sizeY";
                   ?>
                       <font class='notifyText'>degrees</font>
                   </td>
