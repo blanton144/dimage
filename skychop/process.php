@@ -40,7 +40,7 @@
 		}
 		
 		if ($thumbYN == 1) {
-			exec("/usr/local/epd/bin/python $skychop/fits2png.py $im $fname", $thumbName);
+			exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname", $thumbName);
 		}
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");

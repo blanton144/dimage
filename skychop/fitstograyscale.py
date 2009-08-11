@@ -30,5 +30,6 @@ pid = sys.argv[2]
 dataArray = pyfits.open(file)[0].data
 image = Image.fromarray((255.0*asinhScale(dataArray, scale_max=scoreatpercentile(dataArray.ravel(),100.0), non_linear=beta)).astype('UInt8'), 'L')
 image = image.resize((400,400),Image.BICUBIC)
+image.transpose(FLIP_TOP_BOTTOM)
 image.save("%s-asinh.png" % pid)
 print "%s-asinh.png" % pid
