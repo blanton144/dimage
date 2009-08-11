@@ -35,7 +35,7 @@ function setSize(map){
 	var bounds = map.getBounds();
 	var southWest = bounds.getSouthWest();
 	var northEast = bounds.getNorthEast();
-	var lngSpan = southWest.lng() - northEast.lng();
+	var lngSpan = Math.abs(lon2ra(southWest.lng()) - lon2ra(northEast.lng()));
 	document.getElementById("sizex").value = lngSpan;
 }
 function CenterVP(){
