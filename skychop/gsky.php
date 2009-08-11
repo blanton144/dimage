@@ -298,6 +298,7 @@ function initialize() {
                   <input type='submit' name='submit' value='Submit Query' />
               </tr>
           </table>
+          <input type="hidden" id="sizex" value="sizex" />
       </form>
 </td>
 </table>
