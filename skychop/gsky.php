@@ -53,7 +53,7 @@ function initialize() {
     mt[0].getProjection = function() {return p;}
     mt[0].getMaximumResolution = function() {return 13;}
     mt[0].getMinimumResolution = function() {return 2;}
-    map.setCenter(new GLatLng(54.34917, ra2lon(210.80415)), 10);
+    map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
