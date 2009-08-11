@@ -176,6 +176,15 @@ function initialize() {
               </tr>
               
               <tr>
+                  <td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
+				  <?php
+                          print "<td valign='middle'><input type='text' name='sizex' id='sizex' size='10' value='$sizeX' />";
+                  ?>
+                      <font class='notifyText'>degrees</font>
+                  </td>
+              </tr>
+              
+              <tr>
               	  <td colspan="2" align="center">
                    	  <input type="button" id="center" value="Recenter Viewing Window" onClick="CenterVP()"/>
                   </td>
