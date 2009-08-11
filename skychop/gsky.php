@@ -31,6 +31,9 @@ function writeCenter(map){
   document.getElementById("ra").value = lon2ra(map.getCenter().lng());
   document.getElementById("dec").value = map.getCenter().lat();
 }
+function writeZoom(map){
+  document.getElementById("zoom").value = map.getZoom();
+}
 function setSize(map){
 	var bounds = map.getBounds();
 	var southWest = bounds.getSouthWest();
@@ -55,9 +58,13 @@ function initialize() {
     mt[0].getMinimumResolution = function() {return 3;}	
     map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
     map.addControl(new GLargeMapControl());
+	map.setZoom(document.getElementById("zoom").value);
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
 	  setSize(map);
+    });
+	GEvent.addListener(map, "zoomend", function() {
+      writeZoom(map);
     });
   }
 }
@@ -302,6 +309,7 @@ function initialize() {
                   <input type='submit' name='submit' value='Submit Query' />
               </tr>
           </table>
+          <input type='hidden' id='zoom' name='zoom' />
       </form>
 </td>
 </table>
