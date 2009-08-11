@@ -89,6 +89,7 @@ function initialize() {
 		$r = $_GET['r'];
 		$u = $_GET['u'];
 		$z = $_GET['z'];
+		$zoom = $_GET['zoom'];
 		if ($_GET['tyn'] = 'on') { $tyn = 1; }
 		else { $tyn = 0; }
 		$all = $_GET['all'];
@@ -159,6 +160,7 @@ function initialize() {
     </td>
 	<td>
       <form method='GET' name='imageChop'>
+      	  <?php print "<input type='text' id='zoom' name='zoom' value='$zoom'/>"; ?>
           <table border='0'>
               <!--
               <tr>
@@ -309,7 +311,6 @@ function initialize() {
                   <input type='submit' name='submit' value='Submit Query' />
               </tr>
           </table>
-          <input type='hidden' id='zoom' name='zoom' />
       </form>
 </td>
 </table>
