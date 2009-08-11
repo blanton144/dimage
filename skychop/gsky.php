@@ -35,7 +35,7 @@ function setSize(map){
 	var bounds = map.getBounds();
 	var southWest = bounds.getSouthWest();
 	var northEast = bounds.getNorthEast();
-	var lngSpan = Math.abs(lon2ra(southWest.lng()) - lon2ra(northEast.lng()));
+	var lngSpan = southWest.lng() - northEast.lng();
 	document.getElementById("sizex").value = lngSpan;
 }
 function CenterVP(){
@@ -69,26 +69,22 @@ function initialize() {
 	$dec = 54.34917;
 	$fname = "";
 	
-	if (isset($_POST['submit'])) {
+	if (isset($_GET['submit'])) {
 		$submitSuccess = True;
 		// Get variables from form POST
 		$RA = $_GET['ra'];
 		$dec = $_GET['dec'];
-		if ($RA == "") {
-			$RA = $_POST['ra'];
-			$dec = $_POST['dec'];
-		}
 		$sizeX = $_GET['sizex'];
 		$sizeY = $sizeX;
-		$g = $_POST['g'];
-		$i = $_POST['i'];
-		$r = $_POST['r'];
-		$u = $_POST['u'];
-		$z = $_POST['z'];
-		if ($_POST['tyn'] = 'on') { $tyn = 1; }
+		$g = $_GET['g'];
+		$i = $_GET['i'];
+		$r = $_GET['r'];
+		$u = $_GET['u'];
+		$z = $_GET['z'];
+		if ($_GET['tyn'] = 'on') { $tyn = 1; }
 		else { $tyn = 0; }
-		$all = $_POST['all'];
-		$fname = str_replace(" ", "", stripslashes($_POST['fname'])); // Remove slashes and spaces from filename for security
+		$all = $_GET['all'];
+		$fname = str_replace(" ", "", stripslashes($_GET['fname'])); // Remove slashes and spaces from filename for security
 			
 		if ($fname == "" || $fname == "/") {
 			$fname = rand(1000,9999999999);
@@ -154,7 +150,7 @@ function initialize() {
         </center>   
     </td>
 	<td>
-      <form method='post' name='imageChop'>
+      <form method='GET' name='imageChop'>
           <table border='0'>
               <!--
               <tr>
