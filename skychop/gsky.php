@@ -153,13 +153,14 @@ function initialize() {
 	<td>
       <form method='post' name='imageChop'>
           <table border='0'>
+              <!--
               <tr>
                   <td valign='middle' align='center' colspan='2'><font class='theLabels'><u>Coordinates</u></font></td>
-              </tr>
+              </tr>-->
           
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
-                  <td>
+                  <td align='left'>
 				  <?php
                           print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
                   ?>
@@ -169,7 +170,7 @@ function initialize() {
               
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>Dec:</font></td>
-                  <td>
+                  <td align='left'>
 				  <?php
                           print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
                   ?>
@@ -269,7 +270,7 @@ function initialize() {
                   </td>
               </tr>
               <tr>
-                  <td><font class='theLabels'>Output Filename:</font></td>
+                  <td align="right"><font class='theLabels'>Output<br> File:</font></td>
                   <td>
                   <?php
                       print "<input type='text' name='fname' id='fname' size='10' value='$fname' />";
@@ -277,7 +278,7 @@ function initialize() {
                   .tar.gz <font class='notifyText'>(optional)</font></td>
               </tr>
               <tr>
-                  <td>Generate PNG thumbnail: </td>
+                  <td align="right">Generate PNG<br>thumbnail: </td>
                   <td>
                       <?php 
                           if ($_POST['tyn'] == 'on') {
