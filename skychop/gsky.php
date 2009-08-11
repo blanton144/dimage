@@ -311,4 +311,5 @@ function initialize() {
 <br />
 </center>
 </body>
+<?php print "$sizeX"; ?>
 </html>
