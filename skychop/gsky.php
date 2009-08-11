@@ -160,7 +160,7 @@ function initialize() {
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
 				  <?php
-                          print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
+                          print "<td valign='middle'><input type='text' name='ra' id='ra' size='12' value='$RA' />";
                   ?>
                       <font class='notifyText'>degrees</font>
                   </td>
@@ -169,7 +169,7 @@ function initialize() {
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>Dec:</font></td>
 				  <?php
-                          print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
+                          print "<td valign='middle'><input type='text' name='dec' id='dec' size='12' value='$dec' />";
                   ?>
                       <font class='notifyText'>degrees</font>
                   </td>
@@ -178,7 +178,7 @@ function initialize() {
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
 				  <?php
-                          print "<td valign='middle'><input type='text' name='sizex' id='sizex' size='5' value='$sizeX' /> by <input type='text' name='sizey' id='sizey' size='5' value='$sizeX' />";
+                          print "<td valign='middle'><input type='text' name='sizex' id='sizex' size='12' value='$sizeX' />";
                   ?>
                       <font class='notifyText'>degrees</font>
                   </td>
