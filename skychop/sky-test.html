@@ -31,7 +31,7 @@ function writeSize(map){
 	var bounds = map.getBounds();
 	var southWest = bounds.getSouthWest()
 	var northEast = bounds.getNorthEast()
-	var lngSpan = lon2ra(southWest.lng()) - lon2ra(northEast.lng());
+	var lngSpan = southWest.lng() - northEast.lng();
 	var latSpan = northEast.lat() - southWest.lat();
 	document.getElementById("corners").innerHTML = "Size: " + lngSpan + " by " + latSpan;
 }
