@@ -57,7 +57,7 @@ function initialize() {
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
-	  var winSize = getSize(map);
+	  document.getElementById("sizex").value = getSize(map);
     });
   }
 }
@@ -76,8 +76,12 @@ function initialize() {
 		// Get variables from form POST
 		$RA = $_GET['ra'];
 		$dec = $_GET['dec'];
-		$sizeX = $_POST['sizex'];
-		$sizeY = $_POST['sizey'];
+		if ($RA == "") {
+			$RA = $_POST['ra'];
+			$dec = $_POST['dec'];
+		}
+		$sizeX = $_GET['sizex'];
+		$sizeY = $sizeX;
 		$g = $_POST['g'];
 		$i = $_POST['i'];
 		$r = $_POST['r'];
@@ -291,13 +295,13 @@ function initialize() {
               </tr>
               <tr>
                   <td align='center' colspan='2' valign='bottom'><br />
-                  <input type='submit' name='submit' value='Submit' />
+                  <input type='submit' name='submit' value='Submit Query' />
               </tr>
           </table>
       </form>
 </td>
 </table>
-
+<br />
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
 <br />
 <center><font class='notifyText'>Questions? Check the <a class='reDLink' href='FAQ.php'>FAQ.</a></font></center>
