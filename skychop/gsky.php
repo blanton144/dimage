@@ -31,12 +31,12 @@ function writeCenter(map){
   document.getElementById("ra").value = lon2ra(map.getCenter().lng());
   document.getElementById("dec").value = map.getCenter().lat();
 }
-function getSize(map){
+function setSize(map){
 	var bounds = map.getBounds();
 	var southWest = bounds.getSouthWest();
 	var northEast = bounds.getNorthEast();
 	var lngSpan = southWest.lng() - northEast.lng();
-	return lngSpan;
+	document.getElementById("sizex").value = lngSpan;
 }
 function CenterVP(){
   var ra = document.getElementById("ra").value;
@@ -57,7 +57,7 @@ function initialize() {
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
-	  document.getElementById("sizex").value = getSize(map);
+	  setSize(map);
     });
   }
 }
