@@ -57,7 +57,12 @@ function initialize() {
     map.addControl(new GLargeMapControl());
     GEvent.addListener(map, "moveend", function() {
       writeCenter(map);
-	  document.getElementById("sizex").value = getSize(map);
+	  var bounds = map.getBounds();
+	  var southWest = bounds.getSouthWest()
+	  var northEast = bounds.getNorthEast()
+	  var lngSpan = southWest.lng() - northEast.lng();
+	  document.getElementById("sizex").value = lngSpan;
+	  //document.getElementById("sizex").value = getSize(map);
     });
   }
 }
@@ -67,8 +72,6 @@ function initialize() {
 	// Default settings for the Pinwheel Galaxy
 	$RA = 210.80415;
 	$dec = 54.34917;
-	$sizeX = 0.25;
-	$sizeY = 0.25;
 	$fname = "";
 	
 	if (isset($_POST['submit'])) {
@@ -298,7 +301,7 @@ function initialize() {
                   <input type='submit' name='submit' value='Submit Query' />
               </tr>
           </table>
-          <input type="hidden" id="sizex" value="sizex" />
+          <input type="hidden" id="sizex" name="sizex" />
       </form>
 </td>
 </table>
