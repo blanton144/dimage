@@ -134,21 +134,25 @@ function initialize() {
 ?>
 </head>
 <body onLoad="initialize()" onUnload="GUnload()">
-<table>
+<table border='0' align='center'>
+<tr>
+	<td colspan="2">
+    	<div id="output">
+        </div>
+        <div id="corners">
+        </div> 
+    </td>
+</tr>
 <tr>
 	<td>
         <center>
         <div id="sky_map" style="height:500px;width:500px">
         </div>
-        </center>
-        <div id="output">
-        </div>
-        <div id="corners">
-        </div>    
+        </center>   
     </td>
 	<td>
       <form method='post' name='imageChop'>
-          <table border='0' align='center'>
+          <table border='0'>
               <tr>
                   <td valign='middle' align='center' colspan='2'><font class='theLabels'><u>Coordinates</u></font></td>
               </tr>
