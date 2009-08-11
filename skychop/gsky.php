@@ -75,6 +75,7 @@ function initialize() {
 	$RA = 210.80415;
 	$dec = 54.34917;
 	$sizeX = 0.6866455078;
+	$zoom = 10;
 	$fname = "";
 	
 	if (isset($_GET['submit'])) {
