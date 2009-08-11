@@ -51,10 +51,10 @@ function initialize() {
     map = new GMap2(document.getElementById("sky_map"), {
       mapTypes : G_SKY_MAP_TYPES
       });
-    var p = new GMercatorProjection(20);
+    var p = new GMercatorProjection(40);
     var mt = map.getMapTypes();
     mt[0].getProjection = function() {return p;}
-    mt[0].getMaximumResolution = function() {return 14;}
+    mt[0].getMaximumResolution = function() {return 28;}
     mt[0].getMinimumResolution = function() {return 3;}	
     map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
     map.addControl(new GLargeMapControl());
