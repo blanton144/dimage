@@ -178,7 +178,7 @@ function initialize() {
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>Size:</font></td>
 				  <?php
-                          print "<td valign='middle'><input type='hidden' name='sizex' id='sizex' size='10' value='$sizeX' /> $sizeX by $sizeY";
+                          print "<td valign='middle'><input type='hidden' name='sizex' id='sizex' size='10' value='$sizeX' /> " . $sizeX " by " . $sizeY;
                   ?>
                       <font class='notifyText'>degrees</font>
                   </td>
