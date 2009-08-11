@@ -301,10 +301,10 @@ function initialize() {
                   <input type='submit' name='submit' value='Submit Query' />
               </tr>
           </table>
-          <input type="hidden" id="sizex" name="sizex" />
       </form>
 </td>
 </table>
+<?php print "$sizeX"; ?>
 <br />
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
 <br />
@@ -314,5 +314,4 @@ function initialize() {
 <br />
 </center>
 </body>
-<?php print "$sizeX"; ?>
 </html>
