@@ -62,6 +62,7 @@ function initialize() {
 	  var northEast = bounds.getNorthEast()
 	  var lngSpan = southWest.lng() - northEast.lng();
 	  document.getElementById("sizex").value = lngSpan;
+	  print lngSpan;
 	  //document.getElementById("sizex").value = getSize(map);
     });
   }
