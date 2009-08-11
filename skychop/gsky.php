@@ -160,7 +160,7 @@ function initialize() {
     </td>
 	<td>
       <form method='GET' name='imageChop'>
-      	  <?php print "<input type='text' id='zoom' name='zoom' value='$zoom'/>"; ?>
+      	  <?php print "<input type='hidden' id='zoom' name='zoom' value='$zoom'/>"; ?>
           <table border='0'>
               <!--
               <tr>
@@ -314,7 +314,6 @@ function initialize() {
       </form>
 </td>
 </table>
-<?php print "$sizeX"; ?>
 <br />
 <center><font class='notifyText'>Already have a session ID? <br /><a class='reDLink' href='revisit.php'>Click here to re-download your query results.</a></font></center>
 <br />
