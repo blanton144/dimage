@@ -36,7 +36,7 @@ function setSize(map){
 	var southWest = bounds.getSouthWest();
 	var northEast = bounds.getNorthEast();
 	var lngSpan = southWest.lng() - northEast.lng();
-	document.getElementById("sizex").value = lngSpan;
+	document.getElementById("sizex").value = Math.abs(lngSpan);
 }
 function CenterVP(){
   var ra = document.getElementById("ra").value;
@@ -48,7 +48,7 @@ function initialize() {
     map = new GMap2(document.getElementById("sky_map"), {
       mapTypes : G_SKY_MAP_TYPES
       });
-    var p = new GMercatorProjection(20);
+    var p = new GMercatorProjection(30);
     var mt = map.getMapTypes();
     mt[0].getProjection = function() {return p;}
     mt[0].getMaximumResolution = function() {return 13;}
