@@ -160,7 +160,6 @@ function initialize() {
           
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
-                  <td align='left'>
 				  <?php
                           print "<td valign='middle'><input type='text' name='ra' id='ra' size='10' value='$RA' />";
                   ?>
@@ -170,7 +169,6 @@ function initialize() {
               
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>Dec:</font></td>
-                  <td align='left'>
 				  <?php
                           print "<td valign='middle'><input type='text' name='dec' id='dec' size='10' value='$dec' />";
                   ?>
