@@ -67,6 +67,7 @@ function initialize() {
 	// Default settings for the Pinwheel Galaxy
 	$RA = 210.80415;
 	$dec = 54.34917;
+	$sizeX = 0.6866455078;
 	$fname = "";
 	
 	if (isset($_GET['submit'])) {
