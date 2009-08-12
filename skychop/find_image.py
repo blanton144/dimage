@@ -58,9 +58,9 @@ for i in range(len(closestCenters)):
 		for letter in bands:		
 			ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
 			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
-				outDir + fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
+				outDir + fileName + "-clipped-" + letter + "-%02f_%02f.fits" % (rectCenter[0], rectCenter[1])
 			os.unlink(outDir + fileName + "-" + letter + ".fits")
-			oneImEachBand.append(fileName + "-clipped-" + letter + "-" + str(rectCenter[0])+"_"+str(rectCenter[1]) +  ".fits")
+			oneImEachBand.append(fileName + "-clipped-" + letter + "-%02f_%02f.fits" % (rectCenter[0], rectCenter[1]))
 		if allFileNames == None:
 			allFileNames = np.array([oneImEachBand])
 		else:
@@ -70,8 +70,7 @@ allFileNamesT = allFileNames.transpose()
 """ For each clipped subimage in each row (organized by BAND), SWarp the images together"""
 if np.shape(allFileNamesT)[1] == 1:
 	for k in range(np.shape(allFileNamesT)[0]):
-		#arcFileList[k] = allFileNamesT[k][0]
-		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
+		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-%02fx%02f.fits" % (xSize, ySize)
 		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight.fits"
 		print "%s %s" % (allFileNamesT[k][0], swarpKARGS)
 		print coaddFname
@@ -80,12 +79,7 @@ else:
 		swarpArg =""
 		for name in allFileNamesT[k]:
 			swarpArg += " %s" % name
-		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-" + str(xSize) +"x"+ str(ySize) + ".fits"
+		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-%02fx%02f.fits" % (xSize, ySize)
 		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight.fits"
-		#swarpCmds[k] = "swarp%s %s" % (swarpArg,swarpKARGS)
 		print "%s %s" % (swarpArg,swarpKARGS)
-		#os.system("swarp%s %s" % (swarpArg,swarpKARGS))
-		#arcFileList[k] = "sdss-tmp/"+coaddFname
 		print coaddFname
-		#for name in allFileNamesT[k]:
-		#	os.unlink(name)
