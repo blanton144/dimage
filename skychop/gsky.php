@@ -282,7 +282,7 @@ function initialize() {
                   .tar.gz <font class='notifyText'>(optional)</font></td>
               </tr>
               <tr>
-                  <td colspan="2">Generate PNG thumbnail:
+                  <td colspan="2"><font class='theLabels'>Generate PNG thumbnail:</font>
                       <?php 
                           if ($_POST['tyn'] == 'on') {
                               print '<input type="checkbox" name="tyn" id="tyn" checked="yes" />'; 
