@@ -58,7 +58,7 @@ for i in range(len(closestCenters)):
 		for letter in bands:		
 			ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
 			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
-				outDir + fileName + "-clipped-" + letter + "-%02f_%02f.fits" % (rectCenter[0], rectCenter[1])
+				outDir + fileName + "-clipped-" + letter + "-%02f_%02f.fits" % (rectCenter[0], rectCenter[1]))
 			os.unlink(outDir + fileName + "-" + letter + ".fits")
 			oneImEachBand.append(fileName + "-clipped-" + letter + "-%02f_%02f.fits" % (rectCenter[0], rectCenter[1]))
 		if allFileNames == None:
