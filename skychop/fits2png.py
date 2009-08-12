@@ -93,20 +93,19 @@ def main(argv):
   scale_opts = {}
   scale_opts["nonlinearity"] = flags.nonlinearity
     
-  for fitsfile in files:
-    if not os.path.exists(fitsfile):
-      print "Error: file '%s' doesn't exist" % fitsfile
-      sys.exit(2)
+  if not os.path.exists(files[0]):
+	print "Error: file '%s' doesn't exist" % files[0]
+	sys.exit(2)
 
-    name, ext = os.path.splitext(fitsfile)
-    pngfile = "%s.png" % name
+  name, ext = os.path.splitext(files[0])
+  pngfile = "%s.png" % name
 
-    #sys.stderr.write("Converting '%s'... " % fitsfile)
-    image = fitsimage.FitsImage(fitsfile, contrast=flags.contrast,
-                                contrast_opts=contrast_opts, scale=flags.scale,
-                                scale_opts=scale_opts)
-    image.save(str(sys.argv[2]) + "-asinh.png")
-    #sys.stderr.write("done\n")
+	#sys.stderr.write("Converting '%s'... " % fitsfile)
+  image = fitsimage.FitsImage(files[0], contrast=flags.contrast,
+								contrast_opts=contrast_opts, scale=flags.scale,
+								scale_opts=scale_opts)
+  image.save(str(files[1]) + "-asinh.png")
+	#sys.stderr.write("done\n")
 
 if __name__ == "__main__":
   main(sys.argv)
