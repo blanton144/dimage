@@ -22,15 +22,14 @@
 
 .title{
 	font-family: Helvetica;
-	font-size: 16pt;
+	font-size: 18pt;
 	font-weight: bold;
-	text-shadow: $666666;
 }
 
 .theLabels {
 	font-weight: bold;
 	font-family: Helvetica;
-	font-size: 14pt;
+	font-size: 12pt;
 }
 
 a:link {

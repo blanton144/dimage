@@ -152,7 +152,7 @@ function initialize() {
           <table border='0'>
              
               <tr>
-                  <td valign='middle' align='center' colspan='2'><font class='title'>SDSS FITS Image Generator</font></td>
+                  <td valign='middle' align='center' colspan='2'><font class='title'>SDSS FITS Image Generator</font><br /><br /></td>
               </tr>
           
               <tr>
