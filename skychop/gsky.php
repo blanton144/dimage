@@ -149,10 +149,10 @@ function initialize() {
 	<td>
       <form method='GET' name='imageChop'>
       	  <?php print "<input type='hidden' id='zoom' name='zoom' value='$zoom'/>"; ?>
-          <table border='0'>
+          <table border='0' align="center">
              
               <tr>
-                  <td valign='middle' align='center' colspan='2'><font class='title'>SDSS FITS Image Generator</font><br /><br /></td>
+                  <td valign='middle' align='center' colspan='2'><font class='title'>SDSS FITS <br />Image Generator</font><br /><br /></td>
               </tr>
           
               <tr>
