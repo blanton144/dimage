@@ -295,7 +295,7 @@ function initialize() {
               </tr>
               <tr>
                   <td align='center' colspan='2' valign='bottom'><br />
-                  <input type='submit' name='submit' value='Submit Query' />
+                  <input type='submit' name='submit' class='subButton' value='Submit Query' />
               </tr>
           </table>
       </form>
