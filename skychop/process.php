@@ -5,7 +5,7 @@
 <title>Processing Data...</title>
 <link href="style.css" rel="stylesheet" type="text/css">
 </head>
-<body>
+<body><br /><br />
 <center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
 	ini_set("display_errors","2");
@@ -30,8 +30,8 @@
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp,$swarpout);
-			//print_r($swarpout);
-			//print "$outpu";
+			print_r($swarpout);
+			print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
 			if ($bands[$i] == $thumb && $thumbYN == 1) {
