@@ -155,7 +155,7 @@ function initialize() {
 <tr>
 	<td>
         <center>
-        <div id="sky_map" style="height:500px;width:500px">
+        <div id="sky_map" style="height:700px;width:700px">
         </div>
         </center>   
     </td>
