@@ -45,12 +45,12 @@
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
-		print_r($filesToRmv);
+		//print_r($filesToRmv);
 		// Clean Up
-		//unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
-		//foreach ($filesToRmv as $f) {
-		//	unlink($f);
-		//}
+		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
+		foreach ($filesToRmv as $f) {
+			unlink($f);
+		}
 		
 		if (file_exists("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar.gz")) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
