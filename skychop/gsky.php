@@ -156,7 +156,7 @@ function initialize() {
               </tr>
           
               <tr>
-                  <td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
+                  <td align='right' valign='middle' width="100"><font class='theLabels'>RA:</font></td>
 				  <?php
                           print "<td valign='middle'><input type='text' name='ra' id='ra' size='12' value='$RA' />";
                   ?>
