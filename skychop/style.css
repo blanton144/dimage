@@ -7,11 +7,13 @@
 
 .subButton {
     background: #ff0000;
-	font-size: 16px;
+	font-size: 18px;
+	font-weight: bold;
 }
 .subButton:hover {
     background: #dd0000;
-	font-size: 16px;
+	font-size: 18px;
+	font-weight: bold;
 }
 
 .errorTB {
