@@ -150,10 +150,10 @@ function initialize() {
       <form method='GET' name='imageChop'>
       	  <?php print "<input type='hidden' id='zoom' name='zoom' value='$zoom'/>"; ?>
           <table border='0'>
-              <!--
+             
               <tr>
-                  <td valign='middle' align='center' colspan='2'><font class='theLabels'><u>Coordinates</u></font></td>
-              </tr>-->
+                  <td valign='middle' align='center' colspan='2'><font class='title'>SDSS FITS Image Generator</font></td>
+              </tr>
           
               <tr>
                   <td align='right' valign='middle'><font class='theLabels'>RA:</font></td>
