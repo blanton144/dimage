@@ -5,6 +5,13 @@
 	font-size: 16pt;
 }
 
+.subButton {
+    background: #ff0000;
+}
+.subButton:hover {
+    background: #dd0000;
+}
+
 .errorTB {
 	color: red;
 }
