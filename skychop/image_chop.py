@@ -74,14 +74,14 @@ def getFileName(theRA, theDec, fitsPath):
 		if fabs(int(degDec)) % 2 == 0: pathDec = fabs(int(degDec))
 		else: pathDec = fabs(int(degDec)) - 1
 		RADecPath = "%(path)s%(hrRa)02dh/p%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"dec":pathDec}
+		fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
+			{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":degDec,"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
 	else:
 		if fabs(int(degDec)) % 2 == 0: pathDec = fabs(int(degDec))
 		else: pathDec = fabs(int(degDec)) + 1
 		RADecPath = "%(path)s%(hrRa)02dh/m%(dec)02d/" % {"path":fitsPath,"hrRa":hrRa,"dec":pathDec}
-	
-	fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)+03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
-		{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":fabs(degDec),"minDec":minDec,"secDecINT":secDecINT,"secDecDECIMAL":secDecDECIMAL}
-
+		fileName = "J%(hrRa)02d%(minRa)02d%(secRaINT)02d.%(secRaDECIMAL)02d%(degDec)-03d%(minDec)02d%(secDecINT)02d.%(secDecDECIMAL)01d" % \
+			{"hrRa":hrRa,"minRa":minRa,"secRaINT":secRaINT,"secRaDECIMAL":secRaDECIMAL,"degDec":fabs(degDec),"minDec":fabs(minDec),"secDecINT":fabs(secDecINT),"secDecDECIMAL":fabs(secDecDECIMAL)}
 	return fileName, RADecPath
 
 def getIAUFname(theRA, theDec):
