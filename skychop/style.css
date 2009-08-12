@@ -20,6 +20,13 @@
 	font-size: 12pt;
 }
 
+.title{
+	font-family: Helvetica;
+	font-size: 16pt;
+	font-weight: bold;
+	text-shadow: $666666;
+}
+
 .theLabels {
 	font-weight: bold;
 	font-family: Helvetica;
@@ -28,21 +35,21 @@
 
 a:link {
 	font-family: Courier;
-	font-size: 14pt;
+	font-size: 16pt;
 	color: #AA0202;
 	text-decoration: none;
 }
 
 a:visited {
 	font-family: Courier;
-	font-size: 14pt;
+	font-size: 16pt;
 	color: #AA0202;
 	text-decoration: none;
 }
 
 a:hover {
 	font-family: Courier;
-	font-size: 14pt;
+	font-size: 16pt;
 	color: #FF0000;
 	text-decoration: none;
 }

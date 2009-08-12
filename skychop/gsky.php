@@ -127,14 +127,9 @@ function initialize() {
 			$submitSuccess = False;
 		}
 		if ($sizeX > 1.0) {
-			print "<font class='errorText'><center>Size must be 0 < X <= 1.0 and 0 < Y <= 1.0</center></font>";
+			print "<font class='errorText'><center>Size must be 0 < X <= 1.0</center></font>";
 			$submitSuccess = False;
 		}
-		if ($sizeY > 1.0) {
-			print "<font class='errorText'><center>Size must be 0 < X <= 1.0 and 0 < Y <= 1.0</center></font>";
-			$submitSuccess = False;
-		}
-		
 		if ($submitSuccess) {
 			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thmb&tyn=$tyn&proc=0";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
@@ -144,14 +139,6 @@ function initialize() {
 </head>
 <body onLoad="initialize()" onUnload="GUnload()">
 <table border='2' bordercolor="#000000" align='center'>
-<tr>
-	<td colspan="2">
-    	<div id="output">
-        </div>
-        <div id="corners">
-        </div> 
-    </td>
-</tr>
 <tr>
 	<td>
         <center>
@@ -295,8 +282,7 @@ function initialize() {
                   .tar.gz <font class='notifyText'>(optional)</font></td>
               </tr>
               <tr>
-                  <td align="right">Generate PNG<br>thumbnail: </td>
-                  <td>
+                  <td colspan="2">Generate PNG thumbnail:
                       <?php 
                           if ($_POST['tyn'] == 'on') {
                               print '<input type="checkbox" name="tyn" id="tyn" checked="yes" />'; 
