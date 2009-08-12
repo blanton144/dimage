@@ -143,7 +143,7 @@ function initialize() {
 ?>
 </head>
 <body onLoad="initialize()" onUnload="GUnload()">
-<table border='0' align='center'>
+<table border='2' bordercolor="#000000" align='center'>
 <tr>
 	<td colspan="2">
     	<div id="output">
@@ -318,10 +318,9 @@ function initialize() {
       <br />
       <center><font class='notifyText'>Questions? Check the <a class='reDLink' href='FAQ.php'>FAQ.</a></font></center>
       <br />
-      <center><font class='notifyText'>Report bugs to <a class='reDLink' href='mailto:apw235@nyu.edu'>Adrian Price-Whelan</a></font>
+      <center><font class='notifyText'>Report bugs to <a class='reDLink' href='mailto:apw235@nyu.edu'>Adrian Price-Whelan</a></font></center>
       <br />
 </td>
 </table>
-</center>
 </body>
 </html>

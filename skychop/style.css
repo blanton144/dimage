@@ -11,18 +11,18 @@
 
 .notifyText {
 	font-style: italic;
-	font-family: lucida;
+	font-family: Helvetica;
 	font-size: 12pt;
 }
 
 .regText {
-	font-family: lucida;
+	font-family: Helvetica;
 	font-size: 12pt;
 }
 
 .theLabels {
 	font-weight: bold;
-	font-family: 'lucida console';
+	font-family: Helvetica;
 	font-size: 14pt;
 }
 
