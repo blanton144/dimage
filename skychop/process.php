@@ -30,8 +30,8 @@
 		for ($i = 0; $i < strlen($bands); $i++) {
 			$swarp = "swarp " . $output[$i * 2];
 			$outpu = system($swarp,$swarpout);
-			print_r($swarpout);
-			print "$outpu";
+			//print_r($swarpout);
+			//print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
 			if ($bands[$i] == $thumb && $thumbYN == 1) {
@@ -45,12 +45,12 @@
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
-		
+		print_r($filesToRmv);
 		// Clean Up
-		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
-		foreach ($filesToRmv as $f) {
-			unlink($f);
-		}
+		//unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
+		//foreach ($filesToRmv as $f) {
+		//	unlink($f);
+		//}
 		
 		if (file_exists("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar.gz")) {
 			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
