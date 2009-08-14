@@ -197,17 +197,17 @@ another that is intended for DR8).
 
 The only other publicly available mosaicking and background
 subtraction facility for SDSS that we are aware of is the results of
-the Montage package distributed by IRSA {\bf cite}. We compare their
-methodology to ours in \S\ref{sec:mosaic}, concluding that their
-background subtraction procedure in principle could be superior to
-ours, but that their ``drizzle'' approximation to interpolation is
-likely to cause errors for PSF photometry. In \S\ref{sec:psfs}, we
-demonstrate that one the PSF photometry is indeed degraded relative to
-the original SDSS photometry for Montage mosaics. In
-\S\ref{sec:simplegal}, we compare our bright galaxy photometry to that
-from Montage images, {\bf finding what?}  As we describe below, these
-problems are likely not fundamental to the Montage background
-subtraction method.
+the Montage package distributed by IRSA (\citealt{berriman03a}). We
+compare their methodology to ours in \S\ref{sec:mosaic}, concluding
+that their background subtraction procedure in principle could be
+superior to ours, but that their ``drizzle'' approximation to
+interpolation is likely to cause errors for PSF photometry. In
+\S\ref{sec:psfs}, we demonstrate that the PSF photometry is indeed
+degraded relative to the original SDSS photometry for Montage
+mosaics. In \S\ref{sec:simplegal}, we compare our bright galaxy
+photometry to that from Montage images, {\bf finding what?}  As we
+describe below, these problems are likely not fundamental to the
+Montage background subtraction method.
 
 \section{A model fit to the SDSS sky background}
 \label{sec:model}
@@ -371,20 +371,36 @@ oversubtract the light.  However, Section
 \S\ref{sec:simplegal} below shows that it is sufficiently good to
 allow accurate measurements of most nearby galaxies.
 
+Figure \ref{fig:resid} shows the residuals of the data after
+subtracting the model sky.  There are remaining discrepancies visible,
+which in the next subsection we will show to be at a level that is
+fainter than 26 mag arcsec$^{-2}$.
+
 \subsection{Residual tests}
 \label{sec:residuals}
 
-For each run, we have performed a simple residual test by considering
-random unmasked patches 32$\times$32 pixels in size. Figure
-\ref{fig:resid} shows the distribution of the mean fluxes in such
-patches across all SDSS runs, as well as the residuals as a function
-of run number.  {\bf need to make this and comment on it}
+We have performed a simple residual test by considering random
+unmasked patches 13$\times$13 native SDSS pixels in size. We choose
+the areas that the SDSS photometric pipeline has identified as ``sky''
+objects, without identified objects.  
+
+Figure \ref{fig:skyqa} shows the distribution of the mean fluxes per
+square arcsec in such patches across all SDSS runs. The performance in
+most areas is excellent, with a standard deviation representing
+residuals fainter than $26$ mag arcsec$^{-2}$ in the $r$-band. There
+are a handful of outliers, which we find nearly always to be
+associated with very extended emission from the interstellar medium or
+an extremely bright star. While in regions of very extended emission,
+we cannot guarantee that our sky estimate is correct, we do expect
+that they will appear as bright outliers in this residual plot.
 
 These residual tests are adequate insofar as they test the performance
-of our fitting procedure.  However, they do not provide a direct
-estimate of the effects of sky subtraction errors on the resulting
-galaxy photometry.  We will test that more thoroughly in
-\S\ref{sec:simplegal}.
+of our fitting procedure and help to identify runs with highly
+variable backgrounds (astronomical or instrumental).  However, they do
+not provide a direct estimate of the effects of sky subtraction errors
+on the resulting galaxy photometry --- that is, they do not test
+whether we might be oversubtracting light near large sources.  We test
+that effect more thoroughly in \S\ref{sec:simplegal}.
 
 \section{Mosaicking the SDSS}
 \label{sec:mosaic}
@@ -399,9 +415,9 @@ multiple fields after the background subtraction. Here we describe our
 procedure for doing so.
 
 For each desired mosaic we specify a desired World Coordinate System
-header (WCS; {\bf cite}). We identify all SDSS fields that overlap the
-desired area, and pick the minimal set of photometric fields that
-cover that area.
+header (WCS; \citealt{greisen02a}). We identify all SDSS fields that
+overlap the desired area, and pick the minimal set of photometric
+fields that cover that area.
 
 Then we prepare each field for mosaicking.  Starting with the raw SDSS
 data, we apply the flat field determined by the ubercalibration
@@ -418,8 +434,8 @@ the results of \citet{padmanabhan07b} for each field.
 
 To resample each image we evaluate the position of each desired pixel
 within each original field. Then we interpolate the original field's
-image to the desired set of locations, using the well-known bicubic
-interpolation approximation to the sinc function ({\bf cite}). This
+image to the desired set of locations, using the well-known cubic
+approximation to the sinc function (\citealt{park83a}). This
 resampling method is known to work well for Nyquist-sampled images, a
 condition SDSS virtually always satisfies. In practice, we use the
 built-in IDL utilities {\tt polywarp} and {\tt poly\_2d} to perform
