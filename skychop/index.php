@@ -148,7 +148,6 @@ function initialize() {
     </td>
 	<td>
       <form method='GET' name='imageChop'>
-      	  <?php print "<input type='hidden' id='zoom' name='zoom' value='$zoom'/>"; ?>
           <table border='0' align="center">
              
               <tr>
@@ -308,5 +307,7 @@ function initialize() {
       <br />
 </td>
 </table>
+<br>
+<?php print "<input type='text' id='zoom' name='zoom' value='$zoom' />"; ?>
 </body>
 </html>
