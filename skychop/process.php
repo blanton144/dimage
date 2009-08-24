@@ -41,7 +41,7 @@
 		}
 		
 		foreach ($to_clip_again as $im_to_clip) {
-			$pyy = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $im_to_clip $RA $dec $sizeX $sizeY $im_to_clipm 2>&1");
+			$pyy = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $im_to_clip $RA $dec $sizeX $sizeY $im_to_clip 2>&1");
 			print "$pyy";
 		}
 		
