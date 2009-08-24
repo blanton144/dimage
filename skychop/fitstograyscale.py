@@ -7,13 +7,8 @@ from scipy.stats import scoreatpercentile
 import sys
 
 def asinhScale(inputArray, scale=5, non_linear=3):
-	imageData=np.array(inputArray, copy=True)
+	imageData = np.array(inputArray, copy=True)
 	
-	if scale_min == None:
-		scale_min = imageData.min()
-	if scale_max == None:
-		scale_max = imageData.max()
-
 	imageData = np.arcsinh(imageData * scale * non_linear) / non_linear
 	indices0 = np.where(imageData < 0.0)
 	indices2 = np.where(imageData > 1.0)
