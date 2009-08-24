@@ -14,14 +14,14 @@ import pyfits
 astImages.REPORT_ERRORS=True
 
 if len(sys.argv) < 6:
-	print "Run: % clipfits.py <tmp subdirectory> <input .fits image> <RADeg> <decDeg> <clip size> <output .fits>"
+	print "Run: % clipfits.py <tmp subdirectory> <input .fits image> <RADeg> <decDeg> <clip size x> <clip size y> <output .fits>"
 else:
 	subDir=sys.argv[1]
 	inFileName=sys.argv[2]
 	RADeg=float(sys.argv[3])
 	decDeg=float(sys.argv[4])
-	clipSizeDeg=float(sys.argv[5])
-	outFileName=sys.argv[6]
+	clipSizeDeg=float(sys.argv[5]),float(sys.argv[6])
+	outFileName=sys.argv[7]
 
 	img=pyfits.open(subDir + "/" + inFileName)
 
