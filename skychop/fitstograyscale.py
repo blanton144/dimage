@@ -6,7 +6,7 @@ import numpy as np
 from scipy.stats import scoreatpercentile
 import sys
 
-def asinhScale(inputArray, scale=5, non_linear=3):
+def asinhScale(inputArray, scale=5.0, non_linear=3.0):
 	imageData = np.array(inputArray, copy=True)
 	
 	imageData = np.arcsinh(imageData * scale * non_linear) / non_linear
