@@ -33,10 +33,15 @@
 			//print_r($swarpout);
 			//print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
+			$to_clip_again[] = $output[($i * 2) +1];
 			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
 			if ($bands[$i] == $thumb && $thumbYN == 1) {
 				$im = $output[($i * 2) +1];
 			}
+		}
+		
+		foreach ($to_clip_again as $im_to_clip) {
+			$pyy = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $im_to_clip $RA $dec $sizeX,$sizeY $im_to_clip");
 		}
 		
 		if ($thumbYN == 1) {
