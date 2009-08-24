@@ -56,11 +56,11 @@ function initialize() {
     mt[0].getProjection = function() {return p;}
     mt[0].getMaximumResolution = function() {return 14;}
     mt[0].getMinimumResolution = function() {return 3;}	
-	if (IsNumeric(document.getElementById("zoom").value)) {
-    	map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), document.getElementById("zoom").value);
+	if (document.getElementById("zoom").value == "") {
+    	map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
 	}
 	else {
-		map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
+		map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), document.getElementById("zoom").value);
 	}
     map.addControl(new GLargeMapControl());
 	map.setZoom(document.getElementById("zoom").value);
