@@ -25,7 +25,7 @@ variables: ra, dec, xsize, ysize, bands, fname, thumb, tyn, and proc.<br /><br /
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>tyn:</i> For multiple queries, set tyn=0<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>proc:</i> This must be set to 1 for the script to run<br /><br />
 A few example requests:<br /> 
-http://sdss.physics.nyu.edu/sdss3/skychop/process.php?ra=210.51&dec=54.35&xsize=0.25&ysize=0.25&bands=ugi&fname=test_query&thumb=i&tyn=0&proc=1<br />
+http://sdss.physics.nyu.edu/sdss3/skychop/process.php?ra=210.51&dec=54.35&xsize=0.25&ysize=0.25&bands=ugi&fname=test_query&thumb=i&tyn=0&proc=1<br /><br />
 http://sdss.physics.nyu.edu/sdss3/skychop/process.php?ra=185.32&dec=21.66&xsize=1.0&ysize=1.0&bands=ugriz&fname=test_query&thumb=r&tyn=0&proc=1<br />
 </div>
 <br /><br />
