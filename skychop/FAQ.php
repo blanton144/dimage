@@ -6,7 +6,7 @@
 <link href="style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<table width="500" border="0" align="center">
+<table width="700" border="0" align="center">
 <tr>
 	<td>
 		<div class="faqHead">How do I automatically make requests without using the web form?</div>
