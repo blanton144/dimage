@@ -14,7 +14,7 @@ def asinhScale(inputArray, scale=5, non_linear=3):
 	if scale_max == None:
 		scale_max = imageData.max()
 
-	imageData = np.arcsinh(imageData * factor * non_linear) / non_linear
+	imageData = np.arcsinh(imageData * scale * non_linear) / non_linear
 	indices0 = np.where(imageData < 0.0)
 	indices2 = np.where(imageData > 1.0)
 	imageData[indices0] = 0.0
