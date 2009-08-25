@@ -62,7 +62,7 @@ function initialize() {
       });
     var p = new GMercatorProjection(20);
     var mt = map.getMapTypes();
-	if (IsNumeric(zoomLvl) {
+	if (IsNumeric(zoomLvl)) {
 		null;
 	}
 	else {
