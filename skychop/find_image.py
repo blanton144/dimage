@@ -43,8 +43,8 @@ allFileNames = None
 			closest mosaic center to that image. Test to make sure that
 			the image is unique, and that it lies outside of the closest
 			image to the center of the target image."""
-for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0],crnr[1],tableData))	# Find the closest center to each corner of the target image
-closestCenters = ic.repDupesWithZero(closestCenters)													# Replace any duplicates with a 0 to skip
+#for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0],crnr[1],tableData))	# Find the closest center to each corner of the target image
+#closestCenters = ic.repDupesWithZero(closestCenters)													# Replace any duplicates with a 0 to skip
 
 for i in range(len(closestCenters)):
 	if closestCenters[i] == 0: pass
