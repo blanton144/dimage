@@ -143,7 +143,7 @@ function initialize() {
 ?>
 </head>
 <body onLoad="initialize()" onUnload="GUnload()">
-<script>
+<script language="javascript">
 	document.write(document.getElementById("zoom").value);
 </script>
 <table border='2' bordercolor="#000000" align='center'>
