@@ -311,6 +311,6 @@ function initialize() {
 </td>
 </table>
 <br>
-<?php print "<input type='text' id='zoom' name='zoom' value='$zoom' />"; ?>
+<?php print "<input type='hidden' id='zoom' name='zoom' value='$zoom' />"; ?>
 </body>
 </html>
