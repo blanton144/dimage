@@ -56,7 +56,7 @@ function initialize() {
     mt[0].getProjection = function() {return p;}
     mt[0].getMaximumResolution = function() {return 14;}
     mt[0].getMinimumResolution = function() {return 3;}	
-	if (document.getElementById("zoom").value == "") {
+	if (var document.getElementById("zoom").value == 'undefined') {
     	map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
 	}
 	else {
@@ -143,9 +143,6 @@ function initialize() {
 ?>
 </head>
 <body onLoad="initialize()" onUnload="GUnload()">
-<script language="javascript">
-	document.write(document.getElementById("zoom").value);
-</script>
 <table border='2' bordercolor="#000000" align='center'>
 <tr>
 	<td>
