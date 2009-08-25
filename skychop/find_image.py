@@ -18,7 +18,7 @@ import numpy as np
 """Collect user input in the form of shell arguments"""
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
-xSize, ySize = float(sys.argv[3]),float(sys.argv[4])
+xSize, ySize = float(sys.argv[3])+0.01,float(sys.argv[4])+0.01
 bands = sys.argv[5]
 tarName = sys.argv[6]
 size = xSize, ySize
