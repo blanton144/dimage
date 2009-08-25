@@ -80,11 +80,11 @@ function initialize() {
     });
 	GEvent.addListener(map, "zoomend", function() {
       writeZoom(map);
+	  document.write(document.getElementById("zoom").value);
     });
   }
 }
 </script>
-
 <?php
 	// Default settings for the Pinwheel Galaxy
 	$RA = 210.80415;
