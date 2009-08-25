@@ -62,7 +62,9 @@ function initialize() {
       });
     var p = new GMercatorProjection(20);
     var mt = map.getMapTypes();
-	var zoomLvl = 10;
+	if (zoomLvl != 10 && IsNumeric(zoomLvl) == true) {
+		var zoomLvl = 10;
+	}
     mt[0].getProjection = function() {return p;}
     mt[0].getMaximumResolution = function() {return 14;}
     mt[0].getMinimumResolution = function() {return 3;}	
