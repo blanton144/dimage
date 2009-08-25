@@ -62,16 +62,16 @@ function initialize() {
       });
     var p = new GMercatorProjection(20);
     var mt = map.getMapTypes();
+	if (IsNumeric(zoomLvl) {
+		null;
+	}
+	else {
+		var zoomLvl = 10;
+	}
     mt[0].getProjection = function() {return p;}
     mt[0].getMaximumResolution = function() {return 14;}
     mt[0].getMinimumResolution = function() {return 3;}	
-	var zoomLvl = document.getElementById("zoom").value;
-	if (IsNumeric(zoomLvl)) {
-    	map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), document.getElementById("zoom").value);
-	}
-	else {
-		map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), 10);
-	}
+    map.setCenter(new GLatLng(document.getElementById("dec").value, ra2lon(document.getElementById("ra").value)), zoomLvl);
     map.addControl(new GLargeMapControl());
 	map.setZoom(document.getElementById("zoom").value);
     GEvent.addListener(map, "moveend", function() {
@@ -80,6 +80,7 @@ function initialize() {
     });
 	GEvent.addListener(map, "zoomend", function() {
       writeZoom(map);
+	  var zoomLvl = document.getElementById("zoom").value;
     });
   }
 }
