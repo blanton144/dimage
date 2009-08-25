@@ -80,7 +80,6 @@ function initialize() {
     });
 	GEvent.addListener(map, "zoomend", function() {
       writeZoom(map);
-	  document.write(document.getElementById("zoom").value);
     });
   }
 }
