@@ -18,15 +18,6 @@ function checkUncheckAll(theElement) {
 <script src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=ABQIAAAApf7xUVmwSCZbEk-2IaOhQRQJG7NHkz3t4sN6fLBno0qVUQLbrhSt7A62doZlkAz4sWDWxhAyFYfQuQ"
   type="text/javascript"></script>
 <script type="text/javascript">
-function IsNumeric(sText) {
-	var ValidChars = "0123456789.";
-	for (i = 0; i < sText.length; i++) { 
-		if (ValidChars.indexOf(sText.charAt(i)) == -1) {	
-			return false;
-		}
-	}
-	return true;
-}
 var map;
 function ra2lon(ra){
   var lon = 180 - ra;
@@ -62,7 +53,7 @@ function initialize() {
       });
     var p = new GMercatorProjection(20);
     var mt = map.getMapTypes();
-	if (zoomLvl != 10 && IsNumeric(zoomLvl) == true) {
+	if (zoomLvl != 10 && zoomLvl != null) {
 		var zoomLvl = 10;
 	}
     mt[0].getProjection = function() {return p;}
