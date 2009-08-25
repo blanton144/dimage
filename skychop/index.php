@@ -53,7 +53,7 @@ function initialize() {
       });
     var p = new GMercatorProjection(20);
     var mt = map.getMapTypes();
-	if (zoomLvl != 10 && zoomLvl != null) {
+	if (zoomLvl != 10 && !zoomLvl) {
 		var zoomLvl = 10;
 	}
     mt[0].getProjection = function() {return p;}
