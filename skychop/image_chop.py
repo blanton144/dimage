@@ -19,7 +19,7 @@ import operator
 def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
 	RADEC_list = []
 	for i in range(np.shape(tableData)[0]):
-		offset = np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2)
+		offset = np.sqrt(( RADeg/np.cos(pi/180.0*decDeg) - tableData[i][0]/np.cos(pi/180.0*tableData[i][1]))**2 + (decDeg-tableData[i][1])**2)
 		if offset <= (np.sqrt((xSize/2.0)**2.0+(ySize/2.0)**2.0)+0.5):
 			RADEC_list.append((tableData[i][0],tableData[i][1],offset))
 	
@@ -29,7 +29,7 @@ def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
 def findClosestCenter(RADeg, decDeg, tableData):
 	offsets = []
 	for i in range(np.shape(tableData)[0]):
-		offsets.append(np.sqrt((RADeg-tableData[i][0])**2 + (decDeg-tableData[i][1])**2))
+		offsets.append(np.sqrt((RADeg/np.cos(pi/180.0*decDeg) - tableData[i][0]/np.cos(pi/180.0*tableData[i][1]))**2 + (decDeg-tableData[i][1])**2))
 	index = offsets.index(min(offsets))
 	return tableData[index][0], tableData[index][1]
 
@@ -139,7 +139,7 @@ def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz)):
 	ALPH,DELT = (float(ALPH),float(DELT))
 	xSz,ySz = (float(xSz),float(ySz))
 	
-	KAPPA,BETA = ((C-A)/fabs(C-A),(D-B)/fabs(D-B))
+	KAPPA,BETA = ((C/np.cos(pi/180.0*D)-A/np.cos(pi/180.0*B))/fabs(C/np.cos(pi/180.0*D)-A/np.cos(pi/180.0*B)),(D-B)/fabs(D-B))
 	Xs = [U + KAPPA/2.0,ALPH + (KAPPA*xSz/2.0)]
 	Ys = [V + BETA/2.0,DELT + (BETA*ySz/2.0)]
 	XDs = [fabs(A-(U + KAPPA/2.0)),fabs(A-(ALPH + (KAPPA*xSz/2.0)))]

@@ -14,17 +14,12 @@ import image_chop as ic
 from math import fabs, pi
 import os
 
-rawData = pf.open("sky-patches.fits")[1].data
+tableData = pf.open("sky-patches.fits")[1].data
 RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
 xSize = float(sys.argv[3])
 ySize = float(sys.argv[4])
 RADeg = RADeg / np.cos(decDeg * pi / 180.0)
-
-tableData = np.zeros((np.shape(rawData)[0],2))
-for i in range(np.shape(tableData)[0]):
-	tableData[i][0] = rawData[i][0] / np.cos(rawData[i][1] * pi / 180.0)
-	tableData[i][1] = rawData[i][1]
 	
 # RADEC_list format: (RA, Dec, offset)
 RADEC_list = ic.findClosestCenters(RADeg, decDeg, tableData, xSize, ySize)
@@ -35,7 +30,7 @@ oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg
 
 for i in range(len(targetImgCorners)):
 	imName = "test"
-	rectCenter, rectOppCorner = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], ic.findClosestCenter(targetImgCorners[i][0],targetImgCorners[i][1],tableData),(RADeg,decDeg), (xSize, ySize), tableData)
+	rectCenter, rectOppCorner = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], ic.findClosestCenter(targetImgCorners[i][0],targetImgCorners[i][1],tableData),(RADeg,decDeg), (xSize, ySize))
 	rectListx.append(rectCenter[0])
 	rectListy.append(rectCenter[1])
 

@@ -22,22 +22,17 @@ xSize, ySize = float(sys.argv[3])+0.01,float(sys.argv[4])+0.01
 bands = sys.argv[5]
 tarName = sys.argv[6]
 size = xSize, ySize
-RADeg = RADeg / np.cos(decDeg * pi / 180.0)
 
 """Constants and other variable declarations"""
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"													# Server path to FITS data files
 dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"																	# FITS file to read SDSS mosaic center (RA, DEC)
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
-rawData = pf.open(dataFile)[1].data																# Table of (RA, DEC) values from SDSS mosaics
+tableData = pf.open(dataFile)[1].data																# Table of (RA, DEC) values from SDSS mosaics
 tableData = np.zeros((np.shape(rawData)[0],2))
 targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0), \
 					(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg-ySize/2.0)]		# Corners of the user specified image
 oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),\
 					  (RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg+ySize/2.0)]	# Respective opposite corners to the above
-
-for i in range(np.shape(tableData)[0]):
-	tableData[i][0] = rawData[i][0] / np.cos(rawData[i][1] * pi / 180.0)
-	tableData[i][1] = rawData[i][1]
 
 clipXYCen = []
 rectListx,rectListy = [],[]
@@ -64,10 +59,10 @@ for i in range(len(closestCenters)):
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		
 			ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
-			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0] * np.cos(rectCenter[1] * pi / 180.0) , rectCenter[1], [rectSize[0],rectSize[1]], \
-				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0] * np.cos(rectCenter[1] * pi / 180.0), rectCenter[1]))
+			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
+				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
 			os.unlink(outDir + fileName + "-" + letter + ".fits")
-			oneImEachBand.append(fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0] * np.cos(rectCenter[1] * pi / 180.0), rectCenter[1]))
+			oneImEachBand.append(fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
 		if allFileNames == None:
 			allFileNames = np.array([oneImEachBand])
 		else:
