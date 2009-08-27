@@ -11,7 +11,7 @@ os.environ['HOME'] = '/var/www/html/sdss3/skychop'
 #os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
-from math import fabs, sqrt
+from math import fabs, sqrt, pi
 import gzip
 from shutil import move
 import operator
