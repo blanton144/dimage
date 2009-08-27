@@ -63,10 +63,10 @@ for i in range(len(closestCenters)):
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		
 			ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
-			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
-				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
+			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0] / np.cos(rectCenter[1] * pi / 180.0) , rectCenter[1], [rectSize[0],rectSize[1]], \
+				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0] / np.cos(rectCenter[1] * pi / 180.0), rectCenter[1]))
 			os.unlink(outDir + fileName + "-" + letter + ".fits")
-			oneImEachBand.append(fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
+			oneImEachBand.append(fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0] / np.cos(rectCenter[1] * pi / 180.0), rectCenter[1]))
 		if allFileNames == None:
 			allFileNames = np.array([oneImEachBand])
 		else:
