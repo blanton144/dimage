@@ -12,7 +12,7 @@ import image_chop as ic
 import sys
 import tarfile
 import pyfits as pf
-from math import sqrt, fabs
+from math import sqrt, fabs, pi
 import numpy as np
 
 """Collect user input in the form of shell arguments"""
