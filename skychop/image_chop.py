@@ -19,7 +19,7 @@ import operator
 def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
 	RADEC_list = []
 	for i in range(np.shape(tableData)[0]):
-		offset = np.sqrt(( RADeg/np.cos(pi/180.0*decDeg) - tableData[i][0]/np.cos(pi/180.0*tableData[i][1]))**2 + (decDeg-tableData[i][1])**2)
+		offset = np.sqrt((RADeg - tableData[i][0])**2 + (decDeg-tableData[i][1])**2)
 		if offset <= (np.sqrt((xSize/2.0)**2.0+(ySize/2.0)**2.0)+0.5):
 			RADEC_list.append((tableData[i][0],tableData[i][1],offset))
 	
@@ -29,7 +29,7 @@ def findClosestCenters(RADeg, decDeg, tableData, xSize, ySize):
 def findClosestCenter(RADeg, decDeg, tableData):
 	offsets = []
 	for i in range(np.shape(tableData)[0]):
-		offsets.append(np.sqrt((RADeg/np.cos(pi/180.0*decDeg) - tableData[i][0]/np.cos(pi/180.0*tableData[i][1]))**2 + (decDeg-tableData[i][1])**2))
+		offsets.append(np.sqrt((RADeg - tableData[i][0])**2 + (decDeg-tableData[i][1])**2))
 	index = offsets.index(min(offsets))
 	return tableData[index][0], tableData[index][1]
 
