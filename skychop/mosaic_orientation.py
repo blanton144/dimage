@@ -19,6 +19,8 @@ RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
 xSize = float(sys.argv[3])
 ySize = float(sys.argv[4])
+RADeg = RADeg / np.cos(decDeg * pi / 180.0)
+
 tableData = np.zeros((np.shape(rawData)[0],2))
 for i in range(np.shape(tableData)[0]):
 	tableData[i][0] = rawData[i][0] / np.cos(rawData[i][1] * pi / 180.0)

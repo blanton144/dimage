@@ -22,6 +22,7 @@ xSize, ySize = float(sys.argv[3])+0.01,float(sys.argv[4])+0.01
 bands = sys.argv[5]
 tarName = sys.argv[6]
 size = xSize, ySize
+RADeg = RADeg / np.cos(decDeg * pi / 180.0)
 
 """Constants and other variable declarations"""
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"													# Server path to FITS data files
@@ -57,7 +58,7 @@ for i in range(len(closestCenters)):
 	else:
 		oneImEachBand = []
 		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
-			closestCenters[i],(RADeg/ np.cos(decDeg * pi / 180.0),decDeg), (xSize, ySize))				# For each subsection of the target image, find the center,x size,y size to give to clipfits
+			closestCenters[i],(RADeg,decDeg), (xSize, ySize))				# For each subsection of the target image, find the center,x size,y size to give to clipfits
 		fileName, fileDir = ic.getFileName(closestCenters[i][0],closestCenters[i][1], fitsPath)			# Get the filename for the closest mosaic to the corner
 		
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
