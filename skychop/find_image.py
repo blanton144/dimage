@@ -27,11 +27,17 @@ size = xSize, ySize
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"													# Server path to FITS data files
 dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"																	# FITS file to read SDSS mosaic center (RA, DEC)
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
-tableData = pf.open(dataFile)[1].data															# Table of (RA, DEC) values from SDSS mosaics
+rawData = pf.open(dataFile)[1].data																# Table of (RA, DEC) values from SDSS mosaics
+tableData = np.zeros((np.shape(rawData)[0],2))
 targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0), \
 					(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg-ySize/2.0)]		# Corners of the user specified image
 oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),\
 					  (RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg+ySize/2.0)]	# Respective opposite corners to the above
+
+for i in range(np.shape(tableData)[0]):
+	tableData[i][0] = rawData[i][0] / np.cos(rawData[i][1] * pi / 180.0)
+	tableData[i][1] = rawData[i][1]
+
 clipXYCen = []
 rectListx,rectListy = [],[]
 arcFileList = {}
