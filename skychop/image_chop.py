@@ -52,7 +52,7 @@ def repDupesWithZero(seq):
 	return result
 
 def getFileName(theRA, theDec, fitsPath):
-	degRa = (theRA / 15.0) * np.cos(theDec * pi / 180.0)
+	degRa = (theRA / 15.0)
 	hrRa = int(degRa)
 	minRa = (degRa - hrRa) * 60.0
 	secRaINT = int((minRa - int(minRa)) * 60.0)
