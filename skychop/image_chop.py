@@ -128,7 +128,7 @@ def gunzipIt(file, fileDir, outDir):
 	move(write_file,outDir + file[:-3])
 	return None
 
-def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz), tableData):
+def cutSection((A,B), (C,D), (U,V), (ALPH,DELT), (xSz,ySz)):
 	# A,B = targetCorner
 	# C,D = oppositeCorner
 	# U,V = closestMosaicCenter
