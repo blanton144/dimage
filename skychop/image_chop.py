@@ -142,7 +142,7 @@ def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	ALPHA,BETA = ((opCnr[0]-tgCnr[0])/fabs(opCnr[0]-tgCnr[0]),(opCnr[1]-tgCnr[1])/fabs(opCnr[1]-tgCnr[1]))
 	Xs = [(mosCen[0] + ALPHA/2.0) / np.cos((mosCen[1] + BETA/2.0)*pi/180.0), (tgCen[0] + (ALPHA*size[0]/2.0)) / np.cos((tgCen[1] + (BETA*size[1]/2.0))*pi/180.0)]
 	Ys = [mosCen[1] + BETA/2.0, tgCen[1] + (BETA*size[1]/2.0)]
-	XDs = [fabs(tgCnr[0]/ np.cos((tgCnr[1])*pi/180.0)-(mosCen[0] + ALPHA/2.0)/ np.cos((mosCen[1] + BETA/2.0)*pi/180.0), fabs(tgCnr[0]/ np.cos((tgCnr[1])*pi/180.0)-(tgCen[0] + (ALPHA*size[0]/2.0))/ np.cos((tgCen[1] + (BETA*size[1]/2.0)*pi/180.0))]
+	XDs = [fabs(tgCnr[0]/ np.cos((tgCnr[1])*pi/180.0)-(mosCen[0] + ALPHA/2.0)/ np.cos((mosCen[1] + BETA/2.0)*pi/180.0)), fabs(tgCnr[0]/ np.cos((tgCnr[1])*pi/180.0)-(tgCen[0] + (ALPHA*size[0]/2.0))/ np.cos((tgCen[1] + (BETA*size[1]/2.0)*pi/180.0)))]
 	YDs = [fabs(tgCnr[1]-(mosCen[1] + BETA/2.0)), fabs(tgCnr[1]-(tgCen[1] + (BETA*size[1]/2.0)))]
 	xInd = XDs.index(min(XDs))
 	yInd = YDs.index(min(YDs))
