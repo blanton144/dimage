@@ -19,7 +19,6 @@ RADeg = float(sys.argv[1])
 decDeg = float(sys.argv[2])
 xSize = float(sys.argv[3])
 ySize = float(sys.argv[4])
-RADeg = RADeg / np.cos(decDeg * pi / 180.0)
 	
 # RADEC_list format: (RA, Dec, offset)
 RADEC_list = ic.findClosestCenters(RADeg, decDeg, tableData, xSize, ySize)

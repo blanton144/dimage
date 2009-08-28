@@ -1,6 +1,6 @@
 #!/usr/local/epd/bin/python
 #
-#  Created by Adrian Price-Whelan on 6/3/09.
+#  Created by Adrian Price-Whelan on 8/28/09.
 #  Copyright (c) 2009. All rights reserved.
 #
 
@@ -25,13 +25,14 @@ size = xSize, ySize
 
 """Constants and other variable declarations"""
 fitsPath = "/mount/hercules1/sdss/dr7sky/fits/"													# Server path to FITS data files
-dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"																	# FITS file to read SDSS mosaic center (RA, DEC)
+dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"										# Path to FITS file to read SDSS mosaic center (RA, DEC)
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
-tableData = pf.open(dataFile)[1].data																# Table of (RA, DEC) values from SDSS mosaics
-targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0), \
-					(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg-ySize/2.0)]		# Corners of the user specified image
-oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),\
-					  (RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg+ySize/2.0)]	# Respective opposite corners to the above
+tableData = pf.open(dataFile)[1].data															# Table of (RA, DEC) values from SDSS mosaics
+# Corners of the user specified image
+targetImgCorners = [((RADeg+xSize/2.0) / np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),((RADeg-xSize/2.0) / np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
+					((RADeg+xSize/2.0) / np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),((RADeg-xSize/2.0) / np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
+# Respective opposite corners to the above
+oppositeImgCorners = targetImgCorners[::-1]
 
 clipXYCen = []
 rectListx,rectListy = [],[]
@@ -41,9 +42,9 @@ closestCenters = []
 allFileNames = None
 
 """For each of the corners of the user specified target image, find the 
-			closest mosaic center to that image. Test to make sure that
-			the image is unique, and that it lies outside of the closest
-			image to the center of the target image."""
+	closest mosaic center to that image. Test to make sure that
+	the image is unique, and that it lies outside of the closest
+	image to the center of the target image."""
 for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0],crnr[1],tableData))	# Find the closest center to each corner of the target image
 #closestCenters = ic.repDupesWithZero(closestCenters)													# Replace any duplicates with a 0 to skip
 
@@ -52,8 +53,8 @@ for i in range(len(closestCenters)):
 	else:
 		oneImEachBand = []
 		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
-			closestCenters[i],(RADeg,decDeg), (xSize, ySize))					# For each subsection of the target image, find the center,x size,y size to give to clipfits
-		fileName, fileDir = ic.getFileName(closestCenters[i][0],closestCenters[i][1], fitsPath)			# Get the filename for the closest mosaic to the corner
+			closestCenters[i],(RADeg,decDeg), (xSize, ySize))										# For each subsection of the target image, find the center,x size,y size to give to clipfits
+		fileName, fileDir = ic.getFileName(closestCenters[i][0],closestCenters[i][1], fitsPath)		# Get the filename for the closest mosaic to the corner
 		
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		

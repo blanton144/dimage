@@ -11,8 +11,23 @@ import gzip
 from shutil import move
 import operator
 
-def dist((x,y),(u,v)):
-	return sqrt((x-u)**2+(y-v)**2)
+def remDupes(seq):
+    seen = set()
+    return [x for x in seq if x not in seen and not seen.add(x)]
+	
+def repDupesWithZero(seq): 
+	def idfun(x): return x
+	seen = {}
+	result = []
+	for item in seq:
+		marker = idfun(item)
+		if marker not in seen:
+			seen[marker] = 1
+			result.append(item)
+		else:
+			seen[marker] = 1
+			result.append(0)
+	return result
 
 def gzipIt(file, outDir):
 	r_file = open(outDir+file, 'r')
@@ -36,21 +51,5 @@ def gunzipIt(file, fileDir, outDir):
 
 def midpt((x,y),(u,v)):
 	return ((x+u)/2.0,(y+v)/2.0)
-
-def remDupes(seq):
-    seen = set()
-    return [x for x in seq if x not in seen and not seen.add(x)]
-	
-def repDupesWithZero(seq): 
-	def idfun(x): return x
-	seen = {}
-	result = []
-	for item in seq:
-		marker = idfun(item)
-		if marker not in seen:
-			seen[marker] = 1
-			result.append(item)
-		else:
-			seen[marker] = 1
-			result.append(0)
-	return result
+def dist((x,y),(u,v)):
+	return sqrt((x-u)**2+(y-v)**2)
