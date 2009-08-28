@@ -45,7 +45,7 @@ allFileNames = None
 	closest mosaic center to that image. Test to make sure that
 	the image is unique, and that it lies outside of the closest
 	image to the center of the target image."""
-for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0],crnr[1],tableData))	# Find the closest center to each corner of the target image
+for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0]*np.cos(pi/180.0*crnr[1]),crnr[1],tableData))	# Find the closest center to each corner of the target image
 #closestCenters = ic.repDupesWithZero(closestCenters)													# Replace any duplicates with a 0 to skip
 
 for i in range(len(closestCenters)):
@@ -54,7 +54,7 @@ for i in range(len(closestCenters)):
 		oneImEachBand = []
 		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
 			closestCenters[i],(RADeg,decDeg), (xSize, ySize))										# For each subsection of the target image, find the center,x size,y size to give to clipfits
-		fileName, fileDir = ic.getFileName(closestCenters[i][0]*np.cos(pi/180.0*closestCenters[i][1]),closestCenters[i][1], fitsPath)		# Get the filename for the closest mosaic to the corner
+		fileName, fileDir = ic.getFileName(closestCenters[i][0], closestCenters[i][1], fitsPath)		# Get the filename for the closest mosaic to the corner
 		
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		
