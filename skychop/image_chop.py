@@ -146,7 +146,7 @@ def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	YDs = [fabs(tgCnr[1]-(mosCen[1] + BETA/2.0)), fabs(tgCnr[1]-(tgCen[1] + (BETA*size[1]/2.0)))]
 	xInd = XDs.index(min(XDs))
 	yInd = YDs.index(min(YDs))
-	rectCenter = midpt((tgCnr[0]/np.cos((tgCnr[1])*pi/180.0)),tgCnr[1]),(Xs[xInd],Ys[yInd]))
+	rectCenter = midpt((tgCnr[0]/np.cos((tgCnr[1])*pi/180.0),tgCnr[1]),(Xs[xInd],Ys[yInd]))
 	return rectCenter, (fabs(Xs[xInd]-tgCnr[0]/np.cos((tgCnr[1])*pi/180.0)),fabs(Ys[yInd]-tgCnr[1]))
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
