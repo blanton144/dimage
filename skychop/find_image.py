@@ -29,8 +29,8 @@ dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"										# Path to FIT
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
 tableData = pf.open(dataFile)[1].data															# Table of (RA, DEC) values from SDSS mosaics
 # Corners of the user specified image
-targetImgCorners = [((RADeg+xSize/2.0) / np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),((RADeg-xSize/2.0) / np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
-					((RADeg+xSize/2.0) / np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),((RADeg-xSize/2.0) / np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
+targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
+					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
 # Respective opposite corners to the above
 oppositeImgCorners = targetImgCorners[::-1]
 
@@ -45,7 +45,7 @@ allFileNames = None
 	closest mosaic center to that image. Test to make sure that
 	the image is unique, and that it lies outside of the closest
 	image to the center of the target image."""
-for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0]*np.cos(pi/180.0*crnr[1]),crnr[1],tableData))	# Find the closest center to each corner of the target image
+for crnr in targetImgCorners: closestCenters.append(ic.findClosestCenter(crnr[0],crnr[1],tableData))	# Find the closest center to each corner of the target image
 #closestCenters = ic.repDupesWithZero(closestCenters)													# Replace any duplicates with a 0 to skip
 
 for i in range(len(closestCenters)):
