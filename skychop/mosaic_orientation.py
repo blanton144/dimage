@@ -24,8 +24,11 @@ ySize = float(sys.argv[4])
 RADEC_list = ic.findClosestCenters(RADeg, decDeg, tableData, xSize, ySize)
 
 rectListx,rectListy = [],[]
-targetImgCorners = [(RADeg+xSize/2.0,decDeg+ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg-ySize/2.0)]
-oppositeImgCorners = [(RADeg-xSize/2.0,decDeg-ySize/2.0),(RADeg+xSize/2.0,decDeg-ySize/2.0),(RADeg-xSize/2.0,decDeg+ySize/2.0),(RADeg+xSize/2.0,decDeg+ySize/2.0)]
+
+targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
+					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
+# Respective opposite corners to the above
+oppositeImgCorners = targetImgCorners[::-1]
 
 for i in range(len(targetImgCorners)):
 	imName = "test"
@@ -35,16 +38,16 @@ for i in range(len(targetImgCorners)):
 
 foundX, foundY = ic.findClosestCenter(RADeg,decDeg,tableData)
 for i in range(np.shape(tableData)[0]):
-	if tableData[i][0] == foundX and tableData[i][1] == foundY:
+	if ic.dist((tableData[i][0],tableData[i][1]),(foundX,foundY)) < 2.0:
+		pl.plot([tableData[i][0]], [tableData[i][1]],'b.', ms=5.0)
+		"""pl.plot([tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]-0.5)),tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]+0.5))],[tableData[i][1]-0.5,tableData[i][1]+0.5],'b')
+		pl.plot([tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]+0.5)),tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]+0.5))],[tableData[i][1]+0.5,tableData[i][1]+0.5],'b')
+		pl.plot([tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]+0.5)),tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]-0.5))],[tableData[i][1]+0.5,tableData[i][1]-0.5],'b')
+		pl.plot([tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]-0.5)),tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]-0.5))],[tableData[i][1]-0.5,tableData[i][1]-0.5],'b')"""
 		pl.plot([tableData[i][0]-0.5,tableData[i][0]-0.5],[tableData[i][1]-0.5,tableData[i][1]+0.5],'b')
 		pl.plot([tableData[i][0]-0.5,tableData[i][0]+0.5],[tableData[i][1]+0.5,tableData[i][1]+0.5],'b')
 		pl.plot([tableData[i][0]+0.5,tableData[i][0]+0.5],[tableData[i][1]+0.5,tableData[i][1]-0.5],'b')
-		pl.plot([tableData[i][0]+0.5,tableData[i][0]-0.5],[tableData[i][1]-0.5,tableData[i][1]-+0.5],'b')
-	#pl.plot([tableData[i][0]-0.5,tableData[i][0]-0.5],[tableData[i][1]-0.5,tableData[i][1]+0.5],'b')
-	#pl.plot([tableData[i][0]-0.5,tableData[i][0]+0.5],[tableData[i][1]+0.5,tableData[i][1]+0.5],'b')
-	#pl.plot([tableData[i][0]+0.5,tableData[i][0]+0.5],[tableData[i][1]+0.5,tableData[i][1]-0.5],'b')
-	#pl.plot([tableData[i][0]+0.5,tableData[i][0]-0.5],[tableData[i][1]-0.5,tableData[i][1]-+0.5],'b')
-	pl.plot([tableData[i][0]], [tableData[i][1]],'b.', ms=5.0)
+		pl.plot([tableData[i][0]+0.5,tableData[i][0]-0.5],[tableData[i][1]-0.5,tableData[i][1]-0.5],'b')
 
 #print "RA:",foundX, "Dec:", foundY
 #for i in range(np.shape(tableData)[0]):
