@@ -48,6 +48,8 @@
 		if ($thumbYN == 1) {
 			exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname", $thumbName);
 		}
+		print_r($thumbName);
+		print_r($thumbName[0]);
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
