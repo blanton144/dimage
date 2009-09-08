@@ -46,9 +46,8 @@
 		}
 		
 		if ($thumbYN == 1) {
-			$thumbName2 = exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname", $thumbName);
+			exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname", $thumbName);
 		}
-		print_r($thumbName2);
 		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
 		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
 		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
@@ -64,7 +63,7 @@
 			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
 			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
 			if ($thumbYN == 1) {
-				print "<br /><center><img src='sdss-tmp/$thumbName2[0]'></center>";
+				print "<br /><center><img src='sdss-tmp/$thumbName[0]'></center>";
 			}
 		}
 		else {
