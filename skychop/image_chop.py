@@ -140,6 +140,19 @@ def gunzipIt(file, fileDir, outDir):
 	@ rectCenter finds the midpoint between the corner of the target image and XDs[xInd], YDs[yInd]."""
 def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	ALPHA,BETA = ((opCnr[0]-tgCnr[0])/fabs(opCnr[0]-tgCnr[0]),(opCnr[1]-tgCnr[1])/fabs(opCnr[1]-tgCnr[1]))
+	Xs = [mosCen[0] + ((ALPHA/2.0)/np.cos(pi/360.0*(mosCen[1] + BETA)), tgCen[0] + ((ALPHA*size[0]/2.0)/np.cos(pi/360.0*(tgCen[1] + BETA*size[1])))]
+	Ys = [mosCen[1] + BETA/2.0, tgCen[1] + (BETA*size[1]/2.0)]
+	XDs = [fabs(tgCnr[0]-(mosCen[0] + (ALPHA/2.0)/np.cos(pi/360.0*(mosCen[1] + BETA)))), fabs(tgCnr[0]-(tgCen[0] + (ALPHA*size[0]/2.0)/np.cos(pi/360.0*(tgCen[1] + BETA*size[1]))))]
+	YDs = [fabs(tgCnr[1]-(mosCen[1] + BETA/2.0)), fabs(tgCnr[1]-(tgCen[1] + (BETA*size[1]/2.0)))]
+	xInd = XDs.index(min(XDs))
+	yInd = YDs.index(min(YDs))
+	rectCenter = midpt((tgCnr[0],tgCnr[1]),(Xs[xInd],Ys[yInd]))
+	return rectCenter, (fabs(Xs[xInd]-tgCnr[0]),fabs(Ys[yInd]-tgCnr[1]))
+
+# Backup
+"""
+def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
+	ALPHA,BETA = ((opCnr[0]-tgCnr[0])/fabs(opCnr[0]-tgCnr[0]),(opCnr[1]-tgCnr[1])/fabs(opCnr[1]-tgCnr[1]))
 	Xs = [mosCen[0] + ((ALPHA/2.0)/np.cos(pi/180.0*mosCen[1] + BETA/2.0)), tgCen[0] + ((ALPHA*size[0]/2.0)/np.cos(pi/180.0*tgCen[1] + (BETA*size[1]/2.0)))]
 	Ys = [mosCen[1] + BETA/2.0, tgCen[1] + (BETA*size[1]/2.0)]
 	XDs = [fabs(tgCnr[0]-(mosCen[0] + (ALPHA/2.0)/np.cos(pi/180.0*mosCen[1] + BETA/2.0))), fabs(tgCnr[0]-(tgCen[0] + (ALPHA*size[0]/2.0)/np.cos(pi/180.0*tgCen[1] + (BETA*size[1]/2.0))))]
@@ -148,6 +161,7 @@ def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	yInd = YDs.index(min(YDs))
 	rectCenter = midpt((tgCnr[0],tgCnr[1]),(Xs[xInd],Ys[yInd]))
 	return rectCenter, (fabs(Xs[xInd]-tgCnr[0]),fabs(Ys[yInd]-tgCnr[1]))
+"""
 
 def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 	from astLib import astCoords
