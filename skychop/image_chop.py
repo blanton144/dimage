@@ -163,6 +163,8 @@ def clipFits(inFileName, RADeg, decDeg, clipSizeDeg, outFileName):
 		if img[i].header['naxis']==2:
 			fitsExtension=i
 			break
+	
+	clipSizeDeg[0] = clipSizeDeg[0] / np.cos(pi/180.0 * decDeg)
 
 	if fitsExtension==None:
 		print "ERROR: ",inFileName, "contains no image data. Skipping ..." 
