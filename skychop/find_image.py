@@ -33,7 +33,7 @@ targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+
 					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0)]
 
 #targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
-					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
+#					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
 
 # Respective opposite corners to the above
 oppositeImgCorners = targetImgCorners[::-1]
