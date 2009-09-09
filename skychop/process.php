@@ -5,7 +5,7 @@
 <title>Processing Data...</title>
 <link href="style.css" rel="stylesheet" type="text/css">
 </head>
-<body bgcolor="#D38785"><br /><br />
+<body bgcolor="#E5B4AF"><br /><br />
 <center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
 	ini_set("display_errors","2");
