@@ -154,7 +154,8 @@ def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 """
 def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	ALPHA,BETA = ((opCnr[0]-tgCnr[0])/fabs(opCnr[0]-tgCnr[0]),(opCnr[1]-tgCnr[1])/fabs(opCnr[1]-tgCnr[1]))
-	Xs = [mosCen[0] + ((ALPHA/2.0)/np.cos(pi/180.0*(mosCen[1] + (BETA/2.0)))), tgCen[0] + ((ALPHA*size[0]/2.0)/np.cos(pi/180.0*(tgCen[1] + (BETA*size[1]/2.0))))]
+	#Xs = [mosCen[0] + ((ALPHA/2.0)/np.cos(pi/180.0*(mosCen[1] + (BETA/2.0)))), tgCen[0] + ((ALPHA*size[0]/2.0)/np.cos(pi/180.0*(tgCen[1] + (BETA*size[1]/2.0))))]
+	Xs = [mosCen[0] + ((ALPHA/2.0)/np.cos(pi/360.0*(mosCen[1] + (BETA/2.0)))), tgCen[0] + ((ALPHA*size[0]/2.0)/np.cos(pi/360.0*(tgCen[1] + (BETA*size[1]/2.0))))]
 	Ys = [mosCen[1] + BETA/2.0, tgCen[1] + (BETA*size[1]/2.0)]
 	XDs = [fabs(tgCnr[0]-Xs[0]), fabs(tgCnr[0]-(tgCen[0] + Xs[1]))]
 	YDs = [fabs(tgCnr[1]-(mosCen[1] + BETA/2.0)), fabs(tgCnr[1]-(tgCen[1] + (BETA*size[1]/2.0)))]
