@@ -140,7 +140,6 @@ def gunzipIt(file, fileDir, outDir):
 	@ rectCenter finds the midpoint between the corner of the target image and XDs[xInd], YDs[yInd]."""
 def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	ALPHA,BETA = ((opCnr[0]-tgCnr[0])/fabs(opCnr[0]-tgCnr[0]),(opCnr[1]-tgCnr[1])/fabs(opCnr[1]-tgCnr[1]))
-	print ALPHA, BETA
 	Xs = [mosCen[0] + (ALPHA/2.0)/np.cos(pi/180.0*mosCen[1]), tgCen[0] + (ALPHA*size[0]/2.0)/np.cos(pi/180.0*tgCen[1])]
 	Ys = [mosCen[1] + BETA/2.0, tgCen[1] + (BETA*size[1]/2.0)]
 	XDs = [fabs(tgCen[0]-Xs[0]), fabs(tgCen[0]-Xs[1])]
