@@ -141,7 +141,7 @@ function initialize() {
 ?>
 </head>
 <body onLoad="initialize()" onUnload="GUnload()" bgcolor="#eeeeee">
-<font class='errorText'><b>Current Status:</b> Offline</font>
+<font class='errorText'><b>Current Status:</b> </font><font color='#00CC00'>Online for testing</font>
 <br />
 <table border='2' bordercolor="#000000" align='center'>
 <tr>
