@@ -44,10 +44,14 @@ for i in range(np.shape(tableData)[0]):
 		pl.plot([tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]+0.5)),tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]+0.5))],[tableData[i][1]+0.5,tableData[i][1]+0.5],'b')
 		pl.plot([tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]+0.5)),tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]-0.5))],[tableData[i][1]+0.5,tableData[i][1]-0.5],'b')
 		pl.plot([tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]-0.5)),tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]-0.5))],[tableData[i][1]-0.5,tableData[i][1]-0.5],'b')"""
-		pl.plot([tableData[i][0]-0.5,tableData[i][0]-0.5],[tableData[i][1]-0.5,tableData[i][1]+0.5],'b')
-		pl.plot([tableData[i][0]-0.5,tableData[i][0]+0.5],[tableData[i][1]+0.5,tableData[i][1]+0.5],'b')
-		pl.plot([tableData[i][0]+0.5,tableData[i][0]+0.5],[tableData[i][1]+0.5,tableData[i][1]-0.5],'b')
-		pl.plot([tableData[i][0]+0.5,tableData[i][0]-0.5],[tableData[i][1]-0.5,tableData[i][1]-0.5],'b')
+		pl.plot([tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][0]-0.5)),tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]+0.5))], \
+			[tableData[i][1]-0.5,tableData[i][1]+0.5],'b')
+		pl.plot([tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][0]+0.5)),tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]+0.5))], \
+			[tableData[i][1]+0.5,tableData[i][1]+0.5],'b')
+		pl.plot([tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][0]+0.5)),tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][1]-0.5))], \
+			[tableData[i][1]+0.5,tableData[i][1]-0.5],'b')
+		pl.plot([tableData[i][0]+(0.5/np.cos(pi/180.0*tableData[i][0]-0.5)),tableData[i][0]-(0.5/np.cos(pi/180.0*tableData[i][1]-0.5))], \
+			[tableData[i][1]-0.5,tableData[i][1]-0.5],'b')
 
 #print "RA:",foundX, "Dec:", foundY
 #for i in range(np.shape(tableData)[0]):
