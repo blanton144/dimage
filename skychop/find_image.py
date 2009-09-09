@@ -6,8 +6,8 @@
 
 import os
 # Enable this line for testing
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import image_chop as ic
 import sys
 import tarfile
@@ -59,7 +59,7 @@ for i in range(len(closestCenters)):
 		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
 			closestCenters[i],(RADeg,decDeg), (xSize, ySize))										# For each subsection of the target image, find the center,x size,y size to give to clipfits
 		fileName, fileDir = ic.getFileName(closestCenters[i][0], closestCenters[i][1], fitsPath)		# Get the filename for the closest mosaic to the corner
-		
+		print rectCenter, rectSize, fileName, fileDir
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		
 			ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
