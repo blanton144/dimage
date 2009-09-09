@@ -29,11 +29,11 @@ dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"										# Path to FIT
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
 tableData = pf.open(dataFile)[1].data															# Table of (RA, DEC) values from SDSS mosaics
 # Corners of the user specified image
-targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0), \
-					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0)]
+#targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0), \
+#					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0)]
 
-#targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
-#					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
+targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
+					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
 
 # Respective opposite corners to the above
 oppositeImgCorners = targetImgCorners[::-1]
