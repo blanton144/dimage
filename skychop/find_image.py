@@ -29,11 +29,14 @@ dataFile = "/var/www/html/sdss3/skychop/sky-patches.fits"										# Path to FIT
 outDir = "/var/www/html/sdss3/skychop/sdss-tmp/"												# Server path to output directory
 tableData = pf.open(dataFile)[1].data															# Table of (RA, DEC) values from SDSS mosaics
 # Corners of the user specified image
-targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0), \
-					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0)]
+#targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize)*pi/360.0),decDeg+ySize/2.0), \
+#					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize)*pi/360.0),decDeg-ySize/2.0)]
 
 #targetImgCorners = [(RADeg + (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg+ySize/2.0)*pi/180.0),decDeg+ySize/2.0), \
 #					(RADeg + (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos((decDeg-ySize/2.0)*pi/180.0),decDeg-ySize/2.0)]
+
+targetImgCorners = [(RADeg + (xSize/2.0)/np.cos(decDeg*pi/180.0),decDeg+ySize/2.0),(RADeg - (xSize/2.0)/np.cos(decDeg*pi/180.0),decDeg+ySize/2.0), \
+					(RADeg + (xSize/2.0)/np.cos(decDeg*pi/180.0),decDeg-ySize/2.0),(RADeg - (xSize/2.0)/np.cos(decDeg*pi/180.0),decDeg-ySize/2.0)]
 
 # Respective opposite corners to the above
 oppositeImgCorners = targetImgCorners[::-1]
@@ -59,7 +62,7 @@ for i in range(len(closestCenters)):
 		rectCenter, rectSize = ic.cutSection(targetImgCorners[i], oppositeImgCorners[i], \
 			closestCenters[i],(RADeg,decDeg), (xSize, ySize))										# For each subsection of the target image, find the center,x size,y size to give to clipfits
 		fileName, fileDir = ic.getFileName(closestCenters[i][0], closestCenters[i][1], fitsPath)		# Get the filename for the closest mosaic to the corner
-		print rectCenter, rectSize, fileName, fileDir
+
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		
 			ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
