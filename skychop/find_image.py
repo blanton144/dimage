@@ -63,7 +63,7 @@ for i in range(len(closestCenters)):
 			closestCenters[i],(RADeg,decDeg), (xSize, ySize))										# For each subsection of the target image, find the center,x size,y size to give to clipfits
 		fileName, fileDir = ic.getFileName(closestCenters[i][0], closestCenters[i][1], fitsPath)		# Get the filename for the closest mosaic to the corner
 
-		print rectSize, fileName
+		#print rectSize, fileName
 
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
 		for letter in bands:		
