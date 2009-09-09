@@ -163,7 +163,7 @@ def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	xInd = XDs.index(min(XDs))
 	yInd = YDs.index(min(YDs))
 	rectCenter = midpt((tgCnr[0],tgCnr[1]),(Xs[xInd],Ys[yInd]))
-	print np.cos(pi/180.0*fabs(Ys[yInd]-tgCnr[1])), fabs(Xs[xInd]-tgCnr[0])
+	print np.cos((Ys[yInd]-tgCnr[1]))
 	return rectCenter, (fabs(Xs[xInd]-tgCnr[0]),fabs(Ys[yInd]-tgCnr[1]))
 	#return rectCenter, (fabs(Xs[xInd]-tgCnr[0])*np.cos(pi/180.0*fabs(Ys[yInd]-tgCnr[1])),fabs(Ys[yInd]-tgCnr[1]))
 	
