@@ -7,8 +7,8 @@
 
 import os
 # Enable this line for testing
-#os.environ['HOME'] = '/var/www/html/sdss3/skychop'
-os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
+os.environ['HOME'] = '/var/www/html/sdss3/skychop'
+#os.environ['HOME'] = '/var/www/html/sdss3/skychop/sdss-tmp'
 import numpy as np
 import pyfits as pf
 from math import fabs, sqrt, pi
@@ -146,7 +146,7 @@ def cutSection(tgCnr, opCnr, mosCen, tgCen, size):
 	YDs = [fabs(mosCen[1]-Ys[0]), fabs(mosCen[1]-Ys[1])]
 	xInd = XDs.index(min(XDs))
 	yInd = YDs.index(min(YDs))
-	rectCenter = midpt((tgCnr[0],tgCnr[1]),(Xs[xInd],Ys[yInd]))
+	rectCenter = midpt((tgCnr[0],tgCnr[1]),(Xs[xInd]*np.cos(pi/180.0*Ys[yInd]),Ys[yInd]))
 	#print np.cos(pi/180.0*tgCnr[1])
 	return rectCenter, (fabs(Xs[xInd]-tgCnr[0]),fabs(Ys[yInd]-tgCnr[1]))
 	
