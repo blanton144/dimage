@@ -24,7 +24,7 @@
 	
 	// Figure out if the server is busy
 	$filename="pslist.txt"; 
-	$ps = exec('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1');
+	exec('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1', $ps);
 	print "$ps";
 	/*
 	$cpu_perc = array(); 
