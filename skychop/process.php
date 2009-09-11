@@ -31,7 +31,7 @@
     	//read file line by line into a new array element 
 	    $percent = (int) fgets($file, 4096); 
 		if ($percent > 0) {
-			$cpu_perc[] = $percent
+			$cpu_perc[] = $percent;
 		}
 	} 
 	fclose ($file);
