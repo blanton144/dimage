@@ -58,8 +58,11 @@ for i in range(len(closestCenters)):
 		fileName, fileDir = ic.getFileName(closestCenters[i][0], closestCenters[i][1], fitsPath)	# Get the filename for the closest mosaic to the corner
 		
 		""" For each band that the user specifies, clip the closest mosaic image down to size and delete the original"""
-		for letter in bands:		
-			ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
+		for letter in bands:
+			try:
+				ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
+			except IOError:
+				os._exit(0)
 			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
 				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
 			os.unlink(outDir + fileName + "-" + letter + ".fits")
