@@ -138,6 +138,7 @@ function initialize() {
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
 	}
+	}
 ?>
 </head>
 <body onLoad="initialize()" onUnload="GUnload()" bgcolor="#eeeeee">
