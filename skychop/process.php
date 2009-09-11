@@ -23,7 +23,7 @@
 	$tar_files = "";
 	
 	// Figure out if the server is busy
-	$filename="pslist.txt"; 
+	$filename="sdss-tmp/pslist.txt"; 
 	exec('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1', $ps);
 	print_r($ps);
 	/*
