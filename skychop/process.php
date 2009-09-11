@@ -23,8 +23,7 @@
 	$tar_files = "";
 	
 	if ($proc == 1) {
-		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");	
-		$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits");
+		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
 		$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		
 		for ($i = 0; $i < strlen($bands); $i++) {
@@ -34,7 +33,7 @@
 			//print "$outpu";
 			$tar_files .= " " . $output[($i * 2) +1];
 			$to_clip_again[] = $output[($i * 2) +1];
-			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1];
+			$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1]);
 			if ($bands[$i] == $thumb && $thumbYN == 1) {
 				$im = $output[($i * 2) +1];
 			}
@@ -54,6 +53,9 @@
 		//print_r($filesToRmv);
 		// Clean Up
 		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
+		if (is_file("/var/www/html/sdss3/skychop/sdss-tmp/weight.fits")) {
+			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits";
+		}
 		foreach ($filesToRmv as $f) {
 			unlink($f);
 		}

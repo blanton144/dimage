@@ -70,7 +70,7 @@ for i in range(len(closestCenters)):
 			allFileNames = np.append(allFileNames,np.reshape([oneImEachBand],(1,len(bands))),axis=0)
 allFileNamesT = allFileNames.transpose()
 
-""" For each clipped subimage in each row (organized by BAND), SWarp the images together"""
+""" For each clipped subimage in each row (organized by BAND), output the correct shell command for PHP to SWarp the images together"""
 if np.shape(allFileNamesT)[1] == 1:
 	for k in range(np.shape(allFileNamesT)[0]):
 		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-%.2fx%.2f.fits" % (xSize, ySize)
