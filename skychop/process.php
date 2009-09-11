@@ -105,7 +105,7 @@
 			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thumb&tyn=$thumbYN&proc=1";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
-	}
-?>*/
+	}*/
+?>
 </body>
 </html>
