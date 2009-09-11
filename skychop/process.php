@@ -42,6 +42,7 @@
 	}
 	if ($total >= 100 && count($cpu_perc) > 5) { $busy = 1; }
 	else { $busy = 0; }
+	print "$busy";
 	/*
 	if ($busy == 1} {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
