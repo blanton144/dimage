@@ -25,7 +25,8 @@
 	// Figure out if the server is busy
 	$filename="pslist.txt"; 
 	$ps = exec('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1');
-
+	print "$ps";
+	/*
 	$cpu_perc = array(); 
 	$file = fopen($filename, "r"); 
 	while(!feof($file)) { 
@@ -105,6 +106,6 @@
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
 	}
-?>
+?>*/
 </body>
 </html>
