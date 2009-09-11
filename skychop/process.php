@@ -26,50 +26,53 @@
 		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
 		$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
 		
-		for ($i = 0; $i < strlen($bands); $i++) {
-			$swarp = "swarp " . $output[$i * 2];
-			$outpu = system($swarp,$swarpout);
-			//print_r($swarpout);
-			//print "$outpu";
-			$tar_files .= " " . $output[($i * 2) +1];
-			$to_clip_again[] = $output[($i * 2) +1];
-			$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1]);
-			if ($bands[$i] == $thumb && $thumbYN == 1) {
-				$im = $output[($i * 2) +1];
+		if ($output != "0") {
+			for ($i = 0; $i < strlen($bands); $i++) {
+				$swarp = "swarp " . $output[$i * 2];
+				$outpu = system($swarp,$swarpout);
+				$tar_files .= " " . $output[($i * 2) +1];
+				$to_clip_again[] = $output[($i * 2) +1];
+				$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/" . $output[($i * 2) +1]);
+				if ($bands[$i] == $thumb && $thumbYN == 1) {
+					$im = $output[($i * 2) +1];
+				}
 			}
-		}
-		
-		foreach ($to_clip_again as $im_to_clip) {
-			$pyy = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $im_to_clip $RA $dec $sizeX $sizeY $im_to_clip 2>&1");
-			print "$pyy";
-		}
-		
-		if ($thumbYN == 1) {
-			exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname", $thumbName);
-		}
-		exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
-		exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
-		chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
-		//print_r($filesToRmv);
-		// Clean Up
-		unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
-		if (is_file("/var/www/html/sdss3/skychop/sdss-tmp/weight.fits")) {
-			$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits";
-		}
-		foreach ($filesToRmv as $f) {
-			unlink($f);
-		}
-		
-		if (file_exists("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar.gz")) {
-			print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
-			print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
-			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
+			
+			foreach ($to_clip_again as $im_to_clip) {
+				$pyy = exec("/usr/local/epd/bin/python $skychop/clipfits.py $skychop/sdss-tmp $im_to_clip $RA $dec $sizeX $sizeY $im_to_clip 2>&1");
+				print "$pyy";
+			}
+			
 			if ($thumbYN == 1) {
-				print "<br /><center><img src='sdss-tmp/$thumbName[0]'></center>";
+				exec("/usr/local/epd/bin/python $skychop/fitstograyscale.py $im $fname", $thumbName);
+			}
+			exec("tar -cvvf $skychop/sdss-tmp/$fname.tar $tar_files");
+			exec("gzip -c $skychop/sdss-tmp/$fname.tar > $skychop/sdss-tmp/$fname.tar.gz");
+			chmod("$skychop/sdss-tmp/$fname.tar.gz",0777);
+	
+			// Clean Up
+			unlink("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar");
+			if (is_file("/var/www/html/sdss3/skychop/sdss-tmp/weight.fits")) {
+				$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/weight.fits";
+			}
+			foreach ($filesToRmv as $f) {
+				unlink($f);
+			}
+			
+			if (file_exists("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar.gz")) {
+				print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
+				print "<center><font class='notifyText'>Your session ID is: <b>$fname</b>. <br /> You can come back any time within 30 minutes to re-download the files.</font></center>";	
+				print "<center><br /><a href='index.php'>Click to make another request</a></center>";
+				if ($thumbYN == 1) {
+					print "<br /><center><img src='sdss-tmp/$thumbName[0]'></center>";
+				}
+			}
+			else {
+				print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
 			}
 		}
 		else {
-			print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
+			print "<font class='errorText'><center>There is no data for this region!</center></font>";
 		}
 	}
 	else {

@@ -62,7 +62,7 @@ for i in range(len(closestCenters)):
 			try:
 				ic.gunzipIt("%s-%s.fits.gz" % (fileName, letter), fileDir+fileName, outDir)
 			except IOError:
-				os._exit(0)
+				sys.exit("0")
 			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
 				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
 			os.unlink(outDir + fileName + "-" + letter + ".fits")
