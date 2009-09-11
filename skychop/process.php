@@ -39,7 +39,7 @@
 	foreach ($cpu_perc as $i) {
 		$total += $i;
 	}
-	if ($total >= 100 && count($cpu_perc) > 5) { $busy = 1 }
+	if ($total >= 100 && count($cpu_perc) > 5) { $busy = 1; }
 	else { $busy = 0; }
 	
 	if ($busy == 1} {
