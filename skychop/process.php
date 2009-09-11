@@ -25,7 +25,7 @@
 	if ($proc == 1) {
 		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
 		$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
-		print "$py";
+
 		if ($py != "0") {
 			for ($i = 0; $i < strlen($bands); $i++) {
 				$swarp = "swarp " . $output[$i * 2];
@@ -73,6 +73,7 @@
 		}
 		else {
 			print "<font class='errorText'><center>There is no data for this region!</center></font>";
+			print "<center><br /><a href='index.php'>Click to make another request</a></center>";
 		}
 	}
 	else {
