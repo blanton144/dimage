@@ -25,8 +25,8 @@
 	if ($proc == 1) {
 		chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
 		$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
-		
-		if ($output != "0") {
+		print "$py";
+		if ($py != "0") {
 			for ($i = 0; $i < strlen($bands); $i++) {
 				$swarp = "swarp " . $output[$i * 2];
 				$outpu = system($swarp,$swarpout);
