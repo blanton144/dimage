@@ -36,7 +36,6 @@
 		}
 	} 
 	fclose ($file);
-	/*
 	$total = 0;
 	foreach ($cpu_perc as $i) {
 		$total += $i;
@@ -47,6 +46,7 @@
 	if ($busy == 1} {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
 	}
+	/*
 	else {	
 		if ($proc == 1) {
 			chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
