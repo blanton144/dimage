@@ -25,8 +25,6 @@
 	// Figure out if the server is busy
 	$filename="sdss-tmp/pslist.txt"; 
 	exec('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1', $ps);
-	print_r($ps);
-	/*
 	$cpu_perc = array(); 
 	$file = fopen($filename, "r"); 
 	while(!feof($file)) { 
@@ -105,7 +103,7 @@
 			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thumb&tyn=$thumbYN&proc=1";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
 		}
-	}*/
+	}
 ?>
 </body>
 </html>
