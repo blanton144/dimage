@@ -42,11 +42,10 @@
 	}
 	if ($total >= 100 && count($cpu_perc) > 5) { $busy = 1; }
 	else { $busy = 0; }
-	
+	/*
 	if ($busy == 1} {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
 	}
-	/*
 	else {	
 		if ($proc == 1) {
 			chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
