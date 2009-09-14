@@ -30,7 +30,6 @@
 	while(!feof($file)) { 
     	//read file line by line into a new array element 
 	    $percent = (int) fgets($file, 4096);
-		$num_py_proc[] = $percent;
 		if ($percent > 0) {
 			$num_py_proc[] = $percent;
 		}
