@@ -64,9 +64,9 @@ for i in range(len(closestCenters)):
 			except IOError:
 				sys.exit("0")
 			ic.clipFits(outDir + fileName + "-" + letter + ".fits", rectCenter[0], rectCenter[1], [rectSize[0],rectSize[1]], \
-				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
+				outDir + fileName + "-clipped-" + letter + "-%.2f_%.2f-%s.fits" % (rectCenter[0], rectCenter[1],tarName))
 			os.unlink(outDir + fileName + "-" + letter + ".fits")
-			oneImEachBand.append(fileName + "-clipped-" + letter + "-%.2f_%.2f.fits" % (rectCenter[0], rectCenter[1]))
+			oneImEachBand.append(fileName + "-clipped-" + letter + "-%.2f_%.2f-%s.fits" % (rectCenter[0], rectCenter[1],tarName))
 		if allFileNames == None:
 			allFileNames = np.array([oneImEachBand])
 		else:
