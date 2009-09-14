@@ -25,12 +25,12 @@
 	// Figure out if the server is busy
 	$filename="sdss-tmp/pslist.txt"; 
 	exec('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1', $ps);
-	print_r('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1');
 	$num_py_proc = array(); 
 	$file = fopen($filename, "r"); 
 	while(!feof($file)) { 
     	//read file line by line into a new array element 
-	    $percent = (int) fgets($file, 4096); 
+	    $percent = (int) fgets($file, 4096);
+	    print fgets($file, 4096);
 		if ($percent > 0) {
 			$num_py_proc[] = $percent;
 		}
