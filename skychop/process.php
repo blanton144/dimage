@@ -30,6 +30,7 @@
 	while(!feof($file)) { 
     	//read file line by line into a new array element 
 	    $percent = (int) fgets($file, 4096);
+	    print "$percent";
 		$num_py_proc[] = $percent;
 		/*if ($percent > 0) {
 			$num_py_proc[] = $percent;
@@ -44,10 +45,8 @@
 	else { $busy = False; }
 	if ($busy == True) {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
-		print_r($num_py_proc);
 	}
 	else {
-		print_r($num_py_proc);
 		/*
 		if ($proc == 1) {
 			chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
