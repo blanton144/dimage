@@ -46,7 +46,6 @@
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
 	}
 	else {
-		/*
 		if ($proc == 1) {
 			chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
 			$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
@@ -104,7 +103,7 @@
 		else {
 			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thumb&tyn=$thumbYN&proc=1";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
-		}*/
+		}
 	}
 ?>
 </body>
