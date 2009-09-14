@@ -25,26 +25,28 @@
 	// Figure out if the server is busy
 	$filename="sdss-tmp/pslist.txt"; 
 	exec('ps aux | awk "/python/ { print \$3 > \"'.$filename.'\" }" 2>&1', $ps);
-	$cpu_perc = array(); 
+	$num_py_proc = array(); 
 	$file = fopen($filename, "r"); 
 	while(!feof($file)) { 
     	//read file line by line into a new array element 
 	    $percent = (int) fgets($file, 4096); 
 		if ($percent > 0) {
-			$cpu_perc[] = $percent;
+			$num_py_proc[] = $percent;
 		}
 	} 
 	fclose ($file);
 	$total = 0;
-	foreach ($cpu_perc as $i) {
+	foreach ($num_py_proc as $i) {
 		$total += $i;
 	}
-	if ($total >= 100 && count($cpu_perc) > 5) { $busy = 1; }
-	else { $busy = 0; }
-	if ($busy == 1) {
+	if (count($num_py_proc) > 5) { $busy = True; }
+	else { $busy = False; }
+	if ($busy == True) {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
 	}
-	else {	
+	else {
+		print "NOT BUSY!";
+		/*
 		if ($proc == 1) {
 			chdir("/var/www/html/sdss3/skychop/sdss-tmp/");
 			$py = exec("/usr/local/epd/bin/python $skychop/find_image.py $RA $dec $sizeX $sizeY $bands $fname 2>&1",$output);
@@ -102,7 +104,7 @@
 		else {
 			$site = "process.php?ra=$RA&dec=$dec&xsize=$sizeX&ysize=$sizeY&bands=$bands&fname=$fname&thumb=$thumb&tyn=$thumbYN&proc=1";
 			echo('<meta http-equiv="Refresh" content="1;url='.$site.'">');
-		}
+		}*/
 	}
 ?>
 </body>
