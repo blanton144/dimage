@@ -76,8 +76,8 @@ allFileNamesT = allFileNames.transpose()
 """ For each clipped subimage in each row (organized by BAND), output the correct shell command for PHP to SWarp the images together"""
 if np.shape(allFileNamesT)[1] == 1:
 	for k in range(np.shape(allFileNamesT)[0]):
-		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-%.2fx%.2f.fits" % (xSize, ySize)
-		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight.fits"
+		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-%.2fx%.2f-%s.fits" % (xSize, ySize, tarName)
+		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight-%s.fits" % tarName
 		print "%s %s" % (allFileNamesT[k][0], swarpKARGS)
 		print coaddFname
 else:
@@ -85,7 +85,7 @@ else:
 		swarpArg =""
 		for name in allFileNamesT[k]:
 			swarpArg += " %s" % name
-		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-%.2fx%.2f.fits" % (xSize, ySize)
-		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight.fits"
+		coaddFname = ic.getIAUFname(RADeg,decDeg) + "-" + bands[k] + "-%.2fx%.2f-%s.fits" % (xSize, ySize, tarName)
+		swarpKARGS = "-IMAGEOUT_NAME=" + coaddFname + " -WEIGHTOUT_NAME=weight-%s.fits" % tarName
 		print "%s %s" % (swarpArg,swarpKARGS)
 		print coaddFname

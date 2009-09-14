@@ -39,7 +39,7 @@
 	foreach ($num_py_proc as $i) {
 		$total += $i;
 	}
-	if (count($num_py_proc) > 5) { $busy = True; }
+	if (count($num_py_proc) > 4) { $busy = True; }
 	else { $busy = False; }
 	if ($busy == True) {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
