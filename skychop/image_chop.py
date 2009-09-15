@@ -120,14 +120,12 @@ def gzipIt(file, outDir):
 
 def gunzipIt(file, fileDir, outDir, pid):
 	r_file = gzip.GzipFile(fileDir + "/" + file, 'r')
-	write_file = outDir + file[:-3] + "-%s" % pid
+	write_file = outDir + "-%s" % pid + file[:-3]
 	w_file = open(write_file, 'w')
 	w_file.write(r_file.read())
 	w_file.close()
 	r_file.close()
-	move(write_file,outDir + file[:-3] + "-%s" % pid)
-	print write_file
-	print outDir + file[:-3] + "-%s" % pid
+	move(write_file,outDir + "-%s" % pid + file[:-3])
 	return None
 
 """ ALPHA and BETA determine which direction the target corner is in, they act as unit vectors.
