@@ -118,7 +118,7 @@ def gzipIt(file, outDir):
 	os.unlink(outDir+file)
 	return None
 
-def gunzipIt_fits(file, fileDir, outDir, pid):
+def gunzipIt(file, fileDir, outDir, pid):
 	r_file = gzip.GzipFile(fileDir + "/" + file, 'r')
 	write_file = outDir + file[:-8] + "-%s" % pid + file[-8:-3]
 	w_file = open(write_file, 'w')
