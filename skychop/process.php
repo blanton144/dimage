@@ -49,6 +49,7 @@
 	$status = apw_getServerStatus(4, "python", "sdss-tmp/pslist.txt");
 	if ($status == True) {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
+		print "<a href='index.php'>Click to return</a>";
 	}
 	else {
 		if ($proc == 1) {
@@ -61,10 +62,8 @@
 					system($swarp, $swarp_error);
 					$tar_files .= " " . $find_image_output[($i * 2) +1];
 					$to_clip_again[] = $find_image_output[($i * 2) +1];
-					//$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/" . $find_image_output[($i * 2) +1]);
-					if ($bands[$i] == $thumb && $thumbYN == 1) {
-						$im = $find_image_output[($i * 2) +1];
-					}
+					$filesToRmv = array(0 => "/var/www/html/sdss3/skychop/sdss-tmp/" . $find_image_output[($i * 2) +1]);
+					if ($bands[$i] == $thumb && $thumbYN == 1) { $im = $find_image_output[($i * 2) +1]; }
 				}
 				
 				foreach ($to_clip_again as $im_to_clip) {
@@ -84,9 +83,9 @@
 				if (is_file("/var/www/html/sdss3/skychop/sdss-tmp/weight-$fname.fits")) {
 					$filesToRmv[] = "/var/www/html/sdss3/skychop/sdss-tmp/weight-$fname.fits";
 				}
-				/*foreach ($filesToRmv as $f) {
+				foreach ($filesToRmv as $f) {
 					unlink($f);
-				}*/
+				}
 				
 				if (file_exists("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar.gz") && filesize("/var/www/html/sdss3/skychop/sdss-tmp/$fname.tar.gz") > 0) {
 					print "<center><a href='sdss-tmp/$fname.tar.gz'>Download Files</a></center>";
@@ -100,7 +99,7 @@
 					print "<font class='errorText'><center>An unknown error has occurred.</center></font>";
 				}
 				
-				
+				/*
 				// Print all errors and output:
 				print "<font class='errorText'>Swarp:</font><br />";
 				print_r($swarp_error);
@@ -121,7 +120,7 @@
 				print "<br />";
 				print "<font class='errorText'>Find Image (stdout):</font><br />";
 				print_r($find_image_output);
-				
+				*/
 			}
 			else {
 				print "<font class='errorText'><center>There is no data for this region!</center></font>";
