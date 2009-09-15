@@ -47,7 +47,7 @@
 <center><font class="theLabels">Your request is pending, please be patient.<br /> Depending on the size of the image requested, this could take some time.</font></center>
 <?php
 	$status = apw_getServerStatus(4, "python", "sdss-tmp/pslist.txt");
-	if ($busy == True) {
+	if ($status == True) {
 		print "<font class='errorText'><center>The server is currently at its maximum for processing requests. <br>Please try again soon.</center></font>";
 	}
 	else {

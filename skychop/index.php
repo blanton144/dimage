@@ -103,8 +103,6 @@ function initialize() {
 			$fname = rand(1000,9999999999);
 		}
 		
-		// Test to see if the coordinates are in range
-		$coord_test_out = exec("/usr/local/epd/bin/python test_the_coords.py $RA $dec 2>&1",$coord_test);
 		// Figure out which bands are on and add the letters to an array
 		if ($z == 'on') { $bands .= 'z'; $thmb = 'z'; }
 		if ($u == 'on') { $bands .= 'u'; $thmb = 'u'; }
@@ -117,10 +115,6 @@ function initialize() {
 			print "<font class='errorText'><center>Please select a band!</center></font>";
 			$submitSuccess = False;
 		}
-		if ($coord_test_out == 0 || $coord_test_out == '0') {
-			print "<font class='errorText'><center>Coordinates out of range!</center></font>";
-			$submitSuccess = False;
-		}
 		if (!(is_numeric($RA)) || !(is_numeric($dec)) || !(is_numeric($sizeX)) || !(is_numeric($sizeY))) {
 			print "<font class='errorText'><center>Enter only numbers into coordinates and size!</center></font>";
 			$submitSuccess = False;
@@ -131,6 +125,12 @@ function initialize() {
 		}
 		if ($sizeX > 1.0) {
 			print "<font class='errorText'><center>Size must be 0 < X <= 1.0</center></font>";
+			$submitSuccess = False;
+		}
+		// Test to see if the coordinates are in range
+		$coord_test_out = exec("/usr/local/epd/bin/python test_the_coords.py $RA $dec 2>&1",$coord_test);
+		if ($coord_test_out == 0 || $coord_test_out == '0') {
+			print "<font class='errorText'><center>Coordinates out of range!</center></font>";
 			$submitSuccess = False;
 		}
 		if ($submitSuccess) {
