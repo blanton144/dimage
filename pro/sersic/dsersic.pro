@@ -21,7 +21,9 @@
 ;   model - image of best fit model
 ; COMMENTS:
 ;   The input psf should be interpreted as an image of a delta
-;   function source (pixel- and seeing-convolved)
+;    function source (pixel- and seeing-convolved)
+; EXAMPLES:
+;   
 ; BUGS:
 ;   sersic fitting by dsersic currently fails fake data tests
 ; PROCEDURES CALLED:
