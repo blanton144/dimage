@@ -55,6 +55,9 @@ if(keyword_set(noclobber)) then begin
 endif
 if(keyword_set(jpg)) then redo=1
 
+if(NOT keyword_set(scales)) then scales=[4., 5., 6.]
+if(NOT keyword_set(satvalue)) then satvalue=30.
+if(NOT keyword_set(nonlinearity)) then nonlinearity=3.
 if(redo) then $
   djs_rgb_make, prefix[0]+'-i.fits.gz', $
   prefix[0]+'-r.fits.gz', $
