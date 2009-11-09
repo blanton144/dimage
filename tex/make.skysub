@@ -5,9 +5,9 @@
 #
 NAME = skysub
 
-BIB = $(shell echo $(BIBINPUTS) | tr -s '/:' '/\n' | grep ccpp-latex)
+BIB = $(shell echo $(BIBINPUTS) | tr -s '/:' '/\n' | grep ccpp_latex)
 
-all: $(NAME).pdf 
+all: $(NAME).pdf
 
 %.dvi: %.tex %_figures.tex $(BIB)ccpp.bib
 	latex $*; bibtex $*; latex $*; latex $*
