@@ -97,7 +97,8 @@ for i=0L, 4L do begin
     yra= [alog10(0.5), max(yy)+0.2] 
     djs_plot, xx, yy, psym=10, th=2, xra=[fmin, fmax], yra=yra, $ 
       xtitle='!8f_{!6resid}!6 (nanomaggies)!6', $ 
-      ytitle='!6log_{10} !8N_{!6field}!6', /leftaxis, bottomaxis=(i eq 4) 
+      ytitle='!6log_{10} !8N_{!6field}!6', /leftaxis, bottomaxis=(i eq 4) , $
+      charsize=1.4
     sig= djsig(qa.skyval[i]) 
     ymodel= alog10(float(n_elements(qa))* $
                    exp(-0.5*xx^2/sig^2)/sqrt(2.*!DPI)/sig) 
@@ -115,11 +116,11 @@ for i=0L, 4L do begin
     
     xst= !X.CRANGE[0]+0.7*(!X.CRANGE[1]-!X.CRANGE[0])
     yst= !Y.CRANGE[0]+0.85*(!Y.CRANGE[1]-!Y.CRANGE[0])
-    djs_xyouts, xst, yst, '!8'+filtername(i)+'!6-band residuals'
+    djs_xyouts, xst, yst, '!8'+filtername(i)+'!6-band residuals', charsize=1.2
     yst= !Y.CRANGE[0]+0.73*(!Y.CRANGE[1]-!Y.CRANGE[0])
-    djs_xyouts, xst, yst, '!8\sigma = '+sigstr+' !6nmgy'
+    djs_xyouts, xst, yst, '!8\sigma = '+sigstr+' !6nmgy', charsize=1.2
     yst= !Y.CRANGE[0]+0.61*(!Y.CRANGE[1]-!Y.CRANGE[0])
-    djs_xyouts, xst, yst, '!8f_{!6out!8}!6 = '+foutstr+'!6'
+    djs_xyouts, xst, yst, '!8f_{!6out!8}!6 = '+foutstr+'!6', charsize=1.2
 endfor
 
 

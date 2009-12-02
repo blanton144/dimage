@@ -15,6 +15,7 @@
 ;         (in arcsec)
 ; OPTIONAL KEYWORDS:
 ;   /noclobber - do not overwrite previously created files
+;   /cenonly - only output parent image for central object
 ; COMMENTS:
 ;   Creates files:
 ;      base-#-pimage.fits - image with parent number in each pixel
@@ -26,7 +27,8 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dparents, base, imfiles, plim=plim, ref=ref, sky=sky, $
-              noclobber=noclobber, puse=puse, seed=seed0
+              noclobber=noclobber, puse=puse, seed=seed0, $
+              cenonly=cenonly
 
 if(NOT keyword_set(plim)) then plim=5.
 if(NOT keyword_set(ref)) then ref=0
@@ -73,9 +75,14 @@ endfor
 ;; read in images and ivars
 sigma=fltarr(nim)
 pixscale=fltarr(nim)
+allzero=bytarr(nim)
 for k=0L, nim-1L do begin
     ;; read in image
     *images[k]=gz_mrdfits(imfiles[k],0,hdr)
+
+    inot= where(*images[k] ne 0., nnot)
+    if(nnot eq 0) then $
+      allzero[k]=1
 
     ;; hack to find pixel scale
     ntest=10L
@@ -105,10 +112,14 @@ for k=0L, nim-1L do begin
     endif
 
     ivar=gz_mrdfits(imfiles[k],1) 
-    if(NOT keyword_set(ivar)) then $
-      *ivars[k]=fltarr(nx[k], ny[k])+1./sigma[k]^2 $
-    else $
-      *ivars[k]=ivar
+    if(NOT keyword_set(ivar)) then begin
+        if(allzero[k] eq 0) then $
+          *ivars[k]=fltarr(nx[k], ny[k])+1./sigma[k]^2 $
+        else $
+          *ivars[k]=fltarr(nx[k], ny[k])
+    endif  else begin
+        *ivars[k]=ivar
+    endelse
 endfor
 
 ;; do general object detection
@@ -122,12 +133,25 @@ endfor
 
 if(max(fobject) eq -1) then return
 
+nfx= (size(fobject,/dim))[0]
+nfy= (size(fobject,/dim))[1]
+fcen= fobject[nfx/2L, nfy/2L]
+
 pcat=replicate({xst:lonarr(nim), yst:lonarr(nim), $
                 xnd:lonarr(nim), ynd:lonarr(nim), $
                 xc:fltarr(nim), yc:fltarr(nim), $
                 cra:0.D, cdec:0.D},max(fobject)+1L)
 spawn, 'mkdir -p parents'
-for iobj=0L, max(fobject) do begin
+
+obj_st=0L
+obj_nd= max(fobject)
+if(keyword_set(cenonly)) then begin
+    if(fcen eq -1) then return
+    obj_st=fcen
+    obj_nd=fcen
+endif
+
+for iobj=obj_st, obj_nd do begin
     for k=0L, nim-1L do begin
         io=where(*oimage[k] eq iobj)
         ixo=io mod nx[k]
@@ -160,7 +184,10 @@ for iobj=0L, max(fobject) do begin
         
         io=where(nimage eq iobj OR nimage eq -1L)
         
-        iimage=randomn(seed, nxnew, nynew)*sigma[k]
+        if(allzero[k] eq 0) then $
+          iimage=randomn(seed, nxnew, nynew)*sigma[k] $
+        else $
+          iimage=fltarr(nxnew, nynew)
         ii=where(iivar gt 0., nii)
         if(nii gt 0) then $
           iimage[ii]=randomn(seed, nii)/sqrt(iivar[ii])

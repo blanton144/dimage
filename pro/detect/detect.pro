@@ -23,6 +23,7 @@
 ;   /sgset - get locations of stars and galaxies from base-sgset.fits file
 ;   /hand - for children, put results in "hand" subdir (used by dexplore)
 ;   /noclobber - do not overwrite previously created files
+;   /noparentclobber - do not overwrite previously PARENT files
 ;   /gbig - treat galaxies as "big": resample smoothed image
 ;           to save memory and ignore the small stuff
 ; COMMENTS:
@@ -49,14 +50,14 @@ pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             noclobber=noclobber, glim=glim, all=all, single=single, $
             aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
             center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
-            gsaddle=gsaddle, nostarim=nostarim, novpsf=novpsf
+            gsaddle=gsaddle, nostarim=nostarim, novpsf=novpsf, $
+            noparentclobber=noparentclobber
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(glim)) then glim=20.
 if(NOT keyword_set(gsaddle)) then gsaddle=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=3.
-
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -86,8 +87,9 @@ endelse
 
 ;; get parents (creates pcat, pimage, parents files)
 seed_parents=seed0
-dparents, base, imfiles, sky=sky, noclobber=noclobber, ref=pset.ref, $
-  puse=pset.puse, seed=seed_parents
+nc= keyword_set(noclobber) OR keyword_set(noparentclobber)
+dparents, base, imfiles, sky=sky, noclobber=nc, ref=pset.ref, $
+  puse=pset.puse, seed=seed_parents, cenonly=center
 
 ;; read in parents 
 hdr=gz_headfits(base+'-pimage.fits',ext=0)

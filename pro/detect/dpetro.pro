@@ -33,10 +33,12 @@ return,val
 
 end
 ;
-pro dpetro,nprof,profmean,petrorad=petrorad,petroflux=petroflux, $
+pro dpetro,nprof,profmean,profmean_ivar, $
+           petrorad=petrorad,petroflux=petroflux, $
            petror50=petror50,petror90=petror90, $
            petroratiolimit=petroratiolimit, $
-           npetrorad=npetrorad, cpetrorad=cpetrorad
+           npetrorad=npetrorad, cpetrorad=cpetrorad, $
+           ivar_petroflux=ivar_petroflux
 
 if(NOT keyword_set(petroratiolimit)) then petroratiolimit=0.2
 if(NOT keyword_set(npetrorad)) then npetrorad=2.
@@ -69,6 +71,19 @@ endelse
 interp_profmean,nprof,profmean,petrorad*npetrorad,petroflux
 petroflux=petroflux[0]
 
+if(nprof gt 0 AND n_elements(profmean_ivar) eq n_elements(profmean)) then begin
+    profmean_var= 1./profmean_ivar
+    ibad=where(profmean_var lt 0. or finite(profmean_var) eq 0, nbad)
+    if(nbad gt 0) then profmean_var[ibad]=0.
+    interp_profmean,nprof,profmean_var,petrorad*npetrorad,var
+    if(finite(var)) then $
+      ivar_petroflux=1./var[0] $
+    else $
+      ivar_petroflux=0.
+endif else begin
+    ivar_petroflux=0.
+endelse
+    
 indx=where(maggies_cum[0:nradii-2] le 0.5*petroflux and $
            maggies_cum[1:nradii-1] gt 0.5*petroflux,count)
 if(count eq 0) then $

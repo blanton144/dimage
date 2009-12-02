@@ -152,7 +152,7 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
     mwrfits, atset_hand, atsetfile, /create
     help,extra_for_detect,/st
     detect, basename, imagenames, ref=atset.ref, $
-      single=parent, /aset, /hand, /noclobber, /pset, $
+      single=parent, /aset, /hand, /pset, /noparentclobber, $
       _EXTRA=extra_for_detect
     dexplore_parent_display
     dexplore_child_list
