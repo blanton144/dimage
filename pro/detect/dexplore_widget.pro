@@ -478,7 +478,7 @@ if(n_tags(eyeball) eq 0) then begin
 endif
 
 w_eyeball = WIDGET_BASE(/COLUMN, /BASE_ALIGN_TOP, /SCROLL, $
-                        xoff=300, scr_xsize=200, scr_ysize=500)
+                        xoff=300, ysize=700, scr_xsize=200, scr_ysize=700)
 
 w_label = WIDGET_LABEL(w_eyeball, VALUE='Flag values')
 
