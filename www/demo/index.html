@@ -2,31 +2,161 @@
 <html>
  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Flot Examples</title>
+    <title>demo</title>
     <link href="layout.css" rel="stylesheet" type="text/css"></link>
     <!--[if IE]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
     <script language="javascript" type="text/javascript" src="../flot/jquery.js"></script>
     <script language="javascript" type="text/javascript" src="../flot/jquery.flot.js"></script>
-    <script language="javascript" type="text/javascript" src="../flot/jquery.flot.image.js"></script>
-    <script language="javascript" type="text/javascript" src="../flot/jquery.flot.navigate.js"></script>
+    <script language="javascript" type="text/javascript" src="../flot/jquery.flot.selection.js"></script>
+    <script language="javascript" type="text/javascript" src="switch1.js"></script>
  </head>
- <body>
-    <h1>Flot Examples</h1>
+ <body style="background: #111;">
+    <h1 style="color:white;position:absolute;left:50px;top:-10px;">demo</h1>
 
-    <div id="placeholder" style="width:400px;height:400px;"></div>
+<div id="image-switch">
+<div id="image1">
+<img src="demo.jpg"
+style="position:absolute;left:50px;top:50px;width:400px;height:400px;"></img>
+</div>
+
+<div id="image2">
+<img src="guide.jpg"
+style="position:absolute;left:50px;top:50px;width:400px;height:400px;"></img>
+</div>
+</div>
+
+
+    <div id="placeholder" style="position:absolute;left:50px;top:50px;width:400px;height:400px;"></div>
+
+<div id="placeholder2" style="position:absolute;left:570px;top:50px;width:500px;height:400px;"></div>
+
+    <div id="miniature" style="position:absolute;left:770px;top:470px;">
+      <div id="overview" style="width:166px;height:100px"></div>
+      <p id="overviewLegend" style="margin-left:10px"></p>
+    </div>
+
+    <p style="color:#fff;position:absolute;left:50px; top:520px"><input id="enableTooltip" type="checkbox">Enable tooltip</p>
+
+		<p id="hoverdata" style="color:white;position:absolute;left:50px;
+top:480px">Current position: (RA=<span id="x">0</span>, Dec=<span id="y">0</span>). </p>
+
+<ul style="position:absolute;left:490px;top:50px;color:white;list-style-type:none;margin-left:0;padding-left:1em;">
+<li><a onmouseover="switch1('image1');">Wine</a></li>
+<li><a onmouseover="switch1('image2');">Beer</a></li>
+</ul>
 
 <script id="source" language="javascript" type="text/javascript">
 $(function () {
-    var data = [ [ ["demo.jpg", -10, -10, 10, 10] ] ];
-    var options = {
-            series: { images: { show: true } },
-            xaxis: { min: -8, max: 4 },
-            yaxis: { min: -8, max: 4 }
-    };
 
-    $.plot.image.loadDataImages(data, options, function () {
-        $.plot($("#placeholder"), data, options);
+      var options = {
+            series: { points:{ show: true,   
+                                 fill: false }},	
+	  					grid: { show: false, backgroundColor: null, 
+                      hoverable: true},
+              xaxis: { min: -5., max: 5. },
+              yaxis: { min: -5., max: 5. },
+	  					colors: [ "#00ff00", "#ffffff" ]
+      };
+
+    function showTooltip(x, y, contents) {
+        $('<div id="tooltip">' + contents + '</div>').css( {
+            position: 'absolute',
+            display: 'none',
+            top: y - 15,
+            left: x + 5,
+            border: '1px solid #fdd',
+            padding: '0px',
+            'background-color': '#fee',
+            opacity: 0.30
+        }).appendTo("body").fadeIn(200);
+    }
+
+    var previousPoint = null;
+    $("#placeholder").bind("plothover", function (event, pos, item) {
+        $("#x").text(pos.x.toFixed(2));
+        $("#y").text(pos.y.toFixed(2));
+
+        if ($("#enableTooltip:checked").length > 0) {
+            if (item) {
+                if (previousPoint != item.datapoint) {
+                    previousPoint = item.datapoint;
+                    
+                    $("#tooltip").remove();
+                    var x = label[item.dataIndex]
+                    
+                    showTooltip(item.pageX, item.pageY, x )
+                }
+            }
+            else {
+                $("#tooltip").remove();
+                previousPoint = null;            
+            }
+        }
     });
+
+    var data = [];
+		function onDataReceived(series) {
+       data.push(series)
+	  	  var plot = $.plot($("#placeholder"), data, options);
+   }
+
+    $.ajax({
+            url: "ran.json",
+            method: 'GET',
+            dataType: 'json',
+            success: onDataReceived
+     });
+
+     var sdata = [];
+		  function onDataReceived2(series) {
+        sdata.push(series);
+        var options = {
+            selection: { mode: "xy" }
+        };
+	  	  var plot = $.plot($("#placeholder2"), sdata, options);
+
+        // setup overview
+        var overview = $.plot($("#overview"), sdata, {
+              legend: { show: true, container: $("#overviewLegend") },
+              series: {
+                  lines: { show: true, lineWidth: 1 },
+                  shadowSize: 0
+              },
+              xaxis: { ticks: 4 },
+              yaxis: { ticks: 3},
+              grid: { color: "#999" },
+              selection: { mode: "xy" }
+          });
+
+        $("#placeholder2").bind("plotselected", function (event, ranges) {
+            // clamp the zooming to prevent eternal zoom
+            if (ranges.xaxis.to - ranges.xaxis.from < 0.00001)
+                ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+            if (ranges.yaxis.to - ranges.yaxis.from < 0.00001)
+                ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+        
+            // do the zooming
+            plot = $.plot($("#placeholder2"), sdata,
+                   $.extend(true, {}, options, {
+                   xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+                   yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+                   }));
+            
+            // don't fire event on the overview to prevent eternal loop
+            overview.setSelection(ranges, true);
+        });
+        $("#overview").bind("plotselected", function (event, ranges) {
+            plot.setSelection(ranges);
+    });
+      }
+
+    $.ajax({
+            url: "stack.json",
+            method: 'GET',
+            dataType: 'json',
+            success: onDataReceived2
+     });
+
 });
 </script>
 
