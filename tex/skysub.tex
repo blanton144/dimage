@@ -68,7 +68,6 @@
 \author{
 Michael R. Blanton\altaffilmark{\ref{NYU}},
 Eyal Kazin\altaffilmark{\ref{NYU}},
-Demitri Muna\altaffilmark{\ref{NYU}}, \and
 Benjamin A. Weaver\altaffilmark{\ref{NYU}}
 }
 
@@ -102,18 +101,14 @@ studies of the local Universe.
 
 \section{ To-do list}
 
+{\bf mrb: make example mosaics}
+
 {\bf mrb: run montage\_image on a few patches with large galaxies and
 compare to us}
 
 {\bf mrb: create residual qa test for each run}
 
-{\bf mrb: make example mosaics}
-
-{\bf apw: create web front-end and clipping routines for access}
-
 {\bf eak: simple comparison of fake nearby to us}
-
-{\bf eak: dimage comparison of fake nearby to us}
 
 {\bf eak: photo v5\_4 comparison of fake nearby to us}
 
@@ -195,6 +190,9 @@ procedure. We also evaluate the performance of two versions of the
 standard SDSS pipelines (one that corresponds to the SDSS DR7 and
 another that is intended for DR8).
 
+The results described here are available for the Northern Galactic Cap
+portion of the SDSS imaging using a simple on-line
+interface.\footnote{\tt http://sdss.physics.nyu.edu/mosaic/}. 
 The only other publicly available mosaicking and background
 subtraction facility for SDSS that we are aware of is the results of
 the Montage package distributed by IRSA (\citealt{berriman03a}). We
@@ -459,17 +457,25 @@ Although our procedures allow us to evaluate any arbitrary mosaic, for
 ease of distribution we have created a set of 1$\times$1 deg mosaics
 across the entire observed Northern Galactic Cap, or almost 8000
 deg$^2$. We have created a web interface that allows users to easily
-extract sections of these mosaics.
+extract sections of these mosaics.\footnote{\tt
+http://sdss.physics.nyu.edu/mosaic/}
 
-{\bf how to access data}
+This interface can be used either interactively or
+non-interactively. The interactive method allows the user to browse a
+Google sky viewer and select the region of interest.  The
+non-interactive method is explained in the documentation.  In either
+case, the user is returned FITS format images in each desired
+bandpass, with correct WCS headers, sky-subtracted and calibrated. The
+units of the images are nanomaggies per pixel.
 
 \subsection{Comparison to Montage}
 
 The only other publicly available mosaicking and background
 subtraction facility for SDSS that we are aware of is the results of
-the Montage package distributed by IRSA \citep{berriman03a,berriman04a}. We will describe
-the quantitative differences between their results and ours below.
-Here we discuss methodological differences.
+the Montage package distributed by IRSA
+\citep{berriman03a,berriman04a}. We will describe the quantitative
+differences between their results and ours below.  Here we discuss
+methodological differences.
 
 The first major difference is in their method for background
 subtraction. While in our case we rely on a smooth fit to regions with

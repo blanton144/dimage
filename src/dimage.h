@@ -74,3 +74,20 @@ int dtemplates(float *image, int nx, int ny, int *ntemplates, int *xcen,
 int dsersic_params(float flux, float n, float r50, float *amp, float *r0);
 int dfloodfill(int *image, int nx, int ny, int x, int y, int xst, int xnd, 
 							 int yst, int ynd, int nv);
+
+
+void dshift(float *image,
+						int nx,
+						int ny,
+						float dx,
+						float dy,
+						float (*kernel)(float),
+						int nk);
+float dkernel_linear(float dx);
+int dkernel_linear_size();
+float dkernel_puresinc(float dx);
+int dkernel_puresinc_size();
+float dkernel_dampsinc(float dx);
+int dkernel_dampsinc_size();
+float dkernel_bicubic(float dx);
+int dkernel_bicubic_size();

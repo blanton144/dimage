@@ -24,7 +24,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber, $
-             cmap=cmap, base=base, seed=seed0, novpsf=novpsf
+             cmap=cmap, base=base, seed=seed0, novpsf=novpsf, noivar=noivar
 
 if(NOT keyword_set(natlas)) then natlas=41L
 if(NOT keyword_set(seed0)) then seed0=108L
@@ -41,7 +41,7 @@ endif
 splog, 'Reading image '+imfile
 image=gz_mrdfits(imfile,/silent)
 fits_info, imfile, n_ext=next, /silent
-if (next ge 1L) then begin
+if (next ge 1L and keyword_set(noivar) eq 0) then begin
    splog, 'Reading inverse variance map'
    invvar = gz_mrdfits(imfile,1,/silent)
 endif
@@ -49,7 +49,7 @@ nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 
 ;; set a bunch of parameters
-plim=15.
+plim=5.
 box=natlas*2L
 small=(natlas-1L)/2L
 ;nc=1L
@@ -111,7 +111,7 @@ endif
 extract1 = extract
 splog, 'Identified ', n_elements(extract), ' objects.'
 
-rejsigma = [4.0,3.,2.0]
+rejsigma = [4.0,3.,3.0]
 for iter = 0L, n_elements(rejsigma)-1L do begin
 
 ; do initial fit
@@ -171,7 +171,7 @@ sxaddpar, hdr, 'NPSFSTAR', long(n_elements(extract)), ' number of stars used in 
 mwrfits, float(reform(bpsf, natlas, natlas)), base+'-bpsf.fits', hdr, /create
 mwrfits, float(reform(model, natlas, natlas)), base+'-bpsf.fits', hdr ; jm07may01nyu
 
-npinit=4L
+npinit=3L
 np=npinit
 nc=3L
 nchunk=2L

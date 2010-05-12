@@ -12,7 +12,7 @@ all: $(NAME).pdf
 %.dvi: %.tex %_figures.tex $(BIB)ccpp.bib
 	latex $*; bibtex $*; latex $*; latex $*
 
-%.pdf : %.dvi
+%.pdf: %.dvi
 	dvips -Ppdf -N0 -o $*.ps $*.dvi
 	ps2pdf $*.ps
 	rm $*.ps

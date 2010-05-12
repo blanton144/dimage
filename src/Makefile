@@ -71,6 +71,12 @@ OBJECTS = \
 	dpolint2.o \
 	nmf.o \
 	dran3.o \
+	dshift.o \
+	dkernel_linear.o \
+	dkernel_puresinc.o \
+	dkernel_dampsinc.o \
+	dkernel_bicubic.o \
+	idl_dshift.o \
 	idl_dpeaks.o
 
 all : $(LIB)/libdimage.$(SO_EXT) 
