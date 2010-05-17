@@ -1,0 +1,6 @@
+#!/bin/csh -f
+
+montage -bordercolor black -borderwidth 1 -tile 2x3 -geometry +0+0 \
+  -quality 100 -resize 300x300 coma/coma.jpg merger/merger.jpg m5/m5.jpg \
+  m101/m101.jpg ngc4656/ngc4656.jpg ugc3974/ugc3974.jpg example-fig.jpg
+jpeg2ps example-fig.jpg >! example-fig.ps
