@@ -11,7 +11,7 @@
 ;   31-Mar-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_page, dir
+pro atlas_page, dir, sra=sra, sdec=sdec
 
 if(NOT keyword_set(dir)) then $
   dir='.'
@@ -22,10 +22,13 @@ if(NOT keyword_set(base)) then begin
     base=words[n_elements(words)-1]
 endif
 
-bands= ['F', 'N', 'u', 'g', 'r', 'i', 'z']
+srastr=strtrim(string(sra, f='(f40.10)'),2)
+sdecstr=strtrim(string(sdec, f='(f40.10)'),2)
 
-images=[['r', 'n', 'f'], $
-        ['i', 'r', 'g'] ]
+bands= ['u', 'g', 'r', 'i', 'z', 'N', 'F']
+
+images=[ ['i', 'r', 'g'], $
+         ['N', 'N', 'F'] ]
 nimages= (size(images, /dim))[1]
 
 names=strarr(nimages*2L)
@@ -33,21 +36,61 @@ shorthand=strarr(nimages*2L)
 
 ;; make parent images
 for i=0L, nimages-1L do begin
-;;    iband= where(images[0,i] eq bands, nband)
- ;;   if(nband eq 0) then $
- ;;     message, 'No such band: '+images[0,i]
- ;;   rim= mrdfits(base+'-parent.fits.gz', iband*2L)
+
+    iband= where(images[0,i] eq bands, nband)
+    if(nband eq 0) then $
+      message, 'No such band: '+images[0,i]
+    rim= mrdfits(base+'-parent.fits.gz', iband[0]*2L, hdr)
+    if(i eq 0) then $
+      limits= hdrlimits(hdr)
+
+    iband= where(images[1,i] eq bands, nband)
+    if(nband eq 0) then $
+      message, 'No such band: '+images[1,i]
+    gim= mrdfits(base+'-parent.fits.gz', iband[0]*2L)
+
+    iband= where(images[2,i] eq bands, nband)
+    if(nband eq 0) then $
+      message, 'No such band: '+images[1,i]
+    bim= mrdfits(base+'-parent.fits.gz', iband[0]*2L)
+
     names[i]= base+'-parent-'+strjoin(images[*,i])+'.jpg'
+
+    rescale= 0.4 ;; hardish
+    scales= rescale*[5., 6.5, 9.] ;; "normal"
+    nonlinearity= 2.25 ;; less than default nonlinearity
+    djs_rgb_make, rim, gim, bim, name=names[i], $
+      scales=scales, nonlinearity=nonlinearity
+    
     shorthand[i]= strjoin(images[*,i], '-')
 endfor
 
 ;; make child images
 for i=0L, nimages-1L do begin
-;;    iband= where(images[0,i] eq bands, nband)
- ;;   if(nband eq 0) then $
- ;;     message, 'No such band: '+images[0,i]
- ;;   rim= mrdfits(base+'-parent.fits.gz', iband*2L)
+
+    iband= where(images[0,i] eq bands, nband)
+    if(nband eq 0) then $
+      message, 'No such band: '+images[0,i]
+    rim= mrdfits(base+'-child.fits.gz', iband[0])
+
+    iband= where(images[1,i] eq bands, nband)
+    if(nband eq 0) then $
+      message, 'No such band: '+images[1,i]
+    gim= mrdfits(base+'-child.fits.gz', iband[0])
+
+    iband= where(images[2,i] eq bands, nband)
+    if(nband eq 0) then $
+      message, 'No such band: '+images[1,i]
+    bim= mrdfits(base+'-child.fits.gz', iband[0])
+
     names[i+nimages]= base+'-child-'+strjoin(images[*,i])+'.jpg'
+
+    rescale= 0.4 ;; hardish
+    scales= rescale*[5., 6.5, 9.] ;; "normal"
+    nonlinearity= 2.25 ;; less than default nonlinearity
+    djs_rgb_make, rim, gim, bim, name=names[i+nimages], $
+      scales=scales, nonlinearity=nonlinearity
+    
     shorthand[i+nimages]= strjoin(images[*,i], '-')
 endfor
 
@@ -116,9 +159,18 @@ endfor
 printf, unit, '</table>'
 
 printf, unit, '<script id="source" language="javascript" type="text/javascript">'
-printf, unit, 'var limits = {ramin: -10., ramax: 10., decmin:-10., decmax:10.};'
-printf, unit, 'var sra = 0.;'
-printf, unit, 'var sdec = 5.;'
+
+raminstr= strtrim(string(f='(f40.6)', limits.ramin),2)
+ramaxstr= strtrim(string(f='(f40.6)', limits.ramax),2)
+decminstr= strtrim(string(f='(f40.6)', limits.decmin),2)
+decmaxstr= strtrim(string(f='(f40.6)', limits.decmax),2)
+printf, unit, 'var limits = {ramin: '+raminstr+ $
+  ', ramax: '+ramaxstr+ $
+  ', decmin: '+decminstr+ $
+  ', decmax: '+decmaxstr+ $
+  '} ;'
+printf, unit, 'var sra = '+srastr+';'
+printf, unit, 'var sdec = '+sdecstr+';'
 printf, unit, 'prospectus(limits, sra, sdec, "stack.json");'
 printf, unit, '</script>'
 

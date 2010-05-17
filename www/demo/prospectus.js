@@ -13,7 +13,7 @@ function prospectus(limits, sra, sdec, sfile) {
 											 fill: false }},	
 		grid: { show: false, backgroundColor: null, 
 						hoverable: true},
-		xaxis: { min: limits.ramin, max: limits.ramax},
+		xaxis: { min: -limits.ramax, max: -limits.ramin},
 		yaxis: { min: limits.decmin, max: limits.decmax},
 		colors: [ "#00ff00", "#ffffff" ]
 	};
@@ -34,13 +34,13 @@ function prospectus(limits, sra, sdec, sfile) {
 	// run the event handler to show position
 	var previousPoint = null;
 	$("#image").bind("plothover", function (event, pos, item) {
-										 $("#x").text(pos.x.toFixed(2));
+										 $("#x").text(-pos.x.toFixed(2));
 										 $("#y").text(pos.y.toFixed(2));
 									 });
 	
 	// function to read in and plot spectroscopic positions
 	var data = [];
-	series={data: [[sra , sdec] ]};
+	series={data: [[-sra , sdec] ]};
 	data.push(series);
 	var plot = $.plot($("#image"), data, options);
 	

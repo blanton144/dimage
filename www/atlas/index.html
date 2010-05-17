@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>NASA-Sloan Atlas</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="atlas.css" type="text/css" />
+</head>
+<body>
+
+<p>
+<a href="shells.gif"><img border=0 src="shells.gif" alt="Shells" id="shells" /></a>
+<i>Corresponding authors</i>:<br />
+<b><a href="http://cosmo.nyu.edu/blanton/">Michael R. Blanton</a> and
+   <a href="http://cosmo.nyu.edu/hogg/">David W. Hogg</a></b><br />
+<i><a href="http://cosmo.nyu.edu/">Center for Cosmology and Particle Physics</a></i><br />
+<i><a href="http://physics.nyu.edu/">Department of Physics</a></i><br />
+<i><a href="http://www.nyu.edu/">New York University</a></i>
+</p>
+<p>
+<i>Additional authors</i>:
+<a href="http://www.astro.princeton.edu/~schlegel"> David Schlegel</a>
+(LBL),
+<a href="http://cfa-www.harvard.edu/~dfinkbei/"> Douglas Finkbeiner</a>
+(Harvard University),
+Nikhil Padmanabhan
+(LBL), <a href="http://space.mit.edu/home/tegmark/"> Max
+Tegmark</a> (MIT), Idit Zehavi (Case Western), Andreas
+Berlind (Vanderbilt), Ryan Scranton (UPitt), Christy
+Tremonti (University of Arizona),
+Jeff Munn (USNO), Gillian Knapp (Princeton University), James Gunn  (Princeton University)
+</p>
+<ul class="simple">
+<li><a href="#general">General description</a></li>
+<li><a href="#conditions">Conditions of use</a></li>
+<li><a href="#download">Downloading the data</a></li>
+<li><a href="#form">Organization of the data</a></li>
+<li><a href="#geometry">Description of the sample geometry</a></li>
+<li><a href="#software">Software tools</a></li>
+<li><a href="#datasweep">Datasweeps of full SDSS catalog</a></li>
+<li><a href="#problems">Known problems</a></li>
+</ul>
+<p>Note any <b><a href="notes.html">important updates</a></b>.</p>
+
+<h2><a id="general">General Information</a></h2>
+
+<p>The NYU Value-Added Galaxy Catalog (NYU-VAGC) is a cross-matched
+collection of galaxy catalogs maintained for the study of galaxy
+formation and evolution. It includes carefully constructed <a
+href="lss.html"> large-scale structure samples</a> useful for
+calculating power spectra, correlation functions, etc.</p>
+
+<p> This catalog is described in a <a
+href="http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=2005AJ....129.2562B&amp;db_key=AST&amp;data_type=HTML&amp;format=&amp;high=4144d3386a15235"> paper
+published in
+the Astronomical Journal</a>. Usage of the NYU-VAGC requires citing
+this paper (as well as the appropriate <a href="cites.html">
+citations</a> for component
+catalogs and calibrations). </p>
+
+<p> DR7, the final public sample, consists of 10417 sq deg of
+and 7966 sq deg of spectroscopic coverage.  (The spectroscopic
+coverage excludes SEGUE-2 data).</p>
+
+<p> See <a href="notes.html"> important notes</a> for updates on the
+DR6 and DR7 LSS samples.</p>
+
+<p>See <a href="faq.html">the FAQ</a> for answers to some questions about
+the NYU-VAGC. There is also a discussion of the
+<a href="motivation.html">motivation</a> behind the NYU-VAGC, as well as
+some of the <a href="science.html">science</a> being done with it.</p>
+
+<p> Currently, no funding exists for the NYU-VAGC and we create it for
+the warm, fuzzy feeling inside that it gives us when we think that
+people might be using it. In order to feed that warm, fuzzy feeling we
+greatly appreciate any feedback! </p>
+
+
+<h2><a id="conditions">Conditions of use</a></h2>
+
+<p> If you download NYU-VAGC data, we would appreciate you:</p>
+
+<ul>
+<li>sending us an email with your email address;</li>
+<li>citing <a
+href="http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=2005AJ....129.2562B&amp;db_key=AST&amp;data_type=HTML&amp;format=&amp;high=4144d3386a15235">Blanton et
+al. (2005)</a>; and</li>
+<li>citing any other <a href="cites.html">appropriate publications</a>
+depending on what aspects of the NYU-VAGC you use.</li>
+</ul>
+
+
+<h2><a id="download">Downloading the data</a></h2>
+
+<p> Here we describe how to get to the data, and <a href="#form">below</a>
+we describe how the data is organized. </p>
+
+<p> The public data release data is available through a set of
+directories conforming to the data model described below. The base
+URLs are:</p>
+<ul class="simple">
+<li> <a
+href="http://sdss.physics.nyu.edu/vagc-dr7/vagc2">http://sdss.physics.nyu.edu/vagc-dr7/vagc2</a>
+for the value-added catalog (corresponds to VAGC_REDUX below)</li>
+<li> <a
+href="http://sdss.physics.nyu.edu/datasweep/dr7/">http://sdss.physics.nyu.edu/datasweep/dr7/</a>
+for the <a href="#datasweep">datasweeps</a> of the full SDSS DR7 catalog (only 90G)</li>
+<li> <a
+href="http://sdss.physics.nyu.edu/lss/dr72">http://sdss.physics.nyu.edu/lss/dr72</a>
+for the large-scale structure samples (corresponds to $LSS_REDUX/dr72 below)</li>
+</ul>
+<p>
+You can
+retrieve this set of data automatically using Unix WWW downloaders
+such as GNU <a href="http://www.gnu.org/software/wget/">wget</a> or <a
+href="http://curl.mirrors.redwire.net/">curl</a>. </p>
+
+
+<h2><a id="form">Organization of the data</a></h2>
+
+<p> All entries in the catalog are sources in the SDSS imaging survey,
+either because they pass the Main sample target criteria (in some
+version) or had an SDSS spectrum close to their center (details are in
+the <a
+href="flatfiles/object_sdss_imaging.fits.html">object_sdss_imaging
+file description</a>).</p>
+
+<p> We match all of the objects to the SDSS spectroscopic survey, to
+the FIRST radio survey, to the 2MASS Point Source Catalog, to the
+2MASS extended source catalog, to the Two-degree Field Galaxy Redshift
+Survey, to the IRAS Point Source Catalog Redshift Survey, and to Reference
+Catalog 3 (RC3.9b). </p>
+
+<p> We present all the data in the form of <a
+href="http://heasarc.gsfc.nasa.gov/docs/heasarc/fits.html">FITS</a>
+binary tables, <a href="yanny.html">FTCL parameter files</a>, and
+mangle-style polygon files.  <a href="http://spectro.princeton.edu">
+idlutils</a> contains tools for reading all of these files into IDL
+structures.</p>
+
+<p>
+In the $VAGC_REDUX directory are a set of files whose rows are
+parallel (the same row in different files always refers to the same
+object):</p>
+<ul class="simple">
+<li><a href="flatfiles/object_catalog.fits.html">object_catalog.fits</a>:
+coordinates of every object, and their positions (zero-indexed) in
+the constituent catalogs.</li>
+<li><a href="flatfiles/object_sdss_imaging.fits.html">object_sdss_imaging.fits</a>:
+some photometric catalog data for all of the objects in the catalog.</li>
+<li><a href="flatfiles/object_sdss_spectro.fits.html">object_sdss_spectro.fits</a>:
+spectroscopic catalog data for all of the objects.</li>
+<li><a href="flatfiles/object_sdss_tiling.fits.html">object_sdss_tiling.fits</a>:
+tiling catalog data for all of the objects.</li>
+<li><a href="flatfiles/object_twomass.fits.html">object_twomass.fits</a>:
+2MASS Extended Source Catalog data for all the objects.</li>
+<li><a href="flatfiles/object_pscz.fits.html">object_pscz.fits</a>:
+PSCz catalog data for all the objects.</li>
+<li><a href="flatfiles/object_rc3.fits.html">object_rc3.fits</a>:
+RC3 catalog data for all the objects.</li>
+<li><a href="flatfiles/object_twodf.fits.html">object_twodf.fits</a>:
+2dFGRS catalog data for all the objects.</li>
+<!--
+<li><a href="flatfiles/object_galex.fits.html">object_galex.fits</a>:
+GALEX GR1 catalog data forall the objects.</li>
+<li><a href="flatfiles/object_swire.fits.html">object_swire.fits</a>:
+Spitzer SWIRE catalog data for all the objects.</li>
+-->
+</ul>
+<p>
+Each row refers to the same object in all of the files; that is, the
+data in row 10 of object_twomass.fits is the 2MASS data available for
+the object in row 10 of object_sdss_imaging.fits.
+</p>
+
+<p> Note that the above files only contain the objects in each survey
+which match entries in <a
+href="flatfiles/object_sdss_imaging.fits.html">
+object_sdss_imaging</a>. In order to access the other objects from the
+survey in question, you can
+look in files of the form:</p>
+<pre>
+$VAGC_REDUX/[name]/[name]_catalog.fits
+</pre>
+<p>
+See the documentation for the "object_" files for more details. </p>
+
+<p> Some derived quantities are also available for each object in
+subdirectories. Currently these consist of:</p>
+<ul class="simple">
+<li><a href="collisions.html">collisions</a>: a best redshift for
+each object including correction for collisions, using several
+methods.</li>
+<li><a href="cutouts.html">cutouts</a>: some cutout images of
+selected objects.</li>
+<li><a href="doublestar.html">doublestar</a>: detection of
+poorly deblended double stars.</li>
+<li><a href="kcorrect.html">kcorrect</a>: K-corrections of the
+ugrizJHK magnitudes.</li>
+<li><a href="lowz.html">lowz</a>: a specially prepared catalog of
+low-redshift galaxies <b>[NOT FOR DR6 OR DR7 YET]</b>.</li>
+<li><a href="matchspec.html">matchspec</a>: matching
+objects to spectra more generously (connecting objects further
+than 2 arcsec).</li>
+<li><a href="parents.html">parents</a>: properties of parent objects.</li>
+<li><a href="quality.html">quality</a>: eyeball quality checks.</li>
+<li><a href="sersic.html">sersic</a>: Sérsic radial profile fits.</li>
+<li><a href="simpleden.html">simpleden</a>: simple overdensity estimator.</li>
+<li><a href="velmod_distance.html">velmod_distance</a>: distances
+corrected for peculiar velocities.</li>
+</ul>
+
+
+<h2><a id="geometry">Description of the geometry of the catalog</a></h2>
+
+<p> For the SDSS imaging survey we have an <a
+href="flatfiles/sdss_imaging_geometry.fits.html"> expression for its geometry
+in terms of spherical polygons</a>. </p>
+
+<p> However, for most people who are
+worried about the angular selection function, it is best to use a
+large-scale structure subsample, where the imaging, target, and tiling
+masks are combined and the flux limit and completeness are tracked as
+a function of position.  In the $LSS_REDUX/dr72
+directory are the
+files:</p>
+<ul class="simple">
+<li><a href="flatfiles/lss_combmask.fits.html">lss_combmask.dr72.fits</a>:
+geometry of the sample, with areas around bright stars excised.</li>
+<li><a href="flatfiles/lss_index.fits.html">lss_index.dr72.fits</a>:
+positions plus which lss_combmask polygon each catalog entry is in.</li>
+</ul>
+<p>
+The geometry is built out of two separate files, one expressing the
+window and the other expressing the bright star mask:
+</p>
+<ul class="simple">
+<li><a href="flatfiles/lss_geometry.fits.html">lss_geometry.dr72.fits</a>:
+file describing geometry of the full large-scale structure sample.</li>
+<li><a href="flatfiles/lss_bsmask.fits.html">lss_bsmask.dr72.fits</a>:
+file describing the bright star mask.</li>
+</ul>
+
+<p>
+In addition there are a number of subdirectories. Each
+subdirectory corresponds to a "pre-redshift" selection criterion; this
+means that the objects and the area of sky have been selected
+according to flux limit, completeness, and other properties which do
+not require knowing the object redshift. Further subdirectories
+provide complete subsamples based on cuts made after the redshift
+determination: on redshift, luminosity, intrinsic color, etc. <a
+href="lss.html"> Further details</a> on the large-scale structure
+samples are available.
+</p>
+
+<h2><a id="software">Software tools</a></h2>
+
+<p> We use a large suite of tools in order to create this catalog. The
+basics are all in <a href="http://spectro.princeton.edu">
+idlutils</a>. Public tools for dealing with the spectra are in <a
+href="http://spectro.princeton.edu"> idlspec2d</a>. Public tools for
+dealing with the imaging data are in <a
+href="http://photo.astro.princeton.edu"> photoop</a>.  These are all
+IDL products, and you need IDL to use them. But you are an astronomer,
+and probably need IDL anyway (sigh).</p>
+
+<p>
+Deserving of special mention are several tools within the latest
+version of idlutils:</p>
+
+<ul class="simple">
+<li><i>vagc_read.pro</i> - code to quickly read in VAGC objects a circular
+region around some point:<br />
+<pre>         objs= vagc_read(ra, dec, radius)</pre></li>
+<li><i>sdss_sweep_circle.pro</i> - code to quickly read ALL SDSS objects in a
+circular region around some point:
+<pre>         objs= sdss_sweep_circle(ra, dec, radius)</pre></li>
+</ul>
+
+<p> A special piece of code that has been useful to use (and is
+compiled into idlutils) is <a
+href="http://space.mit.edu/~molly/mangle/">mangle</a>, a set of
+tools for dealing with angular masks developed by Andrew Hamilton and
+Max Tegmark. An old version of this code (v1.4) is distributed with <a
+href="http://spectro.princeton.edu"> idlutils</a>.</p>
+
+
+<h2><a id="datasweep">Datasweeps of full SDSS catalog</a></h2>
+
+<p> One of the very useful tools that we use to build the NYU-VAGC are
+the "datasweeps" of the full SDSS catalog. These are compressed
+versions of the full catalog that have only the decent
+detections. They occupy a very small amount of disk space (about 90G)
+so are usefully small. They do not have all of the photometric
+information in them, though, which is a drawback. </p>
+
+<p> All of the data for DR7 is at: <a
+href="http://sdss.physics.nyu.edu/datasweep/dr7/">
+http://sdss.physics.nyu.edu/datasweep/dr7/</a></p>
+
+<p>
+There are two catalogs, split into stars and galaxies.  For stars, the
+datasweeps have any stars where the PSF extinction-corrected
+magnitudes are brigher than the following for at least one band: u &lt;
+22.5, g &lt; 22.5, r &lt; 22.5, i &lt; 22, z &lt; 21.5. The catalog is
+broken down into runs and camcols, and is in files with the names:
+</p>
+<pre>
+calibObj-[run]-[camcol]-star.fits.gz
+</pre>
+
+<p> Similarly, for galaxies , they have any galaxies where the model
+extinction-corrected magnitudes are brigher than the following for at
+least one band: u &lt; 21.0, g &lt; 22.0, r &lt; 22.0, i &lt; 20.5, z &lt;
+20.1. The names of the files for each run and camcol are:</p>
+<pre>
+calibObj-[run]-[camcol]-gal.fits.gz
+</pre>
+
+<p> The meanings of the columns of the FITS files conform to the
+naming conventions at the <a href="http://photo.astro.princeton.edu">
+Princeton reductions site</a>. Important things to remember are:</p>
+<ul class="circle">
+<li>To get only one instance of each object, require
+(RESOLVE_STATUS &amp; 256) &gt; 0 (as described on the <a
+href="http://photo.astro.princeton.edu/#dm_resolve">Princeton site</a>).</li>
+<li>Fluxes are not Galactic extinction corrected, and are in
+nanomaggies.</li>
+<li>Radii are generally given in PIXELS (each SDSS pixel is 0.396
+arcsec)</li>
+<li>For stars, the 2MASS PSC magnitudes are included.</li>
+</ul>
+
+<a name="problems">
+<h2> Known problems</h2>
+
+<ul> <li> In the LSS sample of the "dr72" release, there are a number
+of RA and Dec values in "lss_index" that do not agree with those in
+the "object_sdss_imaging" file (1220 to be exact). These are cases
+where the photometry listed in the LSS sample ACTUALLY corresponds to
+that of the parent object, because we made an <a href="eyeball.html">
+eyeball determination</a> that that photometry would be better. (See
+the <a href="parents.html"> description of the parents tables</a>). In
+and of itself, that is not a problem.  However, a couple dozen of
+those entries actually point back to the SAME parent, and thus look
+like repeat entries. This causes a very slight double-counting problem
+(though it is still LESS severe than if we had just taken the original
+catalog as-is). Thanks to Xiao-hu Yang for pointing this out.</li> 
+<li> The "combmask" files inside the "pre-redshift" subdirectories
+are incorrectly built
+($LSS_REDUX/[sample]/[letter]/combmask.[sample][letter].fits).
+This does not affect anything downstream, since the "lss_combmask"
+file is still correctly built, and the random catalogs are all 
+based on that file. 
+ Thanks to Chia-Hsun Chiang for pointing this out.</li>
+</ul>
+
+<p><a href="./">NYU Value-Added Galaxy Catalog</a></p>
+
+<p>Please <a href="contact.html">contact us</a> with comments or questions.</p>
+
+<p>
+<a href="http://validator.w3.org/check?uri=referer">
+<img style="border:0;width:88px;height:31px;"
+src="http://www.w3.org/Icons/valid-xhtml11"
+alt="Valid XHTML 1.1" /></a>&nbsp;
+<a href="http://jigsaw.w3.org/css-validator/check/referer">
+<img style="border:0;width:88px;height:31px"
+src="http://jigsaw.w3.org/css-validator/images/vcss"
+alt="Valid CSS!" /></a>
+</p>
+
+</body>
+</html>
+

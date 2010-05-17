@@ -7,7 +7,8 @@
 ;   21-Jun-2009  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro simple_jpg, rebin=rebin
+pro simple_jpg, rebin=rebin, scales=scales, nonlinearity=nonlinearity, $
+                satvalue=satvalue, name=name
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -18,10 +19,11 @@ endif
 if(NOT keyword_set(scales)) then scales=[4., 5., 6.]
 if(NOT keyword_set(satvalue)) then satvalue=30.
 if(NOT keyword_set(nonlinearity)) then nonlinearity=3.
+if(NOT keyword_set(name)) then name= base+'.jpg'
 djs_rgb_make, base+'-i.fits.gz', $
   base+'-r.fits.gz', $
   base+'-g.fits.gz', $
-  name=base+'.jpg', $
+  name=name, $
   scales=scales, $
   nonlinearity=nonlinearity, satvalue=satvalue, $
   quality=100., rebin=rebin

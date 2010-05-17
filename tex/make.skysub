@@ -7,8 +7,6 @@ NAME = skysub
 
 BIB = $(shell echo $(BIBINPUTS) | tr -s '/:' '/\n' | grep ccpp_latex)
 
-all: $(NAME).pdf
-
 %.dvi: %.tex %_figures.tex $(BIB)ccpp.bib
 	latex $*; bibtex $*; latex $*; latex $*
 
@@ -16,6 +14,8 @@ all: $(NAME).pdf
 	dvips -Ppdf -N0 -o $*.ps $*.dvi
 	ps2pdf $*.ps
 	rm $*.ps
+
+all: $(NAME).pdf
 
 fullclean:
 	rm -f *.pdf *.log *.dvi *.aux *.bbl *.blg

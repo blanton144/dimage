@@ -23,7 +23,14 @@ for i=0L, n_elements(rundirs)-1L do begin
     runs[i]= long(words[n_elements(words)-1])
 endfor
 ii=where(runs ne 3565 AND $
-         runs ne 5637 AND $
+         runs ne 5637 AND $ ;; missing fils
+         runs ne 5670 AND $ ;; missing fils
+         runs ne 5847 AND $  ;; id==-1??? in 4-603
+         runs ne 5882 AND $  ;; no calibs camcol 1
+         runs ne 5889 AND $  ;; no calibs camcol 1
+         runs ne 5895 AND $  ;; no calibs camcol 1
+         runs ne 5909 AND $  ;; missing fields camcol 3
+         runs ne 6408 AND $  ;; missing calibs camcol 6
          runs ne 6924 AND $
          runs ne 6925 AND $
          runs ne 6952)
