@@ -12,7 +12,9 @@
 ;   ref - integer indicating which imfile is the "reference"
 ;   sky - if set, subtracts a median smoothed sky with this box size
 ;         (in arcsec)
+;   plim - number of sigma for parent detection (default 5)
 ;   glim - number of sigma for a galaxy detection (default 20)
+;   slim - number of sigma for a point source detection (default 10)
 ;   gsmooth - smoothing scale for galaxies (default 5)
 ;   single - if set, only process this parent number
 ;   puse - [Nband] 0 or 1, whether to use band to find parents
@@ -47,15 +49,16 @@
 ;-
 ;------------------------------------------------------------------------------
 pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
-            noclobber=noclobber, glim=glim, all=all, single=single, $
-            aset=aset, sgset=sgset, gsmooth=gsmooth, puse=puse, $
-            center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
+            noclobber=noclobber, glim=glim, slim=slim, all=all, $
+            single=single, aset=aset, sgset=sgset, gsmooth=gsmooth, $
+            puse=puse, center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
             gsaddle=gsaddle, nostarim=nostarim, novpsf=novpsf, $
-            noparentclobber=noparentclobber
+            noparentclobber=noparentclobber, plim=plim, sersic=sersic
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(glim)) then glim=20.
+if(NOT keyword_set(slim)) then slim=10.
 if(NOT keyword_set(gsaddle)) then gsaddle=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=3.
 
@@ -89,7 +92,7 @@ endelse
 seed_parents=seed0
 nc= keyword_set(noclobber) OR keyword_set(noparentclobber)
 dparents, base, imfiles, sky=sky, noclobber=nc, ref=pset.ref, $
-  puse=pset.puse, seed=seed_parents, cenonly=center
+  puse=pset.puse, seed=seed_parents, cenonly=center, plim=plim
 
 ;; read in parents 
 hdr=gz_headfits(base+'-pimage.fits',ext=0)
@@ -122,8 +125,8 @@ if(keyword_set(all)) then begin
         dchildren, base, iparent, psfs=psfs, $
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
-                   gsaddle=gsaddle, nostarim=nostarim, $
-          noclobber=noclobber
+          gsaddle=gsaddle, nostarim=nostarim, noclobber=noclobber, $
+          slim=slim, sersic=sersic
     endfor
 endif
 
@@ -141,8 +144,8 @@ if(n_elements(single) gt 0) then begin
         dchildren, base, single, psfs=psfs, $
           ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
-                   gsaddle=gsaddle, nostarim=nostarim, $
-          noclobber=noclobber
+          gsaddle=gsaddle, nostarim=nostarim, slim=slim, $
+          noclobber=noclobber, sersic=sersic
     endif
 endif
 

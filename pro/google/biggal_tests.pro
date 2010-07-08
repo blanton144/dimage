@@ -42,14 +42,14 @@ for i=0L, ngal-1L do begin
 
     outdir= getenv('GOOGLE_DIR')+'/biggals/dimage/'+name
     spawn, 'mkdir -p '+outdir
-    for j=0L, n_elements(filters)-1L do begin
-        im= sdss_clip(lowz[indx[i]].ra, lowz[indx[i]].dec, sz, $
-                      filter=filters[j], hdr=hdr)
-        outfile= outdir+'/'+name+'-'+filters[j]+'.fits'
-        mwrfits, im, outfile, hdr, /create
-        spawn, 'gzip -v '+outfile
-    endfor
+    if(file_test(name+'-z.fits.gz') eq 0 OR $
+       keyword_set(clobber) gt 0) then $
+      smosaic_make, lowz[indx[i]].ra, lowz[indx[i]].dec, sz, sz, $
+      rerun=137, /global, /dropweights, prefix=outdir+'/'+name, $
+      /ignoreframesstatus, minscore=0.5, /processed
+    spawn, 'gzip -v '+name+'-?.fits.gz'
 
+    if(0) then begin
     outdir= getenv('GOOGLE_DIR')+'/biggals/montage/'+name
     spawn, 'mkdir -p '+outdir
     rastr= strtrim(string(f='(f40.20)', lowz[indx[i]].ra),2)
@@ -62,6 +62,7 @@ for i=0L, ngal-1L do begin
         spawn, 'gzip -v '+outfile
     endfor
     montage_recal,  outdir+'/'+name
+endif
 endfor
 
 end

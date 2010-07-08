@@ -63,7 +63,8 @@ if(keyword_set(sersic)) then begin
         dsersic, templates[*,*,i], iv, xcen=xin[i], ycen=yin[i], $
           /fixcen, model=model, /reinit, /fixsky, /simple
         signt=2.*(float(templates[*,*,i] gt 0.)-0.5)
-        templates[*,*,i]=signt*(abs(templates[*,*,i]) < (model*2.+0.1*sigma))
+        templates[*,*,i]=signt*(abs(templates[*,*,i]) < $
+                                (model*1.3+0.05*sigma))
     endfor
 endif
 

@@ -10,32 +10,27 @@
 ;-
 ;------------------------------------------------------------------------------
 function gz_mrdfits, file, ext, hdr, status=status, $
-                     _EXTRA=extra_for_gz_mrdfits 
+                     silent=silent, _EXTRA=extra_for_gz_mrdfits 
 
 if(n_elements(ext) eq 0) then ext=0
 
-str=mrdfits(file, ext, hdr, status=status, $
-            _EXTRA=extra_for_gz_mrdfits)
-if(status ne 0) then begin
-    splog, 'Trying .gz extension ...'
-    str=mrdfits(file+'.gz', ext, hdr, status=status, $
-                _EXTRA=extra_for_gz_mrdfits)
-endif
-if(status ne 0) then begin
-    splog, 'Trying .Z extension ...'
-    str=mrdfits(file+'.Z', ext, hdr, status=status, $
-                _EXTRA=extra_for_gz_mrdfits)
-endif
-if(status ne 0) then begin
-    splog, 'Trying .z extension ...'
-    str=mrdfits(file+'.z', ext, hdr, status=status, $
-                _EXTRA=extra_for_gz_mrdfits)
-endif
-if(status ne 0) then begin
-    splog, 'Failed to read file '+file
-endif
+exts=['', '.gz', '.Z', '.z']
 
-return, str
+for i=0L, n_elements(exts)-1L do begin
+    tryfile=file+exts[i]
+    fexist= file_test(tryfile)
+    if(fexist gt 0) then begin
+        if(keyword_set(silent) eq 0 AND i gt 0) then $
+          splog, 'Trying '+exts[i]+' extension ...'
+        str=mrdfits(tryfile, ext, hdr, status=status, silent=silent, $
+                    _EXTRA=extra_for_gz_mrdfits)
+        if(status eq 0) then $
+          return, str
+    endif
+endfor
+
+splog, 'Failed to read file '+file
+return, 0
 
 end
 ;------------------------------------------------------------------------------

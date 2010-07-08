@@ -49,9 +49,19 @@ if(keyword_set(noclobber)) then begin
       gotall=0
     if(gotall gt 0) then begin
         pcat=gz_mrdfits(base+'-pcat.fits',1)
-        for i=0L, n_elements(pcat)-1L do $
+        ist=0L
+        ind= n_elements(pcat)-1L
+        if(keyword_set(cenonly)) then begin
+            tmp_pimage=gz_mrdfits(base+'-pimage.fits')
+            tmp_nx=(size(tmp_pimage, /dim))[0]
+            tmp_ny=(size(tmp_pimage, /dim))[0]
+            tmp_icen= tmp_pimage[tmp_nx/2L, tmp_ny/2L]
+            ist= tmp_icen
+            ind= tmp_icen
+        endif
+        for i=ist, ind do $
           if(gz_file_test('parents/'+base+'-parent-'+ $
-                       strtrim(string(i),2)+'.fits') eq 0) then $
+                          strtrim(string(i),2)+'.fits') eq 0) then $
           gotall=0
     endif
     if(gotall) then return

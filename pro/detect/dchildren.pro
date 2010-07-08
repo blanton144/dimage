@@ -4,7 +4,7 @@
 ; PURPOSE:
 ;   deblend children of a parent, in multi-band, multi-res images
 ; CALLING SEQUENCE:
-;   dchildren, base, iparent [, psfs=, plim=, gsmooth=, glim=, $
+;   dchildren, base, iparent [, psfs=, slim=, gsmooth=, glim=, $
 ;      saddle=, xstars=, ystars=, xgals=, ygals=, /hand, ref=, $
 ;      nstars=, /sersic ]
 ; INPUTS:
@@ -19,7 +19,7 @@
 ;           to save memory and ignore the small stuff
 ; OPTIONAL INPUTS:
 ;   psf - [npx, npy] PSF to assume (if none, doesn't search for stars)
-;   plim - nsigma limit for point source detection (default 5.)
+;   slim - nsigma limit for point source detection (default 5.)
 ;   glim - nsigma limit for galaxy detection (default 5.)
 ;   gsmooth - smoothing for galaxy detection (default 2.)
 ;   saddle - saddle point for galaxy peak checking (default 100.)
@@ -69,7 +69,7 @@ return, simage
 
 end
 ;
-pro dchildren, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
+pro dchildren, base, iparent, psfs=psfs, slim=slim, gsmooth=gsmooth, $
                glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
                ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
                sersic=in_sersic, aset=in_aset, sgset=in_sgset, $
@@ -77,7 +77,7 @@ pro dchildren, base, iparent, psfs=psfs, plim=plim, gsmooth=gsmooth, $
                gsaddle=gsaddle, nostarim=nostarim, noclobber=noclobber
 
 maxnstar=2000L
-if(NOT keyword_set(plim)) then plim=5.
+if(NOT keyword_set(slim)) then slim=5.
 if(NOT keyword_set(glim)) then glim=5.
 if(NOT keyword_set(gsaddle)) then gsaddle=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=2.
@@ -184,7 +184,7 @@ dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
 
 ;; find stars and galaxies
 if(keyword_set(newsg)) then begin
-    dstars, images, ivars, psfs, hdrs, sdss=sdss, plim=plim, ref=ref, $
+    dstars, images, ivars, psfs, hdrs, sdss=sdss, slim=slim, ref=ref, $
       nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
       nstars=nstars, puse=puse
     dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $

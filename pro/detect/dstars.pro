@@ -7,7 +7,7 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dstars, images, ivars, psfs, hdrs, sdss=sdss, plim=plim, ref=ref, $
+pro dstars, images, ivars, psfs, hdrs, sdss=sdss, slim=slim, ref=ref, $
             nimages=nimages, ra_stars=out_ra_stars, dec_stars=out_dec_stars, $
             nstars=nstars, puse=puse
 
@@ -46,7 +46,7 @@ for k=0, nim-1L do begin
         simage=dsmooth(*images[k],psfsig)
         ssigma=dsigma(simage, sp=psfsig*5.)
         dpeaks, simage, xc=tmp_xc, yc=tmp_yc, sigma=ssigma, $
-          minpeak=plim*ssigma, /refine, npeaks=nc, maxnpeaks=maxnpeaks, /check
+          minpeak=slim*ssigma, /refine, npeaks=nc, maxnpeaks=maxnpeaks, /check
         
         nstars=0
         if(nc gt 0) then begin

@@ -31,8 +31,13 @@ ii=where(runs ne 3565 AND $
          runs ne 5895 AND $  ;; no calibs camcol 1
          runs ne 5909 AND $  ;; missing fields camcol 3
          runs ne 6408 AND $  ;; missing calibs camcol 6
+         runs ne 6508 AND $  ;; weird failure
          runs ne 6924 AND $
          runs ne 6925 AND $
+         runs ne 6930 AND $
+         runs ne 7043 AND $
+         runs ne 7045 AND $
+         runs ne 7202 AND $
          runs ne 6952)
 runs=runs[ii]
 runs=runs[sort(runs)]

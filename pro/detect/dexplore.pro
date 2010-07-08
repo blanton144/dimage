@@ -23,7 +23,7 @@ endif
 
 icen=-1L
 if(keyword_set(cen)) then begin
-    pim=gz_mrdfits(base+'-pimage.fits')
+    pim=gz_mrdfits(base+'-pimage.fits', /silent)
     if(keyword_set(pim)) then begin
         pnx=(size(pim, /dim))[0]
         pny=(size(pim, /dim))[1]
@@ -39,7 +39,7 @@ if(keyword_set(twomass)) then $
 
 dexplore_widget, base, images, lsb=lsb, twomass=twomass, $
   eyeball_name=eyeball_name, hidestars=hidestars, parent=icen, $
-  nogalex=nogalex, _EXTRA=_extra_for_detect
+  nogalex=nogalex, cen=cen, _EXTRA=_extra_for_detect
 
 end
 ;------------------------------------------------------------------------------

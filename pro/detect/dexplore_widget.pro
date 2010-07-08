@@ -10,7 +10,7 @@ common com_dexplore_widget, $
   fix_stretch, hand, show_templates, gsmooth, glim, gsaddle, atset, $
   subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
   curr_nx, curr_ny, curr_nx_2, curr_ny_2, hidestars, bandnames, $
-  extra_for_detect
+  dexcen, extra_for_detect
 
 curr_nx=0
 curr_ny=0
@@ -153,7 +153,7 @@ if(ev.ID eq w_redeblend or ev.ID eq w_mark) then begin
     help,extra_for_detect,/st
     detect, basename, imagenames, ref=atset.ref, $
       single=parent, /aset, /hand, /pset, /noparentclobber, $
-      _EXTRA=extra_for_detect
+      cen=dexcen, _EXTRA=extra_for_detect
     dexplore_parent_display
     dexplore_child_list
     dexplore_mark_children
@@ -234,7 +234,7 @@ COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-image=gz_mrdfits(ev.value,0,hdr)
+image=gz_mrdfits(ev.value,0,hdr,/silent)
 nx=(size(image, /dim))[0]
 ny=(size(image, /dim))[1]
 align=0
@@ -321,10 +321,10 @@ w_glist=0
 if(NOT keyword_set(parent_images)) then return
 
 pcatfile=basename+'-pcat.fits'
-pcat= gz_mrdfits(pcatfile,1)
+pcat= gz_mrdfits(pcatfile,1,/silent)
 acatfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
   strtrim(string(parent),2)+ '-acat.fits'
-acat= gz_mrdfits(acatfile,1)
+acat= gz_mrdfits(acatfile,1,/silent)
 if(n_tags(acat) gt 0) then begin
     ig=where(acat.good gt 0 and acat.type eq 0L, ng)
     
@@ -351,7 +351,7 @@ dexplore_mark_children
 sgsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-sgset.fits'
 if(file_test(sgsetfile) gt 0 OR $
    file_test(sgsetfile+'.gz') gt 0) then begin
-    sgset=gz_mrdfits(sgsetfile,1)
+    sgset=gz_mrdfits(sgsetfile,1,/silent)
 ;; star marking
     ;;starshow = WIDGET_BUTTON(w_base, value='star show')  
     ;;starset = WIDGET_BUTTON(w_base, value='star set')  
@@ -362,7 +362,7 @@ endif
 asetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-aset.fits'
 if(file_test(asetfile) OR $
    file_test(asetfile+'.gz') gt 0) then begin
-    atset=gz_mrdfits(asetfile,1)
+    atset=gz_mrdfits(asetfile,1,/silent)
     gsmooth=atset.gsmooth
     glim=atset.glim
     if(tag_exist(atset, 'GSADDLE')) then $
@@ -431,7 +431,7 @@ if(keyword_set(show_templates)) then $
   strtrim(string(parent),2)+'-templates-'+strtrim(string(child),2)+'.fits'
 if(file_test(imfile) gt 0 OR $
    file_test(imfile+'.gz') gt 0) then begin
-    image=gz_mrdfits(imfile, band, hdr)
+    image=gz_mrdfits(imfile, band, hdr,/silent)
     if(keyword_set(smooth)) then $
       image=dsmooth(image, smooth)
     nx=(size(image,/dim))[0]
@@ -471,7 +471,8 @@ w_eyeball=0
 
 ;; read in eyeball
 eyeball=gz_mrdfits(subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
-                strtrim(string(parent),2)+'-eyeball-'+eyeball_name+'.fits',1)
+                   strtrim(string(parent),2)+'-eyeball-'+eyeball_name+ $
+                   '.fits', 1, /silent)
 if(n_tags(eyeball) eq 0) then begin
     eyeball=replicate(create_struct('EYEBALL_'+eyeball_name, 0L), $
                       n_elements(acat))
@@ -545,7 +546,7 @@ imfile=subdir+'/'+strtrim(string(parent),2)+'/'+ $
 parent_images=ptrarr(n_elements(imagenames))
 parent_hdrs=ptrarr(n_elements(imagenames))
 for i=0L, n_elements(imagenames)-1L do begin
-    parent_images[i]=ptr_new(gz_mrdfits(imfile, i, hdr))
+    parent_images[i]=ptr_new(gz_mrdfits(imfile, i, hdr, /silent))
     parent_hdrs[i]=ptr_new(hdr)
 endfor
 
@@ -553,14 +554,14 @@ endfor
 sgsetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-sgset.fits'
 if(file_test(sgsetfile) gt 0 OR $
    file_test(sgsetfile+'.gz') gt 0) then begin
-    sgset=gz_mrdfits(sgsetfile,1)
+    sgset=gz_mrdfits(sgsetfile,1, /silent)
 endif
 
 ;; read in aset file
 asetfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-aset.fits'
 if(file_test(asetfile) gt 0 OR $
    file_test(asetfile+'.gz') gt 0) then begin
-    atset=gz_mrdfits(asetfile,1)
+    atset=gz_mrdfits(asetfile,1, /silent)
 endif
 
 
@@ -570,7 +571,7 @@ end
 pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb, $
                      twomass=in_twomass, eyeball_name=in_eyeball_name, $
                      hidestars=in_hidestars, parent=in_parent, $
-                     _EXTRA=_extra_for_detect
+                     cen=cen, _EXTRA=_extra_for_detect
 
 common com_dexplore_widget
 
@@ -581,6 +582,8 @@ if(keyword_set(_extra_for_detect)) then extra_for_detect=_extra_for_detect
 
 ;; clean up before starting
 dexplore_clean
+
+dexcen= keyword_set(cen)
 
 basename=in_basename
 imagenames=in_imagenames
