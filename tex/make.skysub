@@ -5,17 +5,17 @@
 #
 NAME = skysub
 
-BIB = $(shell echo $(BIBINPUTS) | tr -s '/:' '/\n' | grep ccpp_latex)
-
-%.dvi: %.tex %_figures.tex $(BIB)ccpp.bib
-	latex $*; bibtex $*; latex $*; latex $*
-
-%.pdf: %.dvi
-	dvips -Ppdf -N0 -o $*.ps $*.dvi
-	ps2pdf $*.ps
-	rm $*.ps
+BIB = $(shell echo $(BIBINPUTS) | tr -s '/:' '/\n' | grep ccpp-latex)
 
 all: $(NAME).pdf
+
+$(NAME).pdf: $(NAME).dvi
+	dvips -Ppdf -N0 -o $(NAME).ps $(NAME).dvi
+	ps2pdf $(NAME).ps
+	rm $(NAME).ps
+
+$(NAME).dvi: $(NAME).tex $(NAME)_figures.tex $(BIB)ccpp.bib
+	latex $(NAME); bibtex $(NAME); latex $(NAME); latex $(NAME)
 
 fullclean:
 	rm -f *.pdf *.log *.dvi *.aux *.bbl *.blg
