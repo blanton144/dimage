@@ -30,6 +30,13 @@ files= file_search(getenv('GOOGLE_DIR')+'/biggals/dimage/*/*-r.fits.gz')
 
 radius=200.
 
+outstr0= {filename:' ', $
+          radius:fltarr(5), $
+          mflux:fltarr(5), $
+          dflux:fltarr(5)}
+
+outstr= replicate(outstr0, n_elements(files))
+
 for i=0L, n_elements(files)-1L do begin
     words= strsplit(files[i], '/', /extr,/preserve_null)
     idim= where(words eq 'dimage')
@@ -37,6 +44,8 @@ for i=0L, n_elements(files)-1L do begin
     mfile= strjoin(words, '/')
     dbase= strmid(files[i], 0, strlen(files[i])-10L)
     mbase= strmid(mfile, 0, strlen(mfile)-10L)
+
+    outstr[i].filename= files[i]
 
     splog, mbase
     if(file_test(mbase+'-r.fits.gz') gt 0 AND $
@@ -62,15 +71,18 @@ for i=0L, n_elements(files)-1L do begin
             
             mxcen= (size(mim, /dim))[0]/2L
             mycen= (size(mim, /dim))[1]/2L
-            mflux= djs_phot(mxcen, mycen, radius, [0,0], mim, calg='none', $
+            mflux= djs_phot(mxcen, mycen, radius*0.396/0.400, $
+                            [0,0], mim, calg='none', $
                             salg='none')
             
-            help, radius
-            help,dflux[0]
-            help,mflux[0]
+            outstr[i].radius[iband]= radius
+            outstr[i].mflux[iband]= mflux
+            outstr[i].dflux[iband]= dflux
         endfor
     endif
     
 endfor
+
+mwrfits, outstr, getenv('GOOGLE_DIR')+'/biggals/flux-compare.fits', /create
 
 end

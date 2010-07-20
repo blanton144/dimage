@@ -33,7 +33,7 @@ if(n_tags(lowz) eq 0) then begin
 endif
 nlowz= n_elements(lowz)
 
-indx= shuffle_indx(nlowz, num_sub=ngal)
+indx= shuffle_indx(nlowz, num_sub=ngal, seed=seed)
 
 filters=['u', 'g', 'r', 'i', 'z']
 sz=0.1
@@ -43,13 +43,13 @@ for i=0L, ngal-1L do begin
     outdir= getenv('GOOGLE_DIR')+'/biggals/dimage/'+name
     spawn, 'mkdir -p '+outdir
     if(file_test(name+'-z.fits.gz') eq 0 OR $
-       keyword_set(clobber) gt 0) then $
-      smosaic_make, lowz[indx[i]].ra, lowz[indx[i]].dec, sz, sz, $
-      rerun=137, /global, /dropweights, prefix=outdir+'/'+name, $
-      /ignoreframesstatus, minscore=0.5, /processed
-    spawn, 'gzip -v '+name+'-?.fits.gz'
+       keyword_set(clobber) gt 0) then begin
+        smosaic_make, lowz[indx[i]].ra, lowz[indx[i]].dec, sz, sz, $
+          rerun=137, /global, /dropweights, prefix=outdir+'/'+name, $
+          /ignoreframesstatus, minscore=0.5, /processed
+    endif
+    spawn, 'gzip -vf '+outdir+'/'+name+'-?.fits'
 
-    if(0) then begin
     outdir= getenv('GOOGLE_DIR')+'/biggals/montage/'+name
     spawn, 'mkdir -p '+outdir
     rastr= strtrim(string(f='(f40.20)', lowz[indx[i]].ra),2)
@@ -59,10 +59,9 @@ for i=0L, ngal-1L do begin
         outfile= outdir+'/'+name+'-'+filters[j]+'.fits'
         spawn, 'getMontage '+outfile+' '+filters[j]+' '+ $
           rastr+' '+decstr+' '+sizestr
-        spawn, 'gzip -v '+outfile
+        spawn, 'gzip -vf '+outfile
     endfor
     montage_recal,  outdir+'/'+name
-endif
 endfor
 
 end
