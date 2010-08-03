@@ -48,8 +48,16 @@ for i=0L, n_elements(files)-1L do begin
     outstr[i].filename= files[i]
 
     splog, mbase
-    if(file_test(mbase+'-r.fits.gz') gt 0 AND $
-       file_test(dbase+'-r.fits.gz') gt 0) then begin
+    if(file_test(mbase+'-u.fits.gz') gt 0 AND $
+       file_test(dbase+'-u.fits.gz') gt 0 AND $
+       file_test(mbase+'-g.fits.gz') gt 0 AND $
+       file_test(dbase+'-g.fits.gz') gt 0 AND $
+       file_test(mbase+'-r.fits.gz') gt 0 AND $
+       file_test(dbase+'-r.fits.gz') gt 0 AND $
+       file_test(mbase+'-i.fits.gz') gt 0 AND $
+       file_test(dbase+'-i.fits.gz') gt 0 AND $
+       file_test(mbase+'-z.fits.gz') gt 0 AND $
+       file_test(dbase+'-z.fits.gz') gt 0) then begin
         
         bands=['u', 'g', 'r', 'i', 'z']
         
@@ -62,7 +70,7 @@ for i=0L, n_elements(files)-1L do begin
             xyad, dhdr, dxcen, dycen, ra, dec
             spherematch, ra, dec, lowz.ra, lowz.dec, 10./3600., m1, m2
             if(m2[0] ge 0) then $
-              radius= ((lowz[m2].petroth90[2]*1.3)/0.396) > 50. $
+              radius= ((lowz[m2].petroth90[2]*1.3)/0.396) > 20. $
             else $
               radius=50.
             

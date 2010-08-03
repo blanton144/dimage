@@ -21,7 +21,7 @@ pro biggal_tests, seed=seed, ngal=ngal
 
 common com_biggal_tests, lowz
 
-if(NOT keyword_set(ngal)) then ngal= 20L
+if(NOT keyword_set(ngal)) then ngal= 200L
 if(NOT keyword_set(seed)) then seed= -14L
 
 if(n_tags(lowz) eq 0) then begin

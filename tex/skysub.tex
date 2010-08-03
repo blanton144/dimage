@@ -91,20 +91,15 @@ of the run. We have run our procedure on the full Data Release 7 for
 the Northern Galactic Cap. In this region, we have generated 1~deg by
 1~deg mosaics for general distribution. As a test of quality, we
 compare the photometry of point sources in these mosaics relative to
-the SDSS catalog. {\bf and find?} More critically, we have also tested
-the effect of our background subtraction on the photometry of large
-galaxies by inserting fake galaxies into the raw data and attempting
-to measure them after background subtraction. {\bf and find?} These
-techniques and these mosaics will provide the basis of upcoming
-studies of the local Universe.
+the SDSS catalog, finding good agreement. More critically, we have
+also tested the effect of our background subtraction on the photometry
+of large galaxies by inserting fake galaxies into the raw data and
+attempting to measure them after background subtraction. {\bf and
+find?} These techniques and these mosaics will provide the basis of
+upcoming studies of the local Universe.
 \end{abstract}
 
 \section{ To-do list}
-
-{\bf mrb: run montage\_image on a few patches with large galaxies and
-compare to us}
-
-{\bf mrb: create residual qa test for each run}
 
 {\bf eak: simple comparison of fake nearby to us}
 
@@ -190,20 +185,20 @@ another that is intended for DR8).
 
 The results described here are available for the Northern Galactic Cap
 portion of the SDSS imaging using a simple on-line
-interface.\footnote{\tt http://sdss.physics.nyu.edu/mosaic/}. 
-The only other publicly available mosaicking and background
-subtraction facility for SDSS that we are aware of is the results of
-the Montage package distributed by IRSA (\citealt{berriman03a}). We
-compare their methodology to ours in \S\ref{sec:mosaic}, concluding
-that their background subtraction procedure in principle could be
-superior to ours, but that their ``drizzle'' approximation to
-interpolation is likely to cause errors for PSF photometry. In
-\S\ref{sec:psfs}, we demonstrate that the PSF photometry is indeed
-degraded relative to the original SDSS photometry for Montage
-mosaics. In \S\ref{sec:simplegal}, we compare our bright galaxy
-photometry to that from Montage images, {\bf finding what?}  As we
-describe below, these problems are likely not fundamental to the
-Montage background subtraction method.
+interface.\footnote{\tt http://sdss.physics.nyu.edu/mosaic/}.  The
+only other publicly available mosaicking and background subtraction
+facility for SDSS that we are aware of is the results of the Montage
+package distributed by IRSA (\citealt{berriman03a}). We compare their
+methodology to ours in \S\ref{sec:mosaic}, concluding that their
+background subtraction procedure in principle could be superior to
+ours, but that their ``drizzle'' approximation to interpolation is
+likely to cause errors for PSF photometry. In \S\ref{sec:psfs}, we
+demonstrate that the PSF photometry is indeed degraded relative to the
+original SDSS photometry for Montage mosaics. In
+\S\ref{sec:simplegal}, we compare our bright galaxy photometry to that
+from Montage images, finding good agreement.  As we describe below,
+these problems are likely not fundamental to the Montage background
+subtraction method.
 
 \section{A model fit to the SDSS sky background}
 \label{sec:model}
@@ -496,14 +491,14 @@ computes the fraction of each original pixel that overlaps each output
 pixel, and distributes the original pixel's flux accordingly. Relative
 to properly resampling a Nyquist-sampled image, such methods do a poor
 job at maintaining the original PSF (or even at producing an image
-with a well-defined PSF). {\bf refs??} They are also clearly
-irreversible operations even in the noiseless case, demonstrating that
-information is lost and the image is consequently degraded. We compare
-our results to the Montage results for point sources in
-\S\ref{sec:psfs} below, and believe that Montage's less good
-at the bright end in those tests is due to their drizzling
-procedure. However, it is unlikely that these issues affect our main
-interest here, which is large galaxies on the sky.
+with a well-defined PSF). They are also clearly irreversible
+operations even in the noiseless case, demonstrating that information
+is lost and the image is consequently degraded. We compare our results
+to the Montage results for point sources in \S\ref{sec:psfs} below,
+and believe that Montage's less good at the bright end in those tests
+is due to their drizzling procedure. However, it is unlikely that
+these issues affect our main interest here, which is large galaxies on
+the sky.
 
 \section{End-to-end tests of the sky background}
 \label{sec:endtoend}
@@ -583,7 +578,7 @@ distribution is similar to ours; at bright magnitudes it is
 considerably broader. We suspect that this broad distribution is due
 to the degradation of the image caused by the drizzling procedure. As
 we see below, however, these errors appear to be less important when
-considering larger, brighter objects. {\bf make sure this is true}
+considering larger, brighter objects. 
 
 \subsection{Galaxy photometry: isolating the effect of the background}
 \label{sec:simplegal}
@@ -615,14 +610,16 @@ mosaic using the tools described above.
 
 {\bf plots of flux differences between fake and stamps}
 
-{\bf another test: direct comparison to Montage for some bright
-galaxies}
-
 In a final test, we have also taken a sample of nearby bright galaxies
 and compared large-aperture photometry between our images and images
-from Montage. We randomly select 100 galaxies brighter than $r=15$ to
+from Montage. We randomly select 200 galaxies brighter than $r=15$ to
 perform this test. We compare aperture photometry within a radius of
-$1.3 r_{90}$
+$1.3 r_{90}$ for each galaxy. In general, the fluxes and colors are in
+good agreement. The median ratio of the flux estimated from the
+Montage images to our flux estimate to is about 96\%, as for the point
+source estimates above (and likely for the same reason). The standard
+deviations around this mean for the $(u,g,r,i,z)$ bands are
+$(5,2,1,2,3)\%$.  
 
 \subsection{Deblended galaxy photometry}
 \label{sec:deblendgal}
