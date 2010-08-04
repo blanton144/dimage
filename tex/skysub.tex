@@ -68,6 +68,7 @@
 \author{
 Michael R. Blanton\altaffilmark{\ref{NYU}},
 Eyal Kazin\altaffilmark{\ref{NYU}},
+Adrian Price-Whelan\altaffilmark{\ref{NYU}}, 
 Benjamin A. Weaver\altaffilmark{\ref{NYU}}
 }
 
@@ -94,21 +95,38 @@ compare the photometry of point sources in these mosaics relative to
 the SDSS catalog, finding good agreement. More critically, we have
 also tested the effect of our background subtraction on the photometry
 of large galaxies by inserting fake galaxies into the raw data and
-attempting to measure them after background subtraction. {\bf and
-find?} These techniques and these mosaics will provide the basis of
+attempting to measure them after background subtraction. While the
+standard SDSS photometry underestimates fluxes by over 20\% for
+galaxies with half-light radii $r_{50}>10$ arcsec, our technique
+introduces such biases only at half-light radiii $r_{50}>100$
+arcsec. These techniques and these mosaics will provide the basis of
 upcoming studies of the local Universe.
 \end{abstract}
 
-\section{ To-do list}
-
-{\bf eak: simple comparison of fake nearby to us}
-
-{\bf eak: photo v5\_4 comparison of fake nearby to us}
-
-{\bf eak: photo v5\_6 comparison of fake nearby to us}
+%\section{ To-do list}
+%
+%{\bf eak: simple comparison of fake nearby to us}
+%
+%{\bf eak: photo v5\_4 comparison of fake nearby to us}
+%
+%{\bf eak: photo v5\_6 comparison of fake nearby to us}
 
 \section{Why improve the sky-subtraction?}
 \label{sec:intro}
+
+The Sloan Digital Sky Survey (\citealt{york00a}) is the largest
+existing survey of the sky to date. As of Data Release 8 (DR8), it has
+provided reliable, well-calibrated catalogs down to $r\sim 22.5$ over
+14,500 square degrees of sky, in five bands ($u$, $g$, $r$, $i$ and
+$z$).  In so doing, it has provided images of a large fraction of the
+known bright galaxies on the sky --- the Messier and NGC objects, as
+well as lower surface brightness nearby galaxies. However, no reliable
+catalog of the properties of these galaxies yet exists, primarily
+because no standard background subtraction procedure has been
+implemented that properly treats the largest, brightest galaxies in
+the sky. The purpose of this paper is to provide just such a
+background procedure, which has now been run over the entire SDSS
+imaging dataset, and which will be released as part of DR8.
 
 Background subtraction of astronomical images is probably a formally
 impossible task.  The ideal treatment of the data gathered by a
@@ -129,11 +147,10 @@ of background subtraction tend to focus on simple approximations that
 are tractable as well as close to correct for the problems of
 interest.
 
-For the Sloan Digital Sky Survey (\citealt{york00a}), the largest
-existing survey of the sky to date, the standard photometric pipeline
-takes just such a practical and accurate approach ({\tt photo};
-\citealt{lupton01a}). In the version released with Data Release 7
-(DR7; \citealt{abazajian09a}), calculates the median-smoothed
+For the SDSS, the standard photometric pipeline takes just such a
+practical and accurate approach ({\tt photo}; \citealt{lupton01a}). In
+the version released with Data Release 7 (DR7;
+\citealt{abazajian09a}), {\tt photo} calculates the median-smoothed
 background on a scale of $100\times100$ arcsec and subtracts that from
 the image before object detection and measurement. For faint point
 source photometry in this data set --- that is, not a
@@ -147,13 +164,12 @@ well as can be expected given the vagaries of determining the overall
 calibration of the data set (\citealt{padmanabhan07a}).
 
 However, for galaxies the approach that {\tt photo} uses is more
-troublesome.  While galaxies of small enough angular extent are
-treated similarly to the stars, larger galaxies can be substantially
-affected. For typical galaxies this method of sky subtraction causes
-an underestimate in their flux, size, and concentration
-(\citealt{blanton05b}). This problem becomes particularly evident for the
-nearby brightest cluster galaxies (\citealt{bernardi07a,
-lauer07a}).
+troublesome.  Whereas it is appropriate for galaxies of small enough
+angular extent, for larger galaxies it can be inappropriate.
+Typically, this method of sky subtraction causes an underestimate in
+their flux, size, and concentration (\citealt{blanton05b}). This
+problem becomes particularly evident for the nearby brightest cluster
+galaxies (\citealt{bernardi07a, lauer07a, hyde09a}).
 
 In \S\ref{sec:model} below we present a different method for sky
 subtraction that is more accurate for large galaxies (while retaining
@@ -184,21 +200,24 @@ standard SDSS pipelines (one that corresponds to the SDSS DR7 and
 another that is intended for DR8).
 
 The results described here are available for the Northern Galactic Cap
-portion of the SDSS imaging using a simple on-line
-interface.\footnote{\tt http://sdss.physics.nyu.edu/mosaic/}.  The
-only other publicly available mosaicking and background subtraction
-facility for SDSS that we are aware of is the results of the Montage
-package distributed by IRSA (\citealt{berriman03a}). We compare their
-methodology to ours in \S\ref{sec:mosaic}, concluding that their
-background subtraction procedure in principle could be superior to
-ours, but that their ``drizzle'' approximation to interpolation is
-likely to cause errors for PSF photometry. In \S\ref{sec:psfs}, we
-demonstrate that the PSF photometry is indeed degraded relative to the
-original SDSS photometry for Montage mosaics. In
-\S\ref{sec:simplegal}, we compare our bright galaxy photometry to that
-from Montage images, finding good agreement.  As we describe below,
-these problems are likely not fundamental to the Montage background
-subtraction method.
+portion of the SDSS DR7 imaging using a simple on-line
+interface.\footnote{\tt http://sdss.physics.nyu.edu/mosaic/}. In
+addition, calibrated field images with the sky subtracted according to
+these images are being released with the SDSS DR8. {\bf describe both}
+
+The only other publicly available mosaicking and background
+subtraction facility for SDSS that we are aware of is the results of
+the Montage package distributed by IRSA (\citealt{berriman03a}). We
+compare their methodology to ours in \S\ref{sec:mosaic}, concluding
+that their background subtraction procedure in principle could be
+superior to ours, but that their ``drizzle'' approximation to
+interpolation is likely to cause errors for PSF photometry. In
+\S\ref{sec:psfs}, we demonstrate that the PSF photometry is indeed
+degraded relative to the original SDSS photometry for Montage
+mosaics. In \S\ref{sec:simplegal}, we compare our bright galaxy
+photometry to that from Montage images, finding good agreement.  As we
+describe below, these problems are likely not fundamental to the
+Montage background subtraction method.
 
 \section{A model fit to the SDSS sky background}
 \label{sec:model}
@@ -241,7 +260,7 @@ is made before any calibration except for the flat-field correction
 are drift scans.  It is about 2.3 deg wide and represents about 25
 minutes of exposure time. The units are raw counts --- because of the
 varying gains among the CCDs two of camcols mostly saturate in this
-particular stretch.
+particular image stretch.
 
 SDSS's background light estimation consists of a median-smoothed image
 on a scale of 100$\times$100 arcsec. Clearly Figure \ref{fig:rawrun}
@@ -393,6 +412,33 @@ on the resulting galaxy photometry --- that is, they do not test
 whether we might be oversubtracting light near large sources.  We test
 that effect more thoroughly in \S\ref{sec:simplegal}.
 
+\subsection{Distribution of sky-subtracted fields}
+\label{sec:fields}
+
+As part of the SDSS DR8, we are distributing all of the
+sky-subtracted, calibrated fields in each band based on this
+procedure, in FITS format. This data consists of approximately 
+940,000 fields, each 2048$\times$1489 pixels in size. This data is
+available for download on an individual field basis (or requesting
+cutouts) from {\tt http://data.sdss3.org/}. 
+
+The format of the data is FITS files, each of which has a primary HDU
+containing a floating-point image, calibrated in units of nanomaggies
+per pixel.  These images are compressed by zeroing out all but the 10
+most significant binary digits in the floating point numbers, and
+subsequently using {\tt bzip2} to losslessly compress the result. For
+the sky-subtracted images, the 10th binary digit is considerably
+smaller than the noise in any image, meaning that although overall
+this compression is slightly lossy, it has no significant effect on
+the results --- even if these images are combined in stack
+(\citealt{pricewhelan10a}).  Subsequent HDUs in each image yield the
+sky-subtraction and calibration image, so that the sky can be added
+back in and the image put back into counts if so desired. Full details
+of the format and location of the files can be found in the SDSS-III
+data
+model.\footnote{\tt http://data.sdss3.org/datamodel/files/BOSS\_PHOTOOBJ/frames/RERUN/RUN/CAMCOL/frame.html} 
+
+
 \section{Mosaicking the SDSS}
 \label{sec:mosaic}
 
@@ -448,6 +494,7 @@ presence of large, bright objects of various sorts: globular clusters,
 galaxy clusters, and large galaxies.
 
 \subsection{Distribution of mosaics}
+\label{sec:distmosaic}
 
 Although our procedures allow us to evaluate any arbitrary mosaic, for
 ease of distribution we have created a set of 1$\times$1 deg mosaics
@@ -606,11 +653,80 @@ photometric pipeline {\tt photo} as well as our sky subtraction
 procedure. Then, around each fake galaxy that we insert, we create a
 mosaic using the tools described above.
 
-{\bf describe here what exactly the fake sample is}
+The fake galaxy sample is based on the low redshift sample from the
+New York University Value-Added Galaxy Catalog (\citealt{blanton05a}),
+as updated for SDSS Data Release 6 (see, for example,
+\citealt{zhu10a}). This sample consists of essentially all galaxies
+with $r<17.77$ and $z<0.05$.  For each galaxy, we take its flux,
+half-light radius, \Sersic\ index, axis ratio, and $ugriz$ colors from
+the SDSS data. We then reassign each galaxy a redshift in the range
+$0.0033<z<0.025$ (constrained to be smaller than the actual
+redshift), and adjust its size and flux accordingly.  This procedure
+yields a realistic distribution of sizes, fluxes, profile shapes and
+colors, with an emphasis on the large, nearby galaxies of most
+interest here. 
 
-{\bf plots of flux differences between fake and stamps}
+To test how well our sky-subtraction is doing, we ask how much flux it
+removes from the field surrounding the object. In particular, we use
+an aperture with a radius of $r_{95}$, containing 95\% of the light of
+the galaxy.  We use the fake, sky-subtracted field and calculate the
+flux in each band in that aperture.  We then use the real,
+sky-subtracted field and calculate the flux in the same aperture.  Of
+course, in the fake data the sky-subtraction will inevitably subtract
+off a slightly different (usualla larger) amount of light than in the
+real data. The fake aperture flux minus the real aperture flux is
+equal to the fake galaxy flux that remains in the image after sky
+subtraction --- the measured fake galaxy flux $f_{\mathrm{meas}}$, to
+be compared with the original input fake galaxy flux
+$f_{\mathrm{orig}}$.
 
-In a final test, we have also taken a sample of nearby bright galaxies
+In Figure \ref{fig:r_offsets}, we plot $\Delta m =
+-2.5\log_{10}(f_{\mathrm{meas}}/f_{\mathrm{orig}})$, the residual of
+the measured fake galaxy flux with respect to the original, as a
+function of the galaxy half-light radius $r_{50}$.  The filled circles
+are from our results here. We find that $\Delta m$ is most strongly
+related to this property of the fake galaxy images. There is no
+systematic offset of any signficance until $r_{50}>100$ arcsec, which
+indicates a rather large galaxy. The largest galaxies get to $r_{50}=
+10$--$20$ $h^{-1}$ kpc in size, and such galaxies would have $r_{50} =
+100$ arcsec at a distance of 20--40 $h^{-1}$ Mpc. Thus, we can expect
+some of the largest galaxies on the sky --- for example, certain
+Messier objects --- to have up to 20--30\% of their flux subtracted by
+this procedure.
+
+In Figure \ref{fig:r_offsets}, the open circles are the SDSS {\tt photo}
+measurements of the fake galaxies, using the so-called ``cModel''
+fluxes, defined in terms of the best fit combination of the de
+Vaucouleurs and exponential models as follows:
+\begin{equation}
+ f_c = f_{\mathrm{exp}} \left(1-\mathtt{fracdeV}\right) +
+ f_{\mathrm{deV}}
+ \times \mathtt{fracdeV}
+\end{equation}
+These show a much larger
+underestimation of the flux at much smaller radii --- it becomes
+signficant at $r_{50}>10$ arcsec. Of course, this comparison is
+somewhat unfair: the {\tt photo} software also attempts to deblend the
+galaxies from their surroundings. However, the overall trend is due
+to the median-smoothing sky subtraction procedure used.  We emphasize
+that for the primary SDSS target sample at $z\sim 0.1$ 
+the issue is not nearly as dire as it appears in this plot --- the
+largest such galaxies have $r_{50}\sim 10$--20 arcsec, for which the
+effects are small. 
+
+\citet{hyde09a} found similar result to what we find here. The solid
+line in Figure \ref{fig:r_offsets} shows their parametrized estimate
+of the magnitude offset for elliptical galaxies as a function of
+size. The correction between the SDSS estimates of the fluxes of real
+galaxies and their estimates appears somewhat larger than what we
+infer here for our fake sample, but also shows a steep dependence on
+galaxy size.
+
+{\bf plots of color differences between fake and stamps}
+
+{\bf plots of photo v5\_6}
+
+In a final test, we have also taken a sample of nearby bright galaxies 
 and compared large-aperture photometry between our images and images
 from Montage. We randomly select 200 galaxies brighter than $r=15$ to
 perform this test. We compare aperture photometry within a radius of
@@ -630,30 +746,62 @@ $(5,2,1,2,3)\%$.
 
 \section{ Summary}
 
-{\bf basic model}
+In this paper, we have fit a smooth model to the sky background in
+SDSS images, suitable for subtracting off for the purposes of
+measuring large, bright galaxies.  While this model has no physical
+motivation, it has apparently the right balance of freedom and
+physical constraints to adequately describe most of the SDSS imaging.
 
-{\bf outline of tests}
+We have tested the measurements of point sources in the sky subtracted
+images, to ensure that they are not signficantly degraded with respect
+to the original SDSS data.  In addition, we have inserted fake
+galaxies into the data and reran the sky subtraction to evaluate how
+well our procedure works.  We find substantial improvement with
+respect to the standard pipelines.  Whereas for the standard SDSS {\tt
+photo} pipeline the sky-subtraction becomes important at the 20\%
+level at $r_{50}>10$ arcsec or so, comparable errors in our method
+occur only at radii $r_{50}>100$ arcsec. 
 
-{\bf better than Montage: but Montage method a good idea}
+We have compared our results to a similar service provided by IRSA,
+the Montage package. Essentially, our results are similar to theirs
+for large objects, though we identify a slight error in their overall
+fluxes. In addition, for bright stars their interpolation method
+appears to introduce slight errors.
+
+Finally, we make our sky-subtraction results for the SDSS images
+public, in two ways.  First, for the NGC portion of SDSS DR7 we
+provide a large mosaic server described in \S\ref{sec:distmosaic}.
+Second, for all of the SDSS DR8 data we provide the individual,
+sky-subtracted and calibrated frames, as described in
+\S\ref{sec:fields}.
 
 \acknowledgments
 
-Funding for the creation and distribution of the SDSS Archive has been
-provided by the Alfred P. Sloan Foundation, the Participating
-Institutions, the National Aeronautics and Space Administration, the
-National Science Foundation, the U.S. Department of Energy, the
-Japanese Monbukagakusho, and the Max Planck Society. The SDSS Web site
-is http://www.sdss.org/.
+The authors acknowledge funding support from NASA grants
+06-GALEX06-0030, NNX09AC85G and NNX09AC95G, and \emph{Spitzer} grant
+G05-AR-50443. This research has made use of NASA's Astrophysics Data
+System and of the NASA/IPAC Extragalactic Database (NED) which is
+operated by the Jet Propulsion Laboratory, California Institute of
+Technology, under contract with the National Aeronautics and Space
+Administration.
 
-The SDSS is managed by the Astrophysical Research Consortium (ARC) for
-the Participating Institutions. The Participating Institutions are The
-University of Chicago, Fermilab, the Institute for Advanced Study, the
-Japan Participation Group, The Johns Hopkins University, the Korean
-Scientist Group, Los Alamos National Laboratory, the
-Max-Planck-Institute for Astronomy (MPIA), the Max-Planck-Institute
-for Astrophysics (MPA), New Mexico State University, University of
-Pittsburgh, University of Portsmouth, Princeton University, the United
-States Naval Observatory, and the University of Washington.
+Funding for SDSS-III has been provided by the Alfred P. Sloan
+Foundation, the Participating Institutions, the National Science
+Foundation, and the U.S. Department of Energy. The SDSS-III web site
+is http://www.sdss3.org/.
+
+SDSS-III is managed by the Astrophysical Research Consortium for the
+Participating Institutions of the SDSS-III Collaboration including the
+University of Arizona, the Brazilian Participation Group, Brookhaven
+National Laboratory, University of Cambridge, University of Florida,
+the French Participation Group, the German Participation Group, the
+Instituto de Astrofisica de Canarias, the Michigan State/Notre
+Dame/JINA Participation Group, Johns Hopkins University, Lawrence
+Berkeley National Laboratory, Max Planck Institute for Astrophysics,
+New Mexico State University, New York University, the Ohio State
+University, University of Portsmouth, Princeton University, University
+of Tokyo, the University of Utah, Vanderbilt University, University of
+Virginia, University of Washington, and Yale University.
 
 This research made use of Montage, funded by the National Aeronautics and
 Space Administration's Earth Science Technology Office, Computation
