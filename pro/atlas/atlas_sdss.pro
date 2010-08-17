@@ -9,7 +9,7 @@
 ;   Reprocesses the file:
 ;      $DIMAGE_DIR/data/atlas/sdss/specList-dr8.fits
 ;   into 
-;      $DIMAGE_DIR/data/atlas/sdss/specTrim-dr8.fits
+;      $DIMAGE_DIR/data/atlas/sdss_atlas.fits
 ; REVISION HISTORY:
 ;   31-Mar-2004  MRB, NYU
 ;-
