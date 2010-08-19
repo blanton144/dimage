@@ -1,112 +1,61 @@
 ;+
 ; NAME:
-;   dchildren
+;   dchildren_atlas
 ; PURPOSE:
-;   deblend children of a parent, in multi-band, multi-res images
+;   deblend children of a parent atlas image
 ; CALLING SEQUENCE:
-;   dchildren, base, iparent [, psfs=, slim=, gsmooth=, glim=, $
-;      saddle=, xstars=, ystars=, xgals=, ygals=, /hand, ref=, $
-;      nstars=, /sersic ]
-; INPUTS:
-;   base - FITS image base name
-;   iparent - parent to process 
-; OPTIONAL KEYWORDS:
-;   /hand - brings up ATV so user can pick galaxy and star centers
-;   /sersic - fit template with Sersic profile to constrain better
-;   /aset - use [base]-aset.fits file for parameter setting
-;   /sgset - use [base]-aset.fits file for star and galaxy locations
-;   gbig - treat galaxies as "big": resample smoothed image
-;           to save memory and ignore the small stuff
-; OPTIONAL INPUTS:
-;   psf - [npx, npy] PSF to assume (if none, doesn't search for stars)
-;   slim - nsigma limit for point source detection (default 5.)
-;   glim - nsigma limit for galaxy detection (default 5.)
-;   gsmooth - smoothing for galaxy detection (default 2.)
-;   saddle - saddle point for galaxy peak checking (default 100.)
-;   xstars, ystars - [N] input where you want stars assumed
-;   xgals, ygals - [N] input where you want galaxies assumed
-;   ref - reference band (default 0)
-;   sdss - pass this to dvpsf() to use SDSS PSF estimate
-;   puse - [Nband] 0 or 1 whether to detect stars and galaxies in each
-;          band
+;   dchildren_atlas [, /galex, /noclobber, glim=, puse=puse, tuse=tuse, $
+;           slim=, gsaddle=, gsmooth=, /nostarim ]
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-;; internal function: smooth for big galaxy treatment
-function gbig_smooth, image, nxsub, nysub, subpix
+pro dchildren_atlas, glim=glim, slim=slim, gsaddle=gsaddle, gsmooth=gsmooth, $
+                     noclobber=noclobber, puse=puse, tuse=tuse, $
+                     nostarim=nostarim
 
-if(subpix eq 1) then return, image
-
-nx=(size(image,/dim))[0]
-ny=(size(image,/dim))[1]
-
-ii=where(image ne 0., nii)
-ix=ii mod nx
-iy=ii / nx
-
-subminx=(min(ix)/subpix-5)>0L
-submaxx=(max(ix)/subpix+5)<(nxsub-1L)
-subminy=(min(iy)/subpix-5)>0L
-submaxy=(max(iy)/subpix+5)<(nysub-1L)
-
-minx=subminx*subpix
-maxx=((submaxx+1L)*subpix-1L)
-miny=subminy*subpix
-maxy=((submaxy+1L)*subpix-1L)
-
-subimage=image[minx:maxx, miny:maxy]
-
-tmp_image= dsmooth(subimage, subpix*2.2)
-tmp_image= rebin(tmp_image, $
-                 submaxx-subminx+1L, $
-                 submaxy-subminy+1L)
-
-simage=fltarr(nxsub, nysub)
-simage[subminx:submaxx, subminy:submaxy]= tmp_image
-
-return, simage
-
-end
-;
-pro dchildren, base, iparent, psfs=psfs, slim=slim, gsmooth=gsmooth, $
-               glim=glim, xstars=xstars, ystars=ystars, xgals=xgals, $
-               ygals=ygals, hand=hand, saddle=saddle, ref=ref, $
-               sersic=in_sersic, aset=in_aset, sgset=in_sgset, $
-               sdss=sdss, puse=puse, tuse=tuse, gbig=gbig, $
-               gsaddle=gsaddle, nostarim=nostarim, noclobber=noclobber, $
-               maxnstar=maxnstar
-
-if(NOT keyword_set(maxnstar)) then maxnstar=2000L
 if(NOT keyword_set(slim)) then slim=5.
 if(NOT keyword_set(glim)) then glim=5.
 if(NOT keyword_set(gsaddle)) then gsaddle=20.
 if(NOT keyword_set(gsmooth)) then gsmooth=2.
 if(NOT keyword_set(saddle)) then saddle=5.
-if(keyword_set(xstars)) then nstars=n_elements(xstars)
-if(keyword_set(xgals)) then ngals=n_elements(xgals)
-if(keyword_set(in_sersic)) then sersic=in_sersic else sersic=0
+if(NOT keyword_set(maxnstar)) then maxnstar=300L
 
+;; find center object
+pim=gz_mrdfits(base+'-pimage.fits')
+pcat=gz_mrdfits(base+'-pcat.fits',1)
+nx=(size(pim,/dim))[0]
+ny=(size(pim,/dim))[1]
+iparent=pim[nx/2L, ny/2L]
 
-;; pick directory (auto or hand)
-subdir='atlases'
-if(keyword_set(hand)) then subdir='hand'
-spawn, 'mkdir -p '+subdir+'/'+strtrim(string(iparent),2)
+if(iparent eq -1) then return
 
+;; if result exists, skip out
 acatfile=subdir+'/'+strtrim(string(iparent),2)+ $
       '/'+base+'-'+strtrim(string(iparent),2)+ $
       '-acat.fits'
-
 if(gz_file_test(acatfile) gt 0 AND $
    keyword_set(noclobber) gt 0) then $
-  return
+      return
+
+;; read in the psf information
+for k=0L, nim-1L do begin
+   bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
+   tmp_psf=dpsfread(bimfile+'-vpsf.fits') 
+   if(n_tags(psfs) eq 0) then $
+      psfs=tmp_psf $
+   else $
+      psfs=[psfs, tmp_psf]
+endfor
+psfs.xst= pcat[iparent].xst
+psfs.yst= pcat[iparent].yst
 
 ;; read in images and psfs
 hdr=gz_headfits('parents/'+base+'-parent-'+ $
              strtrim(string(iparent),2)+'.fits',ext=0)
 
+;; set up memory
 nim=long(sxpar(hdr, 'NIM'))
-if(NOT keyword_set(tuse)) then tuse=lindgen(nim)
 nx=lonarr(nim)
 ny=lonarr(nim)
 images=ptrarr(nim)
@@ -117,49 +66,28 @@ ivars=ptrarr(nim)
 hdrs=ptrarr(nim)
 subhdrs=ptrarr(nim)
 
-;; read in settings if desired
-asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-aset.fits'
-if(keyword_set(in_aset) eq 0 OR gz_file_test(asetfile) eq 0) then begin
-    aset={base:base, $
-          ref:ref, $
-          iparent:iparent, $
-          sersic:sersic, $
-          gsmooth:gsmooth, $
-          glim:glim, $
-          gsaddle:gsaddle, $
-          tuse:tuse}
-endif else begin
-    aset=gz_mrdfits(asetfile, 1)
-    gsmooth=aset.gsmooth
-    glim=aset.glim
-    gsaddle=aset.gsaddle
-    sersic=aset.sersic
-    tuse=aset.tuse
-    ref=aset.ref
-endelse
+;; set up settings
+aset={base:base, $
+      iparent:iparent, $
+      ref:ref, $
+      sersic:sersic, $
+      gsmooth:gsmooth, $
+      glim:glim, $
+      gsaddle:gsaddle, $
+      tuse:tuse}
 
-;; read in star and galaxy settings if desired
-sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-sgset.fits'
-newsg=1
-if(keyword_set(in_sgset) eq 0 OR gz_file_test(sgsetfile) eq 0) then begin
-    sgset={base:base, $
-           ref:ref, $
-           iparent:iparent, $
-           nstars:0L, $
-           ra_stars:dblarr(maxnstar), $
-           dec_stars:dblarr(maxnstar), $
-           ngals:0L, $
-           ra_gals:dblarr(maxnstar), $
-           dec_gals:dblarr(maxnstar) }
-endif else begin
-    newsg=0
-    sgset=gz_mrdfits(sgsetfile, 1)
-endelse
+;; set up star and galaxy locations
+sgset={base:base, $
+       ref:ref, $
+       iparent:iparent, $
+       nstars:0L, $
+       ra_stars:dblarr(maxnstar), $
+       dec_stars:dblarr(maxnstar), $
+       ngals:0L, $
+       ra_gals:dblarr(maxnstar), $
+       dec_gals:dblarr(maxnstar) }
 
 ;; read in images and ivars
-;; (have simages and ivars point to same data
-;; by default --- if gbig is set this will be 
-;; changed below)
 for k=0L, nim-1L do begin
     images[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
                               strtrim(string(iparent),2)+'.fits',0+k*2L,hdr))
@@ -184,75 +112,34 @@ pny=(size(bpsf,/dim))[1]
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet 
 
 ;; find stars and galaxies
-if(keyword_set(newsg)) then begin
-    dstars, images, ivars, psfs, hdrs, sdss=sdss, slim=slim, ref=ref, $
-      nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
-      nstars=nstars, puse=puse, maxnstar=maxnstar
-    dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
-           ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse, $
-           gsaddle=gsaddle
-    for k=0L, nim-1L do begin
-        ptr_free, nimages[k]
-    endfor
-    nimages=0
-    
-    ;; then take out stars that are near galaxies
-    ;; but give the center as the center of the star
-    if(nstars gt 0 and ngals gt 0) then begin
-        spherematch, ra_stars, dec_stars, ra_gals, dec_gals, gsmooth/3600., $
-          m1,m2, d12
-        if(m1[0] ne -1) then begin
-            keep=lonarr(nstars)+1L
-            keep[m1]=0
-            ra_gals[m2]=ra_stars[m1]
-            dec_gals[m2]=dec_stars[m1]
-            ikeep=where(keep gt 0, nstars)
-            if(nstars gt 0) then begin
-                ra_stars=ra_stars[ikeep]
-                dec_stars=dec_stars[ikeep]
-            endif
-        endif
-    endif
-    
-    sgset.nstars= nstars
-    if(nstars gt 0) then begin
-        sgset.ra_stars[0:(nstars-1)]= ra_stars
-        sgset.dec_stars[0:(nstars-1)]= dec_stars
-    endif
-    sgset.ngals= ngals
-    if(ngals gt 0) then begin
-        sgset.ra_gals[0:ngals-1]= ra_gals
-        sgset.dec_gals[0:ngals-1]= dec_gals
-    endif
-endif else begin
-    nstars=sgset.nstars
-    if(nstars gt 0) then begin
-        ra_stars=sgset.ra_stars[0:(nstars-1)<maxnstar]
-        dec_stars=sgset.dec_stars[0:(nstars-1)<maxnstar]
-    endif
-    ngals=sgset.ngals
-    if(ngals gt 0) then begin
-        ra_gals=sgset.ra_gals[0:ngals-1]
-        dec_gals=sgset.dec_gals[0:ngals-1]
-    endif
-endelse
+dstars, images, ivars, psfs, hdrs, slim=slim, ref=ref, $
+        nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
+        nstars=nstars, puse=puse, maxnstar=maxnstar
+dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
+       ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse, $
+       gsaddle=gsaddle
+for k=0L, nim-1L do begin
+   ptr_free, nimages[k]
+endfor
+nimages=0
 
-mwrfits, aset, asetfile, /create
-mwrfits, sgset, sgsetfile, /create
-
-if(ngals eq 0 and nstars eq 0) then begin
-   return
+;; then take out stars that are near galaxies
+;; but give the center as the center of the star
+if(nstars gt 0 and ngals gt 0) then begin
+   spherematch, ra_stars, dec_stars, ra_gals, dec_gals, gsmooth/3600., $
+                m1,m2, d12
+   if(m1[0] ne -1) then begin
+      keep=lonarr(nstars)+1L
+      keep[m1]=0
+      ra_gals[m2]=ra_stars[m1]
+      dec_gals[m2]=dec_stars[m1]
+      ikeep=where(keep gt 0, nstars)
+      if(nstars gt 0) then begin
+         ra_stars=ra_stars[ikeep]
+         dec_stars=dec_stars[ikeep]
+      endif
+   endif
 endif
-
-;; create acat structure to store children in
-acat=replicate({pid:iparent, $
-                aid:-1L, $
-                racen:0.D, $
-                deccen:0.D, $
-                bgood:lonarr(nim), $
-                type:0L, $
-                good:0L}, ngals+nstars)
-acat.aid=lindgen(ngals+nstars)
 
 ;; refine star and galaxy peaks again based on the reference image
 model=fltarr(nx[ref],ny[ref])
@@ -293,6 +180,40 @@ if(ngals gt 0) then begin
     xyad, *hdrs[ref], r_xgals, r_ygals, ra_gals, dec_gals
 endif 
 
+;; store locations in sgset
+sgset.nstars= nstars
+if(nstars gt 0) then begin
+   sgset.ra_stars[0:(nstars-1)]= ra_stars
+   sgset.dec_stars[0:(nstars-1)]= dec_stars
+endif
+sgset.ngals= ngals
+if(ngals gt 0) then begin
+   sgset.ra_gals[0:ngals-1]= ra_gals
+   sgset.dec_gals[0:ngals-1]= dec_gals
+endif
+
+;; output parent info
+asetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-aset.fits'
+mwrfits, aset, asetfile, /create
+
+;; output star and galaxy info
+sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-sgset.fits'
+mwrfits, sgset, sgsetfile, /create
+
+if(ngals eq 0 and nstars eq 0) then begin
+   return
+endif
+
+;; create acat structure to store children in
+acat=replicate({pid:iparent, $
+                aid:-1L, $
+                racen:0.D, $
+                deccen:0.D, $
+                bgood:lonarr(nim), $
+                type:0L, $
+                good:0L}, ngals+nstars)
+acat.aid=lindgen(ngals+nstars)
+
 ;; now store away the centers in acat
 if(ngals gt 0) then begin
     acat[0:ngals-1].racen=ra_gals
@@ -304,62 +225,6 @@ if(nstars gt 0) then begin
     acat[ngals:nstars+ngals-1].deccen=dec_stars
     acat[ngals:nstars+ngals-1].type=1
 endif
-
-;; now set things up so that we can transparently use 
-;; subsampled images if necessary, by creating nxsub, nysub,
-;; and subhdrs. these are identical to the original full-res
-;; image if gbig is not set, but are made into a version for
-;; the low-res image if gbig IS set.
-nxsub=lonarr(nim)
-nysub=lonarr(nim)
-subpix=lonarr(nim)
-pixscale=fltarr(nim)
-for k=0L, nim-1L do begin
-    nxsub[k]=nx[k]
-    nysub[k]=ny[k]
-    subhdrs[k]=ptr_new(*hdrs[k])
-    if(keyword_set(gbig)) then begin
-        ntest=10L
-        xyad, *hdrs[k], nx[k]/2L, ny[k]/2L, ra1, dec1
-        xyad, *hdrs[k], nx[k]/2L+ntest, ny[k]/2L, ra2, dec2
-        spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
-        pixscale[k]=(d12/float(ntest)*3600.)[0]
-        
-        subpix[k]=(long(gbig) > 1L)[0]
-        help,subpix[k]
-        if(subpix[k] gt 1) then begin
-            nxsub[k]=nx[k]/subpix[k]
-            nysub[k]=ny[k]/subpix[k]
-
-            ;; make new hdr (note it assumes certain config for ast)
-            crpix1= float(sxpar(*subhdrs[k], 'CRPIX1'))
-            crpix2= float(sxpar(*subhdrs[k], 'CRPIX2'))
-            cd1_1= float(sxpar(*subhdrs[k], 'CD1_1'))
-            cd1_2= float(sxpar(*subhdrs[k], 'CD1_2'))
-            cd2_1= float(sxpar(*subhdrs[k], 'CD2_1'))
-            cd2_2= float(sxpar(*subhdrs[k], 'CD2_2'))
-            crpix1= (crpix1-0.5)/float(subpix[k])+0.5
-            crpix2= (crpix2-0.5)/float(subpix[k])+0.5
-            cd1_1= cd1_1*float(subpix[k])
-            cd1_2= cd1_2*float(subpix[k])
-            cd2_1= cd2_1*float(subpix[k])
-            cd2_2= cd2_2*float(subpix[k])
-            sxaddpar, *subhdrs[k], 'CRPIX1', crpix1
-            sxaddpar, *subhdrs[k], 'CRPIX2', crpix2
-            sxaddpar, *subhdrs[k], 'CD1_1', cd1_1
-            sxaddpar, *subhdrs[k], 'CD1_2', cd1_2
-            sxaddpar, *subhdrs[k], 'CD2_1', cd2_1
-            sxaddpar, *subhdrs[k], 'CD2_2', cd2_2
-
-            ;; make sub-images
-            simages[k]=ptr_new(gbig_smooth((*images[k]), nxsub[k], nysub[k], $
-                                           subpix[k]))
-            ssig=dsigma((*simages[k]), sp=10)
-            sivars[k]=ptr_new(fltarr(nxsub[k], nysub[k])+1./ssig^2)
-
-        endif
-    endif 
-endfor
 
 for k=0L, nim-1L do begin
     if(k eq 0) then first=1 else first=0
@@ -544,9 +409,24 @@ endfor
 if(n_tags(acat) gt 0) then begin
     acat.good= total(acat.bgood, 1) gt 0
     mwrfits, acat, acatfile, /create
-endif
+ endif
+
+;; free memory
+for i=0L, n_elements(images)-1L do $
+   ptr_free, images[i]
+for i=0L, n_elements(simages)-1L do $
+   ptr_free, simages[i]
+for i=0L, n_elements(sivars)-1L do $
+   ptr_free, sivars[i]
+for i=0L, n_elements(nimages)-1L do $
+   ptr_free, nimages[i]
+for i=0L, n_elements(ivars)-1L do $
+   ptr_free, ivars[i]
+for i=0L, n_elements(hdrs)-1L do $
+   ptr_free, hdrs[i]
+for i=0L, n_elements(subhdrs)-1L do $
+   ptr_free, subhdrs[i]
 
 return 
-
 end
 ;------------------------------------------------------------------------------

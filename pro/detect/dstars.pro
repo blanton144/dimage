@@ -9,26 +9,24 @@
 ;------------------------------------------------------------------------------
 pro dstars, images, ivars, psfs, hdrs, sdss=sdss, slim=slim, ref=ref, $
             nimages=nimages, ra_stars=out_ra_stars, dec_stars=out_dec_stars, $
-            nstars=nstars, puse=puse
+            nstars=nstars, puse=puse, maxnstar=maxnstar
 
-maxnpeaks=1000L
+if(NOT keyword_set(maxnpeaks)) then $
+   maxnpeaks=1000L
+if(NOT keyword_set(maxnstar)) then $
+   maxnstar=1000L
 
+;; figure out sizes
 nim=n_elements(images)
 nx=lonarr(nim)
 ny=lonarr(nim)
-
 for k=0L, nim-1L do begin
     nx[k]=(size(*images[k],/dim))[0]
     ny[k]=(size(*images[k],/dim))[1]
 endfor
 
-;; read in basic PSFs and get approximate size
-if(n_tags(sdss) gt 0) then begin
-    sdss.filter=filtername(ref)
-    bpsf=dvpsf(nx[ref]/2L, ny[ref]/2L, sdss=sdss) 
-endif else begin
-    bpsf=dvpsf(nx[ref]/2L, ny[ref]/2L, psf=psfs[ref])
-endelse
+;; read in basic PSFs and its get approximate size
+bpsf=dvpsf(nx[ref]/2L, ny[ref]/2L, psf=psfs[ref])
 pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet 
@@ -54,14 +52,8 @@ for k=0, nim-1L do begin
             tmp_yc=tmp_yc[0:nc-1]
             
             ;; try and guess which peaks are PSFlike
-            if(n_tags(sdss) gt 0) then begin
-                sdss.filter=filtername(k)
-                ispsf=dpsfcheck(*images[k], *ivars[k], tmp_xc, tmp_yc, $
-                                sdss=sdss) 
-            endif else begin
-                ispsf=dpsfcheck(*images[k], *ivars[k], tmp_xc, tmp_yc, $
-                                vpsf=psfs[k])
-            endelse
+            ispsf=dpsfcheck(*images[k], *ivars[k], tmp_xc, tmp_yc, $
+                            vpsf=psfs[k])
         
             istars=where(ispsf gt 0, nstars)
             help,k
@@ -81,12 +73,7 @@ for k=0, nim-1L do begin
                 yy=replicate(1.,nx[k])#findgen(ny[k])
                 drefine, fimage, tmp_xstars, tmp_ystars, xr=xr, yr=yr, smooth=1
                 for i=0L, n_elements(tmp_xstars)-1L do begin 
-                    if(n_tags(sdss) gt 0) then begin
-                        sdss.filter=filtername(k)
-                        psf=dvpsf(xr[i], yr[i], sdss=sdss)
-                    endif else begin
-                        psf=dvpsf(xr[i], yr[i], psf=psfs[k])
-                    endelse
+                    psf=dvpsf(xr[i], yr[i], psf=psfs[k])
                     sigpsf=dsigma(psf, sp=3)
                     tmp_model=fltarr(nx[k],ny[k])
                     embed_stamp, tmp_model, psf, $
@@ -135,9 +122,16 @@ nstars=n_elements(ra_stars)
 if(nstars gt 0) then begin
     ing=spheregroup(ra_stars, dec_stars, 2.*psfsig*pixscale_ref, $
                     firstg=firstg)
-    nstars=max(ing)+1L
+    nstars=(max(ing)+1L)
     out_ra_stars=ra_stars[firstg[0:nstars-1]]
     out_dec_stars=dec_stars[firstg[0:nstars-1]]
+    adxy, *hdrs[ref], out_ra_stars, out_dec_stars, out_x, out_y
+    out_fluxes= (*nimages[ref])[out_x, out_y] 
+    isort= reverse(sort(out_fluxes))
+    isort= isort[0:(n_elements(isort)-1)<(maxnstar-1)]
+    out_ra_stars=out_ra_stars[isort]
+    out_dec_stars=out_dec_stars[isort]
+    nstars= n_elements(out_ra_stars)
 endif
 
 end

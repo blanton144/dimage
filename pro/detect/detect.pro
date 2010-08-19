@@ -18,6 +18,7 @@
 ;   gsmooth - smoothing scale for galaxies (default 5)
 ;   single - if set, only process this parent number
 ;   puse - [Nband] 0 or 1, whether to use band to find parents
+;   pbuffer - fractional buffer to add around parents (default 0.1)
 ; OPTIONAL KEYWORDS:
 ;   /all - process all parents
 ;   /pset - use "parent" settings from base-pset.fits file
@@ -53,7 +54,8 @@ pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             single=single, aset=aset, sgset=sgset, gsmooth=gsmooth, $
             puse=puse, center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
             gsaddle=gsaddle, nostarim=nostarim, novpsf=novpsf, $
-            noparentclobber=noparentclobber, plim=plim, sersic=sersic
+            noparentclobber=noparentclobber, plim=plim, sersic=sersic, $
+            pbuffer=pbuffer, maxnstar=maxnstar
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0
@@ -92,7 +94,8 @@ endelse
 seed_parents=seed0
 nc= keyword_set(noclobber) OR keyword_set(noparentclobber)
 dparents, base, imfiles, sky=sky, noclobber=nc, ref=pset.ref, $
-  puse=pset.puse, seed=seed_parents, cenonly=center, plim=plim
+  puse=pset.puse, seed=seed_parents, cenonly=center, plim=plim, $
+  pbuffer=pbuffer
 
 ;; read in parents 
 hdr=gz_headfits(base+'-pimage.fits',ext=0)
@@ -126,7 +129,8 @@ if(keyword_set(all)) then begin
           ref=pset.ref, gsmooth=gsmooth, glim=glim, aset=aset, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
           gsaddle=gsaddle, nostarim=nostarim, noclobber=noclobber, $
-          slim=slim, sersic=sersic
+          slim=slim, sersic=sersic, maxnstar=maxnstar
+        heap_gc
     endfor
 endif
 
@@ -145,7 +149,8 @@ if(n_elements(single) gt 0) then begin
           ref=ref, gsmooth=gsmooth, glim=glim, aset=aset, hand=hand, $
           sgset=sgset, puse=pset.puse, tuse=tuse, gbig=gbig, $
           gsaddle=gsaddle, nostarim=nostarim, slim=slim, $
-          noclobber=noclobber, sersic=sersic
+          noclobber=noclobber, sersic=sersic, maxnstar=maxnstar
+        heap_gc
     endif
 endif
 

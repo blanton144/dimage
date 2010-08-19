@@ -14,7 +14,10 @@ pro atlas_zcat
 
 zcat=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/zcat/zcat-velocity.fits',1)
 
-ikeep= where(zcat.z lt 0.055 and strmatch(zcat.comments, 'SDSS*') eq 0)
+ikeep= where(zcat.z lt 0.055 and $
+             zcat.z gt -0.05 and $
+             zcat.z ne 0. and $
+             strmatch(zcat.comments, 'SDSS*') eq 0)
 zcat=zcat[ikeep]
 
 mwrfits, zcat, getenv('DIMAGE_DIR')+'/data/atlas/zcat_atlas.fits', /create

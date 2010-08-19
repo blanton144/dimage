@@ -28,9 +28,10 @@
 ;------------------------------------------------------------------------------
 pro dparents, base, imfiles, plim=plim, ref=ref, sky=sky, $
               noclobber=noclobber, puse=puse, seed=seed0, $
-              cenonly=cenonly
+              cenonly=cenonly, pbuffer=pbuffer
 
 if(NOT keyword_set(plim)) then plim=5.
+if(NOT keyword_set(pbuffer)) then pbuffer=0.1
 if(NOT keyword_set(ref)) then ref=0
 if(NOT keyword_set(puse)) then puse=replicate(1, n_elements(imfiles))
 if(NOT keyword_set(seed0)) then seed0=108L
@@ -161,15 +162,28 @@ if(keyword_set(cenonly)) then begin
     obj_nd=fcen
 endif
 
+buffer=30L
 for iobj=obj_st, obj_nd do begin
     for k=0L, nim-1L do begin
         io=where(*oimage[k] eq iobj)
         ixo=io mod nx[k]
         iyo=io / nx[k]
-        xstart=(min(ixo)-30L)>0
-        xend=(max(ixo)+30L)<(nx[k]-1L)
-        ystart=(min(iyo)-30L)>0
-        yend=(max(iyo)+30L)<(ny[k]-1L)
+
+        ;; add standard buffer
+        xstart=(min(ixo)-buffer)>0
+        xend=(max(ixo)+buffer)<(nx[k]-1L)
+        ystart=(min(iyo)-buffer)>0
+        yend=(max(iyo)+buffer)<(ny[k]-1L)
+        nxtmp=xend-xstart+1L
+        nytmp=yend-ystart+1L
+
+        ;; add extra buffer
+        xbuffer= long(pbuffer*float(nxtmp))
+        ybuffer= long(pbuffer*float(nytmp))
+        xstart=(xstart-xbuffer)>0
+        xend=(xend+xbuffer)<(nx[k]-1L)
+        ystart=(ystart-ybuffer)>0
+        yend=(yend+ybuffer)<(ny[k]-1L)
         nxnew=xend-xstart+1L
         nynew=yend-ystart+1L
         
