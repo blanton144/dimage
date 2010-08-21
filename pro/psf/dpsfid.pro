@@ -4,7 +4,7 @@
 ; PURPOSE:
 ;   check how well a PSF fits some data
 ; CALLING SEQUENCE:
-;   ispsf= dpsfcheck(image, ivar, x, y [, psf=, amp= ])
+;   ispsf= dpsfid(image, ivar, x, y [, psf=, amp= ])
 ; INPUTS:
 ;   image - [nx, ny] input image
 ;   ivar - [nx, ny] input invverse variance
@@ -13,94 +13,86 @@
 ; OUTPUTS:
 ;   ispsf - [N] 1 for PSF, 0 otherwise
 ;   amp - amplitude of fit (after peak-normalizing PSF)
-; COMMENTS:
-;   Fits a simple linear background plus the PSF.  Subtracts off the
-;   model, median smoothes the image in FWHM boxes, and calls it a PSF
-;   if the median smoothed image is < 0.1 times the original image at
-;   the PSF peak. 
 ; REVISION HISTORY:
-;   1-Mar-2006  Written by Blanton, NYU
+;   1-Aug-2010  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function dpsfid, image, ivar, x, y, amp=amp, psf=psf, vpsf=vpsf, $
-                 flux=flux
+function dpsfid, image, ivar, x, y, amp=amp, vpsf=vpsf, flux=flux, dof=dof, $
+                 subimage=subimage
 
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 
-if(keyword_set(psf)) then begin
-    havevar=0
-    dfit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet ; jm07may01nyu
-    fwhm=psfsig*2.*sqrt(2.*alog(2.))
-endif
+subimage=image
 
-if(n_tags(vpsf) gt 0) then begin
-    havevar=1
-    psf=dvpsf(nx*0.5, ny*0.5, psfsrc=vpsf)
-    dfit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet ; jm07may01nyu
-    fwhm=psfsig*2.*sqrt(2.*alog(2.))
-endif
+psf=dvpsf(nx*0.5, ny*0.5, psfsrc=vpsf)
+dfit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet 
+fwhm=psfsig*2.*sqrt(2.*alog(2.))
 
 npx=(size(psf,/dim))[0]
 npy=(size(psf,/dim))[1]
+ncx=long(fwhm[0]*8.) < npx
+ncy=long(fwhm[0]*8.) < npy
 
-cc=fltarr(npx,npy)+1.
-xx=reform(replicate(1., npx)#findgen(npy), npx*npy)/float(npx)-0.5
-yy=reform(findgen(npx)#replicate(1., npy), npx*npy)/float(npy)-0.5
-rr=sqrt((xx-npx*0.5)^2+(yy-npy*0.5)^2)
+cc=fltarr(ncx,ncy)+1.
+xx=reform(findgen(ncx)#replicate(1., ncy), ncx*ncy)/float(ncy)-0.5
+yy=reform(replicate(1., ncx)#findgen(ncy), ncx*ncy)/float(ncx)-0.5
+rr=sqrt((xx-ncx*0.5)^2+(yy-ncy*0.5)^2)
 
-cmodel=fltarr(3,npx*npy)
-cmodel[0,*]=reform(psf/max(psf), npx*npy)
+xst= npx/2L-ncx/2L
+xnd= xst+ncx-1L
+yst= npy/2L-ncy/2L
+ynd= yst+ncy-1L
+
+cenpsf= psf[xst:xnd, yst:ynd]
+
+cmodel=fltarr(4,ncx*ncy)
+cmodel[0,*]=reform(cenpsf/max(cenpsf), ncx*ncy)
 cmodel[1,*]=xx
 cmodel[2,*]=yy
-;;cmodel[3,*]=cc
+cmodel[3,*]=cc
 
 amp=fltarr(n_elements(x))
 flux=fltarr(n_elements(x))
+chi2=fltarr(n_elements(x))
+dof=fltarr(n_elements(x))+float(n_elements(cenpsf))-4.
 for i=0L, n_elements(x)-1L do begin 
-    cutout_image=fltarr(npx,npy) 
-    cutout_ivar=fltarr(npx,npy) 
-    embed_stamp, cutout_image, image, npx/2L-x[i], npy/2L-y[i] 
-    embed_stamp, cutout_ivar, ivar, npx/2L-x[i], npy/2L-y[i] 
-    cutout_ivar=cutout_ivar>0.
-    
-    if(keyword_set(havevar)) then begin
-        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
-        scale=total(currpsf)/max(currpsf)
-        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
-    endif else begin
-        currpsf=psf
-        scale=max(currpsf)/total(currpsf)
-        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
-    endelse
-    maxm=max(model)
-    cutout_ivar=cutout_ivar*(1.+3.*model/maxm)
-    hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
-      reform(cutout_ivar, npx*npy), coeffs, nsigma=10 
-    ;;hogg_iter_linfit, cmodel, reform(cutout_image, npx*npy), $
-     ;; replicate(median(cutout_ivar), npx*npy), coeffs, nsigma=10 
-    amp[i]=coeffs[0] 
-    flux[i]=coeffs[0] *scale
+   cutout_image=fltarr(ncx,ncy) 
+   cutout_ivar=fltarr(ncx,ncy) 
+
+   embed_stamp, cutout_image, subimage, ncx/2L-x[i], ncy/2L-y[i] 
+   embed_stamp, cutout_ivar, ivar, ncx/2L-x[i], ncy/2L-y[i] 
+   cutout_ivar=cutout_ivar>0.
+   
+   fullpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
+   scale=total(fullpsf)/max(fullpsf)
+
+   currpsf= fullpsf[xst:xnd, yst:ynd]
+
+   if(0) then begin
+      dprefine, cutout_image, currpsf, float(ncx/2L), float(ncy/2L), $
+                xr=xr, yr=yr, invvar=cutout_ivar
+      currpsf= sshift2d(currpsf, [xr-float(ncx/2L), yr-float(ncy/2L)])
+   endif
+   
+   cmodel[0,*]=reform(currpsf/max(fullpsf), ncx, ncy) 
+   hogg_iter_linfit, cmodel, reform(cutout_image, ncx*ncy), $
+                     reform(cutout_ivar, ncx*ncy), coeffs, nsigma=10
+   amp[i]=coeffs[0] 
+   flux[i]=coeffs[0] *scale
+   chi2[i]= total((reform(coeffs#cmodel, ncx*ncy)-reform(cutout_image, ncx*ncy))^2* $
+                  reform(cutout_ivar, ncx*ncy))
+   
+   submodel= (reform(coeffs#cmodel, ncx,ncy)-reform(cutout_image, ncx,ncy))
+
+   if(arg_present(subimage)) then begin
+      subpsf= fullpsf*coeffs[0]/max(fullpsf)
+      embed_stamp, subimage, -subpsf, x[i]-float(npx/2L), y[i]-float(npy/2L)
+   endif
+
 endfor
 
-model=fltarr(nx,ny)
-for i=0L, n_elements(x)-1L do begin 
-    if(keyword_set(havevar)) then begin
-        currpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
-        cmodel[0,*]=reform(currpsf/max(currpsf), npx, npy) 
-    endif else begin
-        currpsf=psf
-    endelse
-    embed_stamp, model, amp[i]*currpsf/max(currpsf), $
-      x[i]-float(npx/2L), y[i]-float(npy/2L)
-endfor
-nimage= image-model
-simage=dmedsmooth(nimage,box=ceil(fwhm)) 
-
-ispsf=image[long(x), long(y)] gt 10.*simage[long(x), long(y)]
-
-
-return, ispsf
+return, chi2
 
 end
 ;------------------------------------------------------------------------------

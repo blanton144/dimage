@@ -53,7 +53,7 @@ return, reform(((model-image)*sqrt(invvar)),n_elements(model))
 end
 ;
 pro dprefine,in_image,in_psf, in_xcen,in_ycen,xr=xr, yr=yr, model=model, $
-             cutout=cutout
+             cutout=cutout, invvar=in_invvar
 
 common com_prefine
 
@@ -69,8 +69,12 @@ ycen=in_ycen
 xcen_orig=long(xcen)
 ycen_orig=long(ycen)
 
-sig=dsigma(in_image)
-invvar=fltarr(nx,ny)+1./sig^2
+if(NOT keyword_set(in_invvar)) then begin
+   sig=dsigma(in_image)
+   invvar=fltarr(nx,ny)+1./sig^2
+endif else begin
+   invvar=in_invvar
+endelse
 
 xlo_orig=(xcen_orig-nn/2L)
 ylo_orig=(ycen_orig-nn/2L)

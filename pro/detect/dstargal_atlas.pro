@@ -95,10 +95,11 @@ pny=(size(bpsf,/dim))[1]
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet 
 
 ;; find stars and galaxies
-dstars, images, ivars, psfs, hdrs, slim=slim, ref=ref, $
+dstars_atlas, images, ivars, psfs, hdrs, slim=slim, ref=ref, $
   nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
-  nstars=nstars, puse=puse, maxnstar=maxnstar
-dgals, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
+  nstars=nstars, maxnstar=maxnstar
+stop
+dgals_atlas, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
   ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse, $
   gsaddle=gsaddle
 nimfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+ $

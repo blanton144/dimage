@@ -49,7 +49,7 @@ nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 
 ;; set a bunch of parameters
-plim=5.
+plim=10.
 box=natlas*2L
 small=(natlas-1L)/2L
 ;nc=1L
@@ -116,12 +116,12 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
 
 ; do initial fit
     exatlas=fltarr(natlas*natlas, n_elements(extract))
-    for i=0L, n_elements(extract)-1L do begin & $
-        scale=total(extract[i].atlas) & $
-        exatlas[*,i]=reform(extract[i].atlas/scale, natlas*natlas) & $
+    for i=0L, n_elements(extract)-1L do begin 
+       scale=total(extract[i].atlas) 
+       exatlas[*,i]=reform(extract[i].atlas/scale, natlas*natlas) 
     endfor
     bpsf=reform(djs_median( exatlas, 2), natlas, natlas)
-
+    
     ;;bpsf= reform(total(reform(extract.atlas,natlas*natlas, $
     ;;                          n_elements(extract)),2),natlas,natlas)
     bpsf=bpsf/total(bpsf)
@@ -130,10 +130,10 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
     
     diff=fltarr(n_elements(extract))
     model=reform(bpsf, natlas*natlas)
-    for i=0L, n_elements(extract)-1L do begin  & $
-        scale=total(model*reform(extract[i].atlas,natlas*natlas))/ $
-          total(model*model) & $
-        diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) & $ ; jm07may07nyu
+    for i=0L, n_elements(extract)-1L do begin  
+       scale=total(model*reform(extract[i].atlas,natlas*natlas))/ $
+             total(model*model) 
+       diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) ; jm07may07nyu
     endfor
     
 ; reject REJSIGMA outliers
@@ -153,6 +153,8 @@ endfor
 atlas=extract.atlas
 bpsf= reform(total(reform(atlas, natlas*natlas, n_elements(extract)),2), $
              natlas,natlas)
+stop
+bpsf=bpsf-median(bpsf)
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model ; jm07may01nyu
 bpsf=bpsf/total(model)
 
