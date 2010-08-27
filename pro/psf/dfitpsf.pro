@@ -24,7 +24,8 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dfitpsf, imfile, natlas=natlas, maxnstar=maxnstar, noclobber=noclobber, $
-             cmap=cmap, base=base, seed=seed0, novpsf=novpsf, noivar=noivar
+             cmap=cmap, base=base, seed=seed0, novpsf=novpsf, noivar=noivar, $
+             check=check
 
 if(NOT keyword_set(natlas)) then natlas=41L
 if(NOT keyword_set(seed0)) then seed0=108L
@@ -52,8 +53,6 @@ ny=(size(image,/dim))[1]
 plim=10.
 box=natlas*2L
 small=(natlas-1L)/2L
-;nc=1L
-;np=1L
 if (n_elements(maxnstar) eq 0L) then maxnstar=200L
 
 ; Set source object name
@@ -104,59 +103,68 @@ dobjects, simage, objects=obj, plim=plim, seed=seed
 dextract, simage, invvar, object=obj, extract=extract, small=small, $
   seed=seed
 if(n_elements(extract) lt 3) then begin
-    splog, 'not enough small enough objects in image'
-    return
+   splog, 'not enough small enough objects in image'
+   return
 endif
 
 extract1 = extract
 splog, 'Identified ', n_elements(extract), ' objects.'
 
-rejsigma = [4.0,3.,3.0]
+rejsigma = [3.0,2.0,1.0,0.5]
 for iter = 0L, n_elements(rejsigma)-1L do begin
 
-; do initial fit
-    exatlas=fltarr(natlas*natlas, n_elements(extract))
-    for i=0L, n_elements(extract)-1L do begin 
-       scale=total(extract[i].atlas) 
-       exatlas[*,i]=reform(extract[i].atlas/scale, natlas*natlas) 
-    endfor
-    bpsf=reform(djs_median( exatlas, 2), natlas, natlas)
-    
-    ;;bpsf= reform(total(reform(extract.atlas,natlas*natlas, $
-    ;;                          n_elements(extract)),2),natlas,natlas)
-    bpsf=bpsf/total(bpsf)
-    
-; clip non-stars
-    
-    diff=fltarr(n_elements(extract))
-    model=reform(bpsf, natlas*natlas)
-    for i=0L, n_elements(extract)-1L do begin  
-       scale=total(model*reform(extract[i].atlas,natlas*natlas))/ $
-             total(model*model) 
-       diff[i]=total((extract[i].atlas/scale-model)^2*extract[i].atlas_ivar) ; jm07may07nyu
-    endfor
-    
-; reject REJSIGMA outliers
-    
-    keep = where(diff lt mpchilim(rejsigma[iter],float(natlas)^2,/sigma),nkeep)
-    splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
-    if (nkeep lt 3L) then begin
-        splog, 'Not enough good stars found.'
-        return
-    endif
-    
-    extract = extract[keep]
-    
+   ;; do initial fit
+   exatlas=fltarr(natlas*natlas, n_elements(extract))
+   for i=0L, n_elements(extract)-1L do begin 
+      scale=total(extract[i].atlas) 
+      exatlas[*,i]=reform(extract[i].atlas/scale, natlas*natlas) 
+   endfor
+   bpsf=reform(djs_median( exatlas, 2), natlas, natlas)
+   
+   bpsf=bpsf/total(bpsf)
+   
+   ;; clip non-stars
+   diff=fltarr(n_elements(extract))
+   scale=fltarr(n_elements(extract))
+   model=reform(bpsf, natlas*natlas)
+   for i=0L, n_elements(extract)-1L do begin  
+      scale[i]=total(model*reform(extract[i].atlas,natlas*natlas))/ $
+               total(model*model) 
+      diff[i]=total((extract[i].atlas-model*scale[i])^2*extract[i].atlas_ivar) 
+   endfor
+   
+   ;; reject REJSIGMA outliers
+   keep = where(diff lt mpchilim(rejsigma[iter],float(natlas)^2,/sigma),nkeep)
+   splog, 'REJSIGMA = ', rejsigma[iter], '; keeping ', nkeep, ' stars'
+   if (nkeep lt 3L) then begin
+      splog, 'Not enough good stars found.'
+      return
+   endif
+   
+   extract = extract[keep]
+   scale = scale[keep]
+   
 endfor
 
 ; find basic PSF
-atlas=extract.atlas
-bpsf= reform(total(reform(atlas, natlas*natlas, n_elements(extract)),2), $
-             natlas,natlas)
-stop
-bpsf=bpsf-median(bpsf)
+exatlas=fltarr(natlas*natlas, n_elements(extract))
+model=reform(bpsf, natlas*natlas)
+for i=0L, n_elements(extract)-1L do begin 
+   scale[i]=total(model*reform(extract[i].atlas,natlas*natlas))/ $
+            total(model*model) 
+   exatlas[*,i]=reform(extract[i].atlas/scale[i], natlas*natlas) 
+endfor
+bpsf=reform(djs_median( exatlas, 2), natlas, natlas)
 dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model ; jm07may01nyu
 bpsf=bpsf/total(model)
+
+if(keyword_set(check)) then begin
+   isort= reverse(sort(scale))
+   for i=0L, n_elements(extract)-1L do begin
+      mm= bpsf*total(model)*scale[isort[i]]
+      atv, extract[isort[i]].atlas-mm, /block
+   endfor
+endif
 
 pnx=(size(bpsf,/dim))[0]
 pny=(size(bpsf,/dim))[1]
@@ -166,12 +174,13 @@ gpsf=(model/mm) > 0.0001
 if(keyword_set(novpsf)) then gpsf=fltarr(pnx,pny)+1.
 
 ; output basic PSF
-mkhdr, hdr, 4, [41,41], /extend
+mkhdr, hdr, 4, [natlas,natlas], /extend
 sxdelpar, hdr, 'COMMENT' & sxdelpar, hdr, 'DATE'
 sxaddpar, hdr, 'PSFSIGMA', float(psfsig[0]), ' Gaussian sigma [pixel]'
-sxaddpar, hdr, 'NPSFSTAR', long(n_elements(extract)), ' number of stars used in the PSF'
+sxaddpar, hdr, 'NPSFSTAR', long(n_elements(extract)), $
+          ' number of stars used in the PSF'
 mwrfits, float(reform(bpsf, natlas, natlas)), base+'-bpsf.fits', hdr, /create
-mwrfits, float(reform(model, natlas, natlas)), base+'-bpsf.fits', hdr ; jm07may01nyu
+mwrfits, float(reform(model, natlas, natlas)), base+'-bpsf.fits', hdr 
 
 npinit=3L
 np=npinit

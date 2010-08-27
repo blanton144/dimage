@@ -1,10 +1,10 @@
 ;+
 ; NAME:
-;   dpsfid
+;   dpsfselect_atlas
 ; PURPOSE:
 ;   check how well a PSF fits some data
 ; CALLING SEQUENCE:
-;   ispsf= dpsfid(image, ivar, x, y [, psf=, amp= ])
+;   ispsf= dpsfselect_atlas(image, ivar, x, y [, psf=, amp= ])
 ; INPUTS:
 ;   image - [nx, ny] input image
 ;   ivar - [nx, ny] input invverse variance
@@ -17,40 +17,52 @@
 ;   1-Aug-2010  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function dpsfid, image, ivar, x, y, amp=amp, vpsf=vpsf, flux=flux, dof=dof, $
-                 subimage=subimage
+function dpsfselect_atlas, image, ivar, x, y, amp=amp, psf=psf, flux=flux, $
+                           dof=dof, subimage=subimage, noclip=noclip
 
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
 
+npx=(size(psf,/dim))[0]
+npy=(size(psf,/dim))[1]
+
 subimage=image
 
-psf=dvpsf(nx*0.5, ny*0.5, psfsrc=vpsf)
 dfit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet 
 fwhm=psfsig*2.*sqrt(2.*alog(2.))
 
-npx=(size(psf,/dim))[0]
-npy=(size(psf,/dim))[1]
-ncx=long(fwhm[0]*8.) < npx
-ncy=long(fwhm[0]*8.) < npy
+if(NOT keyword_set(noclip)) then begin
+   ncx=long(fwhm[0]*4.) < npx
+   ncy=long(fwhm[0]*4.) < npy
+   xst= npx/2L-ncx/2L
+   xnd= xst+ncx-1L
+   yst= npy/2L-ncy/2L
+   ynd= yst+ncy-1L
+endif else begin
+   xst=0L
+   xnd=npx-1L
+   yst=0L
+   ynd=npy-1L
+   ncx=npx
+   ncy=npy
+endelse
 
 cc=fltarr(ncx,ncy)+1.
 xx=reform(findgen(ncx)#replicate(1., ncy), ncx*ncy)/float(ncy)-0.5
 yy=reform(replicate(1., ncx)#findgen(ncy), ncx*ncy)/float(ncx)-0.5
 rr=sqrt((xx-ncx*0.5)^2+(yy-ncy*0.5)^2)
 
-xst= npx/2L-ncx/2L
-xnd= xst+ncx-1L
-yst= npy/2L-ncy/2L
-ynd= yst+ncy-1L
 
 cenpsf= psf[xst:xnd, yst:ynd]
 
-cmodel=fltarr(4,ncx*ncy)
-cmodel[0,*]=reform(cenpsf/max(cenpsf), ncx*ncy)
-cmodel[1,*]=xx
-cmodel[2,*]=yy
-cmodel[3,*]=cc
+cmodel=fltarr(7,ncx*ncy)
+cmodel[0,*]=reform(cenpsf/max(psf), ncx*ncy)
+cmodel[1,*]=cc
+cmodel[2,*]=xx
+cmodel[3,*]=yy
+cmodel[4,*]=xx*xx
+cmodel[5,*]=yy*yy
+cmodel[6,*]=xx*yy
 
 amp=fltarr(n_elements(x))
 flux=fltarr(n_elements(x))
@@ -64,23 +76,17 @@ for i=0L, n_elements(x)-1L do begin
    embed_stamp, cutout_ivar, ivar, ncx/2L-x[i], ncy/2L-y[i] 
    cutout_ivar=cutout_ivar>0.
    
-   fullpsf=dvpsf(x[i], y[i], psfsrc=vpsf)
-   scale=total(fullpsf)/max(fullpsf)
-
-   currpsf= fullpsf[xst:xnd, yst:ynd]
-
-   cmodel[0,*]=reform(currpsf/max(fullpsf), ncx, ncy) 
    hogg_iter_linfit, cmodel, reform(cutout_image, ncx*ncy), $
                      reform(cutout_ivar, ncx*ncy), coeffs, nsigma=10
    amp[i]=coeffs[0] 
-   flux[i]=coeffs[0] *scale
+   flux[i]=coeffs[0] 
    chi2[i]= total((reform(coeffs#cmodel, ncx*ncy)-reform(cutout_image, ncx*ncy))^2* $
                   reform(cutout_ivar, ncx*ncy))
    
    submodel= (reform(coeffs#cmodel, ncx,ncy)-reform(cutout_image, ncx,ncy))
 
    if(arg_present(subimage)) then begin
-      subpsf= fullpsf*coeffs[0]/max(fullpsf)
+      subpsf= coeffs[0]*psf
       embed_stamp, subimage, -subpsf, x[i]-float(npx/2L), y[i]-float(npy/2L)
    endif
 
