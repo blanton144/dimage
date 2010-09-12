@@ -32,8 +32,8 @@ dfit_mult_gauss, psf, 1, amp, psfsig, model=model, /quiet
 fwhm=psfsig*2.*sqrt(2.*alog(2.))
 
 if(NOT keyword_set(noclip)) then begin
-   ncx=long(fwhm[0]*4.) < npx
-   ncy=long(fwhm[0]*4.) < npy
+   ncx=long(fwhm[0]*1.) < npx
+   ncy=long(fwhm[0]*1.) < npy
    xst= npx/2L-ncx/2L
    xnd= xst+ncx-1L
    yst= npy/2L-ncy/2L
