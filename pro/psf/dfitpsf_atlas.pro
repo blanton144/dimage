@@ -74,7 +74,7 @@ xx=replicate(1., natlas)#findgen(natlas)-float(natlas/2L)
 yy=findgen(natlas)#replicate(1., natlas)-float(natlas/2L)
 rr2=xx^2+yy^2
 
-rejsigma = [5.0,4.0,3.0,2.0]
+rejsigma = [10.0,5.0]
 for iter = 0L, n_elements(rejsigma)-1L do begin
 
    ;; take mean of stars
@@ -86,7 +86,7 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
    bpsf=bpsf-median(bpsf)
 
    ;; taper
-   fit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
+   dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
    bpsf=bpsf*exp(-0.5*rr2/(psfsig[0]*8.)^2)
    bpsf=bpsf/total(bpsf)
    

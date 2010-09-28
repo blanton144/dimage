@@ -40,7 +40,8 @@ nim=n_elements(imfiles)
 seed_psf=seed0+1L+lindgen(nim)
 for k=0L, nim-1L do $
   if(pset.dopsf[k]) then $
-  dfitpsf, imfiles[k], noclobber=noclobber, natlas=natlas, seed=seed_psf[k]
+  dfitpsf_atlas, imfiles[k], natlas=natlas, $
+                 seed=seed_psf[k]
 
 end
 ;------------------------------------------------------------------------------

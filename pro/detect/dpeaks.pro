@@ -14,8 +14,9 @@
 ;   dlim - limiting separation for identical peaks (default 1)
 ;   maxnpeaks - maximum number of peaks to return (default 1000)
 ;   minpeak - minimum peak value (defaults to 1 sigma)
-;   saddle - saddle point limit when checking peak separation 
-;            (default 3.)
+;   saddle - saddle point limit when checking peak separation ;
+;            in absolute units if /abssaddle set, in units of sigma 
+;            otherwise (default 3.)
 ; OPTIONAL KEYWORDS:
 ;   /smooth - smooth a bit before finding
 ;   /checkpeaks - check for peaks which are too connected to each other

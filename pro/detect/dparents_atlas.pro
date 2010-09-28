@@ -27,6 +27,7 @@ pro dparents_atlas, galex=galex, noclobber=noclobber
 if(NOT keyword_set(seed0)) then seed0=11L ;; random seed
 if(NOT keyword_set(ref)) then ref=2L ;; use r-band as reference
 if(NOT keyword_set(plim)) then plim=10. ;; for detecting parents
+if(NOT keyword_set(pbuffer)) then pbuffer=0.5 ;; for detecting parents
 
 ;; default to use base name same as directory name
 spawn, 'pwd', cwd

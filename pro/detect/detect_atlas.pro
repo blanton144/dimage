@@ -28,7 +28,8 @@ dparents_atlas, galex=galex, noclobber=noclobber
 
 dpsf_atlas, galex=galex, noclobber=noclobber
 
-dstargal_atlas, galex=galex, noclobber=noclobber
+dstargal_atlas, /plot
+return
 
 dchildren_atlas, galex=galex, noclobber=noclobber
 

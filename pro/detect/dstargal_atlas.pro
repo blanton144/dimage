@@ -4,36 +4,56 @@
 ; PURPOSE:
 ;   deblend children of a parent atlas image
 ; CALLING SEQUENCE:
-;   dstargal_atlas [, /galex, /noclobber ]
+;   dstargal_atlas 
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dstargal_atlas
+pro dstargal_atlas, plot=plot
 
-if(NOT keyword_set(slim)) then slim=10.
 if(NOT keyword_set(ref)) then ref=2L
-if(NOT keyword_set(gsmooth)) then gsmooth=5.
-if(NOT keyword_set(glim)) then glim=15.
-if(NOT keyword_set(gsaddle)) then gsaddle=20.
-if(NOT keyword_set(maxnstar)) then maxnstar=300L
+if(NOT keyword_set(gsmooth)) then gsmooth=10.
+if(NOT keyword_set(glim)) then glim=25.
+if(NOT keyword_set(gsaddle)) then gsaddle=50.
+if(NOT keyword_set(maxnstar)) then maxnstar=3000L
 
 ;; default to use base name same as directory name
 spawn, 'pwd', cwd
 base=(file_basename(cwd))[0]
+
+;; set up star and galaxy locations
+sgset={base:base, $
+       ref:ref, $
+       iparent:-1L, $
+       nstars:0L, $
+       ra_stars:dblarr(maxnstar), $
+       dec_stars:dblarr(maxnstar), $
+       ngals:0L, $
+       ra_gals:dblarr(maxnstar), $
+       dec_gals:dblarr(maxnstar) }
 
 ;; read in pset
 pset= mrdfits(base+'-pset.fits',1)
 imfiles=pset.imfiles
 puse=pset.puse
 nim= n_elements(imfiles)
+nx=lonarr(nim)
+ny=lonarr(nim)
+images=ptrarr(nim)
+nimages=ptrarr(nim)
+ivars=ptrarr(nim)
+hdrs=ptrarr(nim)
+psfs=ptrarr(nim)
 
 ;; find center object
+phdr=gz_headfits(base+'-r.fits')
 pim=gz_mrdfits(base+'-pimage.fits')
 pcat=gz_mrdfits(base+'-pcat.fits',1)
-nx=(size(pim,/dim))[0]
-ny=(size(pim,/dim))[1]
-iparent=pim[nx/2L, ny/2L]
+npx=(size(pim,/dim))[0]
+npy=(size(pim,/dim))[1]
+iparent=pim[npx/2L, npy/2L]
+xyad, phdr, float(npx/2L), float(npy/2L), raex, decex
+sgset.iparent=iparent
 
 if(iparent eq -1) then return
 
@@ -44,134 +64,77 @@ spawn, /nosh, ['mkdir', '-p', subdir+'/'+strtrim(string(iparent),2)]
 ;; read in the psf information
 for k=0L, nim-1L do begin
    bimfile=(stregex(imfiles[k], '(.*)\.fits.*', /sub, /extr))[1]
-   tmp_psf=dpsfread(bimfile+'-vpsf.fits') 
-   if(n_tags(psfs) eq 0) then $
-      psfs=tmp_psf $
-   else $
-      psfs=[psfs, tmp_psf]
+   psfs[k]=ptr_new(mrdfits(bimfile+'-bpsf.fits'))
 endfor
-psfs.xst= pcat[iparent].xst
-psfs.yst= pcat[iparent].yst
 
-;; read in images and psfs
-hdr=gz_headfits('parents/'+base+'-parent-'+ $
-                strtrim(string(iparent),2)+'.fits',ext=0)
-
-;; set up memory
-nim=long(sxpar(hdr, 'NIM'))
-nx=lonarr(nim)
-ny=lonarr(nim)
-images=ptrarr(nim)
-nimages=ptrarr(nim)
-ivars=ptrarr(nim)
-hdrs=ptrarr(nim)
-
-;; set up star and galaxy locations
-sgset={base:base, $
-       ref:ref, $
-       iparent:iparent, $
-       nstars:0L, $
-       ra_stars:dblarr(maxnstar), $
-       dec_stars:dblarr(maxnstar), $
-       ngals:0L, $
-       ra_gals:dblarr(maxnstar), $
-       dec_gals:dblarr(maxnstar) }
-
-;; read in images and ivars
+;; read in the images
+ntest=10L
 for k=0L, nim-1L do begin
-    images[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
-                              strtrim(string(iparent),2)+'.fits',0+k*2L,hdr))
-    hdrs[k]=ptr_new(hdr)
-    nx[k]=(size(*images[k],/dim))[0]
-    ny[k]=(size(*images[k],/dim))[1]
-    ivars[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
-                                strtrim(string(iparent),2)+'.fits',1+k*2L))
+   images[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
+                                strtrim(string(iparent),2)+'.fits',0+k*2L,hdr))
+   hdrs[k]=ptr_new(hdr)
+   nx[k]=(size(*images[k],/dim))[0]
+   ny[k]=(size(*images[k],/dim))[1]
+   ivars[k]=ptr_new(gz_mrdfits('parents/'+base+'-parent-'+ $
+                               strtrim(string(iparent),2)+'.fits',1+k*2L))
 endfor
 
-;; get basic psf size
-bpsf=dvpsf(nx[ref]/2L, ny[ref]/2L, psf=psfs[ref])
-pnx=(size(bpsf,/dim))[0]
-pny=(size(bpsf,/dim))[1]
-dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet 
+;; find and subtract stars in the reference image
+adxy, *hdrs[ref], raex, decex, xex, yex
+nimages[ref]= ptr_new(dpsfsub_atlas(image=*images[ref], ivar=*ivars[ref], $
+                                    psf=*psfs[ref], x=xstar_r, y=ystar_r, $
+                                    flux=fluxstar_r, nstars=nstars, exx=xex, $
+                                    exy=yex, exr=1.5))
+if(nstars gt 0) then begin
+   xyad, *hdrs[ref], xstar_r, ystar_r, ra_stars, dec_stars
+   fluxstar= fltarr(n_elements(fluxstar_r), nim)
+   fluxstar[*,ref]= fluxstar_r
+endif
 
-;; find stars and galaxies
-dstars_atlas, images, ivars, psfs, hdrs, slim=slim, ref=ref, $
-  nimages=nimages, ra_stars=ra_stars, dec_stars=dec_stars, $
-  nstars=nstars, maxnstar=maxnstar
-stop
-dgals_atlas, nimages, psfs, hdrs, gsmooth=gsmooth, glim=glim, $
-  ra_gals=ra_gals, dec_gals=dec_gals, ngals=ngals, puse=puse, $
-  gsaddle=gsaddle
+;; subtract same stars in all other images
+if(nstars gt 0) then begin
+   for k=0L, nim-1L do begin
+      if(k ne ref) then begin
+         adxy, *hdrs[k], ra_stars, dec_stars, xstar, ystar
+         nimages[k]= ptr_new(dpsfsub_atlas(image=*images[k], ivar=*ivars[k], $
+                                           psf=*psfs[k], x=xstar, y=ystar, $
+                                           flux=tmp_fluxstar))
+         fluxstar[*,k]=tmp_fluxstar
+      endif
+   endfor
+endif else begin
+   for k=0L, nim-1L do $
+      if(k ne ref) then $
+         nimages[k]= ptr_new(*images[k])
+endelse
+
+;; output subtracted images
 nimfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+ $
   '-'+strtrim(string(iparent),2)+'-nimage.fits'
-for k=0L, nim-1L do begin
-    mwrfits, *nimages[k], nimfile, create=(k eq 0)
-    ptr_free, nimages[k]
-endfor
-nimages=0
+for k=0L, nim-1L do $
+   mwrfits, *nimages[k], nimfile, create=(k eq 0)
 
-;; then take out stars that are near galaxies
-;; but give the center as the center of the star
-if(nstars gt 0 and ngals gt 0) then begin
-   spherematch, ra_stars, dec_stars, ra_gals, dec_gals, gsmooth/3600., $
-                m1,m2, d12
-   if(m1[0] ne -1) then begin
-      keep=lonarr(nstars)+1L
-      keep[m1]=0
-      ra_gals[m2]=ra_stars[m1]
-      dec_gals[m2]=dec_stars[m1]
-      ikeep=where(keep gt 0, nstars)
-      if(nstars gt 0) then begin
-         ra_stars=ra_stars[ikeep]
-         dec_stars=dec_stars[ikeep]
-      endif
-   endif
-endif
-
-;; refine star and galaxy peaks again based on the reference image
-model=fltarr(nx[ref],ny[ref])
-if(nstars gt 0) then begin
-    msimage=dmedsmooth(*images[ref], box=long(psfsig*30L))
-    fimage=*images[ref]-msimage
-    fivar=*ivars[ref]
-    adxy, *hdrs[ref], ra_stars, dec_stars, xstars, ystars
-    drefine, fimage, xstars, ystars, xr=xr, yr=yr, smooth=2
-    xyad, *hdrs[ref], xr, yr, ra_stars, dec_stars
-    for i=0L, nstars-1L do begin 
-        if(xr[i] gt 0L and xr[i] lt nx[ref]-1 AND $
-           yr[i] gt 0L and yr[i] lt ny[ref]-1) then begin
-            if(n_tags(sdss) gt 0) then begin
-                sdss.filter=filtername(ref)
-                psf=dvpsf(xr[i], yr[i], sdss=sdss)
-            endif else begin
-                psf=dvpsf(xr[i], yr[i], psf=psfs[ref])
-            endelse
-            tmp_model=fltarr(nx[ref],ny[ref])
-            embed_stamp, tmp_model, psf, $
-              xr[i]-float(pnx/2L), $
-              yr[i]-float(pny/2L)
-            ifit=where(tmp_model ne 0., nfit)
-            if(nfit gt 0) then begin
-                scale= total(fimage[ifit]*tmp_model[ifit]*fivar[ifit])/ $
-                  total(tmp_model[ifit]*tmp_model[ifit]*fivar[ifit])
-                model=model+tmp_model*scale
-            endif
-        endif
-    endfor
-endif
-rimage=*images[ref]-model
+;; find galaxies in reference image
+simage=dsmooth(*nimages[ref], gsmooth)
+ssig=dsigma(simage, sp=long(gsmooth*5.))
+saddle=gsaddle*ssig
+dpeaks, simage, xc=xc, yc=yc, sigma=ssig, minpeak=glim*ssig, npeaks=ngals, $
+        /check, saddle= gsaddle, /refine
 if(ngals gt 0) then begin
-    adxy, *hdrs[ref], ra_gals, dec_gals, xgals, ygals
-    drefine, rimage, xgals, ygals, smooth=2., $
-      xr=r_xgals, yr=r_ygals, box=9L
-    xyad, *hdrs[ref], r_xgals, r_ygals, ra_gals, dec_gals
-endif 
+   xgals=float(xc)
+   ygals=float(yc)
+   
+   ;; refine the centers
+   drefine, *nimages[ref], xgals, ygals, smooth=2., $
+            xr=xrgals, yr=yrgals, box=long(5)
+   xyad, *hdrs[ref], xrgals, yrgals, ra_gals, dec_gals
+endif
 
 ;; store locations in sgset
 sgset.nstars= nstars
 if(nstars gt 0) then begin
-   sgset.ra_stars[0:(nstars-1)]= ra_stars
-   sgset.dec_stars[0:(nstars-1)]= dec_stars
+   sgset.ra_stars[0:nstars-1]= ra_stars
+   sgset.dec_stars[0:nstars-1]= dec_stars
 endif
 sgset.ngals= ngals
 if(ngals gt 0) then begin
@@ -184,12 +147,25 @@ sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
   strtrim(string(iparent),2)+'-sgset.fits'
 mwrfits, sgset, sgsetfile, /create
 
-for i=0L, n_elements(images)-1L do $
-   ptr_free, images[i]
-for i=0L, n_elements(ivars)-1L do $
-   ptr_free, ivars[i]
-for i=0L, n_elements(hdrs)-1L do $
-   ptr_free, hdrs[i]
+if(keyword_set(plot)) then begin
+   atv, *nimages[ref]
+   if(ngals gt 0) then begin
+      adxy, *hdrs[ref], sgset.ra_gals[0:ngals-1], sgset.dec_gals[0:ngals-1], $
+            xg, yg
+      atvplot, xg, yg, psym=4, color='blue', th=4
+   endif
+   if(nstars gt 0) then begin
+      adxy, *hdrs[ref], sgset.ra_stars[0:nstars-1], sgset.dec_stars[0:nstars-1], $
+            xs, ys
+      atvplot, xs, ys, psym=4, color='red'
+   endif
+endif
+
+heap_free, psfs
+heap_free, images
+heap_free, nimages
+heap_free, ivars
+heap_free, hdrs
 
 return 
 end
