@@ -9,7 +9,8 @@
 ;   /galex - assume ugrizNF (N and F from GALEX)
 ;   /nolobber - do not overwrite previously PARENT files
 ; COMMENTS:
-;   Detects parents
+;   Detects parents; only outputs a parent that actually includes
+;     the central pixel. 
 ;   Assumes input file names of the form:
 ;      [base]-[ugriz].fits.gz
 ;    where [base] is the current directory name. If /galex is set, 
@@ -18,6 +19,15 @@
 ;     (within a pixel or two)
 ;   Assumes a sky-subtracted image in HDU 0
 ;   Works better if ivars supplied in HDU 1
+;   Writes outputs to:
+;      [base]-pset.fits 
+;      [base]-#-pimage.fits - HDU0: full image with parent number in each pixel
+;                            HDU1-N: individual band parent images
+;                            (because the resolution might be
+;                            different)
+;      [base]-#-pcat.fits - image with parent number in each pixel
+;      parents/[base]-parent-[parent].fits - multi-HDU file with
+;                                            individual parents
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-

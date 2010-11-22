@@ -18,10 +18,13 @@
 ;   /cenonly - only output parent image for central object
 ; COMMENTS:
 ;   Creates files:
-;      base-#-pimage.fits - image with parent number in each pixel
+;      base-#-pimage.fits - HDU0: full image with parent number in each pixel
+;                           HDU1-N: individual band parent images
+;                           (because the resolution might be
+;                           different)
 ;      base-#-pcat.fits - image with parent number in each pixel
-;      parents/base-parent-[parent].fits - multi-HDU file with
-;                                          individual parents
+;      parents/[base]-parent-[parent].fits - multi-HDU file with
+;                                            individual parents
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
@@ -214,7 +217,7 @@ for iobj=obj_st, obj_nd do begin
           iimage=fltarr(nxnew, nynew)
         ii=where(iivar gt 0., nii)
         if(nii gt 0) then $
-          iimage[ii]=randomn(seed, nii)/sqrt(iivar[ii])
+          iimage[ii]=randomn(seed, nii)*sigma[k]
         iimage[io]=timage[io]
 
         if(k eq ref) then begin

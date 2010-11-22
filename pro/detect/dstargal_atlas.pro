@@ -1,10 +1,16 @@
 ;+
 ; NAME:
-;   dchildren_atlas
+;   dstargal_atlas
 ; PURPOSE:
-;   deblend children of a parent atlas image
+;   identify stars and galaxies in NASA-Sloan Atlas image
 ; CALLING SEQUENCE:
 ;   dstargal_atlas 
+; COMMENTS:
+;   Requires dparents_atlas, dpsf_atlas to have been run.
+;   Agressive about calling things stars (ie. tuned to large galaxies)
+;   Outputs files in:
+;     atlases/#/[base]-#-nimage.fits - star-subtracted images
+;     atlases/#/[base]-#-sgset.fits - locations of stars, galaxies
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
@@ -110,9 +116,9 @@ endelse
 
 ;; output subtracted images
 nimfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+ $
-  '-'+strtrim(string(iparent),2)+'-nimage.fits'
+  '-nimage-'+strtrim(string(iparent),2)+'.fits'
 for k=0L, nim-1L do $
-   mwrfits, *nimages[k], nimfile, create=(k eq 0)
+   mwrfits, *nimages[k], nimfile, *hdrs[k], create=(k eq 0)
 
 ;; find galaxies in reference image
 simage=dsmooth(*nimages[ref], gsmooth)

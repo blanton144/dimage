@@ -58,13 +58,21 @@ templates=templates[*,*,0:nt-1L]
 ikept=ikept[0:nt-1L]
 
 if(keyword_set(sersic)) then begin
-    iv=fltarr(nx,ny)+1./sigma^2
+    sub=3L
+    snx= nx/sub
+    sny= ny/sub
+    nnx= snx*sub
+    nny= sny*sub
     for i=0L, nt-1L do begin
-        dsersic, templates[*,*,i], iv, xcen=xin[i], ycen=yin[i], $
-          /fixcen, model=model, /reinit, /fixsky, /simple
-        signt=2.*(float(templates[*,*,i] gt 0.)-0.5)
-        templates[*,*,i]=signt*(abs(templates[*,*,i]) < $
-                                (model*1.3+0.05*sigma))
+       btemplate= rebin(templates[0:nnx-1L,0:nny-1L,i], snx, sny)
+       iv=fltarr(snx,sny)+1.
+       dsersic, btemplate, iv, xcen=xin[i]/float(sub), ycen=yin[i]/float(sub), $
+                /fixcen, model=model, /reinit, /fixsky, /simple
+       fmodel= fltarr(nx, ny)
+       fmodel[0:nnx-1L, 0:nny-1L]= rebin(model, nnx, nny)
+       signt=2.*(float(templates[*,*,i] gt 0.)-0.5)
+       templates[*,*,i]=signt*(abs(templates[*,*,i]) < $
+                               (fmodel*1.3+0.05*sigma))
     endfor
 endif
 

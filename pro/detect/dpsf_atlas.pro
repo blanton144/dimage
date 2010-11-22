@@ -9,15 +9,13 @@
 ;   /galex - assume ugrizNF (N and F from GALEX)
 ;   /nolobber - do not overwrite previously PARENT files
 ; COMMENTS:
-;   Detects parents
+;   Requires dparents_atlas.pro to have been run
 ;   Assumes input file names of the form:
 ;      [base]-[ugriz].fits.gz
-;    where [base] is the current directory name. If /galex is set, 
-;    include -nd and -fd images from GALEX too.
-;   Assumes that the images are APPROXIMATELY overlapping
-;     (within a pixel or two)
-;   Assumes a sky-subtracted image in HDU 0
-;   Works better if ivars supplied in HDU 1
+;      [base]-pset.fits
+;   Outputs:
+;      [base]-bpsf.fits - basic (single-fit) PSF
+;   Doesn't track PSF variation across field
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-

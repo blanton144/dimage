@@ -325,6 +325,11 @@ pcat= gz_mrdfits(pcatfile,1,/silent)
 acatfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-'+ $
   strtrim(string(parent),2)+ '-acat.fits'
 acat= gz_mrdfits(acatfile,1,/silent)
+if(n_tags(acat) eq 0) then begin
+   acatfile=subdir+'/'+strtrim(string(parent),2)+'/'+basename+'-acat-'+ $
+            strtrim(string(parent),2)+ '.fits'
+   acat= gz_mrdfits(acatfile,1,/silent)
+endif
 if(n_tags(acat) gt 0) then begin
     ig=where(acat.good gt 0 and acat.type eq 0L, ng)
     
@@ -546,8 +551,14 @@ imfile=subdir+'/'+strtrim(string(parent),2)+'/'+ $
 parent_images=ptrarr(n_elements(imagenames))
 parent_hdrs=ptrarr(n_elements(imagenames))
 for i=0L, n_elements(imagenames)-1L do begin
-    parent_images[i]=ptr_new(gz_mrdfits(imfile, i, hdr, /silent))
-    parent_hdrs[i]=ptr_new(hdr)
+   im=gz_mrdfits(imfile, i, hdr, /silent)
+   if(keyword_set(im) eq 0) then begin
+      imfile=subdir+'/'+strtrim(string(parent),2)+'/'+ $
+             basename+'-parent-'+strtrim(string(parent),2)+'.fits'
+      im=gz_mrdfits(imfile, i, hdr, /silent)
+   endif
+   parent_images[i]=ptr_new(im)
+   parent_hdrs[i]=ptr_new(hdr)
 endfor
 
 ;; read in sgset file

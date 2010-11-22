@@ -24,9 +24,10 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dobjects, images, objects=objects, dpsf=dpsf, plim=plim, puse=puse, $
-              fobject=fobject, seed=seed
+              fobject=fobject, seed=seed, nlevel=nlevel
 
-nlevel=3L
+if(NOT keyword_set(nlevel)) then $
+   nlevel=3L
 
 if((size(images))[0] eq 1) then begin
     ptrs=1

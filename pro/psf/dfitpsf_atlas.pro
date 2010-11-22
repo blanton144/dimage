@@ -9,7 +9,7 @@
 ;   imfile - input FITS file
 ; COMMENTS:
 ;   Ouputs (imfile is base.fits or base.fits.gz):
-;     base-bpsf.fits - basic (single-fit) PSF
+;     [base]-bpsf.fits - basic (single-fit) PSF
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
