@@ -30,7 +30,7 @@ dpsf_atlas, galex=galex, noclobber=noclobber
 
 dstargal_atlas, /plot
 
-dchildren_atlas, galex=galex, noclobber=noclobber
+dchildren_atlas, noclobber=noclobber
 
 end
 ;------------------------------------------------------------------------------
