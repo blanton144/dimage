@@ -88,45 +88,37 @@ Survey (SDSS) imaging in a manner that improves the resulting
 detection and photometry of large galaxies on the sky. Our method
 treats each drift scan run as a whole and fits a smooth function to
 variation of the sky background to a heavily masked and binned image
-of the run. We have run our procedure on the full Data Release 7 for
-the Northern Galactic Cap. In this region, we have generated 1~deg by
-1~deg mosaics for general distribution. As a test of quality, we
-compare the photometry of point sources in these mosaics relative to
-the SDSS catalog, finding good agreement. More critically, we have
-also tested the effect of our background subtraction on the photometry
-of large galaxies by inserting fake galaxies into the raw data and
-attempting to measure them after background subtraction. While the
-standard SDSS photometry underestimates fluxes by over 20\% for
-galaxies with half-light radii $r_{50}>10$ arcsec, our technique
-introduces such biases only at half-light radiii $r_{50}>100$
-arcsec. These techniques and these mosaics will provide the basis of
-upcoming studies of the local Universe.
+of the run. We have run our procedure on the full Data Release 8, with
+which these sky subtraction results are released.  As a unit test of
+quality, we compare the photometry of point sources in mosaics based
+on these images relative to the SDSS catalog, finding good
+agreement. More critically, we have also tested the effect of our
+background subtraction on the photometry of large galaxies by
+inserting fake galaxies into the raw data and attempting to measure
+them after background subtraction.  Our technique introduces biases
+only at half-light radii $r_{50}>100$ arcsec. These sky-subtracted
+images can provide the basis of upcoming studies of the local
+Universe.
 \end{abstract}
 
-%\section{ To-do list}
-%
-%{\bf eak: simple comparison of fake nearby to us}
-%
-%{\bf eak: photo v5\_4 comparison of fake nearby to us}
-%
-%{\bf eak: photo v5\_6 comparison of fake nearby to us}
 
 \section{Why improve the sky-subtraction?}
 \label{sec:intro}
 
 The Sloan Digital Sky Survey (\citealt{york00a}) is the largest
-existing survey of the sky to date. As of Data Release 8 (DR8), it has
-provided reliable, well-calibrated catalogs down to $r\sim 22.5$ over
-14,500 square degrees of sky, in five bands ($u$, $g$, $r$, $i$ and
-$z$).  In so doing, it has provided images of a large fraction of the
-known bright galaxies on the sky --- the Messier and NGC objects, as
-well as lower surface brightness nearby galaxies. However, no reliable
-catalog of the properties of these galaxies yet exists, primarily
-because no standard background subtraction procedure has been
-implemented that properly treats the largest, brightest galaxies in
-the sky. The purpose of this paper is to provide just such a
-background procedure, which has now been run over the entire SDSS
-imaging dataset, and which will be released as part of DR8.
+existing survey of the sky to date. As of Data Release 8 (DR8;
+\citealt{agol11a}), it has provided reliable, well-calibrated catalogs
+down to $r\sim 22.5$ over 14,500 square degrees of sky, in five bands
+($u$, $g$, $r$, $i$ and $z$).  In so doing, it has provided images of
+a large fraction of the known bright galaxies on the sky --- the
+Messier and NGC objects, as well as lower surface brightness nearby
+galaxies. However, no reliable catalog of the properties of these
+galaxies yet exists, primarily because no standard background
+subtraction procedure has been implemented that properly treats the
+largest, brightest galaxies in the sky. The purpose of this paper is
+to provide just such a background procedure, which has now been run
+over the entire SDSS imaging dataset, and which is being released as
+part of DR8.
 
 Background subtraction of astronomical images is probably a formally
 impossible task.  The ideal treatment of the data gathered by a
@@ -149,12 +141,16 @@ interest.
 
 For the SDSS, the standard photometric pipeline takes just such a
 practical and accurate approach ({\tt photo}; \citealt{lupton01a}). In
-the version released with Data Release 7 (DR7;
-\citealt{abazajian09a}), {\tt photo} calculates the median-smoothed
-background on a scale of $100\times100$ arcsec and subtracts that from
-the image before object detection and measurement. For faint point
-source photometry in this data set --- that is, not a
-confusion-limited one --- this approach is highly accurate. In almost
+the catalog released in Data Release 7 (DR7; \citealt{abazajian09a}),
+{\tt photo} calculates the median-smoothed background on a scale of
+$100\times100$ arcsec and subtracts that from the image before object
+detection and measurement.  In the catalog release in DR8, a more
+sophisticated approach is used, which first models the brightest
+galaxies in each field so that they do not contaminate the sky
+estimate as much.
+
+For faint point source photometry the above approach is highly
+accurate (at least, as long as confusion is not a problem). In almost
 all cases, any diffuse light is subtracted away (whatever its source)
 while the point source itself is left untouched. For these sources, it
 is not necessary to fully model the background --- just to separate
@@ -169,7 +165,9 @@ angular extent, for larger galaxies it can be inappropriate.
 Typically, this method of sky subtraction causes an underestimate in
 their flux, size, and concentration (\citealt{west05a, blanton05b,
 hyde09a, west10a}). This problem becomes particularly evident for the
-nearby brightest cluster galaxies (\citealt{bernardi07a, lauer07a}).
+nearby brightest cluster galaxies (\citealt{bernardi07a,
+lauer07a}). While the DR8 algorithms represent a modest improvement in
+the sky subtraction, the bulk of the problem remains.
 
 In \S\ref{sec:model} below we present a different method for sky
 subtraction that is more accurate for large galaxies (while retaining
@@ -182,9 +180,9 @@ to regularize the problem in the presence of the heavy masking.
 
 In \S\ref{sec:mosaic} we describe how we take sky subtracted SDSS
 fields and mosaic them into single image. We have produced 1~deg by
-1~deg FITS format mosaics over the entire Northern Galactic Cap
-covered by the SDSS, and provide access to snap-shots up this area on
-the web.
+1~deg FITS format mosaics over the entire North Galactic Cap covered
+by the SDSS DR7, and provide access to snap-shots up this area on the
+web.
 
 In \S\ref{sec:endtoend}, we test the resulting photometry of these images
 in two ways.  First, we compare aperture photometry of point sources
@@ -192,32 +190,28 @@ to the standard SDSS aperture photometry, to quantify how much
 degradation our mosaicking procedure and sky subtraction have
 introduced.
 
-Second, we insert bright galaxies into the raw data and reanalyze the
-data completely.  We then compare our background-subtracted mosaicked
-images to the original fake data to evaluate the fidelity of our
-procedure. We also evaluate the performance of two versions of the
-standard SDSS pipelines (one that corresponds to the SDSS DR7 and
-another that is intended for DR8).
+Second, we insert fake bright galaxies into the raw data and reanalyze
+the data completely.  We then compare our background-subtracted
+mosaicked images to the original fake data to evaluate the fidelity of
+our procedure. We also evaluate the performance of two versions of the
+standard SDSS pipelines (the ones used in SDSS DR7 and DR8).
 
-The results described here are available for the Northern Galactic Cap
-portion of the SDSS DR7 imaging using a simple on-line
-interface.\footnote{\tt http://sdss.physics.nyu.edu/mosaic/}. In
-addition, calibrated field images with the sky subtracted according to
-these images are being released with the SDSS DR8. {\bf describe both}
+Third, we compare to the only other publicly available mosaicking and
+background subtraction facility for SDSS that we are aware of, the
+Montage tool distributed by IRSA (\citealt{berriman03a}). We compare
+their methodology to ours in \S\ref{sec:mosaic}, concluding that their
+background subtraction procedure in principle could be superior to
+ours, but that their ``drizzle'' approximation to interpolation is
+could cause errors for PSF photometry. In \S\ref{sec:psfs}, we
+demonstrate that the PSF photometry is indeed very slightly degraded
+relative to the original SDSS photometry for Montage mosaics. In
+\S\ref{sec:simplegal}, we compare our bright galaxy photometry to that
+from Montage images, finding excellent agreement.
 
-The only other publicly available mosaicking and background
-subtraction facility for SDSS that we are aware of is the results of
-the Montage package distributed by IRSA (\citealt{berriman03a}). We
-compare their methodology to ours in \S\ref{sec:mosaic}, concluding
-that their background subtraction procedure in principle could be
-superior to ours, but that their ``drizzle'' approximation to
-interpolation is likely to cause errors for PSF photometry. In
-\S\ref{sec:psfs}, we demonstrate that the PSF photometry is indeed
-degraded relative to the original SDSS photometry for Montage
-mosaics. In \S\ref{sec:simplegal}, we compare our bright galaxy
-photometry to that from Montage images, finding good agreement.  As we
-describe below, these problems are likely not fundamental to the
-Montage background subtraction method.
+The results described here are available on a field-by-field basis
+through the SDSS DR8.\footnote{\tt http://www.sdss3.org/dr8.php} A
+previous version of the results, for DR7, is also still
+available\footnote{\tt http://sdss.physics.nyu.edu/mosaic/}.
 
 \section{A model fit to the SDSS sky background}
 \label{sec:model}
@@ -225,9 +219,9 @@ Montage background subtraction method.
 \subsection{The SDSS imaging data}
 \label{sec:data}
 
-The SDSS has taken $ugriz$ CCD imaging of $>10^4~\mathrm{deg^2}$ of
-the sky \citep{york00a,abazajian09a}.  Automated software performs all
-of the data processing: astrometry \citep{pier03a}; source
+The SDSS has taken $ugriz$ CCD imaging of $14,555~\mathrm{deg^2}$ of
+the sky \citep{york00a,agol11a}.  Automated software performs all of
+the data processing: astrometry \citep{pier03a}; source
 identification, deblending and photometry \citep{lupton01a};
 photometricity determination \citep{hogg01a}; and calibration
 \citep{fukugita96a,smith02a, padmanabhan07b}.
@@ -236,8 +230,8 @@ As \citet{gunn05a} describe, the SDSS focal plane has 30 imaging CCDs
 evenly spaced (with gaps) across it, six ``camcols'' of each filter
 ($u$, $g$, $r$, $i$ and $z$). Each exposure is taken in drift scan
 mode, such that a point in the sky passes through each CCD
-sequentially with a gap of a minute or so.  The native pixel scale on
-the CCDs is approximately 0.396 arcsec; when we refer to pixels in
+sequentially with a gap of 72 seconds or so.  The native pixel scale
+on the CCDs is approximately 0.396 arcsec; when we refer to pixels in
 this paper it is this native scale we will mean. When we discuss these
 images, we will refer to the position in the scan direction as the
 ``pixel row'' or $y$, and the position perpendicular to the scan
@@ -430,7 +424,7 @@ subsequently using {\tt bzip2} to losslessly compress the result. For
 the sky-subtracted images, the 10th binary digit is considerably
 smaller than the noise in any image, meaning that although overall
 this compression is slightly lossy, it has no significant effect on
-the results --- even if these images are combined in stack
+the results --- even if these images are combined in a stack
 (\citealt{pricewhelan10a}).  Subsequent HDUs in each image yield the
 sky-subtraction and calibration image, so that the sky can be added
 back in and the image put back into counts if so desired. Full details
@@ -510,6 +504,10 @@ non-interactive method is explained in the documentation.  In either
 case, the user is returned FITS format images in each desired
 bandpass, with correct WCS headers, sky-subtracted and calibrated. The
 units of the images are nanomaggies per pixel.
+
+Note that we have not yet produced any such mosaics of the area imaged
+in SDSS-III's new imaging in the South Galactic Cap. However, the
+standard DR8 data release tools do provide mosaicking tools.
 
 \subsection{Comparison to Montage}
 
