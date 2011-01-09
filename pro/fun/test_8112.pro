@@ -1,17 +1,17 @@
-pro dr8_examples
+pro test_8112
 
 common com_dr8_examples, run
 
 rootdir= '/global/data/scr/mb144/dr8_examples'
 setenv, 'PHOTO_SKY=/global/data/scr/mb144/sky'
 
-names=[ 'ngc604', 'm33']
+names=[ 'testsky3', 'testsky2', 'testsky1']
 
-ra= [23.638292,  23.4620417D]
+ra= [23.772, 23.72807, 23.43134]
      
-dec= [  30.7848892, 30.6602222D]
+dec= [  30.884, 30.46762, 30.294]
 
-size= [1.2, 1.2]
+size= [0.1, 0.1, 0.1]
 
 if(n_elements(run) eq 0) then begin
     window_read, flist=flist
@@ -19,7 +19,7 @@ if(n_elements(run) eq 0) then begin
     run= (uniqtag(flist[ikeep], 'run')).run
 endif
 
-for i=1, n_elements(ra)-1L do begin
+for i=2, n_elements(ra)-1L do begin
     subdir= rootdir+'/'+names[i]
     prefix= names[i]
     

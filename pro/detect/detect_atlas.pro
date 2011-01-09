@@ -23,14 +23,33 @@
 ;-
 ;------------------------------------------------------------------------------
 pro detect_atlas, galex=galex, noclobber=noclobber
-  
+
+;; default to use base name same as directory name
+spawn, 'pwd', cwd
+base=(file_basename(cwd))[0]
+
+imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+if (keyword_set(galex) gt 0) then begin
+    imfiles=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd']+'.fits.gz'
+endif 
+allthere=1
+for i=0L, n_elements(imfiles)-1L do $
+   if(file_test(imfiles[i]) eq 0) then $
+      allthere=0
+if(allthere eq 0) then begin
+   splog, 'No image files for '+base
+   return
+endif
+
 dparents_atlas, galex=galex, noclobber=noclobber
 
 dpsf_atlas, galex=galex, noclobber=noclobber
 
-dstargal_atlas, /plot
+dstargal_atlas
 
 dchildren_atlas, noclobber=noclobber
+
+heap_gc
 
 end
 ;------------------------------------------------------------------------------

@@ -71,9 +71,9 @@ ycen_orig=long(ycen)
 
 if(NOT keyword_set(in_invvar)) then begin
    sig=dsigma(in_image)
-   invvar=fltarr(nx,ny)+1./sig^2
+   in_invvar2=fltarr(nx,ny)+1./sig^2
 endif else begin
-   invvar=in_invvar
+   in_invvar2=in_invvar
 endelse
 
 xlo_orig=(xcen_orig-nn/2L)
@@ -93,6 +93,9 @@ nfy=yhi-ylo+1L
 image=fltarr(nn, nn)
 image[xoff:xoff+nfx-1L, yoff:yoff+nfy-1L]= $
   in_image[xlo:xhi, ylo:yhi]
+invvar=fltarr(nn, nn)
+invvar[xoff:xoff+nfx-1L, yoff:yoff+nfy-1L]= $
+  in_invvar2[xlo:xhi, ylo:yhi]
 psf=fltarr(nn, nn)
 psf[xoff:xoff+nfx-1L, yoff:yoff+nfy-1L]= $
   in_psf[npx/2L-nn/2L+xoff:npx/2L-nn/2L+xoff+nfx-1, $

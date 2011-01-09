@@ -12,7 +12,7 @@ pro gather_fake_measure, name
 
 dirs= file_search('/global/data/scr/mb144/skyfake/'+name+'/'+name+'-*', $
                   /test_dir)
-dirs=dirs[0:104]
+;;dirs=dirs[0:175]
 
 for i=0L, n_elements(dirs)-1L do begin
     subdir= dirs[i]
@@ -43,8 +43,8 @@ for i=0L, n_elements(dirs)-1L do begin
         if(n_tags(tmp_measure) gt 0) then begin
             tmp_measure= struct_addtags(tmp_measure, {num:long(num)})
             
-            acat=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+pstr+ $
-                            '-acat.fits',1)
+            acat=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-acat-'+$
+                            pstr+'.fits',1)
             nkeep=0
             
             if(n_tags(acat) gt 0) then $

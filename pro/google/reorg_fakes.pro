@@ -27,7 +27,7 @@ for i=0L, n_elements(files)-1L do begin
     outfile=outdir+'/'+name+'/'+name+'-'+num+'/'+ $
       name+'-'+num+'-'+band+'.fits'
     im= mrdfits(infile, 0, hdr)
-    ivar= mrdfits(infile, 2, hdr)
+    ivar= mrdfits(infile, 2)
     ;;ivar= im*0.+1./dsigma(im,sp=4)^2
     mwrfits, im, outfile, hdr,/create
     mwrfits, ivar, outfile

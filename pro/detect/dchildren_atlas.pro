@@ -15,8 +15,11 @@
 ;     atlases/#/[base]-acat-#.fits - catalog of children
 ;     atlases/#/[base]-parent-#.fits - parent images
 ;     atlases/#/[base]-ivar-#.fits - inverse var images
-;     atlases/#/[base]-atlas-#.fits - atlas images
-;     atlases/#/[base]-templates-#.fits - template images
+;     atlases/#/[base]-#-atlas-#.fits - atlas images
+;     atlases/#/[base]-#-templates-#.fits - template images
+; BUGS:
+;   Current version ONLY works if template is used from 
+;   same band every time.
 ; REVISION HISTORY:
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
@@ -55,6 +58,9 @@ nimages=ptrarr(nim)
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
   strtrim(string(iparent),2)+'-sgset.fits'
 sgset= mrdfits(sgsetfile, 1)
+
+if(sgset.ngals eq 0) then $
+  return
 
 ;; file for input images
 nimfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+ $
@@ -103,6 +109,9 @@ for k=0L, nim-1L do begin
       adxy, thdr, acat.racen, acat.deccen, xgals, ygals
       dtemplates, timage, xgals, ygals, templates=curr_templates, $
                   sersic=sersic, ikept=ikept
+      acat=acat[ikept]
+      xgals= xgals[ikept]
+      ygals= ygals[ikept]
       
       splog, 'Smoothing templates ...'
       for i=0L, n_elements(acat)-1L do begin

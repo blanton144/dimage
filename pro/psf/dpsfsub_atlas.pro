@@ -30,7 +30,7 @@ function dpsfsub_atlas, imbase=imbase, image=image, ivar=ivar, psf=psf, $
                         nstars=nstars, exx=xex, exy=yex, exr=rex
 
 if(keyword_set(nsigma) eq 0) then $
-   nsigma=10.
+   nsigma=20.
 
 ;; sanity checks and inputs
 if(keyword_set(image) eq 0 AND $
@@ -57,30 +57,37 @@ if(nix ne nx OR niy ne ny) then $
    message, 'IMAGE must be same size as IVAR'
 
 ;; find stars
+nstars=0
 if(keyword_set(inout_x) eq 0 OR keyword_set(inout_y) eq 0) then begin
    simplexy, image, xc, yc
-   drefine, image, xc, yc, xr=x, yr=y
-   chi2= dpsfselect_atlas(image, ivar, x, y, psf=psf, dof=dof)
-   inex= bytarr(n_elements(x))
-   if(n_elements(rex) gt 0) then begin
-      inex= sqrt((x-xex)^2+(y-yex)^2) lt rex
+   if(n_elements(xc) gt 0) then begin
+      drefine, image, xc, yc, xr=x, yr=y
+      chi2= dpsfselect_atlas(image, ivar, x, y, psf=psf, dof=dof)
+      inex= bytarr(n_elements(x))
+      if(n_elements(rex) gt 0) then begin
+         inex= sqrt((x-xex)^2+(y-yex)^2) lt rex
+      endif
+      istar= where(chi2 lt dof+nsigma*sqrt(2.*dof) AND inex eq 0, nstars)
+      if(nstars eq 0) then begin
+         return, image
+      endif 
+      x=x[istar]
+      y=y[istar]
+      inout_x= x
+      inout_y= y
    endif
-   istar= where(chi2 lt dof+nsigma*sqrt(2.*dof) AND inex eq 0, nstars)
-   if(nstars eq 0) then begin
-      return, image
-   endif 
-   x=x[istar]
-   y=y[istar]
-   inout_x= x
-   inout_y= y
 endif else begin
    if(n_elements(inout_x) ne n_elements(inout_y)) then $
       message, 'X and Y must have same dimensions'
-   xc= inout_x
-   yc= inout_y
-   nstars= n_elements(xc)
-   drefine, image, xc, yc, xr=x, yr=y
+   if(n_elements(inout_x) gt 0) then begin
+      xc= inout_x
+      yc= inout_y
+      nstars= n_elements(xc)
+      drefine, image, xc, yc, xr=x, yr=y
+   endif 
 endelse 
+if(nstars eq 0) then $
+   return, image
 flux=fltarr(nstars)
 
 ;; find approximate PSF size

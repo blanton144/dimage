@@ -53,13 +53,31 @@ ny=(size(image,/dim))[1]
 
 ;; set a bunch of parameters
 if(nx lt box OR ny lt box) then begin
-    message, 'image too small!'
+   nfound=0
+endif else begin
+   ;; find peaks and estimate flux in simple way
+   simage= dsmooth(image, 1.5)
+   simplexy, image, x, y
+   nfound=n_elements(x)
+endelse
+
+;; if no peaks!
+if(nfound eq 0) then begin
+   xx=findgen(natlas)#replicate(1.,natlas)+0.5
+   yy=transpose(findgen(natlas)#replicate(1.,natlas))+0.5
+   radius2=(xx-float(natlas)/2.)^2+(yy-float(natlas)/2.)^2
+   sigma=1.4/0.396
+   bpsf= exp(-0.5*radius2/sigma^2)
+   bpsf=bpsf/total(bpsf)
+   
+   mkhdr, hdr, 4, [natlas,natlas], /extend
+   sxaddpar, hdr, 'NPSFSTAR', long(0), $
+             ' number of stars used in the PSF'
+   mwrfits, float(reform(bpsf,natlas,natlas)), base+'-bpsf.fits', hdr, /create
+   return
+   
 endif
 
-;; find peaks and estimate flux in simple way
-simage= dsmooth(image, 1.5)
-simplexy, image, x, y
-nfound=n_elements(x)
 flux= simage[x,y]
 isort= reverse(sort(flux))
 x=x[isort]
@@ -95,10 +113,12 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
    chi2=dpsfselect_atlas(image, ivaruse, x, y, psf=bpsf, $
                          flux=flux, dof=dof, /noclip)
    istar = where(chi2 lt dof+rejsigma[iter]*sqrt(2.*dof),nstar)
-   
-   keep= bytarr(nfound)
-   nstar= (nstar<(nfound<maxnstar))
-   keep[istar[0L:nstar-1L]]=1
+
+   if(nstar ne 0) then begin
+       keep= bytarr(nfound)
+       nstar= (nstar<(nfound<maxnstar))
+       keep[istar[0L:nstar-1L]]=1
+   endif
 
 endfor
 

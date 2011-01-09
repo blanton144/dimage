@@ -51,10 +51,14 @@ retval=call_external(soname, 'idl_simplexy', $
                      long(npeaks))
 
 if(npeaks gt 0) then begin
-    x=x[0:npeaks-1]
-    y=y[0:npeaks-1]
-    flux=flux[0:npeaks-1]
-endif
+   x=x[0:npeaks-1]
+   y=y[0:npeaks-1]
+   flux=flux[0:npeaks-1]
+endif else begin
+   delvarx, x
+   delvarx, y
+   delvarx, flux
+endelse
 
 end
 ;------------------------------------------------------------------------------

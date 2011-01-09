@@ -13,13 +13,14 @@
 ;-
 pro detect_fakes, name
 
-dirs= file_search('/global/data/scr/mb144/skyfake/'+name+'/*')
+dirs= file_search('/global/data/scr/mb144/skyfake/'+name+'/*', /test_dir)
 
-for i=0L, n_elements(dirs)-1L do begin
+for i=208L, n_elements(dirs)-1L do begin
     cd, dirs[i]
-    detect, /cen, glim=10., gsmooth=4., plim=10.,/nogalex, $
-      pbuffer=0.5, /nostarim, maxnstar=15L
-    dmeasure_multi, dirs[i]
+    if(dirs[i] ne '/global/data/scr/mb144/skyfake/fake-004/fake-004-1184') then begin
+        detect_atlas 
+        dmeasure_atlas
+    endif
 endfor
 
 end

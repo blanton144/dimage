@@ -60,14 +60,18 @@ rr=sqrt((xx-ncx*0.5)^2+(yy-ncy*0.5)^2)
 
 cenpsf= psf[xst:xnd, yst:ynd]
 
-cmodel=fltarr(7,ncx*ncy)
+cmodel=fltarr(11,ncx*ncy)
 cmodel[0,*]=reform(cenpsf/max(psf), ncx*ncy)
 cmodel[1,*]=cc
 cmodel[2,*]=xx
 cmodel[3,*]=yy
-cmodel[4,*]=xx*xx
-cmodel[5,*]=yy*yy
+cmodel[4,*]=xx^2
+cmodel[5,*]=yy^2
 cmodel[6,*]=xx*yy
+cmodel[7,*]=xx^3
+cmodel[8,*]=xx^2*yy
+cmodel[9,*]=xx*yy^2
+cmodel[10,*]=yy^3
 
 amp=fltarr(n_elements(x))
 flux=fltarr(n_elements(x))

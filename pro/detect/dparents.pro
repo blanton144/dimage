@@ -139,13 +139,18 @@ endfor
 ;; do general object detection
 dobjects, images, object=oimage, plim=plim, puse=puse, fobject=fobject, $
   seed=seed
-mwrfits, fobject, base+'-pimage.fits', /create
+mwrfits, fobject, base+'-pimage.fits', *hdrs[ref], /create
 for k=0L, nim-1L do begin
     mwrfits, *oimage[k], base+'-'+strtrim(string(k),2)+'-pimage.fits', $
       *hdrs[k], /create
 endfor
 
-if(max(fobject) eq -1) then return
+if(max(fobject) eq -1) then begin
+   heap_free, images
+   heap_free, ivars
+   heap_free, hdrs
+   return
+endif
 
 nfx= (size(fobject,/dim))[0]
 nfy= (size(fobject,/dim))[1]
@@ -160,7 +165,12 @@ spawn, 'mkdir -p parents'
 obj_st=0L
 obj_nd= max(fobject)
 if(keyword_set(cenonly)) then begin
-    if(fcen eq -1) then return
+    if(fcen eq -1) then begin
+       heap_free, images
+       heap_free, ivars
+       heap_free, hdrs
+       return
+    endif
     obj_st=fcen
     obj_nd=fcen
 endif
@@ -247,6 +257,10 @@ for iobj=obj_st, obj_nd do begin
 endfor
 
 mwrfits, pcat, base+'-pcat.fits', /create
+
+heap_free, images
+heap_free, ivars
+heap_free, hdrs
 
 end
 ;------------------------------------------------------------------------------

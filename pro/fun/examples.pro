@@ -19,7 +19,7 @@ for i=0L, n_elements(names)-1L do begin
     cd, outdir
     if(file_test(name+'-z.fits.gz') eq 0 OR $
        keyword_set(clobber) gt 0) then $
-      smosaic_make, ra, dec, size, size, rerun=137, /global, $
+      smosaic_make, ra, dec, size, size, rerun=301, /global, $
       /dropweights, prefix=name, /ignoreframesstatus, $
       minscore=0.5, /processed
     simple_jpg, name= name+'.full.jpg'

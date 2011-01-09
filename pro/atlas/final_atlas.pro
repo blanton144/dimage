@@ -26,7 +26,7 @@ combine=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits',1)
 iminfo=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_iminfo.fits',1)
 velmod=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_velmod.fits',1)
 
-ikeep= where(iminfo.run gt 0, nkeep)
+ikeep= where(iminfo.run gt 0 and iminfo.score ge 0.5, nkeep)
 combine=combine[ikeep]
 iminfo=iminfo[ikeep]
 velmod=velmod[ikeep]
