@@ -51,7 +51,7 @@ ref=2L
 if (keyword_set(galex) gt 0) then begin
     imfiles=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd']+'.fits.gz'
     puse=long([1,1,1,1,1,0,0])
-    dopsf=long([1,1,1,1,1,1,0])
+    dopsf=long([1,1,1,1,1,0,0])
     ref=2L
 endif 
 

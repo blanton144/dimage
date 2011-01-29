@@ -22,7 +22,8 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect_atlas, galex=galex, noclobber=noclobber
+pro detect_atlas, galex=galex, noclobber=noclobber, nsigma=nsigma, glim=glim, $
+                  gsmooth=gsmooth
 
 ;; default to use base name same as directory name
 spawn, 'pwd', cwd
@@ -45,7 +46,7 @@ dparents_atlas, galex=galex, noclobber=noclobber
 
 dpsf_atlas, galex=galex, noclobber=noclobber
 
-dstargal_atlas
+dstargal_atlas, nsigma=nsigma, glim=glim, gsmooth=gsmooth
 
 dchildren_atlas, noclobber=noclobber
 

@@ -47,7 +47,7 @@ if(iparent eq -1) then return
 
 ;; read in pset
 pset= mrdfits(base+'-pset.fits',1)
-imfiles=pset.imfiles
+imfiles=strtrim(pset.imfiles,2)
 puse=pset.puse
 nim= n_elements(imfiles)
 nx=lonarr(nim)
@@ -150,11 +150,11 @@ for k=0L, nim-1L do begin
       ny ne tny[kuse]) then begin
       splog, 'Mapping templates ...'
       extast, hdr, k_ast
-      extast, hdrs[kuse], kuse_ast
+      extast, *hdrs[kuse], kuse_ast
       ctemplates=fltarr(nx, ny, n_elements(acat))
       for i=0L, n_elements(acat)-1L do begin
          tmp_template=fltarr(nx, ny)
-         smosaic_remap, (*templates[k])[*,*,i], kuse_ast, k_ast, $
+         smosaic_remap, (*templates[kuse])[*,*,i], kuse_ast, k_ast, $
                         refimage=tmp_template
          ctemplates[*,*,i]=tmp_template
       endfor

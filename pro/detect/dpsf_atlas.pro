@@ -31,15 +31,22 @@ base=(file_basename(cwd))[0]
 
 ;; read in pset
 pset= mrdfits(base+'-pset.fits',1)
-imfiles=pset.imfiles
+imfiles=strtrim(pset.imfiles,2)
 
 ;; fit for psf (creates bpsf and vpsf files)
 nim=n_elements(imfiles)
 seed_psf=seed0+1L+lindgen(nim)
-for k=0L, nim-1L do $
-  if(pset.dopsf[k]) then $
-  dfitpsf_atlas, imfiles[k], natlas=natlas, $
-                 seed=seed_psf[k]
+for k=0L, nim-1L do begin
+    if(pset.dopsf[k]) then begin
+        dfitpsf_atlas, imfiles[k], natlas=natlas, $
+          seed=seed_psf[k] 
+    endif else begin
+        mm= strmid(imfiles[k], strlen(base))
+        bname= (stregex(mm, '-(.*)\.fits.*', /sub, /extr))[1]
+        file_copy, getenv('DIMAGE_DIR')+'/data/psf/psf-'+bname+'.fits', $
+          base+'-'+bname+'-bpsf.fits', /over
+    endelse
+endfor
 
 end
 ;------------------------------------------------------------------------------

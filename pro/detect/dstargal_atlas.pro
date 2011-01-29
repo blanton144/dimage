@@ -15,12 +15,14 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dstargal_atlas, plot=plot
+pro dstargal_atlas, plot=plot, gsmooth=gsmooth, glim=glim, gsaddle=gsaddle, $
+                    nsigma=nsigma
 
 if(NOT keyword_set(ref)) then ref=2L
 if(NOT keyword_set(gsmooth)) then gsmooth=10.
 if(NOT keyword_set(glim)) then glim=25.
 if(NOT keyword_set(gsaddle)) then gsaddle=50.
+if(NOT keyword_set(nsigma)) then nsigma=20.
 if(NOT keyword_set(maxnstar)) then maxnstar=3000L
 
 ;; default to use base name same as directory name
@@ -40,7 +42,7 @@ sgset={base:base, $
 
 ;; read in pset
 pset= mrdfits(base+'-pset.fits',1)
-imfiles=pset.imfiles
+imfiles=strtrim(pset.imfiles,2)
 puse=pset.puse
 nim= n_elements(imfiles)
 nx=lonarr(nim)
@@ -90,7 +92,7 @@ adxy, *hdrs[ref], raex, decex, xex, yex
 nimages[ref]= ptr_new(dpsfsub_atlas(image=*images[ref], ivar=*ivars[ref], $
                                     psf=*psfs[ref], x=xstar_r, y=ystar_r, $
                                     flux=fluxstar_r, nstars=nstars, exx=xex, $
-                                    exy=yex, exr=1.5))
+                                    exy=yex, exr=1.5, nsigma=nsigma))
 if(nstars gt 0) then begin
    xyad, *hdrs[ref], xstar_r, ystar_r, ra_stars, dec_stars
    fluxstar= fltarr(n_elements(fluxstar_r), nim)

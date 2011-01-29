@@ -394,7 +394,7 @@ COMPILE_OPT hidden
 
 common com_dexplore_widget
 
-if(n_tags(acat)) then begin
+if(n_tags(acat) gt 0) then begin
     if(ng gt 0) then begin
         phdr=(*parent_hdrs[band])
         adxy, phdr, acat[ig].racen, acat[ig].deccen, xcen, ycen
@@ -408,6 +408,7 @@ if(n_tags(acat)) then begin
         atv2xyouts, xcen, ycen, isstr, align=0.8, charsize=1.7
     endif
 endif
+
 end
 
 function dexplore_child_display_widget, ev
