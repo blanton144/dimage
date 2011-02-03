@@ -17,6 +17,9 @@ $(NAME).pdf: $(NAME).dvi
 $(NAME).dvi: $(NAME).tex $(NAME)_figures.tex $(NAME)_tables.tex $(BIB)/ccpp.bib
 	latex $(NAME); bibtex $(NAME); latex $(NAME); latex $(NAME)
 
+clean:
+	rm -f *.pdf *.dvi 
+
 fullclean:
 	rm -f *.pdf *.log *.dvi *.aux *.bbl *.blg
 
