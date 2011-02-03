@@ -142,7 +142,53 @@ Montage images are significantly degraded.}
 \begin{figure}
 \figurenum{\fignum}
 \epsscale{1.00}
-%\plotone{r_offsets.ps}
-\caption{\label{fig:r_offsets} }
+\plotone{dr8_offsets_fakedist.model.ps}
+\caption{\label{fig:fakedist} Distribution of $r$-band measured
+  half-light sizes and magnitudes for our fake galaxy sample (circles)
+  and for real SDSS galaxies (greyscale and contours). The two
+  distributions follow each other well, but our fake sample is roughly
+  size-limited at $r_{50} \sim 6$ arcsec.}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{1.00}
+\plotone{sky_offsets_ronly.model.ps}
+\caption{\label{fig:sky_offsets_ronly} Errors in half-light radii $r_{50}$
+  (top panel) and magnitudes (bottom panel) in the $r$-band, as a
+  function of true galaxy $r_{50}$. The open circles show standard
+  SDSS catalog photometry from the DR8 version of the pipeline; the
+  DR7 version is similar but slightly worse. The filled circles show
+  photometry and deblending using the methods described in this paper.
+  The open squares show the photometry of the fake galaxies assuming
+  perfect deblending.  The thick lines are running medians for each
+  distribution. The thin lines are the smooth fit given by Equation
+  \ref{eq:sky_offsets_model}, with parameters listed in Table
+  \ref{table:sky_offsets}.}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{1.00}
+\plotone{sky_offsets_ugiz.model.ps}
+\caption{\label{fig:sky_offsets_ugiz} Similar to Figure
+  \ref{fig:sky_offsets_ronly}, but showing errors in colors with respect to
+  $r$, using the $u$, $g$, $i$ and $z$ bands.}
+\end{figure}
+
+\clearpage
+\stepcounter{thefigs}
+\begin{figure}
+\figurenum{\fignum}
+\epsscale{1.00}
+\plotone{sky_offsets_vs_r50meas.model.ps}
+\caption{\label{fig:sky_offsets_vs_r50meas} Similar to Figure
+  \ref{fig:sky_offsets_ronly}, but showing errors $r$-band magnitude against
+  the measured value of $r_{50}$ rather than the true value. The
+  dotted line shows the functional form given by \citet{hyde09a}.}
 \end{figure}
 
