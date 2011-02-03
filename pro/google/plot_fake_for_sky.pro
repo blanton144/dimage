@@ -25,8 +25,9 @@ djs_oplot, xpos, ypos, th=6, color=color
 
 end
 ;
-pro plot_band, name, pobj, pobjv56, rfake, cfake, num, topaxis=topaxis, bottomaxis=bottomaxis, $
-               diff=diff, nomu=nomu, nomag=nomag, nor50=nor50, yra=yra
+pro plot_band, name, pobj, pobjv56, rfake, cfake, num, topaxis=topaxis, $
+               bottomaxis=bottomaxis, diff=diff, nomu=nomu, nomag=nomag, $
+               nor50=nor50, yra=yra
 
 common com_compare_reruns, atlas, im, m1, m2
 
@@ -69,8 +70,8 @@ if(NOT keyword_set(nor50)) then begin
       djs_plot, alog10(rr50), roffset, psym=8, symsize=0.4, $
                 xtitle='!6log_{10} !8r_{50}!6 (arcsec)!6', $
                 ytitle='!6\Deltam_'+name+' (mag)!6', $
-                yra=yra, xra=alog10([3.5, 119.] ), /nodata, /left, topaxis=topaxis, $
-                bottomaxis=bottomaxis
+                yra=yra, xra=alog10([3.5, 419.] ), /left, topaxis=topaxis, $
+                bottomaxis=bottomaxis, color='green'
       djs_oplot, alog10(rr50), proffset, psym=8, symsize=csize, color='red'
       djs_oplot, alog10(rr50), p56roffset, psym=8, symsize=csize, color='blue'
       plot_running_median,  alog10(rr50), proffset, !X.CRANGE, 0.3, 100, color='red'
@@ -214,7 +215,7 @@ if(keyword_set(model)) then begin
    pobj[idev].petroth50= pobj[idev].theta_exp
 endif
 
-k_print, filename=getenv('DIMAGE_DIR')+'/tex/dr8_offsets_fakedist'+postfix+'.ps'
+k_print, filename=getenv('DIMAGE_DIR')+'/tex/sky_offsets_fakedist'+postfix+'.ps'
 
 ii= where(atlas.petroth50[2] gt 1. and atlas.petroflux[2] gt 1., nii)
 help,ii
@@ -232,7 +233,7 @@ djs_oplot, alog10(pobjv56[ii].petroth50[2]), $
 
 k_end_print
 
-k_print, filename=getenv('DIMAGE_DIR')+'/tex/dr8_offsets_ronly'+postfix+'.ps'
+k_print, filename=getenv('DIMAGE_DIR')+'/tex/sky_offsets_ronly'+postfix+'.ps'
 
 !P.MULTI=[2,1,2]
 !Y.MARGIN=0
@@ -261,7 +262,7 @@ plot_band, 'r', pobj, pobjv56, rfake, rfake, 2, /bottom, /nomu, /nomag, $
 
 k_end_print
 
-k_print, filename=getenv('DIMAGE_DIR')+'/tex/dr8_offsets'+postfix+'.ps'
+k_print, filename=getenv('DIMAGE_DIR')+'/tex/sky_offsets'+postfix+'.ps'
 
 !P.MULTI=[15,3,5]
 !X.MARGIN=0
@@ -277,7 +278,7 @@ plot_band, 'z', pobj, pobjv56, rfake, zfake, 4, /bottom
 
 k_end_print
 
-k_print, filename=getenv('DIMAGE_DIR')+'/tex/dr8_offsets_diff'+postfix+'.ps'
+k_print, filename=getenv('DIMAGE_DIR')+'/tex/sky_offsets_diff'+postfix+'.ps'
 
 !P.MULTI=[15,3,5]
 !X.MARGIN=0

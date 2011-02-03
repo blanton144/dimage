@@ -104,7 +104,7 @@ for i=0L, 4L do begin
     med=median(ratio[i,ii])
 
     hogg_scatterplot, mag[i,*], ratio[i,*], xnpix=50, ynpix=20, $
-              xra=[13.6, 22.1], yra=[0.79, 1.21], xcharsize=xcharsize, $
+              xra=[13.6, 22.1], yra=[0.69, 1.31], xcharsize=xcharsize, $
               ycharsize=ycharsize, xtitle=xtitle, ytitle=ytitle, $ 
               title=title, charsize=2.5, /cond, quant=[0.16, 0.5, 0.84], $
               exp=0.45, satfrac=0.001
@@ -113,12 +113,13 @@ for i=0L, 4L do begin
     yst= !Y.CRANGE[0]+0.82*(!Y.CRANGE[1]-!Y.CRANGE[0])
     djs_xyouts, xst, yst, '!8'+bands[i]+'!6'
 
+    xst= !X.CRANGE[0]+0.14*(!X.CRANGE[1]-!X.CRANGE[0])
     limitstr= '('+strtrim(string(long(limits[0,i])),2)+'<'+bands[i]+'<'+ $
               strtrim(string(long(limits[1,i])),2)+')'
-    yst= !Y.CRANGE[0]+0.24*(!Y.CRANGE[1]-!Y.CRANGE[0])
+    yst= !Y.CRANGE[0]+0.82*(!Y.CRANGE[1]-!Y.CRANGE[0])
     djs_xyouts, xst, yst, '!8\sigma'+limitstr+' = '+ $
                 strtrim(string(f='(f40.3)', sig),2)
-    yst= !Y.CRANGE[0]+0.08*(!Y.CRANGE[1]-!Y.CRANGE[0])
+    yst= !Y.CRANGE[0]+0.66*(!Y.CRANGE[1]-!Y.CRANGE[0])
     djs_xyouts, xst, yst, '!8\Delta'+limitstr+' = '+ $
                 strtrim(string(f='(f40.3)', med),2)
 
