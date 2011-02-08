@@ -5,24 +5,20 @@
 \clearpage
 \stepcounter{thetabs}
 \begin{deluxetable}{llllll}
-\tablewidth{0pt}
-\tablecolumns{6}
-\tablenum{\tabnum}
-\tablecaption{\label{table:sky_offsets} Fits to residual sizes and fluxes}
-\tablehead{ Quantity & Sky version & $a_0$ & $a_1$ & $a_2$ &
-  $\sigma_a$ }
-\startdata
-\input{sky_offsets_tablebody.tex}
-\enddata
-\tablecomments{Parameters are defined in Equation
+\tablewidth{0pt} \tablecolumns{6} \tablenum{\tabnum}
+\tablecaption{\label{table:sky_offsets} Fits to residual sizes and
+  fluxes} \tablehead{ Quantity & Sky version & $a_0$ & $a_1$ & $a_2$ &
+  $\sigma_a$ } \startdata \input{sky_offsets_tablebody.tex} \enddata
+\tablecomments{Listed parameters refer to Equation
   \ref{eq:sky_offsets_model}. Magnitude offsets are in units of
   magnitudes.  Half-light radius offsets are in units of dex. Results
   labeled {\tt v5\_4} are appropriate for the SDSS DR7
   catalog. Results labeled {\tt v5\_6} are appropriate for SDSS DR8
   catalog. Results labeled ``global'' are appropriate for the
   sky-subtraction and deblending analysis described in this
-  paper. These fits are appropriate between a true $r_{50}$ of 5 and 100
-  arcsec, or in the case of the last three rows a measured $r_{50}$ of
-  5 and 40 arcsec.}
+  paper. These fits are appropriate between a true $r_{50}$ of 5 and
+  100 arcsec, or in the case of the last three rows a measured
+  $r_{50}$ of 5 and 40 arcsec. See \S\ref{sec:endtoend} for more
+  information.}
 \end{deluxetable}
 
