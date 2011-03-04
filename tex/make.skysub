@@ -14,7 +14,8 @@ $(NAME).pdf: $(NAME).dvi
 	ps2pdf $(NAME).ps
 	rm $(NAME).ps
 
-$(NAME).dvi: $(NAME).tex $(NAME)_figures.tex $(NAME)_tables.tex $(BIB)/ccpp.bib
+$(NAME).dvi: $(NAME).tex $(NAME)_figures.tex $(NAME)_tables.tex $(BIB)/ccpp.bib \
+   sky_offsets_tablebody.tex
 	latex $(NAME); bibtex $(NAME); latex $(NAME); latex $(NAME)
 
 clean:
