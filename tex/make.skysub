@@ -15,7 +15,7 @@ $(NAME).pdf: $(NAME).dvi
 	rm $(NAME).ps
 
 $(NAME).dvi: $(NAME).tex $(NAME)_figures.tex $(NAME)_tables.tex $(BIB)/ccpp.bib \
-   sky_offsets_tablebody.tex
+   sky_offsets_tablebody.model.tex west_params.tex west_params.model.tex
 	latex $(NAME); bibtex $(NAME); latex $(NAME); latex $(NAME)
 
 clean:

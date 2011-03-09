@@ -96,7 +96,7 @@ subtraction on the photometry of large galaxies by inserting fake
 galaxies into the raw pixels, reanalyzing the data, and measuring them
 after background subtraction.  Our technique results in no
 size-dependent bias in galaxy fluxes up to half-light radii $r_{50}
-\sim 100$ arcsec; in contrast, for those sized galaxies the standard
+\sim 100$ arcsec; in contrast, for galaxies of that size the standard
 SDSS photometric catalog underestimates fluxes by about 1.5 mag. Our
 results represent a substantial improvement over the standard SDSS
 catalog results and should form the basis of any analysis of nearby
@@ -197,24 +197,25 @@ images in three ways.  First, we compare aperture photometry of point
 sources to the standard SDSS aperture photometry, to quantify how much
 degradation our mosaicking procedure and sky subtraction have
 introduced.
-
 Second, we insert fake bright galaxies into the raw data and reanalyze
 the data completely.  We then compare our background subtracted
 mosaicked images to the original fake data to evaluate the fidelity of
 our procedure. We also evaluate the performance of two versions of the
 standard SDSS pipelines (the ones used in SDSS DR7 and DR8).
-
 Third, we compare to the only other publicly available mosaicking and
 background subtraction facility for SDSS that we are aware of, the
-Montage tool distributed by IRSA (\citealt{berriman03a}). We compare
-their methodology to ours in \S\ref{sec:mosaic}, concluding that their
-background subtraction procedure in principle could be superior to
-ours, but that their ``drizzle'' approximation to interpolation could
-cause errors for PSF photometry. In \S\ref{sec:psfs}, we demonstrate
-that the PSF photometry is indeed degraded relative to the original
-SDSS photometry for Montage mosaics, but only very slightly. In
-\S\ref{sec:simplegal}, we compare our bright galaxy photometry to that
-from Montage images, finding excellent agreement.
+Montage tool distributed by IRSA (\citealt{berriman03a}); for bright
+galaxies we find excellent agreement. 
+
+%We compare their methodology to ours in \S\ref{sec:mosaic},
+%concluding that their background subtraction procedure in principle
+%could be superior to ours, but that their ``drizzle'' approximation
+%to interpolation could cause errors for PSF photometry. In
+%\S\ref{sec:psfs}, we demonstrate that the PSF photometry is indeed
+%degraded relative to the original SDSS photometry for Montage
+%mosaics, but only very slightly. In \S\ref{sec:simplegal}, we compare
+%our bright galaxy photometry to that from Montage images, finding
+%excellent agreement.
 
 In \S\ref{sec:summary}, we summarize. The results described here are
 available on a field-by-field basis in the SDSS DR8 data
@@ -815,6 +816,12 @@ The errors in color shown in Figure \ref{fig:sky_offsets_ugiz} are
 much smaller, though there are detectable trends in $u$ and $z$. Table
 \ref{table:sky_offsets} also lists the fits to the color residuals.
 
+We also investigated these residuals as a function of galaxy area
+(that is, $\pi r_{50}^2 (b/a)$, where $b/a$ is the axis ratio), as
+advocated by \citet{west10a}. There was little substantial reduction
+in the scatter in these residuals, and qualitatively the results were
+very similar.
+
 We emphasize that for the primary SDSS spectroscopic sample at $z\sim
 0.1$ the issue is not nearly as dire as it appears in this plot ---
 only the largest such galaxies have $r_{50}\sim 10$--20 arcsec, for
@@ -849,10 +856,13 @@ $\sigma_a$ is about a factor of two smaller, which probably results
 from a smaller dependence of the errors on the \Sersic\ index and axis
 ratio of the galaxies.
 
+\subsection{Comparison to previous results}
+\label{sec:comparison}
+
 \citet{hyde09a} found similar results to what we find here, but for
 elliptical galaxies. For comparison to their results, Figure
 \ref{fig:sky_offsets_vs_r50meas} shows the magnitude errors of {\tt
-  photo} {\tt v5\_6} in the $r$-band, as a function of the measure
+  photo} {\tt v5\_6} in the $r$-band, as a function of the measured
 $r_{50}$ (not the true value).  Again, the lines show the running
 median and the fit. The dotted line shows the parametrization of the
 error given by \citet{hyde09a}. At small sizes it is in good agreement
@@ -862,7 +872,60 @@ profiles. The solid points in Figure \ref{fig:sky_offsets_vs_r50meas}
 indicate fake galaxies with \Sersic\ index $n>3.5$, which follow much
 better the results of \citet{hyde09a}.
 
-\subsection{Direct comparison to Montage}
+\citet{west10a} also explored these issues, but for a broader
+distribution of galaxy types.  They published a fitting function based
+on the SDSS catalog axis ratios, 90\% light radii, and magnitudes
+(their Equation 1). They predict the flux ``lost'' in the standard
+reductions $f_{\mathrm{lost}} = f_{\mathrm{meas}} - f_{\mathrm{true}}$
+(in nanomaggies). In this context, both $f_{\mathrm{meas}}$ and
+$f_{\mathrm{true}}$ are standard SDSS Petrosian fluxes
+(\citealt{blanton01a, stoughton02a}).  \citet{west10a} suggest the
+simple form:
+\begin{equation}
+\label{eq:west}
+\log_{10} f_{\mathrm{lost}} = 
+b_0 + 
+b_1 \log_{10} m_r + 
+b_2 \log_{10} r_{90} + 
+b_3 \log_{10} b/a,
+\end{equation}
+where $m_r$, $r_{90}$ and $b/a$ are the Petrosian quantities reported
+by the SDSS catalog. We have refit the parameters of this model to our
+simulated data.  Table \ref{table:west} lists the values of the
+parameters of this fit, for both versions of {\tt photo} studied here,
+and evaluating the flux lost in both the Petrosian and cModel
+estimates.
+
+We demonstrate the quality of fit for this formula in Figure
+\ref{fig:sky_offsets_vs_west}, showing the actual flux lost relative
+to the predicted value. The open circles show results for the DR7
+version of the photometry ({\tt photo v5\_4}) whereas the filled
+circles show results for the DR8 version of the photometry ({\tt photo
+  v5\_6}).  The predictions perform excellently on DR7 data.  However,
+for DR8 data there is greater scatter.  We find a correlation between
+the scatter and $m_r$ that the simple function above fails to explain;
+in particular, the outliers below the relation are typically galaxies
+with $m_r<15$.  These differences are likely due to the DR8 photometry
+being slightly better in the large size, high flux regime
+(\citealt{aihara11a}).
+
+The coefficients for Equation \ref{eq:west} derived by \citet{west10a}
+are not directly comparable to those in Table \ref{table:west}. Their
+comparison only measured the flux lost due to sky subtraction alone,
+and did not include the effects of {\tt photo}'s deblending. Our
+comparison is to the {\tt photo} catalog itself and therefore includes
+the effects of deblending.  It turns out that in the SDSS pipeline
+results, a substantial function of the lost flux is due to effects of
+poor deblending. Therefore, the coefficients found here would be most
+applicable to an actual SDSS photometric catalog sample.
+
+However, we do not necessarily recommend using these formulae for
+robust determinations of fluxes for bright and/or large galaxies ---
+reanalyzing properly background subtracted images is clearly a better
+route.  However, they are excellent ways to determine when such
+effects are important in the SDSS catalog.
+
+\subsection{Direct comparison to Montage} 
 \label{sec:galmontage}
 
 As another test, we have also taken a sample of nearby bright galaxies
@@ -906,6 +969,9 @@ release. Users can acquire individual sky subtracted and calibrated
 fields, as well as request large-scale mosaics in FITS format.
 
 \acknowledgments
+
+We thank Richard Cool, David Hogg, Rachel Mandelbaum, Michael Strauss,
+and Andrew West for discussions of the methods and results found here.
 
 The authors acknowledge funding support from NASA grants
 06-GALEX06-0030, NNX09AC85G and NNX09AC95G, and \emph{Spitzer} grant
