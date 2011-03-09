@@ -85,7 +85,7 @@ sigma= djsig(y-ymodel)
 
 end
 ;
-pro plot_band, name, pobj, pobjv56, rfake, cfake, num, topaxis=topaxis, bottomaxis=bottomaxis, $
+pro plot_band, stamps, name, pobj, pobjv56, rfake, cfake, num, topaxis=topaxis, bottomaxis=bottomaxis, $
                yra=yra, leftaxis=leftaxis, rightaxis=rightaxis, xcharsize=xcharsize, $
                ycharsize=ycharsize, fmeas=fmeas, vsmeas=vsmeas, xmeas=xmeas, xra=xra, unit=unit
 
@@ -137,7 +137,7 @@ endif else begin
                              (fake1[long(fmeas.num)].flux95_stamp/0.95)) 
 endelse
 
-rr50= rfake[iok].r50*0.396
+rr50= rfake[iok].r50*0.396*sqrt(stamps[iok].axisratio)
 pr50= pobjv56[iok].petroth50[2]
 if(keyword_set(vsmeas)) then $
    rr50=pr50
@@ -223,13 +223,15 @@ endif
 
 end
 ;;
-pro plot_for_sky_paper, model=model
+pro plot_for_sky_paper, model=model, ax=ax
 
 common com_compare_reruns, im, atlas
 
 postfix=''
 if(keyword_set(model)) then $
-   postfix='.model'
+   postfix=postfix+'.model'
+if(keyword_set(ax)) then $
+   postfix=postfix+'.ax'
 
 if(n_tags(im) eq 0) then begin
     imfile= '/global/data/vagc-dr7/vagc2/object_sdss_imaging.fits'
@@ -247,12 +249,15 @@ gfake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_g_000.fits',1)
 rfake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_r_000.fits',1)
 ifake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_i_000.fits',1)
 zfake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_z_000.fits',1)
-stamps= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_stamps_003.fits',1)
+stamps= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_stamps_info_003.fits',1)
+if(NOT keyword_set(ax)) then $
+   stamps.axisratio=1.
+stamp_measure= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_stamps_measure_003.fits',1)
 pobj= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_photo_003.fits',1)
 pobjv56= mrdfits(getenv('DIMAGE_DIR')+'/data/skytest/pobj_fake_lsb_v5.6.3.fits',1)
 fmeas= mrdfits('/global/data/scr/mb144/skyfake/fake-004/fake-004-measure.fits',1)
 
-openw, unit, getenv('DIMAGE_DIR')+'/tex/sky_offsets_tablebody.tex', /get_lun
+openw, unit, getenv('DIMAGE_DIR')+'/tex/sky_offsets_tablebody'+postfix+'.tex', /get_lun
 
 if(keyword_set(model)) then begin
    pobj.petroflux= pobj.cmodelflux
@@ -292,39 +297,42 @@ k_print, filename=getenv('DIMAGE_DIR')+'/tex/sky_offsets_ronly'+postfix+'.ps'
 
 ii= where(pobj.petroth50[2] gt 1. and pobj.petroflux[2] gt 1. and $
           rfake.r50 gt 0., nii)
+r50c= rfake[ii].r50*0.396*sqrt(stamps[ii].axisratio)
 r50= rfake[ii].r50*0.396
 delr= alog10(pobj[ii].petroth50[2]/r50)
 
 ii= where(pobjv56.petroth50[2] gt 1. and pobjv56.petroflux[2] gt 1. and $
           rfake.r50 gt 0., nii)
+r50v56c= rfake[ii].r50*0.396*sqrt(stamps[ii].axisratio)
 r50v56= rfake[ii].r50*0.396
 delrv56= alog10(pobjv56[ii].petroth50[2]/r50v56)
 
+r50measc=(rfake[fmeas.num].r50*0.396*sqrt(stamps[ii].axisratio))
 r50meas=(rfake[fmeas.num].r50*0.396)
 delrmeas= alog10(((fmeas.sersic_r50*0.396)>0.001)/r50meas)
 
 hogg_usersym, 10
-djs_plot, alog10(r50v56), delrv56, psym=8, color='blue', xra=alog10([3.5, 119.]), $
+djs_plot, alog10(r50v56c), delrv56, psym=8, color='blue', xra=alog10([3.5, 119.]), $
           /left, symsize=0.45, ytitle='!6\Delta(log_{10}!8r_{50})!6', $
           yra=[-0.99, 0.17]
 
 hogg_usersym, 3
-djs_oplot, alog10(r50meas), delrmeas, psym=8, color='black', symsize=0.45
+djs_oplot, alog10(r50measc), delrmeas, psym=8, color='black', symsize=0.45
 
 ;;plot_running_median, alog10(r50),delr, !X.CRANGE, 0.3, 100, color='red'
-plot_running_median, alog10(r50v56),delrv56, !X.CRANGE, 0.3, 100, color='blue'
-plot_running_median, alog10(r50meas),delrmeas, !X.CRANGE, 0.3, 100, color='black'
+plot_running_median, alog10(r50v56c),delrv56, !X.CRANGE, 0.3, 100, color='blue'
+plot_running_median, alog10(r50measc),delrmeas, !X.CRANGE, 0.3, 100, color='black'
 
-calc_running_median, alog10(r50),delr, !X.CRANGE, 0.3, 100, xpos, ypos, npos
-calc_running_median, alog10(r50v56),delrv56, !X.CRANGE, 0.3, 100, xpos56, ypos56, npos56
-calc_running_median, alog10(r50meas),delrmeas, !X.CRANGE, 0.3, 100, xposmeas, yposmeas, nposmeas
+calc_running_median, alog10(r50c),delr, !X.CRANGE, 0.3, 100, xpos, ypos, npos
+calc_running_median, alog10(r50v56c),delrv56, !X.CRANGE, 0.3, 100, xpos56, ypos56, npos56
+calc_running_median, alog10(r50measc),delrmeas, !X.CRANGE, 0.3, 100, xposmeas, yposmeas, nposmeas
 
 fit_running_median, xpos, ypos, npos, pars
 fit_running_median, xpos56, ypos56, npos56, pars56
 fit_running_median, xposmeas, yposmeas, nposmeas, parsmeas
 
 model= fit_running_median_model(xpos, pars)
-sigma_running_median, alog10(r50), delr, xpos, pars, sigma
+sigma_running_median, alog10(r50c), delr, xpos, pars, sigma
 printf, unit, '$r_{50}$ & \texttt{v5\_4} & $'+strtrim(string(f='(f40.3)', pars[0]),2)+'$ & $'+ $
        strtrim(string(f='(f40.3)', pars[1]),2)+'$ & $'+ $
        strtrim(string(f='(f40.3)', pars[2]),2)+'$ & $'+ $
@@ -332,7 +340,7 @@ printf, unit, '$r_{50}$ & \texttt{v5\_4} & $'+strtrim(string(f='(f40.3)', pars[0
 
 model56= fit_running_median_model(xpos56, pars56)
 djs_oplot, xpos56, model56, color='blue'
-sigma_running_median, alog10(r50v56), delrv56, xpos56, pars56, sigma56
+sigma_running_median, alog10(r50v56c), delrv56, xpos56, pars56, sigma56
 printf, unit, ' & \texttt{v5\_6} & $'+strtrim(string(f='(f40.3)', pars56[0]),2)+'$ & $'+ $
        strtrim(string(f='(f40.3)', pars56[1]),2)+'$ & $'+ $
        strtrim(string(f='(f40.3)', pars56[2]),2)+'$ & $'+ $
@@ -340,13 +348,13 @@ printf, unit, ' & \texttt{v5\_6} & $'+strtrim(string(f='(f40.3)', pars56[0]),2)+
 
 modelmeas= fit_running_median_model(xposmeas, parsmeas)
 djs_oplot, xposmeas, modelmeas, color='black'
-sigma_running_median, alog10(r50meas), delrmeas, xposmeas, parsmeas, sigmameas
+sigma_running_median, alog10(r50measc), delrmeas, xposmeas, parsmeas, sigmameas
 printf, unit, ' & global & $'+strtrim(string(f='(f40.3)', parsmeas[0]),2)+'$ & $'+ $
        strtrim(string(f='(f40.3)', parsmeas[1]),2)+'$ & $'+ $
        strtrim(string(f='(f40.3)', parsmeas[2]),2)+'$ & $'+ $
        strtrim(string(f='(f40.3)', sigmameas),2)+'$\cr'
 
-plot_band, 'm_r', pobj, pobjv56, rfake, rfake, 2, /bottom, yra=[-0.59, 2.29], $
+plot_band, stamps, 'm_r', pobj, pobjv56, rfake, rfake, 2, /bottom, yra=[-0.59, 2.29], $
            fmeas=fmeas, unit=unit
 
 !P.MULTI=0
@@ -379,13 +387,13 @@ k_print, filename=getenv('DIMAGE_DIR')+'/tex/sky_offsets_ugiz'+postfix+'.ps'
 
 hogg_usersym, 3
 
-plot_band, '(u-r)', pobj, pobjv56, rfake, ufake, [0,2], /left, $
+plot_band, stamps, '(u-r)', pobj, pobjv56, rfake, ufake, [0,2], /left, $
            xch=1.2, ych=1.2, fmeas=fmeas, yra=[-0.69, 0.69], unit=unit
-plot_band, '(g-r)', pobj, pobjv56, rfake, gfake, [1,2], /right, $
+plot_band, stamps, '(g-r)', pobj, pobjv56, rfake, gfake, [1,2], /right, $
            xch=1.2, ych=1.2, fmeas=fmeas, yra=[-0.69, 0.69], unit=unit
-plot_band, '(r-i)', pobj, pobjv56, rfake, ifake, [2,3], /bottom, /left, $
+plot_band, stamps, '(r-i)', pobj, pobjv56, rfake, ifake, [2,3], /bottom, /left, $
            xch=1.2, ych=1.2, fmeas=fmeas, yra=[-0.69, 0.69], unit=unit
-plot_band, '(r-z)', pobj, pobjv56, rfake, zfake, [2,4], /bottom, /right, $
+plot_band, stamps, '(r-z)', pobj, pobjv56, rfake, zfake, [2,4], /bottom, /right, $
            xch=1.2, ych=1.2, fmeas=fmeas, yra=[-0.69, 0.69], unit=unit
 
 !P.MULTI=0
@@ -417,7 +425,7 @@ k_print, filename=getenv('DIMAGE_DIR')+'/tex/sky_offsets_vs_r50meas'+postfix+'.p
 
 hogg_usersym, 3
 
-plot_band, 'm_r', pobj, pobjv56, rfake, rfake, 2, /bottom, /left, $
+plot_band, stamps, 'm_r', pobj, pobjv56, rfake, rfake, 2, /bottom, /left, $
            xch=1.2, ych=1.2, fmeas=fmeas, /vsmeas, $
            xra=alog10([3.5, 40.]), unit=unit, yra=[-0.59, 2.29]
 
@@ -428,6 +436,7 @@ djs_oplot, alog10(r_curve), hyde_curve, th=6, color='red', linest=1
 k_end_print
 
 free_lun, unit
+
 
 
 end

@@ -25,7 +25,7 @@ djs_oplot, xpos, ypos, th=6, color=color
 
 end
 ;
-pro plot_band, name, pobj, pobjv56, rfake, cfake, num, topaxis=topaxis, bottomaxis=bottomaxis, $
+pro plot_band, stamps, name, pobj, pobjv56, rfake, cfake, num, topaxis=topaxis, bottomaxis=bottomaxis, $
                diff=diff, nomu=nomu, nomag=nomag, nor50=nor50, yra=yra
 
 common com_compare_reruns, atlas, im, m1, m2
@@ -57,7 +57,8 @@ proffset= -2.5*alog10((pobj[iok].petroflux[num])/(cfake[iok].flux95_stamp/0.95))
 p56roffset= -2.5*alog10((pobjv56[iok].petroflux[num])/(cfake[iok].flux95_stamp/0.95))
 pvroffset= -2.5*alog10((pobjv56[iok].petroflux[num])/(pobj[iok].petroflux[num]))
 
-rr50= rfake[iok].r50*0.396
+help, rfake, stamps
+rr50= stamps[iok].r50*0.396*sqrt(stamps[iok].axisratio)
 pr50= pobjv56[iok].petroth50[2]
 rmag= 22.5-2.5*alog10(rfake[iok].flux95_stamp/0.95)
 pmag= 22.5-2.5*alog10(pobjv56[iok].petroflux[2])
@@ -67,10 +68,10 @@ pmu50= pmag+2.5*alog10(2.0*!DPI*pr50^2)
 if(NOT keyword_set(nor50)) then begin
    if(NOT keyword_set(diff)) then begin
       djs_plot, alog10(rr50), roffset, psym=8, symsize=0.4, $
-                xtitle='!6log_{10} !8r_{50}!6 (arcsec)!6', $
-                ytitle='!6\Deltam_'+name+' (mag)!6', $
-                yra=yra, xra=alog10([3.5, 119.] ), /nodata, /left, topaxis=topaxis, $
-                bottomaxis=bottomaxis
+        xtitle=textoidl('!6log_{10}!8[r_{50}!6 (b/a)^{1/2}]!6 (arcsec)'), $
+        ytitle='!6\Deltam_'+name+' (mag)!6', $
+        yra=yra, xra=alog10([3.5, 119.] ), /nodata, /left, topaxis=topaxis, $
+        bottomaxis=bottomaxis
       djs_oplot, alog10(rr50), proffset, psym=8, symsize=csize, color='red'
       djs_oplot, alog10(rr50), p56roffset, psym=8, symsize=csize, color='blue'
       plot_running_median,  alog10(rr50), proffset, !X.CRANGE, 0.3, 100, color='red'
@@ -197,7 +198,7 @@ gfake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_g_000.fits',1)
 rfake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_r_000.fits',1)
 ifake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_i_000.fits',1)
 zfake= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_lsb_v5.6.3_z_000.fits',1)
-stamps= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_stamps_003.fits',1)
+stamps= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_stamps_info_003.fits',1)
 pobj= mrdfits(getenv('DIMAGE_DIR')+'/data/fake/fake_photo_003.fits',1)
 pobjv56= mrdfits(getenv('DIMAGE_DIR')+'/data/skytest/pobj_fake_lsb_v5.6.3.fits',1)
 
@@ -220,10 +221,10 @@ ii= where(atlas.petroth50[2] gt 1. and atlas.petroflux[2] gt 1., nii)
 help,ii
 hogg_scatterplot, alog10(atlas[ii].petroth50[2]), $
                   22.5-2.5*alog10(atlas[ii].petroflux[2]), $
-                  xtitle=textoidl('!6log_{10} !8r_{50}!6 (arcsec)'), $
-                  ytitle=textoidl('!8m_r!6'), xra=[0.1, 1.9], $
-                  yra=[10.1, 17.7], /internal, exp=0.5, xnpix=35, $
-                  ynpix=35, levels=[0.5, 0.75, 0.9, 0.95, 0.99]
+  xtitle=textoidl('!6log_{10} !8r_{50}!6 (arcsec)!6'), $
+  ytitle=textoidl('!8m_r!6'), xra=[0.1, 1.9], $
+  yra=[10.1, 17.7], /internal, exp=0.5, xnpix=35, $
+  ynpix=35, levels=[0.5, 0.75, 0.9, 0.95, 0.99]
 ii= where(pobjv56.petroth50[2] gt 1. and pobjv56.petroflux[2] gt 1., nii)
 hogg_usersym, 10, /fill
 djs_oplot, alog10(pobjv56[ii].petroth50[2]), $
@@ -241,22 +242,24 @@ hogg_usersym, 10, /fill
 
 ii= where(pobj.petroth50[2] gt 1. and pobj.petroflux[2] gt 1. and $
           rfake.r50 gt 0., nii)
+r50c= stamps[ii].r50*0.396*sqrt(stamps[ii].axisratio)
 r50= rfake[ii].r50*0.396
 delr= alog10(pobj[ii].petroth50[2]/r50)
-djs_plot, alog10(r50), delr, psym=8, color='red', xra=alog10([3.5, 119.]), $
+djs_plot, alog10(r50c), delr, psym=8, color='red', xra=alog10([3.5, 119.]), $
           /left, symsize=0.2, ytitle='!6\Delta(log_{10}!8r_{50})!6', $
           yra=[-0.95, 0.1]
 
 ii= where(pobjv56.petroth50[2] gt 1. and pobjv56.petroflux[2] gt 1. and $
           rfake.r50 gt 0., nii)
+r50v56c= stamps[ii].r50*0.396*sqrt(stamps[ii].axisratio)
 r50v56= rfake[ii].r50*0.396
 delrv56= alog10(pobjv56[ii].petroth50[2]/r50v56)
-djs_oplot, alog10(r50v56), delrv56, psym=8, color='blue', symsize=0.2
+djs_oplot, alog10(r50v56c), delrv56, psym=8, color='blue', symsize=0.2
 
-plot_running_median, alog10(r50),delr, !X.CRANGE, 0.3, 100, color='red'
-plot_running_median, alog10(r50v56),delrv56, !X.CRANGE, 0.3, 100, color='blue'
+plot_running_median, alog10(r50c),delr, !X.CRANGE, 0.3, 100, color='red'
+plot_running_median, alog10(r50v56c),delrv56, !X.CRANGE, 0.3, 100, color='blue'
 
-plot_band, 'r', pobj, pobjv56, rfake, rfake, 2, /bottom, /nomu, /nomag, $
+plot_band, stamps, 'r', pobj, pobjv56, rfake, rfake, 2, /bottom, /nomu, /nomag, $
            yra=[-0.29, 1.89]
 
 k_end_print
@@ -269,11 +272,11 @@ k_print, filename=getenv('DIMAGE_DIR')+'/tex/dr8_offsets'+postfix+'.ps'
 
 hogg_usersym, 10, /fill
 
-plot_band, 'u', pobj, pobjv56, rfake, ufake, 0, /top
-plot_band, 'g', pobj, pobjv56, rfake, gfake, 1
-plot_band, 'r', pobj, pobjv56, rfake, rfake, 2
-plot_band, 'i', pobj, pobjv56, rfake, ifake, 3
-plot_band, 'z', pobj, pobjv56, rfake, zfake, 4, /bottom
+plot_band, stamps, 'u', pobj, pobjv56, rfake, ufake, 0, /top
+plot_band, stamps, 'g', pobj, pobjv56, rfake, gfake, 1
+plot_band, stamps, 'r', pobj, pobjv56, rfake, rfake, 2
+plot_band, stamps, 'i', pobj, pobjv56, rfake, ifake, 3
+plot_band, stamps, 'z', pobj, pobjv56, rfake, zfake, 4, /bottom
 
 k_end_print
 
@@ -285,11 +288,11 @@ k_print, filename=getenv('DIMAGE_DIR')+'/tex/dr8_offsets_diff'+postfix+'.ps'
 
 hogg_usersym, 10, /fill
 
-plot_band, 'u', pobj, pobjv56, rfake, ufake, 0, /top, /diff
-plot_band, 'g', pobj, pobjv56, rfake, gfake, 1, /diff
-plot_band, 'r', pobj, pobjv56, rfake, rfake, 2, /diff
-plot_band, 'i', pobj, pobjv56, rfake, ifake, 3, /diff
-plot_band, 'z', pobj, pobjv56, rfake, zfake, 4, /bottom, /diff
+plot_band, stamps, 'u', pobj, pobjv56, rfake, ufake, 0, /top, /diff
+plot_band, stamps, 'g', pobj, pobjv56, rfake, gfake, 1, /diff
+plot_band, stamps, 'r', pobj, pobjv56, rfake, rfake, 2, /diff
+plot_band, stamps, 'i', pobj, pobjv56, rfake, ifake, 3, /diff
+plot_band, stamps, 'z', pobj, pobjv56, rfake, zfake, 4, /bottom, /diff
 
 k_end_print
 

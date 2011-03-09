@@ -14,9 +14,10 @@
 ;   4-Mar-2009 MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro montage_recal, prefix
+pro montage_recal, prefix, bands=bands
 
-bands=['u', 'g', 'r', 'i', 'z']
+if(keyword_set(bands) eq 0) then $
+   bands=['u', 'g', 'r', 'i', 'z']
 
 for iband=0L, n_elements(bands)-1L do begin
     filename= prefix+'-'+bands[iband]+'.fits'
@@ -24,7 +25,7 @@ for iband=0L, n_elements(bands)-1L do begin
     if(keyword_set(img) gt 0) then begin
      magzp= float(sxpar(hdr, 'MAGZP'))
      img=img*10.^(0.4*(22.5-magzp))
-     img= img-median(img)
+     img= float(img-median(img))
      mwrfits, img, filename, hdr, /create
      spawn, 'gzip -vf '+filename
     endif
