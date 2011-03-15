@@ -61,7 +61,7 @@ pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
          detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
          atlas_jpeg, noclobber=noclobber
          dmeasure_atlas, noclobber=noclobber
-         spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-v', '{}', ';']
+         spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']
      endif
  endfor
  
