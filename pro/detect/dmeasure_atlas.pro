@@ -153,7 +153,8 @@ if(keyword_set(pim)) then begin
                     mall.dflags[iband]= tmp_measure.dflags
                 endfor
                 
-                mwrfits, mall, mfile, /create
+                dhdr= dimage_hdr()
+                mwrfits, mall, mfile, dhdr, /create
                 spawn, 'gzip -vf '+mfile
             endif
 

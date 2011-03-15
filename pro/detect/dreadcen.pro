@@ -41,8 +41,8 @@ if(keyword_set(pim)) then begin
         postfix='-hand'
     endif
     
-    acat=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+pstr+ $
-                    '-acat.fits',1)
+    acat=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+ $
+                    '-acat-'+pstr+'.fits',1)
     nkeep=0
     
     if(n_tags(acat) gt 0) then $

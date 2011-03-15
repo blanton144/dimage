@@ -35,7 +35,7 @@ images=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd']+'.fits.gz'
 if(keyword_set(nogalex)) then $
   images=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz' 
 if(keyword_set(twomass)) then $
-  images=base+'-'+['J', 'H', 'K']+'.fits.gz' 
+  images=[images, base+'-'+['J', 'H', 'K']+'.fits.gz' ]
 
 dexplore_widget, base, images, lsb=lsb, twomass=twomass, $
   eyeball_name=eyeball_name, hidestars=hidestars, parent=icen, $

@@ -256,7 +256,8 @@ for iobj=obj_st, obj_nd do begin
     endfor
 endfor
 
-mwrfits, pcat, base+'-pcat.fits', /create
+dhdr=dimage_hdr()
+mwrfits, pcat, base+'-pcat.fits', dhdr, /create
 
 heap_free, images
 heap_free, ivars

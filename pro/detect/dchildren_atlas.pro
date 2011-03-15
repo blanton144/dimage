@@ -26,10 +26,7 @@
 ;------------------------------------------------------------------------------
 pro dchildren_atlas, noclobber=noclobber, galex=galex
 
-if(keyword_set(galex) eq 0 AND keyword_set(tuse) eq 0) then $
-   tuse=[2,2,2,2,2,2,2]
-if(keyword_set(tuse) eq 0) then $
-   tuse=[2,2,2,2,2]
+tref=2L
 subdir='atlases'
 sersic=1
 
@@ -48,6 +45,7 @@ if(iparent eq -1) then return
 ;; read in pset
 pset= mrdfits(base+'-pset.fits',1)
 imfiles=strtrim(pset.imfiles,2)
+tuse= replicate(tref, n_elements(imfiles))
 puse=pset.puse
 nim= n_elements(imfiles)
 nx=lonarr(nim)
@@ -197,7 +195,8 @@ endfor
 
 if(n_tags(acat) gt 0) then begin
    acat.good= total(acat.bgood, 1) gt 0
-   mwrfits, acat, acatfile, /create
+   dhdr= dimage_hdr()
+   mwrfits, acat, acatfile, dhdr, /create
 endif
 
 ;; free memory

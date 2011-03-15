@@ -153,7 +153,8 @@ endif
 ;; output star and galaxy info
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
   strtrim(string(iparent),2)+'-sgset.fits'
-mwrfits, sgset, sgsetfile, /create
+dhdr= dimage_hdr()
+mwrfits, sgset, sgsetfile, dhdr, /create
 
 if(keyword_set(plot)) then begin
    atv, *nimages[ref]

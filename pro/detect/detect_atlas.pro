@@ -23,7 +23,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro detect_atlas, galex=galex, noclobber=noclobber, nsigma=nsigma, glim=glim, $
-                  gsmooth=gsmooth
+                  gsmooth=gsmooth, twomass=twomass
 
 ;; default to use base name same as directory name
 spawn, 'pwd', cwd
@@ -31,7 +31,10 @@ base=(file_basename(cwd))[0]
 
 imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
 if (keyword_set(galex) gt 0) then begin
-    imfiles=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd']+'.fits.gz'
+    imfiles=[imfiles, base+'-'+['nd', 'fd']+'.fits.gz']
+endif 
+if (keyword_set(twomass) gt 0) then begin
+    imfiles=[imfiles, base+'-'+['J', 'H', 'K']+'.fits.gz']
 endif 
 allthere=1
 for i=0L, n_elements(imfiles)-1L do $
@@ -42,9 +45,9 @@ if(allthere eq 0) then begin
    return
 endif
 
-dparents_atlas, galex=galex, noclobber=noclobber
+dparents_atlas, galex=galex, twomass=twomass, noclobber=noclobber
 
-dpsf_atlas, galex=galex, noclobber=noclobber
+dpsf_atlas, noclobber=noclobber
 
 dstargal_atlas, nsigma=nsigma, glim=glim, gsmooth=gsmooth
 

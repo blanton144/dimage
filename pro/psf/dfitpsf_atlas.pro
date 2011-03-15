@@ -47,9 +47,16 @@ if(NOT keyword_set(base)) then $
 
 splog, 'Reading image '+imfile
 image=gz_mrdfits(imfile,/silent)
-invvar = gz_mrdfits(imfile,1,/silent)
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
+
+splog, 'Reading invvar '+imfile
+invvar = gz_mrdfits(imfile,1,/silent)
+if(NOT keyword_set(invvar)) then begin
+    splog, 'No invvar: estimating'
+    sig= dsigma(image, sp=10)
+    invvar= fltarr(nx,ny)+1./sig^2
+endif
 
 ;; set a bunch of parameters
 if(nx lt box OR ny lt box) then begin
@@ -73,6 +80,7 @@ if(nfound eq 0) then begin
    mkhdr, hdr, 4, [natlas,natlas], /extend
    sxaddpar, hdr, 'NPSFSTAR', long(0), $
              ' number of stars used in the PSF'
+   sxaddpar, hdr, 'DVERSION', dimage_version(), 'dimage version'
    mwrfits, float(reform(bpsf,natlas,natlas)), base+'-bpsf.fits', hdr, /create
    return
    
@@ -134,6 +142,7 @@ sxdelpar, hdr, 'COMMENT'
 sxdelpar, hdr, 'DATE'
 sxaddpar, hdr, 'NPSFSTAR', long(nkeep), $
           ' number of stars used in the PSF'
+sxaddpar, hdr, 'DVERSION', dimage_version(), 'dimage version'
 mwrfits, float(reform(bpsf, natlas, natlas)), base+'-bpsf.fits', hdr, /create
 
 if(keyword_set(check)) then  begin

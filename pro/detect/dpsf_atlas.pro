@@ -6,7 +6,6 @@
 ; CALLING SEQUENCE:
 ;   detect_parents
 ; OPTIONAL KEYWORDS:
-;   /galex - assume ugrizNF (N and F from GALEX)
 ;   /nolobber - do not overwrite previously PARENT files
 ; COMMENTS:
 ;   Requires dparents_atlas.pro to have been run
@@ -20,7 +19,7 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dpsf_atlas, galex=galex, noclobber=noclobber
+pro dpsf_atlas, noclobber=noclobber
   
 if(NOT keyword_set(seed0)) then seed0=11L ;; random seed
 if(NOT keyword_set(plim)) then plim=10. ;; for detecting parents
