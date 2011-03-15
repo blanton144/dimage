@@ -9,7 +9,8 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd
+pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
+                      noclobber=noclobber
 
   if(keyword_set(sdss)) then begin
       galex=0
@@ -35,6 +36,9 @@ pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd
   if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L
   nd= nd < (n_elements(atlas)-1)
   for i=st, nd do begin
+      
+     help, i
+
      subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
                          prefix=prefix, rootdir=rootdir, $
                          subname=subname)
@@ -54,9 +58,9 @@ pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd
        allthere=0
      
      if(allthere gt 0) then begin
-         detect_atlas, galex=galex, twomass=twomass
-         atlas_jpeg
-         dmeasure_atlas
+         detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
+         atlas_jpeg, noclobber=noclobber
+         dmeasure_atlas, noclobber=noclobber
      endif
  endfor
  

@@ -36,15 +36,19 @@ imfiles=strtrim(pset.imfiles,2)
 nim=n_elements(imfiles)
 seed_psf=seed0+1L+lindgen(nim)
 for k=0L, nim-1L do begin
-    if(pset.dopsf[k]) then begin
-        dfitpsf_atlas, imfiles[k], natlas=natlas, $
-          seed=seed_psf[k] 
-    endif else begin
-        mm= strmid(imfiles[k], strlen(base))
-        bname= (stregex(mm, '-(.*)\.fits.*', /sub, /extr))[1]
-        file_copy, getenv('DIMAGE_DIR')+'/data/psf/psf-'+bname+'.fits', $
-          base+'-'+bname+'-bpsf.fits', /over
-    endelse
+    mm= strmid(imfiles[k], strlen(base))
+    bname= (stregex(mm, '-(.*)\.fits.*', /sub, /extr))[1]
+    psffile= base+'-'+bname+'-bpsf.fits'
+    if(file_test(psffile) eq 0 OR $
+       keyword_set(noclobber) eq 0) then begin
+        if(pset.dopsf[k]) then begin
+            dfitpsf_atlas, imfiles[k], natlas=natlas, $
+              seed=seed_psf[k] 
+        endif else begin
+            file_copy, getenv('DIMAGE_DIR')+'/data/psf/psf-'+bname+'.fits', $
+              psffile, /over
+        endelse
+    endif
 endfor
 
 end

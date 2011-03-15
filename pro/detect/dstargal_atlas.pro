@@ -16,7 +16,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dstargal_atlas, plot=plot, gsmooth=gsmooth, glim=glim, gsaddle=gsaddle, $
-                    nsigma=nsigma
+                    nsigma=nsigma, noclobber=noclobber
 
 if(NOT keyword_set(ref)) then ref=2L
 if(NOT keyword_set(gsmooth)) then gsmooth=10.
@@ -28,17 +28,6 @@ if(NOT keyword_set(maxnstar)) then maxnstar=3000L
 ;; default to use base name same as directory name
 spawn, 'pwd', cwd
 base=(file_basename(cwd))[0]
-
-;; set up star and galaxy locations
-sgset={base:base, $
-       ref:ref, $
-       iparent:-1L, $
-       nstars:0L, $
-       ra_stars:dblarr(maxnstar), $
-       dec_stars:dblarr(maxnstar), $
-       ngals:0L, $
-       ra_gals:dblarr(maxnstar), $
-       dec_gals:dblarr(maxnstar) }
 
 ;; read in pset
 pset= mrdfits(base+'-pset.fits',1)
@@ -52,6 +41,17 @@ nimages=ptrarr(nim)
 ivars=ptrarr(nim)
 hdrs=ptrarr(nim)
 psfs=ptrarr(nim)
+
+;; set up star and galaxy locations
+sgset={base:base, $
+       ref:ref, $
+       iparent:-1L, $
+       nstars:0L, $
+       ra_stars:dblarr(maxnstar), $
+       dec_stars:dblarr(maxnstar), $
+       ngals:0L, $
+       ra_gals:dblarr(maxnstar), $
+       dec_gals:dblarr(maxnstar) }
 
 ;; find center object
 phdr=gz_headfits(base+'-r.fits')
@@ -68,6 +68,18 @@ if(iparent eq -1) then return
 ;; setup output directory
 subdir= 'atlases'
 spawn, /nosh, ['mkdir', '-p', subdir+'/'+strtrim(string(iparent),2)]
+
+sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
+  strtrim(string(iparent),2)+'-sgset.fits'
+if(file_test(sgsetfile) ne 0 AND $
+   keyword_set(noclobber) ne 0) then begin
+    nimfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+ $
+      '-nimage-'+strtrim(string(iparent),2)+'.fits'
+    if(file_test(nimfile) eq 0) then begin
+        message, 'sgset file exists, but not nimfile'
+    endif
+    return
+endif
 
 ;; read in the psf information
 for k=0L, nim-1L do begin

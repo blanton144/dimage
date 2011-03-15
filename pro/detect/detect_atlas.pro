@@ -49,7 +49,7 @@ dparents_atlas, galex=galex, twomass=twomass, noclobber=noclobber
 
 dpsf_atlas, noclobber=noclobber
 
-dstargal_atlas, nsigma=nsigma, glim=glim, gsmooth=gsmooth
+dstargal_atlas, nsigma=nsigma, glim=glim, gsmooth=gsmooth, noclobber=noclobber
 
 dchildren_atlas, noclobber=noclobber
 

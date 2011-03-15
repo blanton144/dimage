@@ -141,6 +141,7 @@ dobjects, images, object=oimage, plim=plim, puse=puse, fobject=fobject, $
   seed=seed
 mwrfits, fobject, base+'-pimage.fits', *hdrs[ref], /create
 for k=0L, nim-1L do begin
+    outhdr=
     mwrfits, *oimage[k], base+'-'+strtrim(string(k),2)+'-pimage.fits', $
       *hdrs[k], /create
 endfor

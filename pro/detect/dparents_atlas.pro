@@ -62,14 +62,19 @@ if (keyword_set(twomass) gt 0) then begin
     ref=2L
 endif 
 
-;; create pset structure
-pset={base:base, $
-      imfiles:imfiles, $
-      ref:ref, $
-      puse:puse, $
-      dopsf:dopsf}
-dhdr= dimage_hdr()
-mwrfits, pset, base+'-pset.fits', dhdr, /create
+if(keyword_set(noclobber) eq 0 OR $
+   file_test(base+'-pset.fits') eq 0) then begin
+    ;; create pset structure
+    pset={base:base, $
+          imfiles:imfiles, $
+          ref:ref, $
+          puse:puse, $
+          dopsf:dopsf}
+    dhdr= dimage_hdr()
+    mwrfits, pset, base+'-pset.fits', dhdr, /create
+endif else begin
+    pset= mrdfits(base+'-pset.fits',1)
+endelse
 
 ;; get parents (creates pcat, pimage, parents files)
 seed_parents=seed0
