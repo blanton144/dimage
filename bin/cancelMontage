@@ -1,0 +1,63 @@
+#!/usr/bin/python 
+
+#
+# Code to check if a Montage mosaic is available
+#
+# Usage:
+#   checkMontage
+#
+# MRB 2009-03-04 (based on getWiki)
+# 
+
+from TableParse import *
+import urllib, urllib2, sys, ClientForm, getopt, cookielib
+import datetime
+
+# Cookies are necessary to maintain connection during script.
+def SetupCookies():
+    "Enable cookies"
+    # taken from: http://www.voidspace.org.uk/python/articles/cookielib.shtml
+    cj = cookielib.LWPCookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    urllib2.install_opener(opener)
+
+# Logs into the Montage site
+def LoginMontage():
+    "Login the user."
+    SetupCookies()
+    url_login = "http://hachi.ipac.caltech.edu:8080/montage/mosaicLogin.html"
+    user = "mb144@nyu.edu"
+    passwd = "ooo2taf"
+    response = urllib2.urlopen(url_login)
+    forms = ClientForm.ParseResponse(response, backwards_compat=False)
+    form = forms[0]
+    form["user"] = user
+    form["passwd"] = passwd
+    urllib2.urlopen(form.click()).read()
+    response.close()
+
+# Main program
+def main(argv):
+    usage = "usage: " + sys.argv[0] + " <reqid>\n   reqid - request ID of mosaic call"
+    try:
+        opts, (reqid) = getopt.getopt(argv, "")
+    except:
+        print "Incorrect parameters."
+        print usage
+        sys.exit(2)
+
+    reqid=reqid[0]
+
+    LoginMontage()
+    
+    rstr=str(reqid)
+    url_request="http://hachi.ipac.caltech.edu:8080/romeInterrupt/?user=mb144%40nyu.edu&reqid="+reqid+"&deleteid="+reqid;
+    
+    #   Gets the form with the text of the page, grabs existing text
+    response = urllib2.urlopen(url_request)
+        
+#   Closes up shop
+    response.close()
+
+if __name__ == "__main__": 
+    main(sys.argv[1:])
