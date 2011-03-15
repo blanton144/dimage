@@ -141,7 +141,6 @@ dobjects, images, object=oimage, plim=plim, puse=puse, fobject=fobject, $
   seed=seed
 mwrfits, fobject, base+'-pimage.fits', *hdrs[ref], /create
 for k=0L, nim-1L do begin
-    outhdr=
     mwrfits, *oimage[k], base+'-'+strtrim(string(k),2)+'-pimage.fits', $
       *hdrs[k], /create
 endfor
@@ -250,10 +249,19 @@ for iobj=obj_st, obj_nd do begin
           first=1 $
         else $
           first=0
+        outhdr= hdr
+        if(NOT keyword_set(first)) then begin
+            sxdelpar, outhdr, 'SIMPLE'
+            sxdelpar, outhdr, 'EXTEND'
+            sxdelpar, outhdr, 'DATE'
+        endif
         mwrfits, iimage, 'parents/'+base+'-parent-'+ $
-          strtrim(string(iobj),2)+'.fits', hdr, create=first
+          strtrim(string(iobj),2)+'.fits', outhdr, create=first
+        sxdelpar, outhdr, 'SIMPLE'
+        sxdelpar, outhdr, 'EXTEND'
+        sxdelpar, outhdr, 'DATE'
         mwrfits, iivar, 'parents/'+base+'-parent-'+ $
-          strtrim(string(iobj),2)+'.fits', hdr
+          strtrim(string(iobj),2)+'.fits', outhdr
     endfor
 endfor
 

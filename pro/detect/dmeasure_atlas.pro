@@ -76,7 +76,11 @@ if(keyword_set(pim)) then begin
                 r_sersic=0
                 dsersic, rimage, rinvvar, xcen=xcen, ycen=ycen, sersic=r_sersic, $
                   /fixcen, /fixsky, model=model
-                mwrfits, model, sfile, hdr, /create
+                outhdr= hdr
+                sxdelpar, outhdr, 'XTENSION'
+                sxdelpar, outhdr, 'PCOUNT'
+                sxdelpar, outhdr, 'GCOUNT'
+                mwrfits, model, sfile, outhdr, /create
 
                 xyad, hdr, r_measure.xcen, r_measure.ycen, racen, deccen
                 
