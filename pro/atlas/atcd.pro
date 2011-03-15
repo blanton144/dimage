@@ -9,17 +9,31 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atcd, indx, subname=subname
+pro atcd, indx, name=name, subname=subname
 
-common com_atcd, atlas
+common com_atcd, atlas, iauname
 
-atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
 if(NOT keyword_set(subname)) then subname='detect'
+
+rootdir='/mount/hercules5/sdss/atlas/v0'
+atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
 
 if(n_tags(atlas) eq 0) then $
   atlas=mrdfits(atlasfile,1, /silent)
+if(n_elements(iauname) eq 0) then $
+  iauname= hogg_iau_name(atlas.ra, atlas.dec, '')
 
-rootdir='/mount/hercules5/sdss/atlas/v0'
+if(n_elements(indx) eq 0) then begin
+    if(keyword_set(name)) then begin
+        indx= where(iauname eq name, nindx)
+        if(nindx eq 0) then begin
+            splog, 'No such name '+name
+        endif
+    endif else begin
+        splog, 'Must specify INDX'
+    endelse
+endif
+
 subdir=image_subdir(atlas[indx].ra, atlas[indx].dec, $
                     prefix=prefix, rootdir=rootdir, $
                     subname=subname)

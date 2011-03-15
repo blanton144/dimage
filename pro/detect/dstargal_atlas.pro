@@ -140,6 +140,15 @@ ssig=dsigma(simage, sp=long(gsmooth*5.))
 saddle=gsaddle*ssig
 dpeaks, simage, xc=xc, yc=yc, sigma=ssig, minpeak=glim*ssig, npeaks=ngals, $
         /check, saddle= gsaddle, /refine
+
+;; if no galaxies found, let's just assume there is one at center
+if(ngals eq 0) then begin
+    ngals=1L
+    ra_gals=[raex]
+    dec_gals=[decex]
+    adxy, *hdrs[ref], ra_gals, dec_gals, xc, yc
+endif
+
 if(ngals gt 0) then begin
    xgals=float(xc)
    ygals=float(yc)
@@ -160,7 +169,7 @@ sgset.ngals= ngals
 if(ngals gt 0) then begin
    sgset.ra_gals[0:ngals-1]= ra_gals
    sgset.dec_gals[0:ngals-1]= dec_gals
-endif
+endif 
 
 ;; output star and galaxy info
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
