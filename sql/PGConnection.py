@@ -9,7 +9,7 @@ pg_db = {
 	'user'	: 'postgres', 
 	'password'	: '', 
 	'database'	: 'atlas', 
-	'host'	: 'localhost', 
+	'host'	: 'hercules', 
 	'port'	: 5432
 }
 

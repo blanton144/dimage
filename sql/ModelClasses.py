@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/python-2.7/bin/python
 
 from DatabaseConnection import DatabaseConnection
 
@@ -15,8 +15,12 @@ dbc = DatabaseConnection()
 # ========================
 Base = declarative_base(bind=dbc.engine)
 
-class galaxy(Base):
-	__tablename__ = 'galaxy'
+class atlas(Base):
+	__tablename__ = 'atlas'
+	__table_args__ = {'autoload' : True}
+
+class measure(Base):
+	__tablename__ = 'measure'
 	__table_args__ = {'autoload' : True}
 
 # =========================

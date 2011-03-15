@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/python-2.7/bin/python
 #
 
 import os
