@@ -12,6 +12,7 @@
 ;      $DIMAGE_DIR/data/atlas/alfalfa_atlas.fits
 ;      $DIMAGE_DIR/data/atlas/sixdf_atlas.fits
 ;      $DIMAGE_DIR/data/atlas/zcat_atlas.fits
+;      $DIMAGE_DIR/data/atlas/twodf_atlas.fits
 ;   and outputs:
 ;      $DIMAGE_DIR/data/atlas/atlas.fits
 ;   which has the contents:
@@ -38,6 +39,7 @@ atlas0={ra:0.D, dec:0.D, $
         isixdf:-1L, $
         ialfalfa:-1L, $
         izcat:-1L, $
+        itwodf:-1L, $
         mag:0., $
         z:0., $
         zsrc:' ', $
@@ -83,6 +85,17 @@ sixdf_atlas.z= sixdf.cz/299792.
 sixdf_atlas.zsrc= 'sixdf'
 sixdf_atlas.size= sixdf_size
 
+twodf=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/twodf_atlas.fits', 1)
+twodf_size= ((-0.1*(twodf.bjg-10.)+0.5) > 0.10) < 0.5
+twodf_atlas= replicate(atlas0, n_elements(twodf))
+twodf_atlas.ra= twodf.ra
+twodf_atlas.dec= twodf.dec
+twodf_atlas.itwodf= lindgen(n_elements(twodf))
+twodf_atlas.mag= twodf.bjsel
+twodf_atlas.z= twodf.z_helio
+twodf_atlas.zsrc= 'twodf'
+twodf_atlas.size= twodf_size
+
 alfalfa=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/alfalfa_atlas.fits', 1)
 alfalfa_size= 0.15
 alfalfa_atlas= replicate(atlas0, n_elements(alfalfa))
@@ -109,7 +122,8 @@ zcat_atlas.zsrc= 'zcat'
 zcat_atlas.size= zcat_size
 
 ;; first combine all RA/Decs into a unique list 
-all_atlas= [sdss_atlas, ned_atlas, zcat_atlas, alfalfa_atlas, sixdf_atlas]
+all_atlas= [sdss_atlas, ned_atlas, zcat_atlas, alfalfa_atlas, $
+            sixdf_atlas, twodf_atlas]
 ing= spheregroup(all_atlas.ra, all_atlas.dec, 3./3600., $
                  multg=multg, firstg=firstg, nextg=nextg)
 
@@ -147,6 +161,9 @@ for i=0L, ng-1L do begin
    iin= where(all_atlas[indx].isixdf ge 0, nin)
    if(nin gt 0) then $
       atlas[i].isixdf= all_atlas[indx[iin[0]]].isixdf
+   iin= where(all_atlas[indx].itwodf ge 0, nin)
+   if(nin gt 0) then $
+      atlas[i].itwodf= all_atlas[indx[iin[0]]].itwodf
 endfor
 
 mwrfits, atlas, getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits', /create

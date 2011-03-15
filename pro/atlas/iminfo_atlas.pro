@@ -16,14 +16,19 @@
 ;------------------------------------------------------------------------------
 pro iminfo_atlas
 
-atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits',1)
+common com_iminfo_atlas, atlas, flist, run
 
-flist= mrdfits(getenv('PHOTO_RESOLVE')+'/window_flist.fits',1)
-unif= mrdfits(getenv('PHOTO_RESOLVE')+'/window_unified.fits',1)
+if(n_tags(atlas) eq 0) then $
+  atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits',1)
+
+if(n_tags(flist) eq 0 or n_elements(run) eq 0) then begin
+    window_read, flist=flist
+    ikeep= where(flist.rerun eq '301' and flist.run ne 1473)
+    run= (uniqtag(flist[ikeep], 'run')).run
+endif
 
 ;; check what field, if any, it is in
-
-tmp_iminfo= sdss_findimage(atlas.ra, atlas.dec, rerun=301, /best)
+tmp_iminfo= sdss_findimage(atlas.ra, atlas.dec, rerun=301, /best, run=run)
 
 ;; add score to structure
 iminfo0= create_struct(tmp_iminfo[0], 'score', 0.)
@@ -39,6 +44,8 @@ if(nsdss gt 0) then begin
                                    /ignoreframesstatus)
 endif
 
+hdr=['']
+sxaddpar,hdr, 'TREE_DIR', getenv('TREE_DIR')
 mwrfits, iminfo, getenv('DIMAGE_DIR')+'/data/atlas/atlas_iminfo.fits', /create
 
 end

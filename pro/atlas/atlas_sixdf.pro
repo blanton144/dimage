@@ -1,6 +1,6 @@
 ;+
 ; NAME:
-;   sixdf_atlas
+;   atlas_sixdf
 ; PURPOSE:
 ;   Convert the 6dF file into an atlas-appropriate file
 ; CALLING SEQUENCE:
@@ -9,7 +9,7 @@
 ;   31-Jul-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro sixdf_atlas
+pro atlas_sixdf
 
 six= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sixdf/sixdf.fits', 1)
 
