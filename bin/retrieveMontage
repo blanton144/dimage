@@ -16,7 +16,9 @@ $reqid= $ARGV[0];
 $filename= $ARGV[1];
 
 $done=0;
-while(!$done) {
+$iter=0;
+$maxiter=30;
+while($done == 0 && $iter < $maxiter) {
 	print "Checking montage site ...\n";
 	open(fp,"checkMontage $reqid|");
 	$line= <fp>;
@@ -39,11 +41,18 @@ while(!$done) {
 	if($line eq "MONTAGE STATUS: ERROR\n") {
 		exit;
 	}
-	if(!$done) {
-		sleep 30;
+	if($line eq "MONTAGE STATUS: ABORT\n") {
+		exit;
 	}
+	if(!$done) {
+		sleep 8;
+	}
+
+	$iter++;
 }
 
 if($htmlbase) {
 	system("curl $htmlbase/mosaic.fits > $filename");
 }
+
+system("cancelMontage $reqid");
