@@ -73,7 +73,6 @@ endif else begin
         fitparam[8]=use_fitparam[8]
         model=model*use_fitparam[0]+addtemplate*use_fitparam[8]+use_fitparam[1]
     endif else begin
-;  why does this not work???
         mm=image-use_fitparam[1]
         bb=fltarr(2)
         aa=fltarr(2,2)

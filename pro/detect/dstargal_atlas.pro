@@ -30,7 +30,7 @@ spawn, 'pwd', cwd
 base=(file_basename(cwd))[0]
 
 ;; read in pset
-pset= mrdfits(base+'-pset.fits',1)
+pset= gz_mrdfits(base+'-pset.fits',1)
 imfiles=strtrim(pset.imfiles,2)
 puse=pset.puse
 nim= n_elements(imfiles)
@@ -71,11 +71,11 @@ spawn, /nosh, ['mkdir', '-p', subdir+'/'+strtrim(string(iparent),2)]
 
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
   strtrim(string(iparent),2)+'-sgset.fits'
-if(file_test(sgsetfile) ne 0 AND $
+if(gz_file_test(sgsetfile) ne 0 AND $
    keyword_set(noclobber) ne 0) then begin
     nimfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+ $
       '-nimage-'+strtrim(string(iparent),2)+'.fits'
-    if(file_test(nimfile) eq 0) then begin
+    if(gz_file_test(nimfile) eq 0) then begin
         message, 'sgset file exists, but not nimfile'
     endif
     return

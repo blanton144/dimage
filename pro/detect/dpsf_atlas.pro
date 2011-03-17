@@ -29,7 +29,7 @@ spawn, 'pwd', cwd
 base=(file_basename(cwd))[0]
 
 ;; read in pset
-pset= mrdfits(base+'-pset.fits',1)
+pset= gz_mrdfits(base+'-pset.fits',1)
 imfiles=strtrim(pset.imfiles,2)
 
 ;; fit for psf (creates bpsf and vpsf files)
@@ -39,7 +39,7 @@ for k=0L, nim-1L do begin
     mm= strmid(imfiles[k], strlen(base))
     bname= (stregex(mm, '-(.*)\.fits.*', /sub, /extr))[1]
     psffile= base+'-'+bname+'-bpsf.fits'
-    if(file_test(psffile) eq 0 OR $
+    if(gz_file_test(psffile) eq 0 OR $
        keyword_set(noclobber) eq 0) then begin
         if(pset.dopsf[k]) then begin
             dfitpsf_atlas, imfiles[k], natlas=natlas, $

@@ -43,7 +43,7 @@ iparent=pim[npx/2L, npy/2L]
 if(iparent eq -1) then return
 
 ;; read in pset
-pset= mrdfits(base+'-pset.fits',1)
+pset= gz_mrdfits(base+'-pset.fits',1)
 imfiles=strtrim(pset.imfiles,2)
 tuse= replicate(tref, n_elements(imfiles))
 puse=pset.puse
@@ -55,7 +55,7 @@ nimages=ptrarr(nim)
 ;; read in star and galaxy locations
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
   strtrim(string(iparent),2)+'-sgset.fits'
-sgset= mrdfits(sgsetfile, 1)
+sgset= gz_mrdfits(sgsetfile, 1)
 
 if(sgset.ngals eq 0) then $
   return

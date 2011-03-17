@@ -11,13 +11,8 @@
 ;   31-July-2010
 ;-
 ;------------------------------------------------------------------------------
-pro dmeasure_atlas, noclobber=noclobber, ref=ref, $
-                    scales=scales, nbands=nbands
+pro dmeasure_atlas, noclobber=noclobber
 
-if(n_elements(ref) eq 0) then ref=2L
-if(NOT keyword_set(nbands)) then nbands=5L
-if(n_elements(scales) eq 0) then $
-  scales= fltarr(nbands)+1.
 sub='atlases'
 postfix=''
 
@@ -25,6 +20,24 @@ spawn, /nosh, 'pwd', subdir
 subdir=subdir[0]
 
 prefix= file_basename(subdir)
+
+pset= gz_mrdfits(subdir+'/'+prefix+'-pset.fits',1)
+ref= (pset.ref)[0]
+nbands= n_elements(pset.imfiles)
+
+;; hack to find pixel scale
+pixscales= fltarr(nbands)
+for i=0L, nbands-1L do begin
+    hdr= headfits(strtrim(pset.imfiles[i],2))
+    nx= long(sxpar(hdr, 'NAXIS1'))
+    ny= long(sxpar(hdr, 'NAXIS2'))
+    ntest=10L
+    xyad, hdr, nx/2L, ny/2L, ra1, dec1
+    xyad, hdr, nx/2L+ntest, ny/2L, ra2, dec2
+    spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
+    pixscales[i]=d12/float(ntest)
+endfor
+scales= pixscales[ref]/pixscales
 
 phdr= gz_headfits(subdir+'/'+prefix+'-r.fits')
 pim= gz_mrdfits(subdir+'/'+prefix+'-pimage.fits',0)
@@ -76,6 +89,7 @@ if(keyword_set(pim)) then begin
                 r_sersic=0
                 dsersic, rimage, rinvvar, xcen=xcen, ycen=ycen, sersic=r_sersic, $
                   /fixcen, /fixsky, model=model
+
                 outhdr= hdr
                 sxdelpar, outhdr, 'XTENSION'
                 sxdelpar, outhdr, 'PCOUNT'
@@ -132,8 +146,13 @@ if(keyword_set(pim)) then begin
                       ycen=ycen, /fixcen, measure=tmp_measure, $
                       cpetrorad= mall.petrorad*scales[iband], $
                       faper= 7.57576*scales[iband]
-                    dsersic, image, invvar, xcen=xcen, ycen=ycen, sersic=r_sersic, $
-                      /onlyflux
+                    curr_sersic= r_sersic
+                    curr_sersic.xcen= xcen
+                    curr_sersic.ycen= ycen
+                    curr_sersic.sersicr50= r_sersic.sersicr50*scales[iband]
+                    dsersic, image, invvar, xcen=xcen, ycen=ycen, sersic=curr_sersic, $
+                      /onlyflux, /fixcen, /fixsky
+                    if iband eq 5 then stop
                     
                     mall.nprof[iband]= tmp_measure.nprof
                     mall.profmean[iband,*]= $
@@ -150,8 +169,8 @@ if(keyword_set(pim)) then begin
                     mall.fiberflux[iband]= tmp_measure.fiberflux
                     mall.fiberflux_ivar[iband]= $
                       tmp_measure.fiberflux_ivar
-                    mall.sersicflux[iband]= r_sersic.sersicflux
-                    mall.sersicflux_ivar[iband]= 1./r_sersic.perror[3]^2
+                    mall.sersicflux[iband]= curr_sersic.sersicflux
+                    mall.sersicflux_ivar[iband]= 1./curr_sersic.perror[3]^2
                     mall.asymmetry[iband]= tmp_measure.asymmetry
                     mall.clumpy[iband]= tmp_measure.clumpy
                     mall.dflags[iband]= tmp_measure.dflags
