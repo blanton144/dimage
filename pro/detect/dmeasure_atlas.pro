@@ -152,7 +152,6 @@ if(keyword_set(pim)) then begin
                     curr_sersic.sersicr50= r_sersic.sersicr50*scales[iband]
                     dsersic, image, invvar, xcen=xcen, ycen=ycen, sersic=curr_sersic, $
                       /onlyflux, /fixcen, /fixsky
-                    if iband eq 5 then stop
                     
                     mall.nprof[iband]= tmp_measure.nprof
                     mall.profmean[iband,*]= $

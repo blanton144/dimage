@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
 
 #
 # Request a Montage image and then wait for it and then download.

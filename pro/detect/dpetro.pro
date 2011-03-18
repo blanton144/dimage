@@ -48,6 +48,15 @@ if(NOT keyword_set(profradius)) then $
               45.503910, 70.510155, 110.530769, 172.493530, $
               269.519104, 420.510529, 652.500061]
 
+if(nprof eq 0) then begin
+    petrorad=0.
+    petror50=0.
+    petror90=0.
+    petroflux=0.
+    ivar_petroflux=0.
+    return
+endif
+
 ; set petrorad
 nradii=1000L
 radii=exp(alog(profradius[1])+(alog(profradius[nprof]) $
