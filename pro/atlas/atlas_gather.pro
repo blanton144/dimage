@@ -9,7 +9,7 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_gather, sample=sample
+pro atlas_gather, sample=sample, subname=subname
   
   rootdir='/global/data/atlas/v0'
   if(NOT keyword_set(infile)) then $
@@ -25,10 +25,7 @@ pro atlas_gather, sample=sample
   atlas= gz_mrdfits(infile, 1)
   
   for i=0L, n_elements(atlas)-1L do begin
-     subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
-                         prefix=prefix, rootdir=rootdir)
-     
-     cd, subdir
+      atcd, i, subname=subname
      
      dreadcen, measure=tmp_measure
 

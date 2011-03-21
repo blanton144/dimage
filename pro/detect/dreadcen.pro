@@ -14,7 +14,7 @@ if(NOT keyword_set(band)) then band=2
 if(NOT keyword_set(subdir)) then subdir='.'
 bandnames=['u', 'g', 'r', 'i', 'z']
 
-spawn, 'pwd', cwd
+spawn, /nosh, 'pwd', cwd
 words=strsplit(cwd[0], '/',/extr)
 prefix=words[n_elements(words)-1]
 
