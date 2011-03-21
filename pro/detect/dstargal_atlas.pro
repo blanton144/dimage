@@ -24,6 +24,7 @@ if(NOT keyword_set(glim)) then glim=25.
 if(NOT keyword_set(gsaddle)) then gsaddle=50.
 if(NOT keyword_set(nsigma)) then nsigma=20.
 if(NOT keyword_set(maxnstar)) then maxnstar=3000L
+if(NOT keyword_set(maxmem)) then maxmem=2.e+9
 
 ;; default to use base name same as directory name
 spawn, 'pwd', cwd
@@ -171,10 +172,21 @@ if(ngals gt 0) then begin
    sgset.dec_gals[0:ngals-1]= dec_gals
 endif 
 
+;; get memory use
+maxpix= float(max(nx*ny))
+memuse= 4.*maxpix*float(ngals)
+if(memuse gt maxmem) then begin
+    splog, 'LIMITING MEMORY USE'
+    sgset.ngals= long(maxmem/(4.*maxpix))
+    limitedmem=1
+endif
+
 ;; output star and galaxy info
 sgsetfile=subdir+'/'+strtrim(string(iparent),2)+'/'+base+'-'+ $
   strtrim(string(iparent),2)+'-sgset.fits'
 dhdr= dimage_hdr()
+if(keyword_set(limitedmem)) then $
+  sxaddpar, dhdr, 'LIMMEM', 1, '1 if limited NGALS due to memory'
 mwrfits, sgset, sgsetfile, dhdr, /create
 
 if(keyword_set(plot)) then begin
