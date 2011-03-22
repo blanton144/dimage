@@ -25,19 +25,24 @@ pro atlas_gather, sample=sample, subname=subname
   atlas= gz_mrdfits(infile, 1)
   
   for i=0L, n_elements(atlas)-1L do begin
+      if((i mod 100) eq 0) then $
+        splog, i
+      
       atcd, i, subname=subname
      
-     dreadcen, measure=tmp_measure
-
-     if(n_tags(tmp_measure) gt 0) then begin
-        if(n_tags(measure) eq 0) then begin
-           measure= replicate(tmp_measure, n_elements(atlas))
-           struct_assign, {junk:0}, measure
-           measure.aid=-1L
-        endif
-        measure[i]= tmp_measure
-     endif
-        
+      tmp_measure=0
+      dreadcen, measure=tmp_measure
+      
+      if(n_tags(tmp_measure) gt 0) then begin
+          if(n_tags(measure) eq 0) then begin
+              measure0= tmp_measure[0]
+              struct_assign, {junk:0}, measure0
+              measure= replicate(measure0, n_elements(atlas))
+              measure.aid=-1L
+          endif
+          measure[i]= tmp_measure
+      endif
+      
   endfor
 
   mwrfits, measure, outfile, /create

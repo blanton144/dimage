@@ -8,7 +8,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dreadcen, image, invvar, psf=psf, band=band, measure=measure, $
-              hand=hand
+              hand=hand, acat=acat
 
 if(NOT keyword_set(band)) then band=2
 if(NOT keyword_set(subdir)) then subdir='.'
@@ -20,7 +20,7 @@ prefix=words[n_elements(words)-1]
 
 iau_to_radec, prefix, ra, dec
 
-pim= gz_mrdfits(subdir+'/'+prefix+'-pimage.fits')
+pim= gz_mrdfits(subdir+'/'+prefix+'-pimage.fits', /silent)
 if(keyword_set(pim)) then begin
     nx=(size(pim,/dim))[0]
     ny=(size(pim,/dim))[1]
@@ -42,7 +42,7 @@ if(keyword_set(pim)) then begin
     endif
     
     acat=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+ $
-                    '-acat-'+pstr+'.fits',1)
+                    '-acat-'+pstr+'.fits',1, /silent)
     nkeep=0
     
     if(n_tags(acat) gt 0) then $
@@ -61,16 +61,16 @@ if(keyword_set(pim)) then begin
         
         if(arg_present(image)) then $
           image=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
-                           pstr+'-atlas-'+astr+'.fits', band, hdr)
+                           pstr+'-atlas-'+astr+'.fits', band, hdr, /silent)
         if(arg_present(invvar)) then begin
             invvar=gz_mrdfits(subdir+'/parents/'+prefix+'-parent-'+ $
-                              pstr+'.fits', band*2L+1L, hdr)
+                              pstr+'.fits', band*2L+1L, hdr, /silent)
             invvar=invvar>0.
         endif
 
         if(arg_present(measure)) then begin
             measure=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
-                               pstr+'-measure'+postfix+'.fits',1)
+                               pstr+'-measure'+postfix+'.fits',1, /silent)
         endif
     endif
 endif

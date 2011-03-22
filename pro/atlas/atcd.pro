@@ -9,7 +9,7 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atcd, indx, name=name, subname=subname
+pro atcd, indx, name=name, subname=subname, sample=sample
 
 common com_atcd, atlas, iauname
 
@@ -17,6 +17,10 @@ if(NOT keyword_set(subname)) then subname='detect'
 
 rootdir='/mount/hercules5/sdss/atlas/v0'
 atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
+if(keyword_set(sample)) then begin
+    rootdir='/mount/hercules5/sdss/atlas/sample'
+    atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
+endif
 
 if(n_tags(atlas) eq 0) then $
   atlas=mrdfits(atlasfile,1, /silent)
