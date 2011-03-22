@@ -175,6 +175,17 @@ if(n_tags(sersicfit) eq 0 OR keyword_set(reinit)) then begin
 endif
 if(keyword_set(axisymmetric)) then sersicfit.axisratio=1.
 
+;; if inverse variance is zero everywhere, bomb
+if(total(invvar) eq 0) then begin
+    sersicfit.sersicflux=0.
+    sersicfit.sersicr50=0.
+    sersicfit.sersicn=0.
+    sersicfit.axisratio=0.
+    sersicfit.orientation=0.
+    model= image*0.
+    return
+endif
+
 ; set up parinfo for mpfit
 str1 = {value:0D,fixed:1B,limited:[1B,1B],limits:[0D,1D], $
         step:1D0, mpside:0}
