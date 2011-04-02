@@ -11,7 +11,6 @@
 ;------------------------------------------------------------------------------
 pro atlas_gather, sample=sample, subname=subname
   
-  rootdir='/global/data/atlas/v0'
   if(NOT keyword_set(infile)) then $
      infile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
   if(NOT keyword_set(outfile)) then $
@@ -19,7 +18,6 @@ pro atlas_gather, sample=sample, subname=subname
   if(keyword_set(sample)) then begin
      infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
      outfile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample_measure.fits'
-     rootdir= '/global/data/atlas/sample'
   endif
   
   atlas= gz_mrdfits(infile, 1)
@@ -28,7 +26,7 @@ pro atlas_gather, sample=sample, subname=subname
       if((i mod 100) eq 0) then $
         splog, i
       
-      atcd, i, subname=subname
+      atcd, i, subname=subname, sample=sample
      
       tmp_measure=0
       dreadcen, measure=tmp_measure

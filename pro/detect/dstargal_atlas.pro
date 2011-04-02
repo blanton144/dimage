@@ -160,6 +160,13 @@ if(ngals gt 0) then begin
    xyad, *hdrs[ref], xrgals, yrgals, ra_gals, dec_gals
 endif
 
+;; only store up to maxnstars stars
+if(nstars gt maxnstar) then begin
+    nstars=maxnstar
+    ra_stars= ra_stars[0L:nstars-1L]
+    dec_stars= dec_stars[0L:nstars-1L]
+endif
+
 ;; store locations in sgset
 sgset.nstars= nstars
 if(nstars gt 0) then begin

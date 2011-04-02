@@ -33,7 +33,9 @@ velmod=velmod[ikeep]
 
 mwrfits, ikeep, getenv('DIMAGE_DIR')+'/data/atlas/atlas_indx.fits', /create
 
-atlas0= create_struct(combine[0], $
+atlas0= create_struct('iauname', ' ', $
+                      'subdir', ' ', $
+                      combine[0], $
                       'run', 0, $
                       'camcol', 0B, $
                       'field', 0, $
@@ -45,6 +47,10 @@ atlas0= create_struct(combine[0], $
                       'zdist_err', 0.)
 atlas= replicate(atlas0, nkeep)
 struct_assign, combine, atlas
+atlas.iauname= hogg_iau_name(atlas.ra, atlas.dec, '')
+for i=0L, n_elements(atlas)-1L do $
+   atlas[i].subdir=strmid(image_subdir(atlas[i].ra, atlas[i].dec, $
+                                       subname=' ', rootdir=' '), 4)
 atlas.run= iminfo.run
 atlas.camcol= iminfo.camcol
 atlas.field= iminfo.field

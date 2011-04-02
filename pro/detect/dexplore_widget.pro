@@ -10,7 +10,7 @@ common com_dexplore_widget, $
   fix_stretch, hand, show_templates, gsmooth, glim, gsaddle, atset, $
   subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
   curr_nx, curr_ny, curr_nx_2, curr_ny_2, hidestars, bandnames, $
-  dexcen, extra_for_detect
+  dexcen, extra_for_detect, raplot, decplot
 
 curr_nx=0
 curr_ny=0
@@ -409,6 +409,11 @@ if(n_tags(acat) gt 0) then begin
     endif
 endif
 
+if(n_elements(raplot) gt 0 and n_elements(decplot) gt 0) then begin
+    adxy, phdr, raplot, decplot, xplot, yplot
+    atv2plot, xplot, yplot, psym=1, color='green', symsize=2.
+endif
+
 end
 
 function dexplore_child_display_widget, ev
@@ -583,7 +588,7 @@ end
 pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb, $
                      twomass=in_twomass, eyeball_name=in_eyeball_name, $
                      hidestars=in_hidestars, parent=in_parent, $
-                     cen=cen, _EXTRA=_extra_for_detect
+                     cen=cen, ra=in_ra, dec=in_dec, _EXTRA=_extra_for_detect
 
 common com_dexplore_widget
 
@@ -591,6 +596,8 @@ if(keyword_set(in_lsb)) then lsb=1
 if(keyword_set(in_eyeball_name)) then eyeball_name=in_eyeball_name
 if(keyword_set(in_hidestars)) then hidestars=in_hidestars
 if(keyword_set(_extra_for_detect)) then extra_for_detect=_extra_for_detect
+if(keyword_set(in_ra)) then raplot=in_ra
+if(keyword_set(in_dec)) then decplot=in_dec
 
 ;; clean up before starting
 dexplore_clean

@@ -13,7 +13,7 @@
 ;------------------------------------------------------------------------------
 pro dexplore, base, lsb=lsb, twomass=twomass, eyeball_name=eyeball_name, $
               hidestars=hidestars, cen=cen, nogalex=nogalex, $
-              _EXTRA=_extra_for_detect
+              ra=ra, dec=dec, _EXTRA=_extra_for_detect
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -39,7 +39,7 @@ if(keyword_set(twomass)) then $
 
 dexplore_widget, base, images, lsb=lsb, twomass=twomass, $
   eyeball_name=eyeball_name, hidestars=hidestars, parent=icen, $
-  nogalex=nogalex, cen=cen, _EXTRA=_extra_for_detect
+  nogalex=nogalex, cen=cen, ra=ra, dec=dec, _EXTRA=_extra_for_detect
 
 end
 ;------------------------------------------------------------------------------
