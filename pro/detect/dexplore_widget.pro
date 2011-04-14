@@ -1,7 +1,8 @@
 pro dexplore_clean
 
 common com_dexplore_widget, $
-  w_parent, w_full, w_base, w_done, w_slist, w_band, w_child, w_glist, $
+  w_parent, w_full, w_base, w_next, w_previous, w_finish, $
+  w_slist, w_band, w_child, w_glist, $
   w_settings, w_gsmooth, w_glim, w_redeblend, w_mark, w_smooth, $
   w_gsaddle, basename, imagenames, $
   parent_images, parent_hdrs, $
@@ -10,7 +11,8 @@ common com_dexplore_widget, $
   fix_stretch, hand, show_templates, gsmooth, glim, gsaddle, atset, $
   subdir, setstr, w_eyeball, eyeball, eyeball_name, cup, pup, psfs, $
   curr_nx, curr_ny, curr_nx_2, curr_ny_2, hidestars, bandnames, $
-  dexcen, extra_for_detect, raplot, decplot
+  dexcen, extra_for_detect, raplot, decplot, $
+  send_next, send_previous, send_finish
 
 curr_nx=0
 curr_ny=0
@@ -40,11 +42,22 @@ common com_dexplore_widget
 common atv2_point, markcoord
 
 ;; if we are done, close us out
-if(ev.ID eq w_done) then begin
+if(ev.ID eq w_next OR $
+   ev.ID eq w_previous OR $
+   ev.ID eq w_finish) then begin
     if ev.SELECT then begin
         WIDGET_CONTROL, ev.TOP, /DESTROY  
         dexplore_clean
     endif
+    send_next=0
+    send_previous=0
+    send_finish=0
+    if(ev.ID eq w_next) then $
+      send_next=1
+    if(ev.ID eq w_previous) then $
+      send_previous=1
+    if(ev.ID eq w_finish) then $
+      send_finish=1
 endif
 
 if(ev.ID eq w_parent) then begin
@@ -588,7 +601,8 @@ end
 pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb, $
                      twomass=in_twomass, eyeball_name=in_eyeball_name, $
                      hidestars=in_hidestars, parent=in_parent, $
-                     cen=cen, ra=in_ra, dec=in_dec, _EXTRA=_extra_for_detect
+                     cen=cen, ra=in_ra, dec=in_dec, next=next, $
+                     previous=previous, finish=finish, _EXTRA=_extra_for_detect
 
 common com_dexplore_widget
 
@@ -631,8 +645,10 @@ for i=0L, n_elements(imagenames)-1L do begin
 endfor
 
 ;; set up base widget
-w_base = WIDGET_BASE(ROW=14)  
-w_done = WIDGET_BUTTON(w_base, value='Done')  
+w_base = WIDGET_BASE(xoff=60, ROW=14)  
+w_next = WIDGET_BUTTON(w_base, value='Next')  
+w_previous = WIDGET_BUTTON(w_base, value='Previous')  
+w_finish = WIDGET_BUTTON(w_base, value='Finish')  
 
 ;; set up full image display widget
 allimagenames= [basename+'-pimage.fits', imagenames]
@@ -666,7 +682,7 @@ w_parent = CW_FIELD(w_base, TITLE = "parent", $
                     /LONG, /FRAME, /return_events, value=parent)  
 
 
-stash = {done: w_done}
+stash = {next: w_next, previous:w_previous, finish:w_finish}
 
 WIDGET_CONTROL, w_base, /REALIZE, set_uvalue=stash
 
@@ -682,6 +698,10 @@ XMANAGER, 'dexplore', w_base
 if(keyword_set(w_eyeball)) then $
   WIDGET_CONTROL, w_eyeball, /destroy
 dexplore_clean
+
+next= send_next
+previous= send_previous
+finish= send_finish
 
 end  
 

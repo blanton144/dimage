@@ -9,15 +9,25 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_detect_dirs, sample=sample, sdss=sdss
+pro atlas_detect_dirs, sample=sample, sdss=sdss, justjpg=justjpg
 
 if(keyword_set(sdss)) then begin
     galex=0
     twomass=0
+    sdss=1
+    jpg=1
+    subname='detect-sdss'
+endif else if(keyword_set(justjpg)) then begin
+    galex=0
+    twomass=0
+    sdss=0
+    jpg=1
     subname='detect-sdss'
 endif else begin
     galex=1
     twomass=1
+    sdss=1
+    jpg=1
     subname='detect'
 endelse
 
@@ -32,24 +42,37 @@ endif
 atlas= gz_mrdfits(infile, 1)
 
 for i=0L, n_elements(atlas)-1L do begin
+    if((i mod 1000) eq 0) then $
+      splog, i
     subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
                         prefix=prefix, rootdir=rootdir, $
                         subname=subname)
     
     file_mkdir, subdir
     cd, subdir
-    
+
     sdsssub= 'sdss'
     sdssdir=image_subdir(atlas[i].ra, atlas[i].dec, $
                          prefix=prefix, rootdir='../../../..', $
                          subname=sdsssub)
-    imfiles=prefix+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
-    for iband=0L, n_elements(imfiles)-1L do begin
-        if(file_test(sdssdir+'/'+imfiles[iband])) then begin
-            file_delete, subdir+'/'+imfiles[iband], /allow
-            file_link, sdssdir+'/'+imfiles[iband], subdir+'/'+imfiles[iband]
+
+    if(keyword_set(jpg)) then begin
+        jpgfile=prefix+'.jpg'
+        if(file_test(sdssdir+'/'+jpgfile)) then begin
+            file_delete, subdir+'/'+jpgfile, /allow
+            file_link, sdssdir+'/'+jpgfile, subdir+'/'+jpgfile
         endif
-    endfor
+    endif
+    
+    if(keyword_set(sdss)) then begin
+        imfiles=prefix+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+        for iband=0L, n_elements(imfiles)-1L do begin
+            if(file_test(sdssdir+'/'+imfiles[iband])) then begin
+                file_delete, subdir+'/'+imfiles[iband], /allow
+                file_link, sdssdir+'/'+imfiles[iband], subdir+'/'+imfiles[iband]
+            endif
+        endfor
+    endif
 
     if(keyword_set(galex)) then begin
         galexsub= 'galex'
