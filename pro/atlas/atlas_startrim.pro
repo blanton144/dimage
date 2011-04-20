@@ -53,10 +53,15 @@ spherematch, measure[iok].racen, measure[iok].deccen, $
 tmatch[m1]=1
 st[iok[m1]].itycho=m2
 
+;; also use redshift
+lowz= atlas[iok].zlg lt 0.0015 and $
+  measure[iok].sersic_r50 lt 30. OR $
+  measure[iok].sersicflux[2] lt 250.
+
 istar= where((th50 lt 1. and rmag gt 16.5) OR $
              (th50 lt 2.25 and rmag lt 15.) OR $
              (th50 lt 2.25-(rmag-15.)*1.25/1.5 and rmag gt 15. and rmag lt 16.5) OR $
-             tmatch gt 0)
+             tmatch gt 0 OR lowz gt 0)
 st[iok[istar]].isstar=1
 
 mwrfits, st, getenv('DIMAGE_DIR')+'/data/atlas/atlas_startrim.fits', /create

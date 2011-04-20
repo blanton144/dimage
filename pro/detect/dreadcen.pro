@@ -8,7 +8,7 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dreadcen, image, invvar, psf=psf, band=band, measure=measure, $
-              hand=hand, acat=acat
+              hand=hand, acat=acat, eye=eye, typeeye=typeeye, aid=aid
 
 if(NOT keyword_set(band)) then band=2
 if(NOT keyword_set(subdir)) then subdir='.'
@@ -71,6 +71,11 @@ if(keyword_set(pim)) then begin
         if(arg_present(measure)) then begin
             measure=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
                                pstr+'-measure'+postfix+'.fits',1, /silent)
+         endif
+
+        if(arg_present(eye)) then begin
+           eye=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+ $
+                          prefix+'-'+pstr+'-eyeball-'+typeeye+'.fits',1)
         endif
     endif
 endif

@@ -15,11 +15,13 @@
 ;   15-Apr-2011  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-function read_atlas, notrim=notrim, measure=measure
+function read_atlas, notrim=notrim, measure=measure, kcorrect=kcorrect
 
 atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
 if(arg_present(measure)) then $
   measure=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
+if(arg_present(kcorrect)) then $
+  kcorrect=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_kcorrect.fits',1)
 dup=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_duplicates.fits',1)
 st=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_startrim.fits',1)
 
@@ -34,6 +36,8 @@ if(NOT keyword_set(notrim)) then begin
     atlas= atlas[itrim]
     if(n_tags(measure) gt 0) then $
       measure= measure[itrim]
+    if(n_tags(kcorrect) gt 0) then $
+      kcorrect= kcorrect[itrim]
 endif
 
 return, atlas
