@@ -238,45 +238,50 @@ identification, deblending and photometry \citep{lupton01a};
 photometricity determination \citep{hogg01a}; and calibration
 \citep{fukugita96a,smith02a, padmanabhan07b}.
 
+% REFEREE RESPONSE: reorged these two
 As \citet{gunn05a} describe, the SDSS focal plane has 30 imaging CCDs
 evenly spaced (with gaps) across it, six for each of the five filters
 ($u$, $g$, $r$, $i$ and $z$). Each exposure is taken in drift scan
 mode, such that a point in the sky passes through each CCD
 sequentially with a gap of 71.72 seconds on average.  This procedure
-produces six long images of the sky, called ``camcols.'' The native
-pixel scale on the CCDs is approximately 0.396 arcsec. When we refer
-to pixels in this paper it is this native scale we will mean. When we
-discuss these images, we will refer to the position in the scan
-direction as the ``pixel row'' or $y$, and the position perpendicular
-to the scan direction as the ``pixel column'' or $x$.
+produces six long rectangular images of the sky, called ``camcols.''
+In the standard SDSS pipeline, each camcol is further broken into
+multiple ``fields,'' each with a width of 1361 pixels in the scan
+direction.
+
+The native pixel scale on the CCDs is approximately 0.396 arcsec. When
+we refer to pixels in this paper it is this native scale we will
+mean. When we discuss these images, we will refer to the position in
+the scan direction as the ``pixel row'' or $y$, and the position
+perpendicular to the scan direction as the ``pixel column'' or $x$.
 
 Figure \ref{fig:rawrun} shows this geometry for part of run number
-1336 in the $r$-band, showing each camcol horizontally and the gaps in
-between each one. Thus each run can be considered to consist of thirty
-long rectangular images, one in each filter and camcol. In the
-standard SDSS pipeline, each camcol is further broken into multiple
-``fields,'' each with a width of 1361 pixels in the scan direction.
-
-The image shown is approximately the standard SDSS pipeline's estimate
-of the background light used for photometry, binned in 8$\times$8
-pixels. It is equal to the actual counts in areas where there were no
-detected objects, and is equal to the background estimate plus
-appropriate noise in areas where there were detected objects. This
-determination is made before any calibration except for the flat-field
-correction --- which is only a function of pixel column since the
-observations are drift scans.  It is about 2.3 deg wide and represents
-about 25 minutes of exposure time. The units are raw counts ---
+1336 in the $r$-band, showing each camcol and the gaps in between each
+one.  It shows an area about 2.3 deg wide representing about 25
+minutes of exposure time.  This image is the standard SDSS pipeline's
+estimate of the background light used for photometry, binned in
+8$\times$8 pixels --- that is, detected objects have been removed from
+this image.  In detail, it is equal to the actual counts in areas
+where there were no detected objects, and is equal to the background
+estimate plus appropriate noise in areas where there were detected
+objects. This determination is made before any calibration except for
+the flat-field correction, which is only a function of pixel column
+because the observations are drift scans.  The units are raw counts;
 because of the varying gains among the CCDs two of camcols mostly
 saturate in this particular image stretch.
 
-SDSS's background light estimation consists of a median-smoothed image
-on a scale of 100$\times$100 arcsec. Figure \ref{fig:rawrun}
-demonstrates that bright objects have a substantial amount of their
-light removed during background subtraction --- the background shows
-the presence of bright stars.  We will proceed by fitting a much
-smoother function to this SDSS sky estimate in order to model the
-obvious variation with the background with time but not oversubtract
-the brightest objects.
+Inspection of Figure \ref{fig:rawrun} reveals that residual light from
+bright objects is easily visible in the background light image. This
+residual light is due to the SDSS's background light estimation
+method, which consists of a median-smoothed image on a scale of
+100$\times$100 arcsec.  Under this procedure, large objects have a
+substantial amount of their light removed during background
+subtraction --- therefore, the background shows the presence of bright
+stars.  We will proceed by fitting a much smoother function to this
+SDSS sky estimate in order to model the obvious variation with the
+background with time but not oversubtract the brightest objects.
+
+% REFEREE RESPONSE: clarify why images here
 
 \subsection{Masking the data}
 \label{sec:mask}
@@ -309,7 +314,7 @@ Finally, the SDSS filters suffer from internal reflection at their
 edges, causing stars just outside the frame to scatter light onto the
 CCD, creating large-scale features that we do not want included in our
 background subtraction model. (A more detailed model would explicitly
-subtract these features, which we do not attempt here).  We mask these
+subtract these features, that we do not attempt here).  We mask these
 reflections by identifying any stars from the Tycho-2 catalog that lie
 just outside the frame and masking a rectangular region
 1500$\times$900 pixels centered on the star. We use a rectangular
@@ -453,7 +458,6 @@ individual field basis (or requesting cutouts) from the SDSS-III
 Science Archive Server.\footnote{\tt
   http://data.sdss3.org/}
 
-
 The data format is FITS. Each file's primary HDU contains a
 floating-point image, calibrated in units of nanomaggies per
 pixel. The images have had defects such as bad columns and cosmic rays
@@ -530,7 +534,7 @@ set to zero.
 
 \subsection{Example mosaics}
 
-Figure \ref{fig:examples} show several example mosaics created with
+Figure \ref{fig:examples} shows several example mosaics created with
 this procedure.  We have obviously chosen these partly for dramatic
 effect, but also to demonstrate the robustness of the masking to the
 presence of large, bright objects of various sorts: globular clusters,
@@ -545,7 +549,8 @@ Although our procedures allow us to evaluate any arbitrary mosaic, for
 ease of distribution we have created a set of 1$\times$1 deg mosaics
 across the entire observed Northern Galactic Cap, or almost 8000
 deg$^2$. We have created a web interface that allows users to easily
-extract sections of these DR7 mosaics.
+extract sections of these DR7 mosaics (see footnote in
+\S\ref{sec:intro} for URL).
 
 This interface can be used either interactively or
 non-interactively. The interactive method allows the user to browse a
@@ -620,9 +625,9 @@ reported by the standard SDSS pipeline. The goal here is to verify
 that the overall scale of the mosaicked images is correct and that the
 signal-to-noise has not been degraded.
 
-We randomly choose twenty 1 degree square mosaics. Because we are here
-interested in point source photometry, before our analysis we perform
-a local sky subtraction, on the same scales as SDSS uses (100 arcsec
+We randomly choose twenty 1 degree square mosaics. Because in this
+section we are interested in point source photometry, we perform a
+local sky subtraction on the same scales as SDSS uses (100 arcsec
 median smoothed).  We of course will not do the same in the analysis
 of large galaxies. From the overlapping SDSS catalog, we choose
 unsaturated stars with no neighbors within 15 arcsec.  For each we
@@ -745,15 +750,15 @@ much flux it removes from the aperture surrounding the object. In
 particular, we use an aperture with a radius of $r_{95}$, containing
 95\% of the light of the galaxy.  We use the fake, sky subtracted
 field and calculate the flux in each band in that aperture.  We then
-use the real, sky subtracted field and calculate the flux in the same
-aperture.  Of course, in the fake data the sky subtraction will
-inevitably subtract off a slightly different (usually larger) amount
-of light than does the sky subtraction in the real data, because of
-the presence of the large, fake object. The fake aperture flux minus
-the real aperture flux is equal to the fake galaxy flux that remains
-in the image after sky subtraction --- the measured fake galaxy flux
-$f_{\mathrm{meas}}$, to be compared with the original input fake
-galaxy flux $f_{\mathrm{true}}$.
+use the real, galaxy-free, sky subtracted field and calculate the flux
+in the same aperture.  Of course, in the fake data the sky subtraction
+will inevitably subtract off a slightly different (usually larger)
+amount of light than does the sky subtraction in the real data,
+because of the presence of the large, fake object. The fake aperture
+flux minus the real aperture flux is equal to the fake galaxy flux
+that remains in the image after sky subtraction --- the measured fake
+galaxy flux $f_{\mathrm{meas}}$, to be compared with the original
+input fake galaxy flux $f_{\mathrm{true}}$.
 
 In Figure \ref{fig:sky_offsets_ronly}, the squares in the bottom panel
 are $\Delta m = -2.5\log_{10}(f_{\mathrm{meas}}/f_{\mathrm{true}})$,
@@ -971,7 +976,8 @@ fields, as well as request large-scale mosaics in FITS format.
 \acknowledgments
 
 We thank Richard Cool, David Hogg, Rachel Mandelbaum, Michael Strauss,
-and Andrew West for discussions of the methods and results found here.
+and particularly Andrew A.~West for discussions of the methods and
+results found here.
 
 The authors acknowledge funding support from NASA grants
 06-GALEX06-0030, NNX09AC85G and NNX09AC95G, and \emph{Spitzer} grant

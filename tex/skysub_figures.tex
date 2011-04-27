@@ -72,11 +72,11 @@ evaluation of Equation \ref{skyspline}.}
 \figurenum{\fignum}
 \epsscale{0.70}
 \plotone{example-fig.ps} 
-\caption{\label{fig:examples} Some example images made with the
-  methods described in this paper. Upper left: Coma Cluster
+\caption{\label{fig:examples} Some example $gri$ composite images made
+  with the methods described in this paper. Upper left: Coma Cluster
   ($18'\times 18'$); upper right: NGC 5395 ($18'\times 18'$); middle
-  left: Messier 5 ($18'\times18'$); middle right: Messier
-  101 ($21'\times 21'$); lower left: NGC 4656 ($24'\times 24'$); lower
+  left: Messier 5 ($18'\times18'$); middle right: Messier 101
+  ($21'\times 21'$); lower left: NGC 4656 ($24'\times 24'$); lower
   right: UGC 3974 ($12'\times 12'$).}
 \end{figure}
 
@@ -86,14 +86,15 @@ evaluation of Equation \ref{skyspline}.}
 \figurenum{\fignum}
 \epsscale{1.00}
 \plotone{smosaic-local-qastats-magdiff.ps}
-\caption{\label{fig:sdss_qa_magdiff} Magnitude differences between
+\caption{\label{fig:sdss_qa_magdiff} Flux ratios between
 the 7.3 arcsec aperture flux measured from our mosaic images, and that
 reported by the SDSS catalog, for each SDSS band. The lines are the
-16\%, 50\% and 84\% quantiles of the differences. The grey scale is
+16\%, 50\% and 84\% quantiles. The grey scale is
 proportional to the conditional distribution of the flux ratio on the
-magnitude At bright magnitudes, the differences are small, indicating
+magnitude. At bright magnitudes, the differences are small, indicating
 that these images have retained their overall photometricity. In each
-panel, we list the mean value and dispersion of the differences in the
+panel, we list the mean value and dispersion of the flux ratios 
+in the
 indicated magnitude range. }
 \end{figure}
 
@@ -162,7 +163,7 @@ Montage images are significantly degraded.}
   (top panel) and magnitudes (bottom panel) in the $r$-band, as a
   function of true galaxy $r_{50}$. The open circles show standard
   SDSS catalog photometry from the DR8 version of the pipeline; the
-  DR7 version is similar but slightly worse. The filled circles show
+  DR7 version is similar but slightly worse. The triangles show
   photometry and deblending using the methods described in this paper.
   The open squares show the photometry of the fake galaxies assuming
   perfect deblending.  The thick lines are running medians for each
@@ -190,7 +191,9 @@ Montage images are significantly degraded.}
 \plotone{sky_offsets_vs_r50meas.model.ps}
 \caption{\label{fig:sky_offsets_vs_r50meas} Similar to Figure
   \ref{fig:sky_offsets_ronly}, but showing errors $r$-band magnitude against
-  the measured value of $r_{50}$ rather than the true value. The
+  the measured value of $r_{50}$ rather than the true value. Open
+  circles show galaxies with \Sersic\ indices $n< 3.5$, and filled
+  circles show galaxies with $n>3.5$. The
   dotted line shows the functional form given by \citet{hyde09a}.}
 \end{figure}
 
