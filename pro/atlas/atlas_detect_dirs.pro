@@ -9,7 +9,7 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_detect_dirs, sample=sample, sdss=sdss, justjpg=justjpg
+pro atlas_detect_dirs, sample=sample, sdss=sdss, justjpg=justjpg, galex=galex
 
 if(keyword_set(sdss)) then begin
     galex=0
@@ -17,6 +17,12 @@ if(keyword_set(sdss)) then begin
     sdss=1
     jpg=1
     subname='detect-sdss'
+endif  else if(keyword_set(galex)) then begin
+    galex=1
+    twomass=0
+    sdss=1
+    jpg=1
+    subname='detect-galex'
 endif else if(keyword_set(justjpg)) then begin
     galex=0
     twomass=0
@@ -31,12 +37,11 @@ endif else begin
     subname='detect'
 endelse
 
-rootdir='/mount/hercules5/sdss/atlas/v0'
+rootdir=atlas_rootdir(sample=sample)
 if(NOT keyword_set(infile)) then $
   infile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
 if(keyword_set(sample)) then begin
-    infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
-    rootdir= '/mount/hercules5/sdss/atlas/sample'
+   infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
 endif
 
 atlas= gz_mrdfits(infile, 1)

@@ -20,7 +20,7 @@ pro atlas_dimages, seed=seed, st=st, nd=nd, clobber=clobber
   
   atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits', 1)
   
-  rootdir='/mount/hercules5/sdss/atlas/v0'
+  rootdir=atlas_rootdir(sample=sample)
   
   if(NOT keyword_set(st)) then st=0L
   if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L

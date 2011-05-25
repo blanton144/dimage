@@ -11,12 +11,11 @@
 ;------------------------------------------------------------------------------
 pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber
 
+  rootdir= atlas_rootdir(sample=sample)
   if(NOT keyword_set(sample)) then begin
      atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits', 1)
-     rootdir='/mount/hercules5/sdss/atlas/v0'
   endif else begin
      atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits', 1)
-     rootdir='/mount/hercules5/sdss/atlas/sample'
   endelse
   
   bands=['J', 'H', 'K']
@@ -62,13 +61,28 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber
         scales=[4., 5., 6.]*0.002
         satvalue=2500.
         nonlinearity=3.
-        djs_rgb_make, prefix[0]+'-K.fits.gz', $
-                      prefix[0]+'-H.fits.gz', $
-                      prefix[0]+'-J.fits.gz', $
-                      name=filename, $
-                      scales=scales, $
-                      nonlinearity=nonlinearity, satvalue=satvalue, $
-                      quality=100.
+        
+        try=1
+        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-J.fits.gz'], outstr
+        words= strsplit(outstr, /extr)
+        if(words[1] eq 'FAILED:') then $
+           try=0
+        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-H.fits.gz'], outstr
+        words= strsplit(outstr, /extr)
+        if(words[1] eq 'FAILED:') then $
+           try=0
+        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-K.fits.gz'], outstr
+        words= strsplit(outstr, /extr)
+        if(words[1] eq 'FAILED:') then $
+           try=0
+        if(try) then $
+           djs_rgb_make, prefix[0]+'-K.fits.gz', $
+                         prefix[0]+'-H.fits.gz', $
+                         prefix[0]+'-J.fits.gz', $
+                         name=filename, $
+                         scales=scales, $
+                         nonlinearity=nonlinearity, satvalue=satvalue, $
+                         quality=100.
      endif
   endfor
   

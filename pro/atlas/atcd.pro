@@ -15,10 +15,9 @@ common com_atcd, atlas, iauname
 
 if(NOT keyword_set(subname)) then subname='detect'
 
-rootdir='/mount/hercules5/sdss/atlas/v0'
+rootdir=atlas_rootdir(sample=sample)
 atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
 if(keyword_set(sample)) then begin
-    rootdir='/mount/hercules5/sdss/atlas/sample'
     atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
 endif
 

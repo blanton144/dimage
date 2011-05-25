@@ -11,12 +11,11 @@
 ;------------------------------------------------------------------------------
 pro atlas_galex_images, st=st, nd=nd, sample=sample, clobber=clobber
 
+  rootdir=atlas_rootdir(sample=sample)
   if(NOT keyword_set(sample)) then begin
      atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits', 1)
-     rootdir='/mount/hercules5/sdss/atlas/v0'
   endif else begin
      atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits', 1)
-     rootdir='/mount/hercules5/sdss/atlas/sample'
   endelse
   
   bands=['nd', 'fd']

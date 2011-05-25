@@ -22,12 +22,11 @@ pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
       subname='detect'
   endelse
 
-  rootdir='/mount/hercules5/sdss/atlas/v0'
+  rootdir=atlas_rootdir(sample=sample)
   if(NOT keyword_set(infile)) then $
      infile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
   if(keyword_set(sample)) then begin
      infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
-     rootdir= '/mount/hercules5/sdss/atlas/sample'
   endif
 
   atlas= gz_mrdfits(infile, 1)
@@ -62,6 +61,8 @@ pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
          atlas_jpeg, noclobber=noclobber
          dmeasure_atlas, noclobber=noclobber
          spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']
+
+         dtrim_atlas
      endif
  endfor
  

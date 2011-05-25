@@ -55,8 +55,8 @@ st[iok[m1]].itycho=m2
 
 ;; also use redshift
 lowz= atlas[iok].zlg lt 0.0015 and $
-  measure[iok].sersic_r50 lt 30. OR $
-  measure[iok].sersicflux[2] lt 250.
+  (measure[iok].sersic_r50 lt 30. OR $
+   measure[iok].sersicflux[2] lt 250.)
 
 istar= where((th50 lt 1. and rmag gt 16.5) OR $
              (th50 lt 2.25 and rmag lt 15.) OR $
