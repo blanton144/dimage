@@ -94,7 +94,7 @@ if(keyword_set(pim)) then begin
                 sxdelpar, outhdr, 'XTENSION'
                 sxdelpar, outhdr, 'PCOUNT'
                 sxdelpar, outhdr, 'GCOUNT'
-                mwrfits, model, sfile, outhdr, /create
+                mwrfits, float(model), sfile, outhdr, /create
 
                 xyad, hdr, r_measure.xcen, r_measure.ycen, racen, deccen
                 

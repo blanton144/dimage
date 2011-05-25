@@ -18,6 +18,8 @@ function create_tag, name, type
 
 if(type eq 'int') then $
   tag= create_struct(name, 0L)
+if(type eq 'long') then $
+  tag= create_struct(name, 0LL)
 if(type eq 'double') then $
   tag= create_struct(name, 0.D)
 if(type eq 'char') then $
@@ -60,6 +62,8 @@ while(NOT eof(unit)) do begin
         if(words[i] ne 'null') then begin
             if(types[i] eq 'int') then $
               cat0.(i)= long(words[i]) $
+            else if(types[i] eq 'long') then $
+              cat0.(i)= long64(words[i]) $
             else if(types[i] eq 'double') then $
               cat0.(i)= double(words[i]) $
             else if(types[i] eq 'char') then $
