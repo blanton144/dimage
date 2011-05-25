@@ -18,7 +18,7 @@ $filename= $ARGV[1];
 $done=0;
 $iter=0;
 $maxiter=30;
-while($done == 0 && $iter < $maxiter) {
+while($done == 0 && ($iter < $maxiter || $line eq "MONTAGE STATUS: NEW\n")) {
 	print "Checking montage site ...\n";
 	open(fp,"checkMontage $reqid|");
 	$line= <fp>;
