@@ -9,15 +9,23 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_gather, sample=sample, subname=subname
+pro atlas_gather, sample=sample, subname=subname, outfile=outfile
   
   if(NOT keyword_set(infile)) then $
      infile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
-  if(NOT keyword_set(outfile)) then $
-     outfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits'
+  if(NOT keyword_set(outfile)) then begin
+      if(NOT keyword_set(subname)) then begin
+          outfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits'
+      endif else begin
+          if(subname eq 'detect-sdss') then $
+            outfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure_sdss.fits'
+          if(subname eq 'detect-galex') then $
+            outfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure_galex.fits'
+      endelse
+  endif
   if(keyword_set(sample)) then begin
-     infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
-     outfile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample_measure.fits'
+      infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
+      outfile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample_measure.fits'
   endif
   
   atlas= gz_mrdfits(infile, 1)
@@ -27,7 +35,7 @@ pro atlas_gather, sample=sample, subname=subname
         splog, i
       
       atcd, i, subname=subname, sample=sample
-     
+      
       tmp_measure=0
       dreadcen, measure=tmp_measure
       
@@ -42,7 +50,7 @@ pro atlas_gather, sample=sample, subname=subname
       endif
       
   endfor
-
+  
   mwrfits, measure, outfile, /create
      
 end
