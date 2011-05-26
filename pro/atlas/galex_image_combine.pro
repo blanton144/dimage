@@ -68,13 +68,15 @@ for i=0L, n_elements(atlas)-1L do begin
             for k=0L, n_elements(ims)-1L do begin
                 imfinal[ist:ind, jst:jnd]+= $
                   (*ims[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig]* $
-                  (*rrhrs[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig]
+                  ((*rrhrs[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig]>0.)
                 rfinal[ist:ind, jst:jnd]+= $
-                  (*rrhrs[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig]
+                  ((*rrhrs[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig]>0.)
                 cfinal[ist:ind, jst:jnd]+= $
                   ((*ims[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig]+ $
                    (*skies[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig])* $
                   (*rrhrs[isort[k]])[ist_orig:ind_orig, jst_orig:jnd_orig]
+                
+                sxaddpar, hdrfinal, 'IM'+string(f='(i4.4)', k), file_basename(files[k])
             endfor
             imfinal= imfinal/ (rfinal+float(rfinal le 0))
             ivar= rfinal^2/((cfinal>1.)+float(rfinal le 0.))
