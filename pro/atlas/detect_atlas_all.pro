@@ -10,12 +10,16 @@
 ;-
 ;------------------------------------------------------------------------------
 pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
-                      noclobber=noclobber
+                      noclobber=noclobber, galex=galex
 
   if(keyword_set(sdss)) then begin
       galex=0
       twomass=0
       subname='detect-sdss'
+  endif else if(keyword_set(galex)) then begin
+      galex=1
+      twomass=0
+      subname='detect-galex'
   endif else begin
       galex=1
       twomass=1
