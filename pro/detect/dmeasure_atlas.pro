@@ -11,6 +11,23 @@
 ;   31-July-2010
 ;-
 ;------------------------------------------------------------------------------
+function clip_ivar, ivar, xcen, ycen, radius
+
+out= ivar
+nx=(size(out,/dim))[0]
+ny=(size(out,/dim))[1]
+
+xx= findgen(nx)#replicate(1., ny)-xcen
+yy= replicate(1.,nx)#findgen(ny)-ycen
+rr2= xx^2+yy^2
+iclip= where(rr2 gt radius^2, nclip)
+if(nclip gt 0) then $
+  out[iclip]=0.
+
+return, out
+
+end
+;
 pro dmeasure_atlas, noclobber=noclobber
 
 sub='atlases'
@@ -38,6 +55,13 @@ for i=0L, nbands-1L do begin
     pixscales[i]=d12/float(ntest)
 endfor
 scales= pixscales[ref]/pixscales
+
+;; psf file names
+psffiles= strarr(nbands)
+for i=0L, nbands-1L do begin
+    imfile= strtrim(string(pset.imfiles[i]),2)
+    psffiles[i]=(strmid(imfile, 0, strlen(imfile)-8)+'-bpsf.fits')
+endfor
 
 phdr= gz_headfits(subdir+'/'+prefix+'-r.fits')
 pim= gz_mrdfits(subdir+'/'+prefix+'-pimage.fits',0)
@@ -83,12 +107,14 @@ if(keyword_set(pim)) then begin
                keyword_set(nomeasure) eq 0) then begin
                 
                 adxy, hdr, acat[m2].racen, acat[m2].deccen, xcen, ycen
+
+                psf= gz_mrdfits(psffiles[ref])
                 
                 dmeasure, rimage, rinvvar, xcen=xcen, ycen=ycen, $
                   measure=r_measure
                 r_sersic=0
                 dsersic, rimage, rinvvar, xcen=xcen, ycen=ycen, sersic=r_sersic, $
-                  /fixcen, /fixsky, model=model
+                  /fixcen, /fixsky, model=model, psf=psf
 
                 outhdr= hdr
                 sxdelpar, outhdr, 'XTENSION'
@@ -141,6 +167,15 @@ if(keyword_set(pim)) then begin
                                       'ivar-'+pstr+'.fits', iband)
                     invvar=invvar>0.
 
+                    igd= where(invvar gt 0, ngd)
+                    if(ngd gt 0) then $
+                      ivarmed= median(invvar[igd]) $
+                    else $
+                      ivarmed= 1.
+                    ivar_uniform= float(invvar gt 0.)*ivarmed
+                    
+                    psf= gz_mrdfits(psffiles[iband], /silent)
+
                     adxy, hdr, racen, deccen, xcen, ycen
                     dmeasure, image, invvar, xcen=xcen, $
                       ycen=ycen, /fixcen, measure=tmp_measure, $
@@ -150,8 +185,8 @@ if(keyword_set(pim)) then begin
                     curr_sersic.xcen= xcen
                     curr_sersic.ycen= ycen
                     curr_sersic.sersicr50= r_sersic.sersicr50*scales[iband]
-                    dsersic, image, invvar, xcen=xcen, ycen=ycen, sersic=curr_sersic, $
-                      /onlyflux, /fixcen, /fixsky
+                    dsersic, image, ivar_uniform, xcen=xcen, ycen=ycen, $
+                      sersic=curr_sersic, /onlyflux, /fixcen, /fixsky, psf=psf, model=model
                     
                     mall.nprof[iband]= tmp_measure.nprof
                     mall.profmean[iband,*]= $

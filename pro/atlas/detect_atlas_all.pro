@@ -10,7 +10,8 @@
 ;-
 ;------------------------------------------------------------------------------
 pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
-                      noclobber=noclobber, galex=galex
+                      noclobber=noclobber, galex=galex, notrim=notrim, $
+                      nodetect=nodetect
 
   if(keyword_set(sdss)) then begin
       galex=0
@@ -61,12 +62,15 @@ pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
        allthere=0
      
      if(allthere gt 0) then begin
-         detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
-         atlas_jpeg, noclobber=noclobber
+         if(NOT keyword_set(nodetect)) then begin
+             detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
+             atlas_jpeg, noclobber=noclobber
+         endif
          dmeasure_atlas, noclobber=noclobber
          spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']
 
-         dtrim_atlas
+         if(NOT keyword_set(notrim)) then $
+           dtrim_atlas
      endif
  endfor
  
