@@ -102,6 +102,8 @@ for k=0L, nim-1L do begin
     ntest=10L
     xyad, hdr, nx[k]/2L, ny[k]/2L, ra1, dec1
     xyad, hdr, nx[k]/2L+ntest, ny[k]/2L, ra2, dec2
+    cirrange, ra1
+    cirrange, ra2
     spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
     pixscale[k]=d12/float(ntest)
     

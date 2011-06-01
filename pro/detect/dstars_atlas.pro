@@ -40,6 +40,8 @@ dfit_mult_gauss, bpsf, 1, amp, psfsig, model=model, /quiet
 ntest=10L
 xyad, *hdrs[ref], nx[ref]/2L, ny[ref]/2L, ra1, dec1
 xyad, *hdrs[ref], nx[ref]/2L+ntest, ny[ref]/2L, ra2, dec2
+cirrange, ra1
+cirrange, ra2
 spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
 pixscale_ref=d12/float(ntest)
 
@@ -71,6 +73,7 @@ if(nstars gt 0) then begin
    ;; now convert to RA and Dec
    xyad, *hdrs[ref], tmp_xstars, tmp_ystars, $
          ra_stars, dec_stars
+   cirrange, ra_stars
    
    ;; refine center and subtract off best fit 
    ;; psf for each star in this band

@@ -27,6 +27,7 @@ if(keyword_set(pim)) then begin
     nx=(size(pim,/dim))[0]
     ny=(size(pim,/dim))[1]
     xyad, phdr, float(nx/2L), float(ny/2L), racen, deccen
+    cirrange, racen
     pid=pim[nx/2L, ny/2L]
     pstr=strtrim(string(pid),2)
     
@@ -78,6 +79,7 @@ if(keyword_set(pim)) then begin
                   measure=r_measure
 
                 xyad, hdr, r_measure.xcen, r_measure.ycen, racen, deccen
+                cirrange, racen
                 
                 help,/st,r_measure
                 

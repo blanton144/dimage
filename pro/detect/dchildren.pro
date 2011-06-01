@@ -263,6 +263,7 @@ if(nstars gt 0) then begin
     adxy, *hdrs[ref], ra_stars, dec_stars, xstars, ystars
     drefine, fimage, xstars, ystars, xr=xr, yr=yr, smooth=2
     xyad, *hdrs[ref], xr, yr, ra_stars, dec_stars
+    cirrange, ra_stars
     for i=0L, nstars-1L do begin 
         if(xr[i] gt 0L and xr[i] lt nx[ref]-1 AND $
            yr[i] gt 0L and yr[i] lt ny[ref]-1) then begin
@@ -291,6 +292,7 @@ if(ngals gt 0) then begin
     drefine, rimage, xgals, ygals, smooth=2., $
       xr=r_xgals, yr=r_ygals, box=9L
     xyad, *hdrs[ref], r_xgals, r_ygals, ra_gals, dec_gals
+    cirrange, ra_gals
 endif 
 
 ;; now store away the centers in acat
@@ -322,6 +324,8 @@ for k=0L, nim-1L do begin
         ntest=10L
         xyad, *hdrs[k], nx[k]/2L, ny[k]/2L, ra1, dec1
         xyad, *hdrs[k], nx[k]/2L+ntest, ny[k]/2L, ra2, dec2
+        cirrange, ra1
+        cirrange, ra2
         spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
         pixscale[k]=(d12/float(ntest)*3600.)[0]
         

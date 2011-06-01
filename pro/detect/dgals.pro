@@ -29,6 +29,8 @@ if(keyword_set(puse[k])) then begin
     ntest=10L
     xyad, *hdrs[k], nx[k]/2L, ny[k]/2L, ra1, dec1
     xyad, *hdrs[k], nx[k]/2L+ntest, ny[k]/2L, ra2, dec2
+    cirrange, ra1
+    cirrange, ra2
     spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
     pixscale=(d12/float(ntest)*3600.)[0]
 
@@ -69,6 +71,7 @@ if(keyword_set(puse[k])) then begin
 
         xyad, *hdrs[k], r_xgals, r_ygals, $
           tmp_ra_gals, tmp_dec_gals
+        cirrange, tmp_ra_gals
         
         if(n_elements(ra_gals) eq 0) then begin
             ra_gals=tmp_ra_gals

@@ -31,6 +31,7 @@ pro atlas_gather, sample=sample, subname=subname, outfile=outfile
   atlas= gz_mrdfits(infile, 1)
   
   for i=0L, n_elements(atlas)-1L do begin
+  ;; for i=60000L, 62000L do begin
       if((i mod 100) eq 0) then $
         splog, i
       

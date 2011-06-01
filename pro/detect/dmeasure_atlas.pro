@@ -51,6 +51,8 @@ for i=0L, nbands-1L do begin
     ntest=10L
     xyad, hdr, nx/2L, ny/2L, ra1, dec1
     xyad, hdr, nx/2L+ntest, ny/2L, ra2, dec2
+    cirrange,ra1
+    cirrange,ra2
     spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
     pixscales[i]=d12/float(ntest)
 endfor
@@ -69,6 +71,7 @@ if(keyword_set(pim)) then begin
     nx=(size(pim,/dim))[0]
     ny=(size(pim,/dim))[1]
     xyad, phdr, float(nx/2L), float(ny/2L), racen, deccen
+    cirrange, racen
     pid=pim[nx/2L, ny/2L]
     pstr=strtrim(string(pid),2)
     
@@ -123,6 +126,7 @@ if(keyword_set(pim)) then begin
                 mwrfits, float(model), sfile, outhdr, /create
 
                 xyad, hdr, r_measure.xcen, r_measure.ycen, racen, deccen
+                cirrange, racen
                 
                 help,/st,r_measure
                 

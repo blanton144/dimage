@@ -62,6 +62,7 @@ npx=(size(pim,/dim))[0]
 npy=(size(pim,/dim))[1]
 iparent=pim[npx/2L, npy/2L]
 xyad, phdr, float(npx/2L), float(npy/2L), raex, decex
+cirrange, raex
 sgset.iparent=iparent
 
 if(iparent eq -1) then return
@@ -108,6 +109,7 @@ nimages[ref]= ptr_new(dpsfsub_atlas(image=*images[ref], ivar=*ivars[ref], $
                                     exy=yex, exr=1.5, nsigma=nsigma))
 if(nstars gt 0) then begin
    xyad, *hdrs[ref], xstar_r, ystar_r, ra_stars, dec_stars
+   cirrange, ra_stars
    fluxstar= fltarr(n_elements(fluxstar_r), nim)
    fluxstar[*,ref]= fluxstar_r
 endif
@@ -158,6 +160,7 @@ if(ngals gt 0) then begin
    drefine, *nimages[ref], xgals, ygals, smooth=2., $
             xr=xrgals, yr=yrgals, box=long(5)
    xyad, *hdrs[ref], xrgals, yrgals, ra_gals, dec_gals
+   cirrange, ra_gals
 endif
 
 ;; only store up to maxnstars stars
