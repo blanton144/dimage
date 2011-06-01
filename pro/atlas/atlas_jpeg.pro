@@ -26,6 +26,7 @@ npx=(size(pim,/dim))[0]
 npy=(size(pim,/dim))[1]
 iparent=pim[npx/2L, npy/2L]
 xyad, hdr, float(npx/2L), float(npy/2L), racen, deccen
+cirrange, racen
 
 if(iparent eq -1) then return
 
