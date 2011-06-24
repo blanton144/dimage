@@ -7,10 +7,10 @@
 ;   atlas_startrim
 ; COMMENTS:
 ;   Reads in the files:
-;      $DIMAGE_DIR/data/atlas/atlas.fits
-;      $DIMAGE_DIR/data/atlas/atlas_measure.fits
+;      atlas_rootdir/catalogs/atlas.fits
+;      atlas_rootdir/catalogs/atlas_measure.fits
 ;   Outputs the file:
-;      $DIMAGE_DIR/data/atlas/atlas_startrim.fits
+;      atlas_rootdir/catalogs/atlas_startrim.fits
 ;   Basically, identifies cases where the object
 ;   that has been measured is in fact a bright star,
 ;   either based on its structural parameters or that 
@@ -22,10 +22,12 @@
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_startrim
+pro atlas_startrim, version=version
 
-measure=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
-atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
+rootdir=atlas_rootdir(version=version, mdir=mdir, cdir=cdir, ddir=ddir)
+
+measure=mrdfits(mdir+'/atlas_measure.fits',1)
+atlas=mrdfits(cdir+'/atlas.fits',1)
 
 tycho= tycho_read()
 
@@ -64,6 +66,6 @@ istar= where((th50 lt 1. and rmag gt 16.5) OR $
              tmatch gt 0 OR lowz gt 0)
 st[iok[istar]].isstar=1
 
-mwrfits, st, getenv('DIMAGE_DIR')+'/data/atlas/atlas_startrim.fits', /create
+mwrfits, st, ddir+'/atlas_startrim.fits', /create
 
 end

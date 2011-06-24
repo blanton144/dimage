@@ -7,10 +7,10 @@
 ;   atlas_duplicates
 ; COMMENTS:
 ;   Reads in the files:
-;      $DIMAGE_DIR/data/atlas/atlas.fits
-;      $DIMAGE_DIR/data/atlas/atlas_measure.fits
+;      atlas_rootdir/catalogs/atlas.fits
+;      atlas_rootdir/measure/vx_x/atlas_measure.fits
 ;   Outputs the file:
-;      $DIMAGE_DIR/data/atlas/atlas_duplicates.fits
+;      atlas_rootdir/derived/vx_x_x/atlas_duplicates.fits
 ;   Basically, identifies cases where the 
 ;   central object has the same RA/Dec in multiple 
 ;   entries, and picks that with the largest SIZE
@@ -23,10 +23,12 @@
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_duplicates
+pro atlas_duplicates, version=version
 
-measure=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
-atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
+rootdir= atlas_rootdir(version=version, cdir=cdir, mdir=mdir, ddir=ddir)
+
+measure=mrdfits(mdir+'/atlas_measure.fits',1)
+atlas=mrdfits(cdir+'/atlas.fits',1)
 
 dup= replicate({primary:0, good:1, iprimary:-1L, ndup:0}, $
                n_elements(measure))
@@ -53,7 +55,7 @@ for i=0L, ng-1L do begin
     dup[iok[ig]].ndup=n_elements(ig)
 endfor
 
-mwrfits, dup, getenv('DIMAGE_DIR')+'/data/atlas/atlas_duplicates.fits', /create
+mwrfits, dup, ddir+'/atlas_duplicates.fits', /create
 
 
 

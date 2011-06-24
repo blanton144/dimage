@@ -4,14 +4,16 @@
 ; PURPOSE:
 ;   run detect_atlas on everything
 ; CALLING SEQUENCE:
-;   detect_atlas_all [, infile=, /sample]
+;   detect_atlas_all [, infile= ]
 ; REVISION HISTORY:
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
 pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
                       noclobber=noclobber, galex=galex, notrim=notrim, $
-                      nodetect=nodetect
+                      nodetect=nodetect, version=version
+
+rootdir=atlas_rootdir(sample=sample, version=version, cdir=cdir)
 
   if(keyword_set(sdss)) then begin
       galex=0
@@ -27,12 +29,8 @@ pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
       subname='detect'
   endelse
 
-  rootdir=atlas_rootdir(sample=sample)
   if(NOT keyword_set(infile)) then $
-     infile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
-  if(keyword_set(sample)) then begin
-     infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
-  endif
+     infile=cdir+'/atlas.fits'
 
   atlas= gz_mrdfits(infile, 1)
   

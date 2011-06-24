@@ -9,11 +9,11 @@
 ;   23-Apr-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro galex_image_combine
+pro galex_image_combine, version=version
 
-atlas= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
+rootdir=atlas_rootdir(sample=sample, version=version)
 
-rootdir=atlas_rootdir(sample=sample)
+atlas= mrdfits(rootdir+'/catalogs/atlas.fits',1)
 
 bands= ['fd', 'nd']
 zp= [18.82, 20.08]

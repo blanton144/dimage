@@ -24,11 +24,13 @@
 ;   15-Aug-2010  Fixed for atlas, MRB NYU
 ;-
 ;------------------------------------------------------------------------------
-pro zcat2fits
+pro zcat2fits, version=version
 
-ngals= numlines(getenv('DIMAGE_DIR')+'/data/atlas/zcat/zcat-velocity.dat')
+rootdir=atlas_rootdir(sample=sample, version=version)
 
-OPENR, unit, getenv('DIMAGE_DIR')+'/data/atlas/zcat/zcat-velocity.dat', /GET_LUN
+ngals= numlines(rootdir+'/catalogs/zcat/zcat-velocity.dat')
+
+OPENR, unit, rootdir+'/catalogs/zcat/zcat-velocity.dat', /GET_LUN
 
 zcat1={name:' ', $
        ra:0.D, $
@@ -157,6 +159,6 @@ endfor
 free_lun, unit
 
 zcat=zcat[0:ngals-1]
-mwrfits,zcat,getenv('DIMAGE_DIR')+'/data/atlas/zcat/zcat-velocity.fits',/create
+mwrfits,zcat,rootdir+'/catalogs/zcat/zcat-velocity.fits',/create
 
 end

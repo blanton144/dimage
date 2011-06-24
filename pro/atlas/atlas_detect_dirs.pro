@@ -9,7 +9,8 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_detect_dirs, sample=sample, sdss=sdss, justjpg=justjpg, galex=galex
+pro atlas_detect_dirs, sample=sample, sdss=sdss, justjpg=justjpg, galex=galex, $
+                       st=st, nd=nd, version=version
 
 if(keyword_set(sdss)) then begin
     galex=0
@@ -37,16 +38,18 @@ endif else begin
     subname='detect'
 endelse
 
-rootdir=atlas_rootdir(sample=sample)
+rootdir=atlas_rootdir(sample=sample, version=version)
 if(NOT keyword_set(infile)) then $
-  infile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
+   infile=rootdir+'/catalogs/atlas.fits'
 if(keyword_set(sample)) then begin
-   infile= getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
+   infile= rootdir+'/catalogs/atlas_sample.fits'
 endif
 
 atlas= gz_mrdfits(infile, 1)
 
-for i=0L, n_elements(atlas)-1L do begin
+if(NOT keyword_set(st)) then st=0L
+if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L
+for i=st, nd do begin
     if((i mod 1000) eq 0) then $
       splog, i
     subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
@@ -89,7 +92,28 @@ for i=0L, n_elements(atlas)-1L do begin
             if(file_test(galexdir+'/'+imfiles[iband])) then begin
                 file_delete, subdir+'/'+imfiles[iband], /allow
                 file_link, galexdir+'/'+imfiles[iband], '.'
-            endif
+            endif else begin
+                file_delete, subdir+'/'+imfiles[iband], /allow
+                ufile= prefix+'-u.fits'
+                hdr= gz_headfits(ufile)
+                if(size(hdr, /tname) eq 'STRING') then begin
+                    nx_sdss=long(sxpar(hdr, 'NAXIS1'))
+                    ny_sdss=long(sxpar(hdr, 'NAXIS2'))
+                    dra= float(nx_sdss)*0.396/3600.
+                    ddec= float(ny_sdss)*0.396/3600.
+                    xyad, hdr, (float(nx_sdss)-1.)/2., (float(ny_sdss)-1.)/2., $
+                          racen, deccen
+                    ast= hogg_make_astr(racen, deccen, dra, ddec, pix=1.5/3600.)
+                    nx= ast.naxis[0]
+                    ny= ast.naxis[1]
+                    gim= fltarr(nx, ny)
+                    mkhdr, ghdr, gim
+                    putast, ghdr, ast
+                    outfile= strmid(imfiles[iband],0,strlen(imfiles[iband])-3)
+                    mwrfits, gim, subdir+'/'+outfile, ghdr, /create
+                    spawn, /nosh, ['gzip', '-vf', subdir+'/'+outfile]
+                endif
+            endelse
         endfor
     endif
 
@@ -103,7 +127,28 @@ for i=0L, n_elements(atlas)-1L do begin
             if(file_test(twomassdir+'/'+imfiles[iband])) then begin
                 file_delete, subdir+'/'+imfiles[iband], /allow
                 file_link, twomassdir+'/'+imfiles[iband], '.'
-            endif
+            endif else begin
+                file_delete, subdir+'/'+imfiles[iband], /allow
+                ufile= prefix+'-u.fits'
+                hdr= gz_headfits(ufile)
+                if(size(hdr, /tname) eq 'STRING') then begin
+                    nx_sdss=long(sxpar(hdr, 'NAXIS1'))
+                    ny_sdss=long(sxpar(hdr, 'NAXIS2'))
+                    dra= float(nx_sdss)*0.396/3600.
+                    ddec= float(ny_sdss)*0.396/3600.
+                    xyad, hdr, (float(nx_sdss)-1.)/2., (float(ny_sdss)-1.)/2., $
+                          racen, deccen
+                    ast= hogg_make_astr(racen, deccen, dra, ddec, pix=1./3600.)
+                    nx= ast.naxis[0]
+                    ny= ast.naxis[1]
+                    tim= fltarr(nx, ny)
+                    mkhdr, thdr, tim
+                    putast, thdr, ast
+                    outfile= strmid(imfiles[iband],0,strlen(imfiles[iband])-3)
+                    mwrfits, tim, subdir+'/'+outfile, thdr, /create
+                    spawn, /nosh, ['gzip', '-vf', subdir+'/'+outfile]
+                endif
+            endelse
         endfor
     endif
     

@@ -7,14 +7,14 @@
 ;   combine_atlas
 ; COMMENTS:
 ;   Reads in the files:
-;      $DIMAGE_DIR/data/atlas/sdss_atlas.fits
-;      $DIMAGE_DIR/data/atlas/ned_atlas.fits
-;      $DIMAGE_DIR/data/atlas/alfalfa_atlas.fits
-;      $DIMAGE_DIR/data/atlas/sixdf_atlas.fits
-;      $DIMAGE_DIR/data/atlas/zcat_atlas.fits
-;      $DIMAGE_DIR/data/atlas/twodf_atlas.fits
+;      atlas_rootdir/catalogs/sdss_atlas.fits
+;      atlas_rootdir/catalogs/ned_atlas.fits
+;      atlas_rootdir/catalogs/alfalfa_atlas.fits
+;      atlas_rootdir/catalogs/sixdf_atlas.fits
+;      atlas_rootdir/catalogs/zcat_atlas.fits
+;      atlas_rootdir/catalogs/twodf_atlas.fits
 ;   and outputs:
-;      $DIMAGE_DIR/data/atlas/atlas.fits
+;      atlas_rootdir/catalogs/atlas.fits
 ;   which has the contents:
 ;        .RA (J2000 deg)
 ;        .DEC (J2000 deg)
@@ -31,7 +31,9 @@
 ;   31-Mar-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro combine_atlas
+pro combine_atlas, version=version
+
+rootdir=atlas_rootdir(sample=sample, version=version)
 
 atlas0={ra:0.D, dec:0.D, $
         isdss:-1L, $
@@ -45,7 +47,7 @@ atlas0={ra:0.D, dec:0.D, $
         zsrc:' ', $
         size:0.}
 
-sdss=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sdss_atlas.fits', 1)
+sdss=mrdfits(rootdir+'/catalogs/sdss_atlas.fits', 1)
 sdss_size= ((sdss.petrotheta[2]*10L)/3600.) > 0.07
 sdss_atlas= replicate(atlas0, n_elements(sdss))
 sdss_atlas.ra= sdss.ra
@@ -57,7 +59,7 @@ sdss_atlas.z= sdss.z
 sdss_atlas.zsrc= 'sdss'
 sdss_atlas.size= sdss_size
 
-ned=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/ned_atlas.fits', 1)
+ned=mrdfits(rootdir+'/catalogs/ned_atlas.fits', 1)
 izero= where(ned.mag eq 0, nzero)
 if(nzero gt 0) then $
    ned[izero].mag=25.
@@ -71,7 +73,7 @@ ned_atlas.z= ned.vel/299792.
 ned_atlas.zsrc= 'ned'
 ned_atlas.size= ned_size
 
-sixdf=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sixdf_atlas.fits', 1)
+sixdf=mrdfits(rootdir+'/catalogs/sixdf_atlas.fits', 1)
 izero= where(sixdf.bj eq 0, nzero)
 if(nzero gt 0) then $
    sixdf[izero].bj=25.
@@ -85,7 +87,7 @@ sixdf_atlas.z= sixdf.cz/299792.
 sixdf_atlas.zsrc= 'sixdf'
 sixdf_atlas.size= sixdf_size
 
-twodf=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/twodf_atlas.fits', 1)
+twodf=mrdfits(rootdir+'/catalogs/twodf_atlas.fits', 1)
 twodf_size= ((-0.1*(twodf.bjg-10.)+0.5) > 0.10) < 0.5
 twodf_atlas= replicate(atlas0, n_elements(twodf))
 twodf_atlas.ra= twodf.ra
@@ -96,7 +98,7 @@ twodf_atlas.z= twodf.z_helio
 twodf_atlas.zsrc= 'twodf'
 twodf_atlas.size= twodf_size
 
-alfalfa=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/alfalfa_atlas.fits', 1)
+alfalfa=mrdfits(rootdir+'/catalogs/alfalfa_atlas.fits', 1)
 alfalfa_size= 0.15
 alfalfa_atlas= replicate(atlas0, n_elements(alfalfa))
 alfalfa_atlas.ra= alfalfa.ra
@@ -107,7 +109,7 @@ alfalfa_atlas.z= alfalfa.cz/299792.
 alfalfa_atlas.zsrc= 'alfalfa'
 alfalfa_atlas.size= alfalfa_size
 
-zcat=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/zcat_atlas.fits', 1)
+zcat=mrdfits(rootdir+'/catalogs/zcat_atlas.fits', 1)
 izero= where(zcat.bmag eq 0, nzero)
 if(nzero gt 0) then $
    zcat[izero].bmag=25.
@@ -166,6 +168,6 @@ for i=0L, ng-1L do begin
       atlas[i].itwodf= all_atlas[indx[iin[0]]].itwodf
 endfor
 
-mwrfits, atlas, getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits', /create
+mwrfits, atlas, rootdir+'/catalogs/atlas_combine.fits', /create
 
 end

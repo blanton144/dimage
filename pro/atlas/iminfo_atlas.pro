@@ -7,19 +7,21 @@
 ;   iminfo_atlas
 ; COMMENTS:
 ;   Reads in the file:
-;      $DIMAGE_DIR/data/atlas/atlas_combine.fits
+;      atlas_rootdir/catalogs/atlas_combine.fits
 ;   Outputs the file:
-;      $DIMAGE_DIR/data/atlas/atlas_iminfo.fits
+;      atlas_rootdir/catalogs/atlas_iminfo.fits
 ; REVISION HISTORY:
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro iminfo_atlas
+pro iminfo_atlas, version=version
 
 common com_iminfo_atlas, atlas, flist, run
 
+rootdir=atlas_rootdir(sample=sample, version=version)
+
 if(n_tags(atlas) eq 0) then $
-  atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits',1)
+  atlas=mrdfits(rootdir+'/catalogs/atlas_combine.fits',1)
 
 if(n_tags(flist) eq 0 or n_elements(run) eq 0) then begin
     window_read, flist=flist
@@ -46,6 +48,6 @@ endif
 
 hdr=['']
 sxaddpar,hdr, 'TREE_DIR', getenv('TREE_DIR')
-mwrfits, iminfo, getenv('DIMAGE_DIR')+'/data/atlas/atlas_iminfo.fits', /create
+mwrfits, iminfo, rootdir+'/catalogs/atlas_iminfo.fits', /create
 
 end

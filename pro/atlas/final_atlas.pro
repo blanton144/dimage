@@ -7,12 +7,12 @@
 ;   final_atlas
 ; COMMENTS:
 ;   Reads in the files:
-;      $DIMAGE_DIR/data/atlas/atlas_combine.fits
-;      $DIMAGE_DIR/data/atlas/atlas_iminfo.fits
-;      $DIMAGE_DIR/data/atlas/atlas_velmod.fits
+;      atlas_rootdir/catalogs/atlas_combine.fits
+;      atlas_rootdir/catalogs/atlas_iminfo.fits
+;      atlas_rootdir/catalogs/atlas_velmod.fits
 ;   Outputs the file:
-;      $DIMAGE_DIR/data/atlas/atlas_indx.fits
-;      $DIMAGE_DIR/data/atlas/atlas.fits
+;      atlas_rootdir/catalogs/atlas_indx.fits
+;      atlas_rootdir/catalogs/atlas.fits
 ;   Basically, restricts atlas to objects within the 
 ;   SDSS area, and adds in the correct distances.
 ;   The indx file just stores the indices selected
@@ -20,18 +20,20 @@
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro final_atlas
+pro final_atlas, version=version
 
-combine=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits',1)
-iminfo=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_iminfo.fits',1)
-velmod=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_velmod.fits',1)
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+combine=mrdfits(rootdir+'/catalogs/atlas_combine.fits',1)
+iminfo=mrdfits(rootdir+'/catalogs/atlas_iminfo.fits',1)
+velmod=mrdfits(rootdir+'/catalogs/atlas_velmod.fits',1)
 
 ikeep= where(iminfo.run gt 0 and iminfo.score ge 0.5, nkeep)
 combine=combine[ikeep]
 iminfo=iminfo[ikeep]
 velmod=velmod[ikeep]
 
-mwrfits, ikeep, getenv('DIMAGE_DIR')+'/data/atlas/atlas_indx.fits', /create
+mwrfits, ikeep, rootdir+'/catalogs/atlas_indx.fits', /create
 
 atlas0= create_struct('iauname', ' ', $
                       'subdir', ' ', $
@@ -61,6 +63,6 @@ atlas.zlg= velmod.zlg
 atlas.zdist= velmod.zdist
 atlas.zdist_err= velmod.zdist_err
 
-mwrfits, atlas, getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits', /create
+mwrfits, atlas, rootdir+'/catalogs/atlas.fits', /create
 
 end

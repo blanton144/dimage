@@ -15,15 +15,20 @@
 ;   15-Apr-2011  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-function read_atlas, notrim=notrim, measure=measure, kcorrect=kcorrect
+function read_atlas, notrim=notrim, measure=measure, kcorrect=kcorrect, $
+                     sdssline=sdssline, version=version
 
-atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
+rootdir=atlas_rootdir(version=version, cdir=cdir, mdir=mdir, ddir=ddir)
+
+atlas=mrdfits(cdir+'/atlas.fits',1)
 if(arg_present(measure)) then $
-  measure=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
+  measure=mrdfits(mdir+'/atlas_measure.fits',1)
 if(arg_present(kcorrect)) then $
-  kcorrect=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_kcorrect.fits',1)
-dup=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_duplicates.fits',1)
-st=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_startrim.fits',1)
+  kcorrect=mrdfits(ddir+'/atlas_kcorrect.fits',1)
+if(arg_present(sdssline)) then $
+  sdssline=mrdfits(cdir+'/sdssline_atlas.fits',1)
+dup=mrdfits(ddir+'/atlas_duplicates.fits',1)
+st=mrdfits(ddir+'/atlas_startrim.fits',1)
 
 nsaid= replicate({nsaid:-1L}, n_elements(atlas))
 nsaid.nsaid= lindgen(n_elements(atlas))
@@ -38,6 +43,8 @@ if(NOT keyword_set(notrim)) then begin
       measure= measure[itrim]
     if(n_tags(kcorrect) gt 0) then $
       kcorrect= kcorrect[itrim]
+    if(n_tags(sdssline) gt 0) then $
+      sdssline= sdssline[itrim]
 endif
 
 return, atlas

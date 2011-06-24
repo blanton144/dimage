@@ -6,16 +6,18 @@
 ; CALLING SEQUENCE:
 ;   gather_ned_galaxies
 ; COMMENTS:
-;   Reads NED outputs from $DIMAGE_DIR/data/atlas/blanton_atlas_???.txt.gz
-;   Writes output file $DIMAGE_DIR/data/atlas/ned_atlas.fits
+;   Reads NED outputs from atlas_rootdir/catalogs/blanton_atlas_???.txt.gz
+;   Writes output file atlas_rootdir/catalogs/ned_atlas.fits
 ; REVISION HISTORY:
 ;   2-May-2008  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro gather_ned_galaxies
+pro gather_ned_galaxies, version=version
 
-outdir= getenv('DIMAGE_DIR')+'/data/atlas/ned'
-indir= getenv('DIMAGE_DIR')+'/data/atlas/'
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+outdir= rootdir+'/catalogs/ned'
+indir= rootdir+'/catalogs/'
 filebase= 'blanton_atlas_'
 tmpfile= indir+'/ned.tmp'
 

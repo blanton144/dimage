@@ -11,11 +11,13 @@
 ;   31-Mar-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro ned_query_atlas_get, st=st
+pro ned_query_atlas_get, st=st, version=version
 
 if(NOT keyword_set(st)) then st=0L
 
-outdir=getenv('DIMAGE_DIR')+'/data/atlas/ned'
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+outdir=rootdir+'/catalogs/ned'
 
 cd, outdir
 

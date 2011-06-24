@@ -11,14 +11,14 @@
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_thumbs
+pro atlas_thumbs, version=version
 
-atlas= read_atlas(/notrim, measure=measure)
-rootdir=atlas_rootdir()
+atlas= read_atlas(/notrim, measure=measure, version=version)
+rootdir=atlas_rootdir(version=version)
 
 for i=0L, n_elements(atlas)-1L do begin
    help, i, atlas[i].subdir
-   atcd, i, sub='detect-sdss'
+   atcd, i, version=version
    iauname=strtrim(atlas[i].iauname,2)
 
    hdr= headfits(atlas[i].iauname+'-r.fits.gz')

@@ -12,15 +12,14 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_dimages, seed=seed, st=st, nd=nd, clobber=clobber
+pro atlas_dimages, seed=seed, st=st, nd=nd, clobber=clobber, version=version
 
   window_read, flist=flist
   ikeep= where(flist.rerun eq '301' and flist.run ne 1473)
   run= (uniqtag(flist[ikeep], 'run')).run
   
-  atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits', 1)
-  
-  rootdir=atlas_rootdir(sample=sample)
+  rootdir= atlas_rootdir(sample=sample, version=version)
+  atlas=gz_mrdfits(rootdir+'/catalogs/atlas.fits', 1)
   
   if(NOT keyword_set(st)) then st=0L
   if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L

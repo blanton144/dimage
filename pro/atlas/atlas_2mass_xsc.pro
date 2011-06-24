@@ -7,17 +7,18 @@
 ;   atlas_2mass_xsc 
 ; COMMENTS:
 ;   Reads from: 
-;     $DIMAGE_DIR/data/atlas_combine.fits
+;     atlas_rootdir/catalogs/atlas_combine.fits
 ;     $VAGC_REDUX/twomass/twomass_catalog_00[0-3].fits
 ;   Writes to:
-;     $DIMAGE_DIR/data/atlas_2mass_xsc.fits
+;     atlas_rootdir/catalogs/atlas_2mass_xsc.fits
 ; REVISION HISTORY:
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_2mass_xsc
+pro atlas_2mass_xsc, version=version
 
-combine=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits', 1)
+rootdir= atlas_rootdir(version=version)
+combine=gz_mrdfits(rootdir+'/catalogs/atlas_combine.fits', 1)
 
 for i=0L, 3L do begin
     filebase= getenv('VAGC_REDUX')+'/twomass/twomass_catalog_'
@@ -32,6 +33,6 @@ for i=0L, 3L do begin
     outx[m1]= xsc[m2]
 endfor
 
-mwrfits, outx, getenv('DIMAGE_DIR')+'/data/atlas/atlas_2mass_xsc.fits', /create
+mwrfits, outx, rootdir+'/catalogs/atlas_2mass_xsc.fits', /create
   
 end

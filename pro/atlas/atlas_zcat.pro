@@ -10,9 +10,11 @@
 ;   15-Aug-2010  Fixed for atlas, MRB NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_zcat
+pro atlas_zcat, version=version
 
-zcat=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/zcat/zcat-velocity.fits',1)
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+zcat=mrdfits(rootdir+'/catalogs/zcat/zcat-velocity.fits',1)
 
 ikeep= where(zcat.z lt 0.055 and $
              zcat.z gt -0.05 and $
@@ -20,6 +22,6 @@ ikeep= where(zcat.z lt 0.055 and $
              strmatch(zcat.comments, 'SDSS*') eq 0)
 zcat=zcat[ikeep]
 
-mwrfits, zcat, getenv('DIMAGE_DIR')+'/data/atlas/zcat_atlas.fits', /create
+mwrfits, zcat, rootdir+'/catalogs/zcat_atlas.fits', /create
 
 end

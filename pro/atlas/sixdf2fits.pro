@@ -9,9 +9,11 @@
 ;   31-Jul-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro sixdf2fits
+pro sixdf2fits, version=version
 
-readcol, getenv('DIMAGE_DIR')+'/data/atlas/6dF/6dFGSzDR3.txt', $
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+readcol, rootdir+'/catalogs/6dF/6dFGSzDR3.txt', $
          comment='#', $
          format='(a,a,a,a,a,a,a,l,l,f,l,f,l,l,f,f,l,f,f,f,l,l,a,a,a)', $
          targetid, $
@@ -48,6 +50,6 @@ string2radec, rahr, ramin, rasec, decdeg, decmin, decsec, ra, dec
 six.ra= ra
 six.dec= dec
 
-mwrfits, six, getenv('DIMAGE_DIR')+'/data/atlas/sixdf/sixdf.fits', /create
+mwrfits, six, rootdir+'/catalogs/sixdf/sixdf.fits', /create
 
 end

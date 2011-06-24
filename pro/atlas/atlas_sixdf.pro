@@ -11,13 +11,15 @@
 ;------------------------------------------------------------------------------
 pro atlas_sixdf
 
-six= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sixdf/sixdf.fits', 1)
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+six= mrdfits(rootdir+'/catalogs/sixdf/sixdf.fits', 1)
 
 z=six.cz/299792.
 ikeep= where(z lt 0.055)
 six=six[ikeep]
 
-mwrfits, six, getenv('DIMAGE_DIR')+'/data/atlas/sixdf_atlas.fits', /create
+mwrfits, six, rootdir+'/catalogs/sixdf_atlas.fits', /create
 
 end
 

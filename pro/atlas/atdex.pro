@@ -9,7 +9,7 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atdex, indx, name=name, subname=subname, sample=sample, twomass=twomass
+pro atdex, indx, name=name, subname=subname, twomass=twomass, version=version
 
 common com_atdex, atlas
 
@@ -18,7 +18,8 @@ if(n_elements(name) gt 0) then $
 else $
   nat=n_elements(indx)
 
-atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
+rootdir=atlas_rootdir(version=version)
+atlasfile=rootdir+'/catalogs/atlas.fits'
 if(n_tags(atlas) eq 0) then $
   atlas=mrdfits(atlasfile,1, /silent)
 
@@ -26,10 +27,10 @@ i=0L
 while (i lt nat) do begin
     if(n_elements(name) eq 0) then begin
         splog, indx[i]
-        atcd, indx[i], subname=subname, sample=sample
+        atcd, indx[i], subname=subname
         tmp_indx=indx[i]
     endif else begin
-        atcd, tmp_indx, name=name[i], subname=subname, sample=sample
+        atcd, tmp_indx, name=name[i], subname=subname
     endelse
     
     dexplore, /cen, twomass=twomass, next=next, previous=previous, finish=finish, $

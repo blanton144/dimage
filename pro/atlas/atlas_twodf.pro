@@ -9,14 +9,16 @@
 ;   31-Jul-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_twodf
+pro atlas_twodf, version=version
 
-two= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/twodf/twodf_catalog.fits.gz', 1)
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+two= mrdfits(rootdir+'/catalogs/twodf/twodf_catalog.fits.gz', 1)
 
 ikeep= where(two.z_helio lt 0.055)
 two=two[ikeep]
 
-mwrfits, two, getenv('DIMAGE_DIR')+'/data/atlas/twodf_atlas.fits', /create
+mwrfits, two, rootdir+'/catalogs/twodf_atlas.fits', /create
 
 end
 

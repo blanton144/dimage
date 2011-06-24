@@ -7,10 +7,10 @@
 ;   atlas_kcorrect
 ; COMMENTS:
 ;   Reads in the files:
-;      $DIMAGE_DIR/data/atlas/atlas.fits
-;      $DIMAGE_DIR/data/atlas/atlas_measure.fits
+;      atlas_rootdir/catalogs/atlas.fits
+;      atlas_rootdir/catalogs/atlas_measure.fits
 ;   Outputs the file:
-;      $DIMAGE_DIR/data/atlas/atlas_duplicates.fits
+;      atlas_rootdir/catalogs/atlas_duplicates.fits
 ;   Basically, identifies cases where the 
 ;   central object has the same RA/Dec in multiple 
 ;   entries, and picks that with the largest SIZE
@@ -23,42 +23,106 @@
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_kcorrect
+pro atlas_kcorrect_sdss_maggies, measure, nmgy, nmgy_ivar
 
-measure=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
-atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
+errband=[0.05,0.02,0.02,0.02,0.03]
+
+nmgy= measure.sersicflux[0:4]
+nmgy_ivar= measure.sersicflux_ivar[0:4]
+k_minerror, nmgy, nmgy_ivar
+k_abfix, nmgy, nmgy_ivar
+
+end
+;
+pro atlas_kcorrect_galex_maggies, measure, nmgy, nmgy_ivar
+
+errband=[0.04,0.04]
+
+nmgy= fltarr(2, n_elements(measure))
+nmgy_ivar= fltarr(2, n_elements(measure))
+nmgy[0,*]= measure.sersicflux[6]
+nmgy[1,*]= measure.sersicflux[5]
+nmgy_ivar[0,*]= measure.sersicflux_ivar[6]
+nmgy_ivar[1,*]= measure.sersicflux_ivar[5]
+k_minerror, nmgy, nmgy_ivar, errband
+
+end
+;
+pro atlas_kcorrect, version=version
+
+sfilterlist= 'sdss_'+['u','g','r','i','z']+'0.par'
+gfilterlist= 'galex_'+['FUV','NUV']+'.par'
+
+info= atlas_version_info(version)
+rootdir=atlas_rootdir(version=version, mdir=mdir, cdir=cdir, ddir=ddir)
+
+measure=mrdfits(mdir+'/atlas_measure.fits',1)
+atlas=mrdfits(cdir+'/atlas.fits',1)
+
+case info.kcorrect of
+    'sdss': begin
+        nband=5L
+        fkcorrect='sdss_kcorrect'
+        atlas_kcorrect_sdss_maggies, measure, nmgy, nmgy_ivar
+        filterlist= sfilterlist
+    end
+    'galex': begin
+        nband=7L
+        fkcorrect='galex_kcorrect'
+        nmgy= fltarr(nband, n_elements(measure))
+        nmgy_ivar= fltarr(nband, n_elements(measure))
+        atlas_kcorrect_sdss_maggies, measure, snmgy, snmgy_ivar
+        nmgy[2:6, *]= snmgy
+        nmgy_ivar[2:6, *]= snmgy_ivar
+        atlas_kcorrect_galex_maggies, measure, gnmgy, gnmgy_ivar
+        nmgy[0:1, *]= gnmgy
+        nmgy_ivar[0:1, *]= gnmgy_ivar
+        filterlist= [gfilterlist, sfilterlist]
+    end
+    default: message, 'No such kcorrection '+info.kcorrect
+endcase
 
 iok= where(atlas.zdist gt 0. and $
            (measure.racen ne 0. or measure.deccen ne 0.), nok)
 
-kc= sdss_kcorrect(atlas[iok].zdist, cal=measure[iok], flux='sersic', absmag=absmag, $
-                  amivar=amivar, mass=mass, rmaggies=rmaggies, omaggies=omaggies, $
-                  mtol=mtol)
+kcorrect, nmgy[*,iok]*1.e-9, nmgy_ivar[*,iok]*1.e+18, atlas[iok].zdist, kc, $
+  band_shift=0., filterlist=filterlist, mass=mass, absmag=absmag, $
+  rmaggies=rmgy, amivar=amivar, b300=b300, b1000=b1000, mets=mets, $
+  mtol=mtol
+rnmgy= 1.e+9*rmgy
 
 kcorrect0= {ra:0.D, $
             dec:0.D, $
             zdist:0., $
-            omaggies:fltarr(5), $
-            rmaggies:fltarr(5), $
-            absmag:fltarr(5), $
-            amivar:fltarr(5), $
-            kcorrect:fltarr(5), $
-            mtol:fltarr(5), $
+            nmgy:fltarr(nband), $
+            nmgy_ivar:fltarr(nband), $
+            ok:0, $
+            rnmgy:fltarr(nband), $
+            absmag:fltarr(nband), $
+            amivar:fltarr(nband), $
+            kcorrect:fltarr(nband), $
+            mtol:fltarr(nband), $
+            b300:0., $
+            b1000:0., $
+            mets:0., $
             mass:0.}
 kcorrect= replicate(kcorrect0, n_elements(atlas))
 kcorrect.ra= measure.racen
 kcorrect.dec= measure.deccen
 kcorrect.zdist= atlas.zdist
-kcorrect[iok].omaggies= omaggies
-kcorrect[iok].rmaggies= rmaggies
+kcorrect.nmgy= nmgy
+kcorrect.nmgy_ivar= nmgy_ivar
+kcorrect[iok].ok= 1
+kcorrect[iok].rnmgy= rnmgy
 kcorrect[iok].absmag= absmag
 kcorrect[iok].amivar= amivar
-kcorrect[iok].mtol= mtol
 kcorrect[iok].kcorrect= kc
+kcorrect[iok].mtol= mtol
+kcorrect[iok].b300= b300
+kcorrect[iok].b1000= b1000
+kcorrect[iok].mets= mets
 kcorrect[iok].mass= mass
 
-mwrfits, kcorrect, getenv('DIMAGE_DIR')+'/data/atlas/atlas_kcorrect.fits', /create
-
-
+mwrfits, kcorrect, ddir+'/atlas_kcorrect.fits', /create
 
 end

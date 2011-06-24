@@ -12,7 +12,9 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro sample_dimages, seed=seed
+pro sample_dimages, seed=seed, version=version
+
+rootdir=atlas_rootdir(/sample, version=version)
 
   if(not keyword_set(seed)) then seed=-109L
 
@@ -20,7 +22,7 @@ pro sample_dimages, seed=seed
   ikeep= where(flist.rerun eq '301' and flist.run ne 1473)
   run= (uniqtag(flist[ikeep], 'run')).run
 
-  atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits', 1)
+  atlas=gz_mrdfits(rootdir+'/catalogs/atlas.fits', 1)
 
   ibright= where(atlas.mag lt 15.5)
   atlas=atlas[ibright]
@@ -28,9 +30,7 @@ pro sample_dimages, seed=seed
   indx= shuffle_indx(n_elements(atlas), num_sub=500, seed=seed)
   atlas=atlas[indx]
 
-  mwrfits, atlas, getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits', /create
-  
-  rootdir='/global/data/atlas/sample'
+  mwrfits, atlas, rootdir+'/catalogs/atlas_sample.fits', /create
   
   for i=0, n_elements(atlas)-1L do begin
      subdir=image_subdir(atlas[i].ra, atlas[i].dec, $

@@ -7,16 +7,18 @@
 ;   sdss_atlas_doublestar
 ; COMMENTS:
 ;   Reads from 
-;      $DIMAGE_DIR/data/atlas/sdss/specTrim-dr8.fits
+;      atlas_rootdir/catalogs/sdss/specTrim-dr8.fits
 ;   Writes to 
-;      $DIMAGE_DIR/data/atlas/sdss/doubleStar-dr8.fits
+;      atlas_rootdir/catalogs/sdss/doubleStar-dr8.fits
 ; REVISION HISTORY:
 ;   31-Jul-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro sdss_atlas_doublestar
+pro sdss_atlas_doublestar, version=version
 
-trim=hogg_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sdss/specTrim-dr8.fits', $
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+trim=hogg_mrdfits(rootdir+'/catalogs/sdss/specTrim-dr8.fits', $
                   1, nrow=28800)
 
 ;; if it is classified spectroscopically as a star

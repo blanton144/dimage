@@ -9,13 +9,14 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_galex_images, st=st, nd=nd, sample=sample, clobber=clobber
+pro atlas_galex_images, st=st, nd=nd, sample=sample, clobber=clobber, $
+                        version=version
 
-  rootdir=atlas_rootdir(sample=sample)
+  rootdir=atlas_rootdir(sample=sample, version=version)
   if(NOT keyword_set(sample)) then begin
-     atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits', 1)
+     atlas=gz_mrdfits(rootdir+'/catalogs/atlas.fits', 1)
   endif else begin
-     atlas=gz_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits', 1)
+     atlas=gz_mrdfits(rootdir+'/catalogs/atlas_sample.fits', 1)
   endelse
   
   bands=['nd', 'fd']

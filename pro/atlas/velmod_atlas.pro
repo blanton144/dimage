@@ -7,19 +7,21 @@
 ;   velmod_atlas
 ; COMMENTS:
 ;   Reads in the file:
-;      $DIMAGE_DIR/data/atlas/atlas_combine.fits
+;      atlas_rootdir/catalogs/atlas_combine.fits
 ;   Outputs the file:
-;      $DIMAGE_DIR/data/atlas/atlas_velmod.fits
+;      atlas_rootdir/catalogs/atlas_velmod.fits
 ; REVISION HISTORY:
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro velmod_atlas
+pro velmod_atlas, version=version
 
 if(NOT keyword_set(sigv)) then sigv=150.
 if(n_elements(beta) eq 0) then beta=0.5
 
-atlas=mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_combine.fits',1)
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+atlas=mrdfits(rootdir+'/catalogs/atlas_combine.fits',1)
 
 vmod1={zdist:-1., $
        zdist_err:-1., $
@@ -44,6 +46,6 @@ if(nlow gt 0) then begin
    vmod[ilow].zdist_err=ldist.distance_err/2.99792e+5
 endif
 
-mwrfits, vmod, getenv('DIMAGE_DIR')+'/data/atlas/atlas_velmod.fits', /create
+mwrfits, vmod, rootdir+'/catalogs/atlas_velmod.fits', /create
 
 end

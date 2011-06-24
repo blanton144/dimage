@@ -7,16 +7,18 @@
 ;   atlas_sdss
 ; COMMENTS:
 ;   Reprocesses the file:
-;      $DIMAGE_DIR/data/atlas/sdss/specList-dr8.fits
+;      atlas_rootdir/catalogs/sdss/specList-dr8.fits
 ;   into 
-;      $DIMAGE_DIR/data/atlas/sdss_atlas.fits
+;      atlas_rootdir/catalogs/sdss_atlas.fits
 ; REVISION HISTORY:
 ;   31-Mar-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_sdss
+pro atlas_sdss, version=version
 
-list=hogg_mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sdss/specList-dr8.fits', $
+rootdir=atlas_rootdir(sample=sample, version=version)
+
+list=hogg_mrdfits(rootdir+'/catalogs/sdss/specList-dr8.fits', $
                   1, nrow=28800)
 
 sdss_flux2lups, list.modelflux, model, /noivar
@@ -68,7 +70,6 @@ ing= spheregroup(trim.ra, trim.dec, 2./3600., firstg=firstg)
 ii=where(firstg ge 0)
 trim=trim[firstg[ii]]
 
-mwrfits, trim, getenv('DIMAGE_DIR')+'/data/atlas/sdss_atlas.fits', $
-  /create
+mwrfits, trim, rootdir+'/catalogs/sdss_atlas.fits', /create
 
 end

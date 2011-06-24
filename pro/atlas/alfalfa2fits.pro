@@ -9,9 +9,9 @@
 ;   15-Aug-2010  Fixed for atlas, MRB NYU
 ;-
 ;------------------------------------------------------------------------------
-pro alfalfa2fits
+pro alfalfa2fits, version=version
 
-infile=getenv('DIMAGE_DIR')+'/data/atlas/alfalfa/alfalfa3.txt'
+infile=atlas_rootdir(version=version)+'/catalogs/alfalfa/alfalfa3.txt'
 nlines=numlines(infile)-13L
 
 str0={agc:0L, $
@@ -81,6 +81,7 @@ for i=0L, nlines-1L do begin
 endfor
 free_lun, unit
 
-mwrfits, str, getenv('DIMAGE_DIR')+'/data/atlas/alfalfa/alfalfa3.fits', /create
+mwrfits, str, atlas_rootdir(version=version)+ $
+         '/catalogs/alfalfa/alfalfa3.fits', /create
 
 end

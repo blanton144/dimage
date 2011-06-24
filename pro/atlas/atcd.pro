@@ -9,17 +9,14 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atcd, indx, name=name, subname=subname, sample=sample
+pro atcd, indx, name=name, subname=subname, version=version
 
 common com_atcd, atlas, iauname
 
 if(NOT keyword_set(subname)) then subname='detect'
 
-rootdir=atlas_rootdir(sample=sample)
-atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits'
-if(keyword_set(sample)) then begin
-    atlasfile=getenv('DIMAGE_DIR')+'/data/atlas/atlas_sample.fits'
-endif
+rootdir=atlas_rootdir(version=version)
+atlasfile=rootdir+'/catalogs/atlas.fits'
 
 if(n_tags(atlas) eq 0) then $
   atlas=mrdfits(atlasfile,1, /silent)

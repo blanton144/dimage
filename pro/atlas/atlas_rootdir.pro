@@ -9,12 +9,21 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-function atlas_rootdir, sample=sample
+function atlas_rootdir, version=version, cdir=cdir, mdir=mdir, ddir=ddir
 
-  rootdir='/mount/hercules5/sdss/atlas/v0'
-  if(keyword_set(sample)) then $
-     rootdir='/mount/hercules5/sdss/atlas/sample'
-  
-  return, rootdir
+if(NOT keyword_set(version)) then $
+   version=atlas_default_version()
+
+words= strsplit(version, '_', /extr)
+vtop= words[0]
+vmeas= words[0]+'_'+words[1]
+
+rootdir='/global/data/sdss/atlas/'+vtop
+
+cdir= rootdir+'/catalogs'
+mdir= rootdir+'/measure/'+vmeas
+ddir= rootdir+'/derived/'+version
+
+return, rootdir
   
 end

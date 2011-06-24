@@ -10,12 +10,14 @@
 ;      $SPECTRO_REDUX/photoPlate-dr8.fits
 ;      $SPECTRO_REDUX/specObj-dr8.fits
 ;   into a managable file:
-;      $DIMAGE_DIR/data/atlas/sdss/specList-dr8.fits
+;      atlas_rootdir/catalogs/sdss/specList-dr8.fits
 ; REVISION HISTORY:
 ;   31-Mar-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro sdss_speclist
+pro sdss_speclist, version=version
+
+rootdir=atlas_rootdir(sample=sample, version=version)
 
 ph_columns= ['run', 'camcol', 'field', 'id', 'rerun', $
              'objc_type', 'objc_prob_psf', 'objc_flags', 'objc_flags2', $
@@ -51,7 +53,7 @@ new= replicate(new0, n_elements(ph))
 struct_assign, ph, new
 struct_assign, sp, new,/nozero
 
-mwrfits, new, getenv('DIMAGE_DIR')+'/data/atlas/sdss/specList-dr8.fits', $
+mwrfits, new, rootdir+'/catalogs/sdss/specList-dr8.fits', $
   /create
 
 
