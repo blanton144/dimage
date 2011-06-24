@@ -171,13 +171,6 @@ if(keyword_set(pim)) then begin
                                       'ivar-'+pstr+'.fits', iband)
                     invvar=invvar>0.
 
-                    igd= where(invvar gt 0, ngd)
-                    if(ngd gt 0) then $
-                      ivarmed= median(invvar[igd]) $
-                    else $
-                      ivarmed= 1.
-                    ivar_uniform= float(invvar gt 0.)*ivarmed
-                    
                     psf= gz_mrdfits(psffiles[iband], /silent)
 
                     adxy, hdr, racen, deccen, xcen, ycen
@@ -189,8 +182,9 @@ if(keyword_set(pim)) then begin
                     curr_sersic.xcen= xcen
                     curr_sersic.ycen= ycen
                     curr_sersic.sersicr50= r_sersic.sersicr50*scales[iband]
-                    dsersic, image, ivar_uniform, xcen=xcen, ycen=ycen, $
-                      sersic=curr_sersic, /onlyflux, /fixcen, /fixsky, psf=psf, model=model
+                    dsersic, image, invvar, xcen=xcen, ycen=ycen, $
+                      sersic=curr_sersic, /onlyflux, /fixcen, /fixsky, $
+                      psf=psf, model=model
                     
                     mall.nprof[iband]= tmp_measure.nprof
                     mall.profmean[iband,*]= $
@@ -208,7 +202,7 @@ if(keyword_set(pim)) then begin
                     mall.fiberflux_ivar[iband]= $
                       tmp_measure.fiberflux_ivar
                     mall.sersicflux[iband]= curr_sersic.sersicflux
-                    mall.sersicflux_ivar[iband]= 1./curr_sersic.perror[3]^2
+                    mall.sersicflux_ivar[iband]= curr_sersic.sersicflux_ivar
                     mall.asymmetry[iband]= tmp_measure.asymmetry
                     mall.clumpy[iband]= tmp_measure.clumpy
                     mall.dflags[iband]= tmp_measure.dflags

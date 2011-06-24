@@ -8,10 +8,12 @@
 ; REVISION HISTORY:
 ;   11-Apr-2011 MRB NYU
 ;-
-pro plot_wise_gv
+pro plot_wise_gv, version=version
 
-atlas= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
-measure= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
+rootdir=atlas_rootdir(version=version)
+
+atlas= mrdfits(rootdir+'/catalogs/atlas.fits',1)
+measure= mrdfits(rootdir+'/catalogs/atlas_measure.fits',1)
 absmag= mrdfits('atlas_wise_absmag.fits',1)
 
 k_print, filename='wise_cmd_mir.ps'

@@ -8,10 +8,12 @@
 ; REVISION HISTORY:
 ;   14-Apr-2011 MRB NYU
 ;-
-pro wise_atlas_search
+pro wise_atlas_search, version=version
 
-atlas= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
-measure= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
+rootdir=atlas_rootdir(version=version)
+
+atlas= mrdfits(rootdir+'/catalogs/atlas.fits',1)
+measure= mrdfits(rootdir+'/catalogs/atlas_measure.fits',1)
 
 euler, measure.racen, measure.deccen, elon, elat, 3
 iin= where((elon gt 27.8 and elon lt 133.4) OR $

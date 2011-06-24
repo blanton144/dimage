@@ -172,9 +172,11 @@ endif
    
 end
 ;;
-pro plot_fake_for_sky, model=model
+pro plot_fake_for_sky, model=model, version=version
 
 common com_compare_reruns
+
+rootdir=atlas_rootdir(sample=sample, version=version)
 
 postfix=''
 if(keyword_set(model)) then $
@@ -189,7 +191,7 @@ if(n_tags(im) eq 0) then begin
 endif
 
 if(n_tags(atlas) eq 0) then $
-  atlas= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sdss_atlas.fits',1)
+  atlas= mrdfits(rootdir+'/catalogs/sdss_atlas.fits',1)
     
 spherematch, atlas.ra, atlas.dec, im.ra, im.dec, 2./3600., m1, m2
 

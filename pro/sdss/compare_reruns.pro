@@ -7,15 +7,17 @@
 ;   compare_reruns
 ; COMMENTS:
 ;   Takes data from:
-;     $DIMAGE_DIR/data/atlas/sdss_atlas.fits
+;     atlas_rootdir/catalogs/sdss_atlas.fits
 ;     /global/data/vagc-dr7/vagc2/object_sdss_imaging.fits
 ; REVISION HISTORY:
 ;   2-Dec-2010  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro compare_reruns
+pro compare_reruns, version=version
 
 common com_compare_reruns, atlas, im
+
+rootdir=atlas_rootdir(version=version)
 
 if(n_tags(im) eq 0) then begin
     imfile= '/global/data/vagc-dr7/vagc2/object_sdss_imaging.fits'
@@ -26,7 +28,7 @@ if(n_tags(im) eq 0) then begin
 endif
 
 if(n_tags(atlas) eq 0) then $
-  atlas= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/sdss_atlas.fits',1)
+  atlas= mrdfits(rootdir+'/catalogs/sdss_atlas.fits',1)
     
 spherematch, atlas.ra, atlas.dec, im.ra, im.dec, 2./3600., m1, m2
 

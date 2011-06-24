@@ -18,7 +18,9 @@
 ; REVISION HISTORY:
 ;   14-Apr-2011 MRB NYU
 ;-
-pro convert_wise_cat
+pro convert_wise_cat, version=version
+
+rootdir=atlas_rootdir(version=version)
 
 wise=mrdfits('wise_prelim.wise_prelim_p3as_psd17879.fits',1)
 
@@ -37,7 +39,7 @@ free_lun, unit
 so= replicate({SOUGHT:0}, n_elements(wise))
 wise= struct_addtags(wise, so)
 
-atlas= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
+atlas= mrdfits(rootdir+'/catalogs/atlas.fits',1)
 
 atwise0= wise[0]
 struct_assign, {junk:0}, atwise0

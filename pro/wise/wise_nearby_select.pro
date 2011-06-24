@@ -11,10 +11,12 @@
 ; REVISION HISTORY:
 ;   11-Apr-2011 MRB NYU
 ;-
-pro wise_nearby_select
+pro wise_nearby_select, version=version
 
-atlas= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas.fits',1)
-measure= mrdfits(getenv('DIMAGE_DIR')+'/data/atlas/atlas_measure.fits',1)
+rootdir=atlas_rootdir(version=version)
+
+atlas= mrdfits(rootdir+'/catalogs/atlas.fits',1)
+measure= mrdfits(rootdir+'/catalogs/atlas_measure.fits',1)
 radec= struct_trimtags(atlas, select=['ra', 'dec'])
 measure= struct_addtags(measure, radec)
 
