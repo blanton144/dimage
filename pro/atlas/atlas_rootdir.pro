@@ -9,7 +9,8 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-function atlas_rootdir, version=version, cdir=cdir, mdir=mdir, ddir=ddir
+function atlas_rootdir, version=version, cdir=cdir, mdir=mdir, ddir=ddir, $
+                        subname=subname
 
 if(NOT keyword_set(version)) then $
    version=atlas_default_version()
@@ -23,7 +24,8 @@ rootdir='/global/data/sdss/atlas/'+vtop
 cdir= rootdir+'/catalogs'
 mdir= rootdir+'/measure/'+vmeas
 ddir= rootdir+'/derived/'+version
+subname= 'detect/'+vmeas
 
 return, rootdir
-  
+
 end

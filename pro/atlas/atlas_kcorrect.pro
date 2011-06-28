@@ -50,6 +50,9 @@ end
 ;
 pro atlas_kcorrect, version=version
 
+if(NOT keyword_set(version)) then $
+  version= atlas_default_version()
+
 sfilterlist= 'sdss_'+['u','g','r','i','z']+'0.par'
 gfilterlist= 'galex_'+['FUV','NUV']+'.par'
 
@@ -77,6 +80,10 @@ case info.kcorrect of
         atlas_kcorrect_galex_maggies, measure, gnmgy, gnmgy_ivar
         nmgy[0:1, *]= gnmgy
         nmgy_ivar[0:1, *]= gnmgy_ivar
+        nmgy_ivar= nmgy_ivar < 100.
+        izero= where(nmgy eq 0, nzero)
+        if(nzero gt 0) then $
+          nmgy_ivar[izero]=0.
         filterlist= [gfilterlist, sfilterlist]
     end
     default: message, 'No such kcorrection '+info.kcorrect
@@ -88,7 +95,7 @@ iok= where(atlas.zdist gt 0. and $
 kcorrect, nmgy[*,iok]*1.e-9, nmgy_ivar[*,iok]*1.e+18, atlas[iok].zdist, kc, $
   band_shift=0., filterlist=filterlist, mass=mass, absmag=absmag, $
   rmaggies=rmgy, amivar=amivar, b300=b300, b1000=b1000, mets=mets, $
-  mtol=mtol
+  mtol=mtol, coeff=coeff
 rnmgy= 1.e+9*rmgy
 
 kcorrect0= {ra:0.D, $
@@ -101,6 +108,7 @@ kcorrect0= {ra:0.D, $
             absmag:fltarr(nband), $
             amivar:fltarr(nband), $
             kcorrect:fltarr(nband), $
+            kcoeff:fltarr(5L), $
             mtol:fltarr(nband), $
             b300:0., $
             b1000:0., $
@@ -122,6 +130,7 @@ kcorrect[iok].b300= b300
 kcorrect[iok].b1000= b1000
 kcorrect[iok].mets= mets
 kcorrect[iok].mass= mass
+kcorrect[iok].kcoeff= coeff
 
 mwrfits, kcorrect, ddir+'/atlas_kcorrect.fits', /create
 

@@ -1,0 +1,9 @@
+typedef struct {
+		char version[20];  
+		char imagetypes[100];
+		char kcorrect[100];
+		char comments[100];
+} ATLAS_VERSION;
+
+ATLAS_VERSION v0_0_0 "SDSS" "sdss" "Original version with just SDSS"
+ATLAS_VERSION v0_1_0 "SDSS GALEX" "galex" "SDSS and GALEX images"

@@ -23,14 +23,17 @@ rootdir= atlas_rootdir(version=version, cdir=cdir)
 atlas= read_atlas(version=version, measure=measure, kcorrect=kcorrect, $
                   sdssline=sdssline)
 
+sdss= mrdfits(cdir+'/sdss_atlas.fits',1)
+
 atlas0= atlas[0]
-sdssline0= struct_trimtags(sdssline[0], except=['PLATE', 'FIBERID', 'MJD', $
-                                                'RA', 'DEC', 'Z'])
+sdssline0= struct_trimtags(sdssline[0], except=['RA', 'DEC', 'Z'])
 measure0= struct_trimtags(measure[0], except=['RACEN', 'DECCEN'])
 kcorrect0= struct_trimtags(kcorrect[0], except=['ZDIST', 'RA', 'DEC'])
 
-all0= create_struct(atlas0, kcorrect0, measure0, sdssline0, 'RACAT', 0.D, $
-                    'DECCAT', 0.D, 'ZSDSSLINE', 0.)
+all0= create_struct(atlas0, kcorrect0, measure0, sdssline0, $
+                    'RACAT', 0.D, 'DECCAT', 0.D, 'ZSDSSLINE', 0., $
+                    'SURVEY', ' ', 'PROGRAMNAME', ' ', 'PLATEQUALITY', ' ', $
+                    'TILE', 0L, 'PLUG_RA', 0.D, 'PLUG_DEC', 0.D)
 
 all= replicate(all0, n_elements(atlas))
 
@@ -42,6 +45,16 @@ struct_assign, sdssline, all, /nozero
 all.ra= measure.racen
 all.dec= measure.deccen
 all.zsdssline= sdssline.z
+
+isdss= where(all.isdss ge 0, nsdss)
+if(nsdss gt 0) then begin
+    all[isdss].plug_ra= sdss[all[isdss].isdss].plug_ra
+    all[isdss].plug_dec= sdss[all[isdss].isdss].plug_dec
+    all[isdss].survey= sdss[all[isdss].isdss].survey
+    all[isdss].programname= sdss[all[isdss].isdss].programname
+    all[isdss].platequality= sdss[all[isdss].isdss].platequality
+    all[isdss].tile= sdss[all[isdss].isdss].tile
+endif
 
 case info.imagetypes of
     'SDSS': begin

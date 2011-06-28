@@ -26,7 +26,7 @@ if(arg_present(measure)) then $
 if(arg_present(kcorrect)) then $
   kcorrect=mrdfits(ddir+'/atlas_kcorrect.fits',1)
 if(arg_present(sdssline)) then $
-  sdssline=mrdfits(cdir+'/sdssline_atlas.fits',1)
+  origsdssline=mrdfits(cdir+'/sdssline_atlas.fits',1)
 dup=mrdfits(ddir+'/atlas_duplicates.fits',1)
 st=mrdfits(ddir+'/atlas_startrim.fits',1)
 
@@ -43,8 +43,15 @@ if(NOT keyword_set(notrim)) then begin
       measure= measure[itrim]
     if(n_tags(kcorrect) gt 0) then $
       kcorrect= kcorrect[itrim]
-    if(n_tags(sdssline) gt 0) then $
-      sdssline= sdssline[itrim]
+    if(n_tags(origsdssline) gt 0) then begin
+        isdss= where(atlas.isdss ge 0, nsdss)
+        if(nsdss gt 0) then begin
+            sdssline0= origsdssline[0]
+            struct_assign, {junk:0}, sdssline0
+            sdssline= replicate(sdssline0, ntrim)
+            sdssline[isdss]= origsdssline[atlas[isdss].isdss]
+        endif
+    endif
 endif
 
 return, atlas

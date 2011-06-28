@@ -9,14 +9,12 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atcd, indx, name=name, subname=subname, version=version
+pro atcd, indx, name=name, version=version
 
 common com_atcd, atlas, iauname
 
-if(NOT keyword_set(subname)) then subname='detect'
-
-rootdir=atlas_rootdir(version=version)
-atlasfile=rootdir+'/catalogs/atlas.fits'
+rootdir=atlas_rootdir(version=version, cdir=cdir, subname=subname)
+atlasfile=cdir+'/atlas.fits'
 
 if(n_tags(atlas) eq 0) then $
   atlas=mrdfits(atlasfile,1, /silent)

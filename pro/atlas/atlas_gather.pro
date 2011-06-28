@@ -9,22 +9,12 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_gather, subname=subname, outfile=outfile, version=version
+pro atlas_gather, version=version
 
 rootdir=atlas_rootdir(version=version, cdir=cdir, mdir=mdir)
 
-if(NOT keyword_set(infile)) then $
-   infile=rootdir+'/catalogs/atlas.fits'
-if(NOT keyword_set(outfile)) then begin
-    if(NOT keyword_set(subname)) then begin
-        outfile=rootdir+'/catalogs/atlas_measure.fits'
-    endif else begin
-        if(subname eq 'detect-sdss') then $
-           outfile=rootdir+'/catalogs/atlas_measure_sdss.fits'
-        if(subname eq 'detect-galex') then $
-           outfile=rootdir+'/catalogs/atlas_measure_galex.fits'
-    endelse
-endif
+infile=cdir+'/atlas.fits'
+outfile=mdir+'/atlas_measure.fits'
 
 atlas= gz_mrdfits(infile, 1)
 
@@ -32,7 +22,7 @@ for i=0L, n_elements(atlas)-1L do begin
     if((i mod 100) eq 0) then $
        splog, i
     
-    atcd, i, subname=subname
+    atcd, i, version=version
     
     tmp_measure=0
     dreadcen, measure=tmp_measure
