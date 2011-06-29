@@ -9,67 +9,64 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro detect_atlas_all, infile=infile, sample=sample, sdss=sdss, st=st, nd=nd, $
-                      noclobber=noclobber, galex=galex, notrim=notrim, $
+pro detect_atlas_all, infile=infile, st=st, nd=nd, $
+                      noclobber=noclobber, notrim=notrim, $
                       nodetect=nodetect, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version, cdir=cdir)
+rootdir=atlas_rootdir(version=version, cdir=cdir, subname=subname)
+info= atlas_version_info(version)
 
-  if(keyword_set(sdss)) then begin
-      galex=0
-      twomass=0
-      subname='detect-sdss'
-  endif else if(keyword_set(galex)) then begin
-      galex=1
-      twomass=0
-      subname='detect-galex'
-  endif else begin
-      galex=1
-      twomass=1
-      subname='detect'
-  endelse
+imagetypes= strsplit(info.imagetypes,/extr)
+for i=0L, n_elements(imagetypes)-1L do begin
+    case imagetypes[i] of
+        'SDSS': sdss=1
+        'GALEX': galex=1
+        '2MASS': twomass=1
+        else: message, 'No such imagetype '+imagetypes[i]
+    endcase
+endfor
 
-  if(NOT keyword_set(infile)) then $
-     infile=cdir+'/atlas.fits'
+if(NOT keyword_set(infile)) then $
+  infile=cdir+'/atlas.fits'
 
-  atlas= gz_mrdfits(infile, 1)
-  
-  if(NOT keyword_set(st)) then st=0L
-  if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L
-  nd= nd < (n_elements(atlas)-1)
-  for i=st, nd do begin
-      
-     help, i
+atlas= gz_mrdfits(infile, 1)
 
-     subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
-                         prefix=prefix, rootdir=rootdir, $
-                         subname=subname)
-     
-     cd, subdir
-
-     imfiles=prefix+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
-     if (keyword_set(galex) gt 0) then begin
-         imfiles=[imfiles, prefix+'-'+['nd', 'fd']+'.fits.gz']
-     endif 
-     if (keyword_set(twomass) gt 0) then begin
-         imfiles=[imfiles, prefix+'-'+['J', 'H', 'K']+'.fits.gz']
-     endif 
-     allthere=1
-     for j=0L, n_elements(imfiles)-1L do $
-       if(file_test(imfiles[j]) eq 0) then $
-       allthere=0
-     
-     if(allthere gt 0) then begin
-         if(NOT keyword_set(nodetect)) then begin
-             detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
-             atlas_jpeg, noclobber=noclobber
-         endif
-         dmeasure_atlas, noclobber=noclobber
-         spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']
-
-         if(NOT keyword_set(notrim)) then $
-           dtrim_atlas
-     endif
- endfor
+if(NOT keyword_set(st)) then st=0L
+if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L
+nd= nd < (n_elements(atlas)-1)
+for i=st, nd do begin
+    
+    help, i
+    
+    subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
+                        prefix=prefix, rootdir=rootdir, $
+                        subname=subname)
+    
+    cd, subdir
+    
+    imfiles=prefix+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
+    if (keyword_set(galex) gt 0) then begin
+        imfiles=[imfiles, prefix+'-'+['nd', 'fd']+'.fits.gz']
+    endif 
+    if (keyword_set(twomass) gt 0) then begin
+        imfiles=[imfiles, prefix+'-'+['J', 'H', 'K']+'.fits.gz']
+    endif 
+    allthere=1
+    for j=0L, n_elements(imfiles)-1L do $
+      if(file_test(imfiles[j]) eq 0) then $
+      allthere=0
+    
+    if(allthere gt 0) then begin
+        if(NOT keyword_set(nodetect)) then begin
+            detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
+            atlas_jpeg, noclobber=noclobber
+        endif
+        dmeasure_atlas, noclobber=noclobber
+        spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']
+        
+        if(NOT keyword_set(notrim)) then $
+          dtrim_atlas
+    endif
+endfor
  
 end
