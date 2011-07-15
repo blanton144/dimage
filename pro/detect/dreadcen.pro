@@ -8,7 +8,8 @@
 ;-
 ;------------------------------------------------------------------------------
 pro dreadcen, image, invvar, psf=psf, band=band, measure=measure, $
-              hand=hand, acat=acat, eye=eye, typeeye=typeeye, aid=aid
+              hand=hand, acat=acat, eye=eye, typeeye=typeeye, aid=aid, $
+              pid=pid, parent=parent, hdr=hdr, dversion=dversion
 
 if(NOT keyword_set(band)) then band=2
 if(NOT keyword_set(subdir)) then subdir='.'
@@ -61,16 +62,23 @@ if(keyword_set(pim)) then begin
         
         if(arg_present(image)) then $
           image=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
-                           pstr+'-atlas-'+astr+'.fits', band, hdr, /silent)
+                           pstr+'-atlas-'+astr+'.fits', band, /silent)
+        if(arg_present(hdr)) then $
+          hdr=gz_headfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
+                          pstr+'-atlas-'+astr+'.fits', ext=band)
+        if(arg_present(parent)) then $
+          parent=gz_mrdfits(subdir+'/parents/'+prefix+'-parent-'+ $
+                            pstr+'.fits', band*2L+0L, /silent)
         if(arg_present(invvar)) then begin
             invvar=gz_mrdfits(subdir+'/parents/'+prefix+'-parent-'+ $
-                              pstr+'.fits', band*2L+1L, hdr, /silent)
+                              pstr+'.fits', band*2L+1L, /silent)
             invvar=invvar>0.
         endif
 
         if(arg_present(measure)) then begin
             measure=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
-                               pstr+'-measure'+postfix+'.fits',1, /silent)
+                               pstr+'-measure'+postfix+'.fits',1, mhdr, /silent)
+            dversion= sxpar(mhdr, 'DVERSION')
          endif
 
         if(arg_present(eye)) then begin

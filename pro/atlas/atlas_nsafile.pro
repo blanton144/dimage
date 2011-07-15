@@ -27,10 +27,21 @@ sdss= mrdfits(cdir+'/sdss_atlas.fits',1)
 
 atlas0= atlas[0]
 sdssline0= struct_trimtags(sdssline[0], except=['RA', 'DEC', 'Z'])
-measure0= struct_trimtags(measure[0], except=['RACEN', 'DECCEN'])
+measure0= struct_trimtags(measure[0], except=['RACEN', 'DECCEN', $
+                                              'PROFRADIUS', $
+                                              'PETRORAD', $
+                                              'PETROR50', $
+                                              'PETROR90', $
+                                              'SERSIC_R50'])
 kcorrect0= struct_trimtags(kcorrect[0], except=['ZDIST', 'RA', 'DEC'])
 
-all0= create_struct(atlas0, kcorrect0, measure0, sdssline0, $
+all0= create_struct(atlas0, kcorrect0, measure0, $
+                    'PROFTHETA', 0.*measure[0].profradius, $
+                    'PETROTHETA', 0.*measure[0].petrorad, $
+                    'PETROTH50', 0.*measure[0].petror50, $
+                    'PETROTH90', 0.*measure[0].petror90, $
+                    'SERSIC_TH50', 0.*measure[0].sersic_r50, $
+                    sdssline0, $
                     'RACAT', 0.D, 'DECCAT', 0.D, 'ZSDSSLINE', 0., $
                     'SURVEY', ' ', 'PROGRAMNAME', ' ', 'PLATEQUALITY', ' ', $
                     'TILE', 0L, 'PLUG_RA', 0.D, 'PLUG_DEC', 0.D)
@@ -44,7 +55,23 @@ struct_assign, sdssline, all, /nozero
 
 all.ra= measure.racen
 all.dec= measure.deccen
+all.racat= atlas.ra
+all.deccat= atlas.dec
 all.zsdssline= sdssline.z
+
+;; convert pixels to arcsec
+pixscale=0.396D
+all.proftheta= measure.profradius*pixscale
+all.petrotheta= measure.petrorad*pixscale
+all.petroth50= measure.petror50*pixscale
+all.petroth90= measure.petror90*pixscale
+all.sersic_th50= measure.sersic_r50*pixscale
+
+;; convert angles to E of N
+all.phistokes= (all.phistokes+270.) MOD 180.
+all.phi50= (all.phi50+270.) MOD 180.
+all.phi90= (all.phi90+270.) MOD 180.
+all.sersic_phi= (all.sersic_phi+270.) MOD 180.
 
 isdss= where(all.isdss ge 0, nsdss)
 if(nsdss gt 0) then begin
@@ -74,7 +101,6 @@ for i=0L, nband-1L do begin
     all.nprof[outband[i]]= measure.profmean[inband[i]]
     all.profmean[outband[i],*]= measure.profmean[inband[i],*]
     all.profmean_ivar[outband[i],*]= measure.profmean_ivar[inband[i],*]
-    all.profradius[outband[i]]= measure.profradius[inband[i]]
     all.qstokes[outband[i],*]= measure.qstokes[inband[i],*]
     all.ustokes[outband[i],*]= measure.ustokes[inband[i],*]
     all.bastokes[outband[i],*]= measure.bastokes[inband[i],*]

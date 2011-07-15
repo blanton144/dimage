@@ -29,6 +29,8 @@ OBJECTS = \
 	dsmooth.o \
 	idl_dmedsmooth.o \
 	dmedsmooth.o \
+	idl_dmeansmooth.o \
+	dmeansmooth.o \
 	idl_dmsmooth.o \
 	dfitpsf.o \
 	idl_dfitpsf.o \

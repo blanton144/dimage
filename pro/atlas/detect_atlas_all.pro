@@ -59,7 +59,7 @@ for i=st, nd do begin
     if(allthere gt 0) then begin
         if(NOT keyword_set(nodetect)) then begin
             detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
-            atlas_jpeg, noclobber=noclobber
+            atlas_jpeg, noclobber=noclobber, galex=galex, twomass=twomass
         endif
         dmeasure_atlas, noclobber=noclobber
         spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']

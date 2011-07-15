@@ -17,14 +17,19 @@ this routine, refer to the IDL Online Help Navigator
 or type: </p>
 <pre>     ? make_html_help</pre>
 <p>at the IDL command line prompt.</p>
-<p><strong>Last modified: </strong>Tue Sep 28 11:01:12 2010.</p>
+<p><strong>Last modified: </strong>Thu Jul  7 14:58:53 2011.</p>
 <hr />
-<h2><a id="ROUTINELIST">List of Routines</a></h2>
+<h2 id="ROUTINELIST">List of Routines</h2>
 <ul>
+<li><a href="#ABSMK2SM">ABSMK2SM</a>-- Convert M_K to stellar mass</li>
 <li><a href="#ARRAY_TO_FLOT">ARRAY_TO_FLOT</a>-- 
 create a flot-style data command for an array pair</li>
 <li><a href="#ATV2">ATV2</a>-- Interactive display of 2-D images.</li>
 <li><a href="#ATV3">ATV3</a>-- Interactive display of 2-D images.</li>
+<li><a href="#CHECK_GILDEPAZ">CHECK_GILDEPAZ</a>-- 
+Checks atlas against Gil de Paz results</li>
+<li><a href="#CHECK_MUNOZ">CHECK_MUNOZ</a>-- 
+Checks atlas against Munoz-Mateos numbers</li>
 <li><a href="#CONC2N">CONC2N</a>-- 
 convert an r90/r50 concentration to a Sersic n</li>
 <li><a href="#DASYMMETRY">DASYMMETRY</a>-- measure asymmetry in the image</li>
@@ -32,10 +37,8 @@ convert an r90/r50 concentration to a Sersic n</li>
 fit center to a 3x3 image with a peak in the center</li>
 <li><a href="#DCHILDREN">DCHILDREN</a>-- 
 deblend children of a parent, in multi-band, multi-res images</li>
-<li><a href="#DCHILDREN_ATLAS[1]">DCHILDREN_ATLAS[1]</a>-- 
-deblend children of a parent atlas image</li>
-<li><a href="#DCHILDREN_ATLAS[2]">DCHILDREN_ATLAS[2]</a>-- 
-deblend children of a parent atlas image</li>
+<li><a href="#DCHILDREN_ATLAS">DCHILDREN_ATLAS</a>-- 
+deblend children in NASA-Sloan Atlas imagees</li>
 <li><a href="#DCLUMPY">DCLUMPY</a>-- measure clumpiness of a galaxy image</li>
 <li><a href="#DETECT">DETECT</a>-- 
 detect objects in multi-band, multi-res images</li>
@@ -64,7 +67,14 @@ find galaxies in multi-band, multi-res images (called by dchildren)</li>
 Return bitmask labels corresponding to bit numbers.</li>
 <li><a href="#DIMAGE_FLAGVAL">DIMAGE_FLAGVAL</a>-- 
 Return bitmask values corresponding to labels.</li>
+<li><a href="#DIMAGE_HDR">DIMAGE_HDR</a>-- return header with dimage version
+</li>
+<li><a href="#DIMAGE_VERSION">DIMAGE_VERSION</a>-- 
+Return the version name for the dimage product</li>
+<li><a href="#DMEANSMOOTH">DMEANSMOOTH</a>-- mean smooth</li>
 <li><a href="#DMEASURE">DMEASURE</a>-- measure a deblended image</li>
+<li><a href="#DMEASURE_ATLAS">DMEASURE_ATLAS</a>-- 
+Run measurements on atlas results</li>
 <li><a href="#DMEASURE_CHECK">DMEASURE_CHECK</a>-- 
 visual check of measurements of deblended image</li>
 <li><a href="#DMEASURE_MULTI">DMEASURE_MULTI</a>-- 
@@ -102,6 +112,8 @@ run 2d, two-component sersic fitting on an image</li>
 <li><a href="#DSHIFT">DSHIFT</a>-- shift in 2D with chosen interpolation</li>
 <li><a href="#DSIGMA">DSIGMA</a>-- find approximate sigma from image</li>
 <li><a href="#DSMOOTH">DSMOOTH</a>-- smooth with a simple gaussian</li>
+<li><a href="#DSTARGAL_ATLAS">DSTARGAL_ATLAS</a>-- 
+identify stars and galaxies in NASA-Sloan Atlas image</li>
 <li><a href="#DSTARS">DSTARS</a>-- 
 find stars in multi-band, multi-res images (called by dchildren)</li>
 <li><a href="#DSTARS_ATLAS">DSTARS_ATLAS</a>-- find and subtract stars</li>
@@ -119,6 +131,8 @@ file_test, but if it fails, try reading in .gz version</li>
 headfits, but if it fails, try reading in .gz version</li>
 <li><a href="#GZ_MRDFITS">GZ_MRDFITS</a>-- 
 mrdfits, but if it fails, try reading in .gz version</li>
+<li><a href="#READ_MUNOZ">READ_MUNOZ</a>-- 
+Reads in Munoz-Mateos et al (2009) catalog</li>
 <li><a href="#SIMPLEXY">SIMPLEXY</a>-- 
 get basic X and Y for brightish sources away from edge of an image</li>
 <li><a href="#TWOMASS_CONVERT">TWOMASS_CONVERT</a>-- 
@@ -126,7 +140,21 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </ul>
 <hr />
 <h2>Routine Descriptions</h2>
-<h3><a id="ARRAY_TO_FLOT">ARRAY_TO_FLOT</a></h3>
+<h3 id="ABSMK2SM">ABSMK2SM</h3>
+<p><a href="#ARRAY_TO_FLOT">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   absmk2sm
+ PURPOSE:
+   Convert M_K to stellar mass
+ REVISION HISTORY:
+   17-Mar-2010 
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/utils/absmk2sm.pro)</strong></p>
+<hr />
+<h3 id="ARRAY_TO_FLOT">ARRAY_TO_FLOT</h3>
+<p><a href="#ABSMK2SM">[Previous Routine]</a></p>
 <p><a href="#ATV2">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
@@ -141,7 +169,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/array_to_flot.pro)</strong></p>
 <hr />
-<h3><a id="ATV2">ATV2</a></h3>
+<h3 id="ATV2">ATV2</h3>
 <p><a href="#ARRAY_TO_FLOT">[Previous Routine]</a></p>
 <p><a href="#ATV3">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -223,9 +251,9 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/atv2.pro)</strong></p>
 <hr />
-<h3><a id="ATV3">ATV3</a></h3>
+<h3 id="ATV3">ATV3</h3>
 <p><a href="#ATV2">[Previous Routine]</a></p>
-<p><a href="#CONC2N">[Next Routine]</a></p>
+<p><a href="#CHECK_GILDEPAZ">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
  NAME:
@@ -305,8 +333,40 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/atv3.pro)</strong></p>
 <hr />
-<h3><a id="CONC2N">CONC2N</a></h3>
+<h3 id="CHECK_GILDEPAZ">CHECK_GILDEPAZ</h3>
 <p><a href="#ATV3">[Previous Routine]</a></p>
+<p><a href="#CHECK_MUNOZ">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   check_gildepaz
+ PURPOSE:
+   Checks atlas against Gil de Paz results
+ CALLING SEQUENCE:
+   check_munoz
+ REVISION HISTORY:
+   22-Jun-2011  Written by Mike Blanton, NYU
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/utils/check_gildepaz.pro)</strong></p>
+<hr />
+<h3 id="CHECK_MUNOZ">CHECK_MUNOZ</h3>
+<p><a href="#CHECK_GILDEPAZ">[Previous Routine]</a></p>
+<p><a href="#CONC2N">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   check_munoz
+ PURPOSE:
+   Checks atlas against Munoz-Mateos numbers
+ CALLING SEQUENCE:
+   check_munoz
+ REVISION HISTORY:
+   22-Jun-2011  Written by Mike Blanton, NYU
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/utils/check_munoz.pro)</strong></p>
+<hr />
+<h3 id="CONC2N">CONC2N</h3>
+<p><a href="#CHECK_MUNOZ">[Previous Routine]</a></p>
 <p><a href="#DASYMMETRY">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
@@ -321,7 +381,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/sersic/conc2n.pro)</strong></p>
 <hr />
-<h3><a id="DASYMMETRY">DASYMMETRY</a></h3>
+<h3 id="DASYMMETRY">DASYMMETRY</h3>
 <p><a href="#CONC2N">[Previous Routine]</a></p>
 <p><a href="#DCEN3X3">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -350,7 +410,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dasymmetry.pro)</strong></p>
 <hr />
-<h3><a id="DCEN3X3">DCEN3X3</a></h3>
+<h3 id="DCEN3X3">DCEN3X3</h3>
 <p><a href="#DASYMMETRY">[Previous Routine]</a></p>
 <p><a href="#DCHILDREN">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -370,9 +430,9 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dcen3x3.pro)</strong></p>
 <hr />
-<h3><a id="DCHILDREN">DCHILDREN</a></h3>
+<h3 id="DCHILDREN">DCHILDREN</h3>
 <p><a href="#DCEN3X3">[Previous Routine]</a></p>
-<p><a href="#DCHILDREN_ATLAS[1]">[Next Routine]</a></p>
+<p><a href="#DCHILDREN_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
  NAME:
@@ -410,41 +470,39 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dchildren.pro)</strong></p>
 <hr />
-<h3><a id="DCHILDREN_ATLAS[1]">DCHILDREN_ATLAS[1]</a></h3>
+<h3 id="DCHILDREN_ATLAS">DCHILDREN_ATLAS</h3>
 <p><a href="#DCHILDREN">[Previous Routine]</a></p>
-<p><a href="#DCHILDREN_ATLAS[2]">[Next Routine]</a></p>
-<p><a href="#ROUTINELIST">[List of Routines]</a></p>
-<pre>
- NAME:
-   dchildren_atlas
- PURPOSE:
-   deblend children of a parent atlas image
- CALLING SEQUENCE:
-   dchildren_atlas [, /galex, /noclobber, glim=, puse=puse, tuse=tuse, $
-           slim=, gsaddle=, gsmooth=, /nostarim ]
- REVISION HISTORY:
-   11-Jan-2006  Written by Blanton, NYU
-</pre>
-<p><strong>(See /home/users/mb144/dimage/pro/detect/dchildren_atlas.pro)</strong></p>
-<hr />
-<h3><a id="DCHILDREN_ATLAS[2]">DCHILDREN_ATLAS[2]</a></h3>
-<p><a href="#DCHILDREN_ATLAS[1]">[Previous Routine]</a></p>
 <p><a href="#DCLUMPY">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
  NAME:
    dchildren_atlas
  PURPOSE:
-   deblend children of a parent atlas image
+   deblend children in NASA-Sloan Atlas imagees
  CALLING SEQUENCE:
-   dstargal_atlas 
+   dchildren_atlas [, /noclobber ]
+ COMMENTS:
+   Requires dparents_atlas, dpsf_atls, dstargal_atlas to be run
+   Uses file:
+     atlases/#/[base]-nimage-#.fits - star-subtracted images
+   which has just the galaxies in it. Gets list of galaxies from:
+     atlases/#/[base]-#-sgset.fits - locations of stars, galaxies
+   Writes files:
+     atlases/#/[base]-acat-#.fits - catalog of children
+     atlases/#/[base]-parent-#.fits - parent images
+     atlases/#/[base]-ivar-#.fits - inverse var images
+     atlases/#/[base]-#-atlas-#.fits - atlas images
+     atlases/#/[base]-#-templates-#.fits - template images
+ BUGS:
+   Current version ONLY works if template is used from 
+   same band every time.
  REVISION HISTORY:
    11-Jan-2006  Written by Blanton, NYU
 </pre>
-<p><strong>(See /home/users/mb144/dimage/pro/detect/dstargal_atlas.pro)</strong></p>
+<p><strong>(See /home/users/mb144/dimage/pro/detect/dchildren_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DCLUMPY">DCLUMPY</a></h3>
-<p><a href="#DCHILDREN_ATLAS[2]">[Previous Routine]</a></p>
+<h3 id="DCLUMPY">DCLUMPY</h3>
+<p><a href="#DCHILDREN_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DETECT">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
@@ -470,7 +528,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dclumpy.pro)</strong></p>
 <hr />
-<h3><a id="DETECT">DETECT</a></h3>
+<h3 id="DETECT">DETECT</h3>
 <p><a href="#DCLUMPY">[Previous Routine]</a></p>
 <p><a href="#DETECT_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -526,7 +584,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/detect.pro)</strong></p>
 <hr />
-<h3><a id="DETECT_ATLAS">DETECT_ATLAS</a></h3>
+<h3 id="DETECT_ATLAS">DETECT_ATLAS</h3>
 <p><a href="#DETECT">[Previous Routine]</a></p>
 <p><a href="#DETECT_NEW">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -555,7 +613,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/detect_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DETECT_NEW">DETECT_NEW</a></h3>
+<h3 id="DETECT_NEW">DETECT_NEW</h3>
 <p><a href="#DETECT_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DEXPLORE">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -603,7 +661,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/detect_new.pro)</strong></p>
 <hr />
-<h3><a id="DEXPLORE">DEXPLORE</a></h3>
+<h3 id="DEXPLORE">DEXPLORE</h3>
 <p><a href="#DETECT_NEW">[Previous Routine]</a></p>
 <p><a href="#DEXTRACT">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -621,7 +679,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dexplore.pro)</strong></p>
 <hr />
-<h3><a id="DEXTRACT">DEXTRACT</a></h3>
+<h3 id="DEXTRACT">DEXTRACT</h3>
 <p><a href="#DEXPLORE">[Previous Routine]</a></p>
 <p><a href="#DFAKEGAL">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -653,7 +711,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dextract.pro)</strong></p>
 <hr />
-<h3><a id="DFAKEGAL">DFAKEGAL</a></h3>
+<h3 id="DFAKEGAL">DFAKEGAL</h3>
 <p><a href="#DEXTRACT">[Previous Routine]</a></p>
 <p><a href="#DFIND">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -686,7 +744,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/sersic/dfakegal.pro)</strong></p>
 <hr />
-<h3><a id="DFIND">DFIND</a></h3>
+<h3 id="DFIND">DFIND</h3>
 <p><a href="#DFAKEGAL">[Previous Routine]</a></p>
 <p><a href="#DFITELLIPSE">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -706,7 +764,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dfind.pro)</strong></p>
 <hr />
-<h3><a id="DFITELLIPSE">DFITELLIPSE</a></h3>
+<h3 id="DFITELLIPSE">DFITELLIPSE</h3>
 <p><a href="#DFIND">[Previous Routine]</a></p>
 <p><a href="#DFITPSF">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -731,7 +789,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dfitellipse.pro)</strong></p>
 <hr />
-<h3><a id="DFITPSF">DFITPSF</a></h3>
+<h3 id="DFITPSF">DFITPSF</h3>
 <p><a href="#DFITELLIPSE">[Previous Routine]</a></p>
 <p><a href="#DFITPSF_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -761,7 +819,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dfitpsf.pro)</strong></p>
 <hr />
-<h3><a id="DFITPSF_ATLAS">DFITPSF_ATLAS</a></h3>
+<h3 id="DFITPSF_ATLAS">DFITPSF_ATLAS</h3>
 <p><a href="#DFITPSF">[Previous Routine]</a></p>
 <p><a href="#DFLOODFILL">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -776,13 +834,13 @@ convert twomass images to sky-subtracted versions with nice names</li>
    imfile - input FITS file
  COMMENTS:
    Ouputs (imfile is base.fits or base.fits.gz):
-     base-bpsf.fits - basic (single-fit) PSF
+     [base]-bpsf.fits - basic (single-fit) PSF
  REVISION HISTORY:
    11-Jan-2006  Written by Blanton, NYU
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dfitpsf_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DFLOODFILL">DFLOODFILL</a></h3>
+<h3 id="DFLOODFILL">DFLOODFILL</h3>
 <p><a href="#DFITPSF_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DFLUXES">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -807,7 +865,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/dfloodfill.pro)</strong></p>
 <hr />
-<h3><a id="DFLUXES">DFLUXES</a></h3>
+<h3 id="DFLUXES">DFLUXES</h3>
 <p><a href="#DFLOODFILL">[Previous Routine]</a></p>
 <p><a href="#DGALS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -832,7 +890,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dfluxes.pro)</strong></p>
 <hr />
-<h3><a id="DGALS">DGALS</a></h3>
+<h3 id="DGALS">DGALS</h3>
 <p><a href="#DFLUXES">[Previous Routine]</a></p>
 <p><a href="#DIMAGE_FLAGNAME">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -846,7 +904,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dgals.pro)</strong></p>
 <hr />
-<h3><a id="DIMAGE_FLAGNAME">DIMAGE_FLAGNAME</a></h3>
+<h3 id="DIMAGE_FLAGNAME">DIMAGE_FLAGNAME</h3>
 <p><a href="#DGALS">[Previous Routine]</a></p>
 <p><a href="#DIMAGE_FLAGVAL">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -896,9 +954,9 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/dimage_flagname.pro)</strong></p>
 <hr />
-<h3><a id="DIMAGE_FLAGVAL">DIMAGE_FLAGVAL</a></h3>
+<h3 id="DIMAGE_FLAGVAL">DIMAGE_FLAGVAL</h3>
 <p><a href="#DIMAGE_FLAGNAME">[Previous Routine]</a></p>
-<p><a href="#DMEASURE">[Next Routine]</a></p>
+<p><a href="#DIMAGE_HDR">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
  NAME:
@@ -933,9 +991,67 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/dimage_flagval.pro)</strong></p>
 <hr />
-<h3><a id="DMEASURE">DMEASURE</a></h3>
+<h3 id="DIMAGE_HDR">DIMAGE_HDR</h3>
 <p><a href="#DIMAGE_FLAGVAL">[Previous Routine]</a></p>
-<p><a href="#DMEASURE_CHECK">[Next Routine]</a></p>
+<p><a href="#DIMAGE_VERSION">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   dimage_hdr
+ PURPOSE:
+   return header with dimage version
+ CALLING SEQUENCE:
+   hdr=dimage_hdr()
+ REVISION HISTORY:
+   11-Jan-2006  Written by Blanton, NYU
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/detect/dimage_hdr.pro)</strong></p>
+<hr />
+<h3 id="DIMAGE_VERSION">DIMAGE_VERSION</h3>
+<p><a href="#DIMAGE_HDR">[Previous Routine]</a></p>
+<p><a href="#DMEANSMOOTH">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   dimage_version
+ PURPOSE:
+   Return the version name for the dimage product 
+ CALLING SEQUENCE:
+   vers = dimage_version()
+ OUTPUTS:
+   vers       - Version name for the product dimage 
+ COMMENTS:
+   Depends on shell script in $DIMAGE_DIR/bin
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/utils/dimage_version.pro)</strong></p>
+<hr />
+<h3 id="DMEANSMOOTH">DMEANSMOOTH</h3>
+<p><a href="#DIMAGE_VERSION">[Previous Routine]</a></p>
+<p><a href="#DMEASURE">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   dmeansmooth
+ PURPOSE:
+   mean smooth 
+ CALLING SEQUENCE:
+   smooth= dmeansmooth(image, invvar, box=)
+ INPUTS:
+   image - [nx, ny] input image
+   invvar - [nx, ny] invverse variance
+   box - box size for smooth
+ OUTPUTS:
+   smooth - [nx, ny] smooth image
+ COMMENTS:
+   Doesn't weight by inverse variance: just ignores invvar=0 data
+ REVISION HISTORY:
+   11-Jan-2006  Written by Blanton, NYU
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/detect/dmeansmooth.pro)</strong></p>
+<hr />
+<h3 id="DMEASURE">DMEASURE</h3>
+<p><a href="#DMEANSMOOTH">[Previous Routine]</a></p>
+<p><a href="#DMEASURE_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
  NAME:
@@ -962,8 +1078,26 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dmeasure.pro)</strong></p>
 <hr />
-<h3><a id="DMEASURE_CHECK">DMEASURE_CHECK</a></h3>
+<h3 id="DMEASURE_ATLAS">DMEASURE_ATLAS</h3>
 <p><a href="#DMEASURE">[Previous Routine]</a></p>
+<p><a href="#DMEASURE_CHECK">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   dmeasure_atlas
+ PURPOSE:
+   Run measurements on atlas results
+ CALLING SEQUENCE:
+   dmeasure_atlas, subdir
+ COMMENTS:
+   Assumes dimage-style detection outputs
+ REVISION HISTORY:
+   31-July-2010
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/detect/dmeasure_atlas.pro)</strong></p>
+<hr />
+<h3 id="DMEASURE_CHECK">DMEASURE_CHECK</h3>
+<p><a href="#DMEASURE_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DMEASURE_MULTI">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
@@ -983,7 +1117,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dmeasure_check.pro)</strong></p>
 <hr />
-<h3><a id="DMEASURE_MULTI">DMEASURE_MULTI</a></h3>
+<h3 id="DMEASURE_MULTI">DMEASURE_MULTI</h3>
 <p><a href="#DMEASURE_CHECK">[Previous Routine]</a></p>
 <p><a href="#DMEDSMOOTH">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1001,7 +1135,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dmeasure_multi.pro)</strong></p>
 <hr />
-<h3><a id="DMEDSMOOTH">DMEDSMOOTH</a></h3>
+<h3 id="DMEDSMOOTH">DMEDSMOOTH</h3>
 <p><a href="#DMEASURE_MULTI">[Previous Routine]</a></p>
 <p><a href="#DOBJECTS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1025,7 +1159,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dmedsmooth.pro)</strong></p>
 <hr />
-<h3><a id="DOBJECTS">DOBJECTS</a></h3>
+<h3 id="DOBJECTS">DOBJECTS</h3>
 <p><a href="#DMEDSMOOTH">[Previous Routine]</a></p>
 <p><a href="#DPARENTS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1055,7 +1189,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dobjects.pro)</strong></p>
 <hr />
-<h3><a id="DPARENTS">DPARENTS</a></h3>
+<h3 id="DPARENTS">DPARENTS</h3>
 <p><a href="#DOBJECTS">[Previous Routine]</a></p>
 <p><a href="#DPARENTS_ATLAS[1]">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1079,16 +1213,19 @@ convert twomass images to sky-subtracted versions with nice names</li>
    /cenonly - only output parent image for central object
  COMMENTS:
    Creates files:
-      base-#-pimage.fits - image with parent number in each pixel
+      base-#-pimage.fits - HDU0: full image with parent number in each pixel
+                           HDU1-N: individual band parent images
+                           (because the resolution might be
+                           different)
       base-#-pcat.fits - image with parent number in each pixel
-      parents/base-parent-[parent].fits - multi-HDU file with
-                                          individual parents
+      parents/[base]-parent-[parent].fits - multi-HDU file with
+                                            individual parents
  REVISION HISTORY:
    11-Jan-2006  Written by Blanton, NYU
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dparents.pro)</strong></p>
 <hr />
-<h3><a id="DPARENTS_ATLAS[1]">DPARENTS_ATLAS[1]</a></h3>
+<h3 id="DPARENTS_ATLAS[1]">DPARENTS_ATLAS[1]</h3>
 <p><a href="#DPARENTS">[Previous Routine]</a></p>
 <p><a href="#DPARENTS_ATLAS[2]">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1101,9 +1238,11 @@ convert twomass images to sky-subtracted versions with nice names</li>
    detect_parents
  OPTIONAL KEYWORDS:
    /galex - assume ugrizNF (N and F from GALEX)
+   /twomass - assume ugrizNFJHK 
    /nolobber - do not overwrite previously PARENT files
  COMMENTS:
-   Detects parents
+   Detects parents; only outputs a parent that actually includes
+     the central pixel. 
    Assumes input file names of the form:
       [base]-[ugriz].fits.gz
     where [base] is the current directory name. If /galex is set, 
@@ -1112,12 +1251,21 @@ convert twomass images to sky-subtracted versions with nice names</li>
      (within a pixel or two)
    Assumes a sky-subtracted image in HDU 0
    Works better if ivars supplied in HDU 1
+   Writes outputs to:
+      [base]-pset.fits 
+      [base]-#-pimage.fits - HDU0: full image with parent number in each pixel
+                            HDU1-N: individual band parent images
+                            (because the resolution might be
+                            different)
+      [base]-#-pcat.fits - image with parent number in each pixel
+      parents/[base]-parent-[parent].fits - multi-HDU file with
+                                            individual parents
  REVISION HISTORY:
    11-Jan-2006  Written by Blanton, NYU
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dparents_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DPARENTS_ATLAS[2]">DPARENTS_ATLAS[2]</a></h3>
+<h3 id="DPARENTS_ATLAS[2]">DPARENTS_ATLAS[2]</h3>
 <p><a href="#DPARENTS_ATLAS[1]">[Previous Routine]</a></p>
 <p><a href="#DPEAKS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1129,24 +1277,21 @@ convert twomass images to sky-subtracted versions with nice names</li>
  CALLING SEQUENCE:
    detect_parents
  OPTIONAL KEYWORDS:
-   /galex - assume ugrizNF (N and F from GALEX)
    /nolobber - do not overwrite previously PARENT files
  COMMENTS:
-   Detects parents
+   Requires dparents_atlas.pro to have been run
    Assumes input file names of the form:
       [base]-[ugriz].fits.gz
-    where [base] is the current directory name. If /galex is set, 
-    include -nd and -fd images from GALEX too.
-   Assumes that the images are APPROXIMATELY overlapping
-     (within a pixel or two)
-   Assumes a sky-subtracted image in HDU 0
-   Works better if ivars supplied in HDU 1
+      [base]-pset.fits
+   Outputs:
+      [base]-bpsf.fits - basic (single-fit) PSF
+   Doesn't track PSF variation across field
  REVISION HISTORY:
    11-Jan-2006  Written by Blanton, NYU
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dpsf_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DPEAKS">DPEAKS</a></h3>
+<h3 id="DPEAKS">DPEAKS</h3>
 <p><a href="#DPARENTS_ATLAS[2]">[Previous Routine]</a></p>
 <p><a href="#DPETRO">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1190,7 +1335,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dpeaks.pro)</strong></p>
 <hr />
-<h3><a id="DPETRO">DPETRO</a></h3>
+<h3 id="DPETRO">DPETRO</h3>
 <p><a href="#DPEAKS">[Previous Routine]</a></p>
 <p><a href="#DPREFINE">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1221,7 +1366,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dpetro.pro)</strong></p>
 <hr />
-<h3><a id="DPREFINE">DPREFINE</a></h3>
+<h3 id="DPREFINE">DPREFINE</h3>
 <p><a href="#DPETRO">[Previous Routine]</a></p>
 <p><a href="#DPSFCHECK">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1243,7 +1388,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dprefine.pro)</strong></p>
 <hr />
-<h3><a id="DPSFCHECK">DPSFCHECK</a></h3>
+<h3 id="DPSFCHECK">DPSFCHECK</h3>
 <p><a href="#DPREFINE">[Previous Routine]</a></p>
 <p><a href="#DPSFID">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1272,7 +1417,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dpsfcheck.pro)</strong></p>
 <hr />
-<h3><a id="DPSFID">DPSFID</a></h3>
+<h3 id="DPSFID">DPSFID</h3>
 <p><a href="#DPSFCHECK">[Previous Routine]</a></p>
 <p><a href="#DPSFREAD">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1296,7 +1441,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dpsfid.pro)</strong></p>
 <hr />
-<h3><a id="DPSFREAD">DPSFREAD</a></h3>
+<h3 id="DPSFREAD">DPSFREAD</h3>
 <p><a href="#DPSFID">[Previous Routine]</a></p>
 <p><a href="#DPSFSELECT_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1320,7 +1465,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dpsfread.pro)</strong></p>
 <hr />
-<h3><a id="DPSFSELECT_ATLAS">DPSFSELECT_ATLAS</a></h3>
+<h3 id="DPSFSELECT_ATLAS">DPSFSELECT_ATLAS</h3>
 <p><a href="#DPSFREAD">[Previous Routine]</a></p>
 <p><a href="#DPSFSUB">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1347,7 +1492,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dpsfselect_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DPSFSUB">DPSFSUB</a></h3>
+<h3 id="DPSFSUB">DPSFSUB</h3>
 <p><a href="#DPSFSELECT_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DPSFSUB_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1367,7 +1512,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dpsfsub.pro)</strong></p>
 <hr />
-<h3><a id="DPSFSUB_ATLAS">DPSFSUB_ATLAS</a></h3>
+<h3 id="DPSFSUB_ATLAS">DPSFSUB_ATLAS</h3>
 <p><a href="#DPSFSUB">[Previous Routine]</a></p>
 <p><a href="#DREADCEN">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1399,7 +1544,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dpsfsub_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DREADCEN">DREADCEN</a></h3>
+<h3 id="DREADCEN">DREADCEN</h3>
 <p><a href="#DPSFSUB_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DRECENTER">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1413,7 +1558,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dreadcen.pro)</strong></p>
 <hr />
-<h3><a id="DRECENTER">DRECENTER</a></h3>
+<h3 id="DRECENTER">DRECENTER</h3>
 <p><a href="#DREADCEN">[Previous Routine]</a></p>
 <p><a href="#DREFINE">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1432,7 +1577,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/drecenter.pro)</strong></p>
 <hr />
-<h3><a id="DREFINE">DREFINE</a></h3>
+<h3 id="DREFINE">DREFINE</h3>
 <p><a href="#DRECENTER">[Previous Routine]</a></p>
 <p><a href="#DSERSIC">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1458,7 +1603,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/drefine.pro)</strong></p>
 <hr />
-<h3><a id="DSERSIC">DSERSIC</a></h3>
+<h3 id="DSERSIC">DSERSIC</h3>
 <p><a href="#DREFINE">[Previous Routine]</a></p>
 <p><a href="#DSERSIC2">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1468,8 +1613,9 @@ convert twomass images to sky-subtracted versions with nice names</li>
  PURPOSE:
    run 2d sersic fitting on an image
  CALLING SEQUENCE:
-   dsersic,image [,invvar,xcen=,ycen=,psf=,sersicfit=, $
-      model=, /reinit, /fixsky, /fixcen]
+   dsersic, image [, invvar, xcen=, ycen=, psf=, sersicfit=, $
+      model=, /reinit, /fixsky, /fixcenter, /simple, $
+      /axisymmetric, /onlyflux]
  INPUTS:
    image - [nx,ny] input image
  OPTIONAL INPUTS:
@@ -1478,25 +1624,43 @@ convert twomass images to sky-subtracted versions with nice names</li>
    ycen - center of image [default to ny/2L]
    psf - [nxpsf,nypsf] estimated psf [default to just pixel convolution]
    /reinit - don't use given sersicfit (if it exists) as initial conditions
-   /fixcen - fix the center at the input xcen, ycen
+   /fixcenter - fix the center at the input xcen, ycen
    /fixsky - fix the sky to zero
+   /axisymmetric - fix axis ratio to unity
+   /onlyflux - just fit for the flux, nothing else
+   /simple - just evaluate Sersic at each pixel, don't integrate it
+ INPUT/OUTPUTS:
+   sersicfit - sersic parameters fit (interpreted as input if
+               /onlyflux set); structure with elements:
+                    .SKY
+                    .XCEN
+                    .YCEN
+                    .SERSICFLUX
+                    .SERSICFLUX_IVAR
+                    .SERSICR50
+                    .SERSICN
+                    .AXISRATIO
+                    .ORIENTATION (deg -x of +y)
+                    .NDOF (# of deg of freedom)
+                    .CHISQUARED
+                    .FITPARAM[8]
+                    .PERROR[8]
+                    .COVARIANCE[8]
  OUTPUTS:
-   sersicfit - sersic parameters fit
    model - image of best fit model
  COMMENTS:
    The input psf should be interpreted as an image of a delta
     function source (pixel- and seeing-convolved)
- EXAMPLES:
-   
- BUGS:
-   sersic fitting by dsersic currently fails fake data tests
- PROCEDURES CALLED:
+   If /onlyflux is set, then the inverse variances aren't used
+    on a pixel-by-pixel basis
+   If /onlyflux is set, only SERSICFLUX and SERSICFLUXIVAR are
+    changed in the &quot;sersicfit&quot; structure
  REVISION HISTORY:
    10-Sep-2003  Written by Mike Blanton, NYU
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/sersic/dsersic.pro)</strong></p>
 <hr />
-<h3><a id="DSERSIC2">DSERSIC2</a></h3>
+<h3 id="DSERSIC2">DSERSIC2</h3>
 <p><a href="#DSERSIC">[Previous Routine]</a></p>
 <p><a href="#DSERSIC_PARAMS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1537,7 +1701,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/sersic/dsersic2.pro)</strong></p>
 <hr />
-<h3><a id="DSERSIC_PARAMS">DSERSIC_PARAMS</a></h3>
+<h3 id="DSERSIC_PARAMS">DSERSIC_PARAMS</h3>
 <p><a href="#DSERSIC2">[Previous Routine]</a></p>
 <p><a href="#DSHIFT">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1562,7 +1726,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/sersic/dsersic_params.pro)</strong></p>
 <hr />
-<h3><a id="DSHIFT">DSHIFT</a></h3>
+<h3 id="DSHIFT">DSHIFT</h3>
 <p><a href="#DSERSIC_PARAMS">[Previous Routine]</a></p>
 <p><a href="#DSIGMA">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1583,7 +1747,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dshift.pro)</strong></p>
 <hr />
-<h3><a id="DSIGMA">DSIGMA</a></h3>
+<h3 id="DSIGMA">DSIGMA</h3>
 <p><a href="#DSHIFT">[Previous Routine]</a></p>
 <p><a href="#DSMOOTH">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1608,9 +1772,9 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dsigma.pro)</strong></p>
 <hr />
-<h3><a id="DSMOOTH">DSMOOTH</a></h3>
+<h3 id="DSMOOTH">DSMOOTH</h3>
 <p><a href="#DSIGMA">[Previous Routine]</a></p>
-<p><a href="#DSTARS">[Next Routine]</a></p>
+<p><a href="#DSTARGAL_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
  NAME:
@@ -1629,8 +1793,30 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dsmooth.pro)</strong></p>
 <hr />
-<h3><a id="DSTARS">DSTARS</a></h3>
+<h3 id="DSTARGAL_ATLAS">DSTARGAL_ATLAS</h3>
 <p><a href="#DSMOOTH">[Previous Routine]</a></p>
+<p><a href="#DSTARS">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   dstargal_atlas
+ PURPOSE:
+   identify stars and galaxies in NASA-Sloan Atlas image
+ CALLING SEQUENCE:
+   dstargal_atlas 
+ COMMENTS:
+   Requires dparents_atlas, dpsf_atlas to have been run.
+   Agressive about calling things stars (ie. tuned to large galaxies)
+   Outputs files in:
+     atlases/#/[base]-#-nimage.fits - star-subtracted images
+     atlases/#/[base]-#-sgset.fits - locations of stars, galaxies
+ REVISION HISTORY:
+   11-Jan-2006  Written by Blanton, NYU
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/detect/dstargal_atlas.pro)</strong></p>
+<hr />
+<h3 id="DSTARS">DSTARS</h3>
+<p><a href="#DSTARGAL_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DSTARS_ATLAS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
@@ -1643,7 +1829,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dstars.pro)</strong></p>
 <hr />
-<h3><a id="DSTARS_ATLAS">DSTARS_ATLAS</a></h3>
+<h3 id="DSTARS_ATLAS">DSTARS_ATLAS</h3>
 <p><a href="#DSTARS">[Previous Routine]</a></p>
 <p><a href="#DTEMPLATES">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1660,7 +1846,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dstars_atlas.pro)</strong></p>
 <hr />
-<h3><a id="DTEMPLATES">DTEMPLATES</a></h3>
+<h3 id="DTEMPLATES">DTEMPLATES</h3>
 <p><a href="#DSTARS_ATLAS">[Previous Routine]</a></p>
 <p><a href="#DUMMY_PSF">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1686,7 +1872,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dtemplates.pro)</strong></p>
 <hr />
-<h3><a id="DUMMY_PSF">DUMMY_PSF</a></h3>
+<h3 id="DUMMY_PSF">DUMMY_PSF</h3>
 <p><a href="#DTEMPLATES">[Previous Routine]</a></p>
 <p><a href="#DVPSF">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1710,7 +1896,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dummy_psf.pro)</strong></p>
 <hr />
-<h3><a id="DVPSF">DVPSF</a></h3>
+<h3 id="DVPSF">DVPSF</h3>
 <p><a href="#DUMMY_PSF">[Previous Routine]</a></p>
 <p><a href="#DWEIGHTS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1741,7 +1927,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/psf/dvpsf.pro)</strong></p>
 <hr />
-<h3><a id="DWEIGHTS">DWEIGHTS</a></h3>
+<h3 id="DWEIGHTS">DWEIGHTS</h3>
 <p><a href="#DVPSF">[Previous Routine]</a></p>
 <p><a href="#FIT_MULT_GAUSS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1765,7 +1951,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dweights.pro)</strong></p>
 <hr />
-<h3><a id="FIT_MULT_GAUSS">FIT_MULT_GAUSS</a></h3>
+<h3 id="FIT_MULT_GAUSS">FIT_MULT_GAUSS</h3>
 <p><a href="#DWEIGHTS">[Previous Routine]</a></p>
 <p><a href="#GZ_FILE_TEST">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1793,7 +1979,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/detect/dfit_mult_gauss.pro)</strong></p>
 <hr />
-<h3><a id="GZ_FILE_TEST">GZ_FILE_TEST</a></h3>
+<h3 id="GZ_FILE_TEST">GZ_FILE_TEST</h3>
 <p><a href="#FIT_MULT_GAUSS">[Previous Routine]</a></p>
 <p><a href="#GZ_HEADFITS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1809,7 +1995,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/gz_file_test.pro)</strong></p>
 <hr />
-<h3><a id="GZ_HEADFITS">GZ_HEADFITS</a></h3>
+<h3 id="GZ_HEADFITS">GZ_HEADFITS</h3>
 <p><a href="#GZ_FILE_TEST">[Previous Routine]</a></p>
 <p><a href="#GZ_MRDFITS">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
@@ -1825,9 +2011,9 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/gz_headfits.pro)</strong></p>
 <hr />
-<h3><a id="GZ_MRDFITS">GZ_MRDFITS</a></h3>
+<h3 id="GZ_MRDFITS">GZ_MRDFITS</h3>
 <p><a href="#GZ_HEADFITS">[Previous Routine]</a></p>
-<p><a href="#SIMPLEXY">[Next Routine]</a></p>
+<p><a href="#READ_MUNOZ">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
  NAME:
@@ -1841,8 +2027,26 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/gz_mrdfits.pro)</strong></p>
 <hr />
-<h3><a id="SIMPLEXY">SIMPLEXY</a></h3>
+<h3 id="READ_MUNOZ">READ_MUNOZ</h3>
 <p><a href="#GZ_MRDFITS">[Previous Routine]</a></p>
+<p><a href="#SIMPLEXY">[Next Routine]</a></p>
+<p><a href="#ROUTINELIST">[List of Routines]</a></p>
+<pre>
+ NAME:
+   read_munoz
+ PURPOSE:
+   Reads in Munoz-Mateos et al (2009) catalog
+ CALLING SEQUENCE:
+   munoz= read_munoz()
+ COMMENTS:
+   Data stored in $DIMAGE_DIR/data/sstest/munozmateos.txt
+ REVISION HISTORY:
+   22-Jun-2011  Written by Mike Blanton, NYU
+</pre>
+<p><strong>(See /home/users/mb144/dimage/pro/utils/read_munoz.pro)</strong></p>
+<hr />
+<h3 id="SIMPLEXY">SIMPLEXY</h3>
+<p><a href="#READ_MUNOZ">[Previous Routine]</a></p>
 <p><a href="#TWOMASS_CONVERT">[Next Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>
@@ -1862,7 +2066,7 @@ convert twomass images to sky-subtracted versions with nice names</li>
 </pre>
 <p><strong>(See /home/users/mb144/dimage/pro/utils/simplexy.pro)</strong></p>
 <hr />
-<h3><a id="TWOMASS_CONVERT">TWOMASS_CONVERT</a></h3>
+<h3 id="TWOMASS_CONVERT">TWOMASS_CONVERT</h3>
 <p><a href="#SIMPLEXY">[Previous Routine]</a></p>
 <p><a href="#ROUTINELIST">[List of Routines]</a></p>
 <pre>

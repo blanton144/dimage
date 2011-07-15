@@ -19,22 +19,29 @@ outfile=mdir+'/atlas_measure.fits'
 atlas= gz_mrdfits(infile, 1)
 
 for i=0L, n_elements(atlas)-1L do begin
+;;for i=102500L, 104999L do begin
     if((i mod 100) eq 0) then $
        splog, i
     
     atcd, i, version=version
     
     tmp_measure=0
-    dreadcen, measure=tmp_measure
+    pid=-1L
+    dreadcen, measure=tmp_measure, pid=pid, dversion=dversion
     
     if(n_tags(tmp_measure) gt 0) then begin
         if(n_tags(measure) eq 0) then begin
-            measure0= tmp_measure[0]
+            measure0= create_struct(tmp_measure[0], 'pid', 0L, $
+                                    'dversion', ' ')
             struct_assign, {junk:0}, measure0
             measure= replicate(measure0, n_elements(atlas))
             measure.aid=-1L
+            measure.pid=-1L
         endif
-        measure[i]= tmp_measure
+        struct_assign, tmp_measure, measure0
+        measure0.pid= pid
+        measure0.dversion= dversion
+        measure[i]= measure0
     endif
     
 endfor

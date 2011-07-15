@@ -80,8 +80,7 @@ case info.kcorrect of
         atlas_kcorrect_galex_maggies, measure, gnmgy, gnmgy_ivar
         nmgy[0:1, *]= gnmgy
         nmgy_ivar[0:1, *]= gnmgy_ivar
-        nmgy_ivar= nmgy_ivar < 100.
-        izero= where(nmgy eq 0, nzero)
+        izero= where(abs(nmgy) lt 1.d-20, nzero)
         if(nzero gt 0) then $
           nmgy_ivar[izero]=0.
         filterlist= [gfilterlist, sfilterlist]
@@ -90,7 +89,8 @@ case info.kcorrect of
 endcase
 
 iok= where(atlas.zdist gt 0. and $
-           (measure.racen ne 0. or measure.deccen ne 0.), nok)
+           (measure.racen ne 0. or measure.deccen ne 0.) and $
+           total(nmgy_ivar,1) ne 0., nok)
 
 kcorrect, nmgy[*,iok]*1.e-9, nmgy_ivar[*,iok]*1.e+18, atlas[iok].zdist, kc, $
   band_shift=0., filterlist=filterlist, mass=mass, absmag=absmag, $
