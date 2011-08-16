@@ -268,11 +268,13 @@ pbase=base+'-parent-'+strtrim(string(iparent),2)
 opfile= subdir+'/'+ strtrim(string(iparent),2)+ $
   '/'+pbase+'.fits'
 for j=0L, nband-1L do begin
-    bwjpgfile= subdir+'/'+strtrim(string(iparent),2)+ '/'+pbase+'-'+bands[j]+'.jpg'
+    bwjpgbase= subdir+'/'+strtrim(string(iparent),2)+ '/'+pbase+'-'+bands[j]
     dim= gz_mrdfits(opfile, j)
-    nw_rgb_make, dim, dim, dim, name= bwjpgfile, $
+    nw_rgb_make, dim, dim, dim, name= bwjpgbase+'.jpg', $
       scales=bwscales[j]*[1.,1.,1.], nonlinearity=nonlinearity, $
       quality=100, /invert
+    spawn, /nosh, ['convert', '-resize', '130', bwjpgbase+'.jpg', $
+                   bwjpgbase+'.thumb.jpg']
 endfor
 
 abase= subdir+'/'+ strtrim(string(iparent),2)+ $
@@ -280,26 +282,31 @@ abase= subdir+'/'+ strtrim(string(iparent),2)+ $
   '-atlas-'+strtrim(string(aid),2)
 afile= abase+'.fits'
 for j=0L, nband-1L do begin
-    bwjpgfile= abase+'-'+bands[j]+'.jpg'
+    bwjpgbase= abase+'-'+bands[j]
     dim= gz_mrdfits(afile, j)
-    nw_rgb_make, dim, dim, dim, name= bwjpgfile, $
+    nw_rgb_make, dim, dim, dim, name= bwjpgbase+'.jpg', $
       scales=bwscales[j]*[1.,1.,1.], nonlinearity=nonlinearity, $
       quality=100, /invert
+    spawn, /nosh, ['convert', '-resize', '130', bwjpgbase+'.jpg', $
+                   bwjpgbase+'.thumb.jpg']
 endfor
 
 sbase= subdir+'/'+ strtrim(string(iparent),2)+ $
   '/'+base+'-'+strtrim(string(iparent),2)+ $
   '-sersic'
 sfile= sbase+'.fits'
-bwjpgfile= sbase+'.jpg'
 mim= gz_mrdfits(sfile)
 dim= gz_mrdfits(afile, 2)
-nw_rgb_make, mim, mim, mim, name= bwjpgfile, $
+nw_rgb_make, mim, mim, mim, name= sbase+'.jpg', $
   scales=bwscales[2]*[1.,1.,1.], nonlinearity=nonlinearity, $
   quality=100, /invert
+spawn, /nosh, ['convert', '-resize', '330', sbase+'.jpg', $
+               sbase+'.thumb.jpg']
 bwjpgfile= sbase+'-sub.jpg'
 nw_rgb_make, dim-mim+3.e-2, dim-mim+3.e-2, dim-mim+3.e-2, name= bwjpgfile, $
   scales=bwscales[2]*[1.,1.,1.], nonlinearity=nonlinearity, $
   quality=100, /invert
+spawn, /nosh, ['convert', '-resize', '330', sbase+'-sub.jpg', $
+               sbase+'-sub.thumb.jpg']
 
 end

@@ -6,17 +6,30 @@ version= atlas_default_version()
 rdir= atlas_rootdir(version=version)
 nsa= mrdfits(rdir+'/nsa_'+version+'.fits',1)
 
-spherematch, gdp._raj2000, gdp._dej2000, nsa.ra, nsa.dec, 5./3600., m1, m2
+spherematch, gdp._raj2000, gdp._dej2000, nsa.ra, nsa.dec, 5./3600., m1, m2, d12
 
-gdpcomp0= create_struct(gdp[0], 'nd25_child', 0., $
-                       'nd25_parent', 0., $
-                       'nd25_schild', 0., $
-                       'nd25_sparent', 0., $
-                       'nd25_full', 0., $
-                       'nd25_orig', 0., $
-                       'sersic_r50', 0., $
-                       'sersic_phi', 0., $
-                       'sersic_nmag', 0.)
+gdpcomp0= create_struct(gdp[0], $
+                        'nd25_child', 0., $
+                        'nd25_parent', 0., $
+                        'nd25_schild', 0., $
+                        'nd25_sparent', 0., $
+                        'nd25_full', 0., $
+                        'nd25_orig', 0., $
+                        'nsersic_child', 0., $
+                        'nsersic_parent', 0., $
+                        'nsersic_schild', 0., $
+                        'nsersic_schild_fit', 0., $
+                        'nsersic_schild_fit_sky', 0., $
+                        'nsersic_sparent', 0., $
+                        'nsersic_full', 0., $
+                        'nsersic_orig', 0., $
+                        'nsersic_full_fit', 0., $
+                        'nsersic_full_fit_sky', 0., $
+                        'sersic_th50', 0., $
+                        'sersic_phi', 0., $
+                        'sersic_n', 0., $
+                        'sersic_ba', 0., $
+                        'sersic_nmag', 0.)
 gdpcomp= replicate(gdpcomp0, n_elements(m1))
 struct_assign, gdp[m1], gdpcomp
 
@@ -26,6 +39,7 @@ for i=0L, n_elements(m1)-1L do begin
 
     nimage= mrdfits(nsa[m2[i]].iauname+'-nd.fits.gz',0, nhdr)
     nivar= mrdfits(nsa[m2[i]].iauname+'-nd.fits.gz',1)
+    psf= gz_mrdfits(nsa[m2[i]].iauname+'-nd-bpsf.fits.gz',0, /silent)
     cts= mrdfits(nsa[m2[i]].iauname+'-nd.fits.gz',2)
     rr= mrdfits(nsa[m2[i]].iauname+'-nd.fits.gz',3)
 
@@ -49,13 +63,40 @@ for i=0L, n_elements(m1)-1L do begin
     simage[inz]= simage[inz]-sky[inz]
 
     dist_ellipse, rad, [nx, ny], xcen, ycen, gdp[m1[i]].majaxis/gdp[m1[i]].minaxis, $
-      ((nsa[m2[i]].sersic_phi+90.) mod 180.)
+      ((nsa[m2[i]].sersic_phi) mod 180.)
     mask= float(rad lt gdp[m1[i]].majaxis*60./1.5/2.)
 
     flux_child_d25= total(image*mask)
     flux_parent_d25= total(parent*mask)
     flux_schild_d25= total(simage*mask)
     flux_sparent_d25= total(sparent*mask)
+
+    tsersic={SKY:0., XCEN:xcen, YCEN:ycen, SERSICFLUX:1., $
+             SERSICFLUX_IVAR:1., SERSICR50:nsa[m2[i]].sersic_th50/1.5, $
+             SERSICN:nsa[m2[i]].sersic_n, AXISRATIO:nsa[m2[i]].sersic_ba, $
+             ORIENTATION:nsa[m2[i]].sersic_phi+90., NDOF:0L, $
+             CHISQUARED:0., FITPARAM:fltarr(8), PERROR:fltarr(8), $
+             COVARIANCE:fltarr(8,8)}
+    dsersic, image, invvar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             /onlyflux, sersic=tsersic, psf=psf
+    flux_child_sersic= tsersic.sersicflux
+    dsersic, simage, invvar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             /onlyflux, sersic=tsersic, psf=psf
+    flux_schild_sersic= tsersic.sersicflux
+    dsersic, parent, invvar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             /onlyflux, sersic=tsersic, psf=psf
+    flux_parent_sersic= tsersic.sersicflux
+    dsersic, sparent, invvar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             /onlyflux, sersic=tsersic, psf=psf
+    flux_sparent_sersic= tsersic.sersicflux
+
+    dsersic, simage, invvar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             sersic=tsersic, psf=psf
+    flux_schild_sersic_fit= tsersic.sersicflux
+
+    dsersic, simage, invvar, xcen= xcen, ycen= ycen, /fixcen, $
+             sersic=tsersic, psf=psf
+    flux_schild_sersic_fit_sky= tsersic.sersicflux
 
     adxy, nhdr, nsa[m2[i]].ra, nsa[m2[i]].dec, xcen, ycen
     
@@ -73,7 +114,7 @@ for i=0L, n_elements(m1)-1L do begin
       fimage[inz]=cts[inz]/rr[inz]*10.^(0.4*(22.5-20.08))
 
     dist_ellipse, rad, [nx, ny], xcen, ycen, gdp[m1[i]].majaxis/gdp[m1[i]].minaxis, $
-      ((nsa[m2[i]].sersic_phi+90.) mod 180.)
+      ((nsa[m2[i]].sersic_phi) mod 180.)
     smask= float(rad lt 1.5*gdp[m1[i]].majaxis*60./1.5/2.)
 
     fivar= fltarr(nx, ny)+1.
@@ -90,6 +131,27 @@ for i=0L, n_elements(m1)-1L do begin
 
     flux_orig_d25= total(nimage*mask)
     flux_full_d25= total(fimage*mask)
+
+    tsersic={SKY:0., XCEN:xcen, YCEN:ycen, SERSICFLUX:1., $
+             SERSICFLUX_IVAR:1., SERSICR50:nsa[m2[i]].sersic_th50/1.5, $
+             SERSICN:nsa[m2[i]].sersic_n, AXISRATIO:nsa[m2[i]].sersic_ba, $
+             ORIENTATION:nsa[m2[i]].sersic_phi+90., NDOF:0L, $
+             CHISQUARED:0., FITPARAM:fltarr(8), PERROR:fltarr(8), $
+             COVARIANCE:fltarr(8,8)}
+    dsersic, nimage, nivar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             /onlyflux, sersic=tsersic, psf=psf
+    flux_orig_sersic= tsersic.sersicflux
+    dsersic, fimage, nivar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             /onlyflux, sersic=tsersic, psf=psf
+    flux_full_sersic= tsersic.sersicflux
+
+    dsersic, fimage, nivar, xcen= xcen, ycen= ycen, /fixsky, /fixcen, $
+             sersic=tsersic, psf=psf
+    flux_full_sersic_fit= tsersic.sersicflux
+
+    dsersic, fimage, nivar, xcen= xcen, ycen= ycen, /fixcen, $
+             sersic=tsersic, psf=psf
+    flux_full_sersic_fit_sky= tsersic.sersicflux
     
     gdpcomp[i].nd25_child= 22.5-2.5*alog10(flux_child_d25)
     gdpcomp[i].nd25_schild= 22.5-2.5*alog10(flux_schild_d25)
@@ -97,9 +159,21 @@ for i=0L, n_elements(m1)-1L do begin
     gdpcomp[i].nd25_sparent= 22.5-2.5*alog10(flux_sparent_d25)
     gdpcomp[i].nd25_full= 22.5-2.5*alog10(flux_full_d25)
     gdpcomp[i].nd25_orig= 22.5-2.5*alog10(flux_orig_d25)
+    gdpcomp[i].nsersic_child= 22.5-2.5*alog10(flux_child_sersic)
+    gdpcomp[i].nsersic_schild= 22.5-2.5*alog10(flux_schild_sersic)
+    gdpcomp[i].nsersic_schild_fit= 22.5-2.5*alog10(flux_schild_sersic_fit)
+    gdpcomp[i].nsersic_schild_fit_sky= 22.5-2.5*alog10(flux_schild_sersic_fit_sky)
+    gdpcomp[i].nsersic_parent= 22.5-2.5*alog10(flux_parent_sersic)
+    gdpcomp[i].nsersic_sparent= 22.5-2.5*alog10(flux_sparent_sersic)
+    gdpcomp[i].nsersic_full= 22.5-2.5*alog10(flux_full_sersic)
+    gdpcomp[i].nsersic_orig= 22.5-2.5*alog10(flux_orig_sersic)
+    gdpcomp[i].nsersic_full_fit= 22.5-2.5*alog10(flux_full_sersic_fit)
+    gdpcomp[i].nsersic_full_fit_sky= 22.5-2.5*alog10(flux_full_sersic_fit_sky)
     gdpcomp[i].sersic_nmag= 22.5-2.5*alog10(nsa[m2[i]].sersicflux[1]>0.001)
-    gdpcomp[i].sersic_r50= nsa[m2[i]].sersic_r50
+    gdpcomp[i].sersic_th50= nsa[m2[i]].sersic_th50
     gdpcomp[i].sersic_phi= nsa[m2[i]].sersic_phi
+    gdpcomp[i].sersic_n= nsa[m2[i]].sersic_n
+    gdpcomp[i].sersic_ba= nsa[m2[i]].sersic_ba
 
     help, gdpcomp[i].nd25_full
     help, gdpcomp[i].d25nuv
