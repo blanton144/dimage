@@ -26,7 +26,7 @@
 ;   7-Apr-2004  Written by Mike Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-function velmod_distance, z, ra, dec, beta=beta, sigv=sigv
+function velmod_distance, z, ra, dec, beta=beta, sigv=sigv, version=version
 
 common com_velmod_distance, dengrid, vxgrid, vygrid, vzgrid, cell, $
   nx, ny, nz, mwv
@@ -36,6 +36,8 @@ if(NOT keyword_set(sigv)) then sigv=150.
 if(NOT keyword_set(rbin)) then rbin=10.
 if(NOT keyword_set(nbin)) then nbin=640L
 if(NOT keyword_set(taper)) then taper=50.
+
+rd= atlas_rootdir(version=version)
 
 ; get local group relative motion
 cspeed=2.99792e+5
@@ -48,12 +50,13 @@ glactc, ra, dec, 2000, sgl, sgb, 1, /deg, /super
 
 if(n_elements(dengrid) eq 0) then begin
 ;   load density and velocity grids
-    dengrid=mrdfits(getenv('VAGC_DIR')+'/data/velfield/iter10.dengrid.fits')
+    vdir= rd+'/misc/velfield/'+version
+    dengrid=mrdfits(vdir+'/iter10.dengrid.fits')
     nx=(size(dengrid,/dim))[0]
     ny=(size(dengrid,/dim))[1]
     nz=(size(dengrid,/dim))[2]
     cell=100.
-    velgrid=mrdfits(getenv('VAGC_DIR')+'/data/velfield/iter10.velgrid.fits')
+    velgrid=mrdfits(vdir+'/iter10.velgrid.fits')
     vxgrid=reform(velgrid[0,*,*,*],nx,ny,nz)
     vygrid=reform(velgrid[1,*,*,*],nx,ny,nz)
     vzgrid=reform(velgrid[2,*,*,*],nx,ny,nz)

@@ -20,10 +20,22 @@ info= atlas_version_info(version)
 
 rootdir= atlas_rootdir(version=version, cdir=cdir)
 
+;; read in atlas and associated information 
 atlas= read_atlas(version=version, measure=measure, kcorrect=kcorrect, $
-                  sdssline=sdssline)
+                  finalz=finalz, velmod=velmod)
 
+;; read in the SDSS catalog, which has some meta-data of importance
 sdss= mrdfits(cdir+'/sdss_atlas.fits',1)
+
+;; now read in the SDSS line catalog, which needs to be sorted
+;; correctly with respect to the full atlas
+osdssline= mrdfits(rootdir+'/misc/sdssline/'+version+'/sdssline_atlas.fits',1)
+osdssline0= osdssline[0]
+struct_assign, {junk:0}, osdssline0
+sdssline= replicate(osdssline0, n_elements(atlas))
+isdssmatch= where(finalz.isdssmatch ge 0, nsdssmatch)
+if(nsdssmatch gt 0) then $
+  sdssline[isdssmatch]= osdssline[finalz[isdssmatch].isdssmatch]
 
 atlas0= atlas[0]
 sdssline0= struct_trimtags(sdssline[0], except=['RA', 'DEC', 'Z'])
@@ -49,6 +61,7 @@ all0= create_struct(atlas0, kcorrect0, measure0, $
 all= replicate(all0, n_elements(atlas))
 
 struct_assign, atlas, all
+struct_assign, velmod, all, /nozero
 struct_assign, measure, all, /nozero
 struct_assign, kcorrect, all, /nozero
 struct_assign, sdssline, all, /nozero
@@ -58,6 +71,8 @@ all.dec= measure.deccen
 all.racat= atlas.ra
 all.deccat= atlas.dec
 all.zsdssline= sdssline.z
+all.z= finalz.z
+all.zsrc= finalz.zsrc
 
 ;; convert pixels to arcsec
 pixscale=0.396D
@@ -73,6 +88,7 @@ all.phi50= (all.phi50+270.) MOD 180.
 all.phi90= (all.phi90+270.) MOD 180.
 all.sersic_phi= (all.sersic_phi+270.) MOD 180.
 
+;; use SDSS numbers from original catalog ...
 isdss= where(all.isdss ge 0, nsdss)
 if(nsdss gt 0) then begin
     all[isdss].plug_ra= sdss[all[isdss].isdss].plug_ra
@@ -81,6 +97,23 @@ if(nsdss gt 0) then begin
     all[isdss].programname= sdss[all[isdss].isdss].programname
     all[isdss].platequality= sdss[all[isdss].isdss].platequality
     all[isdss].tile= sdss[all[isdss].isdss].tile
+    all[isdss].plate= sdss[all[isdss].isdss].plate
+    all[isdss].mjd= sdss[all[isdss].isdss].mjd
+    all[isdss].fiberid= sdss[all[isdss].isdss].fiberid
+endif
+
+;; ... or preferentially the closest match
+isdssmatch= where(finalz.isdssmatch ge 0, nsdss)
+if(nsdss gt 0) then begin
+    all[isdssmatch].plug_ra= sdss[finalz[isdssmatch].isdssmatch].plug_ra
+    all[isdssmatch].plug_dec= sdss[finalz[isdssmatch].isdssmatch].plug_dec
+    all[isdssmatch].survey= sdss[finalz[isdssmatch].isdssmatch].survey
+    all[isdssmatch].programname= sdss[finalz[isdssmatch].isdssmatch].programname
+    all[isdssmatch].platequality= sdss[finalz[isdssmatch].isdssmatch].platequality
+    all[isdssmatch].tile= sdss[finalz[isdssmatch].isdssmatch].tile
+    all[isdssmatch].plate= sdss[finalz[isdssmatch].isdssmatch].plate
+    all[isdssmatch].mjd= sdss[finalz[isdssmatch].isdssmatch].mjd
+    all[isdssmatch].fiberid= sdss[finalz[isdssmatch].isdssmatch].fiberid
 endif
 
 case info.imagetypes of

@@ -26,8 +26,8 @@ pro atlas_startrim, version=version
 
 rootdir=atlas_rootdir(version=version, mdir=mdir, cdir=cdir, ddir=ddir)
 
-measure=mrdfits(mdir+'/atlas_measure.fits',1)
-atlas=mrdfits(cdir+'/atlas.fits',1)
+atlas=read_atlas(/notrim, measure=measure, velmod=velmod)
+
 
 tycho= tycho_read()
 
@@ -56,7 +56,7 @@ tmatch[m1]=1
 st[iok[m1]].itycho=m2
 
 ;; also use redshift
-lowz= atlas[iok].zlg lt 0.0015 and $
+lowz= velmod[iok].zlg lt 0.0015 and $
   (measure[iok].sersic_r50 lt 30. OR $
    measure[iok].sersicflux[2] lt 250.)
 
