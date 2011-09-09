@@ -134,7 +134,7 @@ if(keyword_set(pim)) then begin
                        deccen:deccen, $
                        xcen:r_measure.xcen, $
                        ycen:r_measure.ycen, $
-                       nprof:fltarr(nbands), $
+                       nprof:bytarr(nbands), $
                        profmean:fltarr(nbands, 15), $
                        profmean_ivar:fltarr(nbands, 15), $
                        profradius:r_measure.profradius, $
