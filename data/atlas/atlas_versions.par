@@ -7,3 +7,4 @@ typedef struct {
 
 ATLAS_VERSION v0_0_0 "SDSS" "sdss" "Original version with just SDSS"
 ATLAS_VERSION v0_1_0 "SDSS GALEX" "galex" "SDSS and GALEX images"
+ATLAS_VERSION v0_1_1 "SDSS GALEX" "galex" "SDSS and GALEX images, extinction and duplication fixed"
