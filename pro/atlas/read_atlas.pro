@@ -25,7 +25,7 @@
 ;-
 ;------------------------------------------------------------------------------
 function read_atlas, notrim=notrim, measure=measure, kcorrect=kcorrect, $
-                     velmod=velmod, finalz=finalz, version=version
+                     velmod=velmod, finalz=finalz, version=version, sdss=sdss
 
 rootdir=atlas_rootdir(version=version, cdir=cdir, mdir=mdir, ddir=ddir)
 
@@ -33,6 +33,8 @@ atlas=mrdfits(cdir+'/atlas.fits',1)
 measure=mrdfits(mdir+'/atlas_measure.fits',1)
 if(arg_present(kcorrect) ne 0) then $
   kcorrect=mrdfits(ddir+'/atlas_kcorrect.fits',1)
+if(arg_present(sdss) ne 0) then $
+  sdss=mrdfits(cdir+'/sdss_atlas.fits',1)
 if(arg_present(finalz) ne 0) then $
   finalz=mrdfits(ddir+'/atlas_finalz.fits',1)
 if(arg_present(velmod) ne 0 OR keyword_set(notrim) eq 0) then $
