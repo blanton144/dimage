@@ -26,7 +26,7 @@ pro atlas_startrim, version=version
 
 rootdir=atlas_rootdir(version=version, mdir=mdir, cdir=cdir, ddir=ddir)
 
-atlas=read_atlas(/notrim, measure=measure, velmod=velmod)
+atlas=read_atlas(/notrim, measure=measure, velmod=velmod, sdss=sdss)
 
 
 tycho= tycho_read()
@@ -55,15 +55,26 @@ spherematch, measure[iok].racen, measure[iok].deccen, $
 tmatch[m1]=1
 st[iok[m1]].itycho=m2
 
-;; also use redshift
+;; also use redshift to exclude stars (low-redshift and not bright)
 lowz= velmod[iok].zlg lt 0.0015 and $
   (measure[iok].sersic_r50 lt 30. OR $
    measure[iok].sersicflux[2] lt 250.)
 
-istar= where((th50 lt 1. and rmag gt 16.5) OR $
-             (th50 lt 2.25 and rmag lt 15.) OR $
-             (th50 lt 2.25-(rmag-15.)*1.25/1.5 and rmag gt 15. and rmag lt 16.5) OR $
-             tmatch gt 0 OR lowz gt 0)
+;; and again as a veto on stars (high redshift spectrum at center)
+refra= atlas.ra
+refdec= atlas.dec
+isdss= where(atlas.isdss ge 0, nsdss)
+if(nsdss gt 0) then begin & $
+    refra[isdss]=sdss[atlas[isdss].isdss].plug_ra & $
+    refdec[isdss]=sdss[atlas[isdss].isdss].plug_dec & $
+endif
+dcen= 3600.*djs_diff_angle(refra, refdec, measure.racen, measure.deccen)
+hiz= velmod[iok].zlg gt 0.005 and dcen[iok] lt 2.
+
+istar= where(((th50 lt 1. and rmag gt 16.5) OR $
+              (th50 lt 2.25 and rmag lt 15.) OR $
+              (th50 lt 2.25-(rmag-15.)*1.25/1.5 and rmag gt 15. and rmag lt 16.5) OR $
+              tmatch gt 0 OR lowz gt 0) and hiz eq 0)
 st[iok[istar]].isstar=1
 
 mwrfits, st, ddir+'/atlas_startrim.fits', /create
