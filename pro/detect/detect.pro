@@ -55,7 +55,7 @@ pro detect, base, imfiles, pset=pset, hand=hand, ref=ref, sky=sky, $
             puse=puse, center=center, seed=seed0, gbig=gbig, nogalex=nogalex, $
             gsaddle=gsaddle, nostarim=nostarim, novpsf=novpsf, $
             noparentclobber=noparentclobber, plim=plim, sersic=sersic, $
-            pbuffer=pbuffer, maxnstar=maxnstar
+            pbuffer=pbuffer, maxnstar=maxnstar, dopsf=dopsf
 
 if(NOT keyword_set(seed0)) then seed0=11L
 if(NOT keyword_set(ref)) then ref=0

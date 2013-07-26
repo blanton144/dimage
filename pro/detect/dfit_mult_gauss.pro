@@ -50,7 +50,7 @@ yy=transpose(findgen(ny)#replicate(1.,nx))+0.5
 radius2=(xx-float(nx)/2.)^2+(yy-float(ny)/2.)^2
 
 ; set error
-image_err=sqrt(image)
+image_err=sqrt(image>0) ; jm13jul19siena
 notindx=where(image gt 0.,notcount)
 minerr=min(image_err[notindx])
 indx=where(image le 0.,count)

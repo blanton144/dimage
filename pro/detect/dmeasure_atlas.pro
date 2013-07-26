@@ -116,7 +116,8 @@ if(keyword_set(pim)) then begin
                 dmeasure, rimage, rinvvar, xcen=xcen, ycen=ycen, $
                   measure=r_measure
                 r_sersic=0
-                dsersic, rimage, rinvvar, xcen=xcen, ycen=ycen, sersic=r_sersic, $
+; jm13jul19siena - bug fix                
+                dsersic, rimage, rinvvar, xcen=r_measure.xcen, ycen=r_measure.ycen, sersic=r_sersic, $
                   /fixcen, /fixsky, model=model, psf=psf
 
                 outhdr= hdr

@@ -106,7 +106,7 @@ for k=0L, nim-1L do begin
     cirrange, ra2
     spherematch, ra1, dec1, ra2,dec2, 360., m1, m2, d12
     pixscale[k]=d12/float(ntest)
-    
+
     ;; sky subtract if desired
     if(keyword_set(sky)) then begin
         skypix=sky/(pixscale*3600.)
@@ -195,6 +195,7 @@ for iobj=obj_st, obj_nd do begin
         ;; add extra buffer
         xbuffer= long(pbuffer*float(nxtmp))
         ybuffer= long(pbuffer*float(nytmp))
+
         xstart=(xstart-xbuffer)>0
         xend=(xend+xbuffer)<(nx[k]-1L)
         ystart=(ystart-ybuffer)>0
@@ -258,12 +259,12 @@ for iobj=obj_st, obj_nd do begin
             sxdelpar, outhdr, 'DATE'
         endif
         mwrfits, iimage, 'parents/'+base+'-parent-'+ $
-          strtrim(string(iobj),2)+'.fits', outhdr, create=first
+          strtrim(string(iobj),2)+'.fits', outhdr, create=first, /silent
         sxdelpar, outhdr, 'SIMPLE'
         sxdelpar, outhdr, 'EXTEND'
         sxdelpar, outhdr, 'DATE'
         mwrfits, iivar, 'parents/'+base+'-parent-'+ $
-          strtrim(string(iobj),2)+'.fits', outhdr
+          strtrim(string(iobj),2)+'.fits', outhdr, /silent
     endfor
 endfor
 

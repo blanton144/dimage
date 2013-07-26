@@ -33,7 +33,7 @@ endfor
 
 end
 ;;
-pro dfitpsf_atlas, imfile, natlas=natlas, $
+pro dfitpsf_atlas, imfile, natlas=natlas, maxnstar=maxnstar, $
                    base=base, seed=seed0, check=check
 
 if(NOT keyword_set(natlas)) then natlas=61L

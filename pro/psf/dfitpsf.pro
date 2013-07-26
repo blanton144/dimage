@@ -122,7 +122,6 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
    bpsf=reform(djs_median( exatlas, 2), natlas, natlas)
    
    bpsf=bpsf/total(bpsf)
-   
    ;; clip non-stars
    diff=fltarr(n_elements(extract))
    scale=fltarr(n_elements(extract))
@@ -143,9 +142,8 @@ for iter = 0L, n_elements(rejsigma)-1L do begin
    
    extract = extract[keep]
    scale = scale[keep]
-   
-endfor
 
+endfor
 ; find basic PSF
 exatlas=fltarr(natlas*natlas, n_elements(extract))
 model=reform(bpsf, natlas*natlas)

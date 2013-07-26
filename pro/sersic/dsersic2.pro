@@ -61,7 +61,10 @@ model2=dfakegal(nx=nx,ny=ny,xcen=use_fitparam[3],ycen=use_fitparam[4], $
                 flux=1., simple=simple)
 
 ; convolve with seeing
-if(n_elements(psf) gt 1) then model=convolve(model,psf)
+if(n_elements(psf) gt 1) then begin
+   model1=convolve(model1,psf)
+   model2=convolve(model2,psf)
+endif
 
 ; set flux linearly
 mm=image-use_fitparam[2]
