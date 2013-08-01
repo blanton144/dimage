@@ -1,25 +1,25 @@
 ;+
 ; NAME:
-;   atlas_2mass
+;   atlas_wise
 ; PURPOSE:
-;   make the atlas 2MASS images
+;   make the atlas WISE images
 ; CALLING SEQUENCE:
-;   atlas_2mass_images 
+;   atlas_wise_images 
 ; COMMENTS:
-;   Rewritten to use command line 2MASS tools
+;   Rewritten to use command line WISE tools
 ; REVISION HISTORY:
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
+pro atlas_wise_images, st=st, nd=nd, sample=sample, clobber=clobber, $
                         version=version
 
   rootdir= atlas_rootdir(version=version)
   atlas=gz_mrdfits(rootdir+'/catalogs/atlas.fits', 1)
   
-  bands=['J', 'H', 'K']
-  mexecbands=['j', 'h', 'k']
-  vega2ab=[1.37993, 0.900667, 1.84706]
+  bands=['3.4', '4.6', '12', '22']
+  mexecbands=['3.4', '4.6', '12', '22']
+  vega2ab=[2.699, 3.339, 5.174, 6.620]
   
   if(NOT keyword_set(st)) then st=0L
   if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L
@@ -27,7 +27,7 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
       help, i
      subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
                          prefix=prefix, rootdir=rootdir, $
-                         subname='detect/2mass')
+                         subname='detect/wise')
      
      spawn, /nosh, ['mkdir', '-p' ,subdir]
      cd, subdir
@@ -63,7 +63,7 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
                  '-o', filename, $
                  '-d', '2', $
                  '-f', hdrname, $
-                 '2mass', dirname]
+                 'wise', dirname]
            spawn, /nosh, cmd
            
            spawn, 'gzip -vf '+filename
@@ -73,7 +73,7 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
      endif
         
      runjpg=0
-     filename=prefix+'-JHK.jpg'
+     filename=prefix+'-W123.jpg'
      if(file_test(filename) eq 0 OR keyword_set(clobber) ne 0) then $
         runjpg=1
      if(runjpg) then begin
@@ -82,22 +82,22 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
         nonlinearity=3.
         
         try=1
-        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-J.fits.gz'], outstr
+        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-3.4.fits.gz'], outstr
         words= strsplit(outstr, /extr)
         if(words[1] eq 'FAILED:') then $
            try=0
-        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-H.fits.gz'], outstr
+        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-4.6.fits.gz'], outstr
         words= strsplit(outstr, /extr)
         if(words[1] eq 'FAILED:') then $
            try=0
-        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-K.fits.gz'], outstr
+        spawn, /nosh, ['fitsverify', '-q', prefix[0]+'-12.fits.gz'], outstr
         words= strsplit(outstr, /extr)
         if(words[1] eq 'FAILED:') then $
            try=0
         if(try) then $
-           djs_rgb_make, prefix[0]+'-K.fits.gz', $
-                         prefix[0]+'-H.fits.gz', $
-                         prefix[0]+'-J.fits.gz', $
+           djs_rgb_make, prefix[0]+'-3.4.fits.gz', $
+                         prefix[0]+'-4.6.fits.gz', $
+                         prefix[0]+'-12.fits.gz', $
                          name=filename, $
                          scales=scales, $
                          nonlinearity=nonlinearity, satvalue=satvalue, $

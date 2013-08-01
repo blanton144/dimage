@@ -1,29 +1,45 @@
 pro plot_wise_mir_umr
 
-atlas= read_atlas()
-rootdir=atlas_rootdir(sample=sample)
-absmag= mrdfits(rootdir+'/wise-cat/atlas_wise_absmag.fits',1)
+atlas= read_nsa()
+rootdir=atlas_rootdir(cdir=cdir)
+absmag= mrdfits(rootdir+'/misc/wise-cat/atlas_wise_absmag.fits',1)
 absmag= absmag[atlas.nsaid]
 
-indx= mrdfits('~/dimage/data/atlas/atlas_indx.fits')
-twomass= mrdfits('~/dimage/data/atlas/atlas_2mass_xsc.fits',1)
+indx= mrdfits(cdir+'/atlas_indx.fits')
+twomass= mrdfits(cdir+'/atlas_2mass_xsc.fits',1)
 twomass= twomass[indx[atlas.nsaid]]
 
 kabs= twomass.k_m_ext- lf_distmod(atlas.zdist)
 
-galex=mrdfits('~ioannis/home/research/data/vagc-dr7/vagc2/object_galex_gr6.fits.gz',1)
-spherematch, galex.ra, galex.dec, atlas.ra, atlas.dec, 3./3600., m1, m2
+igd= where(atlas.amivar[1] gt 0., ngd)
 
-nabs= galex[m1].nuv_mag- lf_distmod(atlas[m2].zdist)
+nmr= atlas[igd].absmag[1]- atlas[igd].absmag[4]
+rmk= atlas[igd].absmag[4]- kabs[igd]
 
-nmr= nabs- absmag[m2].absmag[2]
-rmk= absmag[m2].absmag[2]- kabs[m2]
+mir= absmag[igd].absmag[5]-absmag[igd].absmag[7]
 
-mir= absmag[m2].absmag[5]-absmag[m2].absmag[7]
+okmir= mir ne 0. and $
+       absmag[igd].absmag[5] lt 0. and absmag[igd].absmag[7]  lt 0. and $
+       atlas[igd].absmag[4] gt -23. and atlas[igd].absmag[4] lt -17.5
 
-ii= where(galex[m1].nuv_mag gt 0. and mir ne 0. and $
-          absmag[m2].absmag[5] lt 0. and absmag[m2].absmag[7]  lt 0. and $
-          absmag[m2].absmag[2] gt -23. and absmag[m2].absmag[2] lt -18.5)
+save
+
+ff= fltarr(4)
+ired= where(abs(nmr-5.8) lt 0.4 and abs(mir+1.9) lt 0.4 and okmir ne 0)
+ff[0]= 10.^(-0.4*median(nmr[ired]))  ;; near
+ff[1]= 1. ;; r
+ff[2]= 10.^(-0.4*median(absmag[igd[ired]].absmag[5]-atlas[igd[ired]].absmag[4])) ;; 3.4
+ff[3]= 10.^(-0.4*median(absmag[igd[ired]].absmag[7]-atlas[igd[ired]].absmag[4])) ;; 12
+iv= fltarr(4)+1.
+iv[0]=1000.
+iv[2]=0.1
+iv[3]=0.1
+
+kcorrect, ff, iv, 0.001, kc, filterlist=['galex_NUV.par', 'sdss_r0.par', $
+                                         'wise_w1.par', 'wise_w4.par'], $
+          coeffs=coeffs, vmatrix=vmatrix, lambda=lambda, rmaggies=rff
+
+ii= where(okmir)
 
 k_print, filename='wise_mir_nmr.ps', xsize=13., ysize=13.
 
@@ -32,8 +48,8 @@ djs_plot, xra=[-2.8, 2.8], yra=[0.7, 8.7], xtitle='!8[12]-[3.4]!6', $
   ytitle='!8N-r!6', -mir[ii], nmr[ii], psym=8, symsize=0.5, $
   xcharsize=2.3, ycharsize=2.3
 
-djs_xyouts, -2., 1.0, '!8star-forming!6', color='blue', charsize=2.0
-djs_xyouts, 1., 8.3, '!8quiescent!6', color='red', charsize=2.0
+djs_xyouts, -2., 1.0, '!8star-forming!6', color='blue', charsize=3.0, th=2
+djs_xyouts, 1., 8.3, '!8quiescent!6', color='red', charsize=3.0, th=2
 
 k_end_print
 
