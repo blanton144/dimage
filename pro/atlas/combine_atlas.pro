@@ -33,7 +33,7 @@
 ;------------------------------------------------------------------------------
 pro combine_atlas, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 
 atlas0={ra:0.D, dec:0.D, $
         isdss:-1L, $

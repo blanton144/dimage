@@ -21,7 +21,7 @@
 ;------------------------------------------------------------------------------
 pro final_atlas, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 
 combine=mrdfits(rootdir+'/catalogs/atlas_combine.fits',1)
 iminfo=mrdfits(rootdir+'/catalogs/atlas_iminfo.fits',1)
