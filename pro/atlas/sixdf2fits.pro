@@ -11,9 +11,9 @@
 ;------------------------------------------------------------------------------
 pro sixdf2fits, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 
-readcol, rootdir+'/catalogs/6dF/6dFGSzDR3.txt', $
+readcol, rootdir+'/catalogs/sixdf/6dFGSzDR3.txt', $
          comment='#', $
          format='(a,a,a,a,a,a,a,l,l,f,l,f,l,l,f,f,l,f,f,f,l,l,a,a,a)', $
          targetid, $

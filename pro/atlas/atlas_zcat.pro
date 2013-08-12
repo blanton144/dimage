@@ -12,11 +12,21 @@
 ;------------------------------------------------------------------------------
 pro atlas_zcat, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
+if(file_test(rootdir, /dir) eq 0) then $
+   message, 'No root directory for '+version+': '+rootdir
+info= atlas_version_info(version)
+
+spawn, /nosh, ['mkdir', '-p', rootdir+'/catalogs/zcat']
+spawn, ['cp', getenv('DIMAGE_DIR')+ $
+        '/data/atlas/catalogs/zcat-velocity.dat', $
+        rootdir+'/catalogs/zcay'], /nosh
+
+zcat2fits, version=version
 
 zcat=mrdfits(rootdir+'/catalogs/zcat/zcat-velocity.fits',1)
 
-ikeep= where(zcat.z lt 0.055 and $
+ikeep= where(zcat.z lt info.zmax and $
              zcat.z gt -0.05 and $
              zcat.z ne 0. and $
              strmatch(zcat.comments, 'SDSS*') eq 0)

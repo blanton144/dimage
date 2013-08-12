@@ -9,7 +9,6 @@
 ;   Reads in the files:
 ;      atlas_rootdir/catalogs/atlas_combine.fits
 ;      atlas_rootdir/catalogs/atlas_iminfo.fits
-;      atlas_rootdir/catalogs/atlas_velmod.fits
 ;   Outputs the file:
 ;      atlas_rootdir/catalogs/atlas_indx.fits
 ;      atlas_rootdir/catalogs/atlas.fits
@@ -26,12 +25,10 @@ rootdir=atlas_rootdir(sample=sample, version=version)
 
 combine=mrdfits(rootdir+'/catalogs/atlas_combine.fits',1)
 iminfo=mrdfits(rootdir+'/catalogs/atlas_iminfo.fits',1)
-velmod=mrdfits(rootdir+'/catalogs/atlas_velmod.fits',1)
 
 ikeep= where(iminfo.run gt 0 and iminfo.score ge 0.5, nkeep)
 combine=combine[ikeep]
 iminfo=iminfo[ikeep]
-velmod=velmod[ikeep]
 
 mwrfits, ikeep, rootdir+'/catalogs/atlas_indx.fits', /create
 
@@ -43,10 +40,7 @@ atlas0= create_struct('iauname', ' ', $
                       'field', 0, $
                       'rerun', ' ', $
                       'xpos', 0., $
-                      'ypos', 0., $
-                      'zlg', 0., $
-                      'zdist', 0., $
-                      'zdist_err', 0.)
+                      'ypos', 0.)
 atlas= replicate(atlas0, nkeep)
 struct_assign, combine, atlas
 atlas.iauname= hogg_iau_name(atlas.ra, atlas.dec, '')
@@ -59,9 +53,6 @@ atlas.field= iminfo.field
 atlas.rerun= iminfo.rerun
 atlas.xpos= iminfo.xpos
 atlas.ypos= iminfo.ypos
-atlas.zlg= velmod.zlg
-atlas.zdist= velmod.zdist
-atlas.zdist_err= velmod.zdist_err
 
 mwrfits, atlas, rootdir+'/catalogs/atlas.fits', /create
 

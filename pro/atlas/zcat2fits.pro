@@ -26,7 +26,7 @@
 ;------------------------------------------------------------------------------
 pro zcat2fits, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 
 ngals= numlines(rootdir+'/catalogs/zcat/zcat-velocity.dat')
 

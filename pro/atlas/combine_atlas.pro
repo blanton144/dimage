@@ -14,7 +14,7 @@
 ;      atlas_rootdir/catalogs/zcat_atlas.fits
 ;      atlas_rootdir/catalogs/twodf_atlas.fits
 ;   and outputs:
-;      atlas_rootdir/catalogs/atlas.fits
+;      atlas_rootdir/catalogs/atlas_combine.fits
 ;   which has the contents:
 ;        .RA (J2000 deg)
 ;        .DEC (J2000 deg)

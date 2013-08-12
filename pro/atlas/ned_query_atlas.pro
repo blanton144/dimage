@@ -15,7 +15,7 @@ pro ned_query_atlas, st=st, version=version
 
 if(NOT keyword_set(st)) then st=0L
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 
 outdir=rootdir+'/catalogs/ned'
 

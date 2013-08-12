@@ -17,8 +17,9 @@
 pro atlas_sdss, version=version
 
 rootdir=atlas_rootdir(sample=sample, version=version)
+info= atlas_version_info(version)
 
-list=hogg_mrdfits(rootdir+'/catalogs/sdss/specList-dr8.fits', $
+list=hogg_mrdfits(rootdir+'/catalogs/sdss/specList-'+info.sdss_drname+'.fits', $
                   1, nrow=28800)
 
 sdss_flux2lups, list.modelflux, model, /noivar
@@ -27,7 +28,7 @@ sdss_flux2lups, list.psfflux, psf, /noivar
 pmm= psf[2,*]-rmag
 
 ;; check low redshift
-lowz= list.z lt 0.055 and list.z ne 0.
+lowz= list.z lt info.zmax and list.z ne 0.
 
 ;; if it is classified as an M-star
 mstar= strmatch(list.class, 'STAR*') gt 0 AND $

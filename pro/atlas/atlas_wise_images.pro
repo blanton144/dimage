@@ -20,6 +20,7 @@ pro atlas_wise_images, st=st, nd=nd, sample=sample, clobber=clobber, $
   bands=['3.4', '4.6', '12', '22']
   mexecbands=['3.4', '4.6', '12', '22']
   vega2ab=[2.699, 3.339, 5.174, 6.620]
+  magzp=[20.5, 19.5, 18.0, 13.0]
   
   if(NOT keyword_set(st)) then st=0L
   if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L
@@ -49,9 +50,10 @@ pro atlas_wise_images, st=st, nd=nd, sample=sample, clobber=clobber, $
            filename= prefix+'-'+bands[iband]+'.fits'
            hdrname= prefix+'-'+bands[iband]+'.hdr'
 
+           file_delete, dirname, /recurs, /allow_nonexistent
+
            ;; get hdr 
            cmd= ['mHdr', $
-                 '-t', mexecbands[iband], $
                  '"'+rastr+' '+decstr+'"', $
                  sizestr, $
                  hdrname]
@@ -63,13 +65,14 @@ pro atlas_wise_images, st=st, nd=nd, sample=sample, clobber=clobber, $
                  '-o', filename, $
                  '-d', '2', $
                  '-f', hdrname, $
-                 'wise', dirname]
+                 'wise', mexecbands[iband], dirname]
            spawn, /nosh, cmd
            
            spawn, 'gzip -vf '+filename
         endfor
         
-        montage_recal, prefix, bands=bands, vega2ab=vega2ab
+        montage_recal, prefix, bands=bands, vega2ab=vega2ab, $
+                       magzp=magzp
      endif
         
      runjpg=0

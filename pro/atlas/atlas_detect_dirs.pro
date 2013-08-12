@@ -4,12 +4,12 @@
 ; PURPOSE:
 ;   create atlas detection directories
 ; CALLING SEQUENCE:
-;   atlas_detect_dirs [, /sample, /sdss ]
+;   atlas_detect_dirs [, /sdss ]
 ; REVISION HISTORY:
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_detect_dirs, sample=sample, sdss=sdss, justjpg=justjpg, galex=galex, $
+pro atlas_detect_dirs, sdss=sdss, justjpg=justjpg, galex=galex, $
                        st=st, nd=nd, version=version
 
 if(keyword_set(sdss)) then begin
@@ -33,17 +33,15 @@ endif else if(keyword_set(justjpg)) then begin
 endif else begin
     galex=1
     twomass=1
+    wise=1
     sdss=1
     jpg=1
     subname='detect'
 endelse
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 if(NOT keyword_set(infile)) then $
    infile=rootdir+'/catalogs/atlas.fits'
-if(keyword_set(sample)) then begin
-   infile= rootdir+'/catalogs/atlas_sample.fits'
-endif
 
 atlas= gz_mrdfits(infile, 1)
 
@@ -127,6 +125,41 @@ for i=st, nd do begin
             if(file_test(twomassdir+'/'+imfiles[iband])) then begin
                 file_delete, subdir+'/'+imfiles[iband], /allow
                 file_link, twomassdir+'/'+imfiles[iband], '.'
+            endif else begin
+                file_delete, subdir+'/'+imfiles[iband], /allow
+                ufile= prefix+'-u.fits'
+                hdr= gz_headfits(ufile)
+                if(size(hdr, /tname) eq 'STRING') then begin
+                    nx_sdss=long(sxpar(hdr, 'NAXIS1'))
+                    ny_sdss=long(sxpar(hdr, 'NAXIS2'))
+                    dra= float(nx_sdss)*0.396/3600.
+                    ddec= float(ny_sdss)*0.396/3600.
+                    xyad, hdr, (float(nx_sdss)-1.)/2., (float(ny_sdss)-1.)/2., $
+                          racen, deccen
+                    ast= hogg_make_astr(racen, deccen, dra, ddec, pix=1./3600.)
+                    nx= ast.naxis[0]
+                    ny= ast.naxis[1]
+                    tim= fltarr(nx, ny)
+                    mkhdr, thdr, tim
+                    putast, thdr, ast
+                    outfile= strmid(imfiles[iband],0,strlen(imfiles[iband])-3)
+                    mwrfits, tim, subdir+'/'+outfile, thdr, /create
+                    spawn, /nosh, ['gzip', '-vf', subdir+'/'+outfile]
+                endif
+            endelse
+        endfor
+     endif
+
+    if(keyword_set(wise)) then begin
+        wisesub= 'wise'
+        wisedir=image_subdir(atlas[i].ra, atlas[i].dec, $
+                                prefix=prefix, rootdir='../../../..', $
+                                subname=wisesub)
+        imfiles=prefix+'-'+['J', 'H', 'K']+'.fits.gz'
+        for iband=0L, n_elements(imfiles)-1L do begin
+            if(file_test(wisedir+'/'+imfiles[iband])) then begin
+                file_delete, subdir+'/'+imfiles[iband], /allow
+                file_link, wisedir+'/'+imfiles[iband], '.'
             endif else begin
                 file_delete, subdir+'/'+imfiles[iband], /allow
                 ufile= prefix+'-u.fits'

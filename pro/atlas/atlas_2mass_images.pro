@@ -49,6 +49,8 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
            filename= prefix+'-'+bands[iband]+'.fits'
            hdrname= prefix+'-'+bands[iband]+'.hdr'
 
+           file_delete, dirname, /recurs, /allow_nonexistent
+
            ;; get hdr 
            cmd= ['mHdr', $
                  '-t', mexecbands[iband], $
@@ -63,7 +65,7 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
                  '-o', filename, $
                  '-d', '2', $
                  '-f', hdrname, $
-                 '2mass', dirname]
+                 '2mass', mexecbands[iband], dirname]
            spawn, /nosh, cmd
            
            spawn, 'gzip -vf '+filename
