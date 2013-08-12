@@ -11,7 +11,7 @@
 ;------------------------------------------------------------------------------
 pro atlas_twodf, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 if(file_test(rootdir, /dir) eq 0) then $
    message, 'No root directory for '+version+': '+rootdir
 info= atlas_version_info(version)

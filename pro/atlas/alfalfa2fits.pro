@@ -12,7 +12,7 @@
 pro alfalfa2fits, version=version
 
 infile=atlas_rootdir(version=version)+'/catalogs/alfalfa/alfalfa3.txt'
-nlines=numlines(infile)-13L
+nlines=file_lines(infile)-13L
 
 str0={agc:0L, $
       catnum:' ', $

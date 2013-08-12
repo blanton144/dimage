@@ -28,7 +28,7 @@ pro zcat2fits, version=version
 
 rootdir=atlas_rootdir(version=version)
 
-ngals= numlines(rootdir+'/catalogs/zcat/zcat-velocity.dat')
+ngals= file_lines(rootdir+'/catalogs/zcat/zcat-velocity.dat')
 
 OPENR, unit, rootdir+'/catalogs/zcat/zcat-velocity.dat', /GET_LUN
 

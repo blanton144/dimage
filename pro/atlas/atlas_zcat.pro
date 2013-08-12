@@ -20,7 +20,7 @@ info= atlas_version_info(version)
 spawn, /nosh, ['mkdir', '-p', rootdir+'/catalogs/zcat']
 spawn, ['cp', getenv('DIMAGE_DIR')+ $
         '/data/atlas/catalogs/zcat-velocity.dat', $
-        rootdir+'/catalogs/zcay'], /nosh
+        rootdir+'/catalogs/zcat'], /nosh
 
 zcat2fits, version=version
 

@@ -18,7 +18,7 @@ pro iminfo_atlas, version=version
 
 common com_iminfo_atlas, atlas, flist, run
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 
 if(n_tags(atlas) eq 0) then $
   atlas=mrdfits(rootdir+'/catalogs/atlas_combine.fits',1)
