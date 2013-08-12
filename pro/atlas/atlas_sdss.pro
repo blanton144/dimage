@@ -16,7 +16,7 @@
 ;------------------------------------------------------------------------------
 pro atlas_sdss, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 info= atlas_version_info(version)
 
 list=hogg_mrdfits(rootdir+'/catalogs/sdss/specList-'+info.sdss_drname+'.fits', $
