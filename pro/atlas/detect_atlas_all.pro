@@ -22,6 +22,7 @@ for i=0L, n_elements(imagetypes)-1L do begin
         'SDSS': sdss=1
         'GALEX': galex=1
         '2MASS': twomass=1
+        'WISE': wise=1
         else: message, 'No such imagetype '+imagetypes[i]
     endcase
 endfor
@@ -50,6 +51,9 @@ for i=st, nd do begin
     endif 
     if (keyword_set(twomass) gt 0) then begin
         imfiles=[imfiles, prefix+'-'+['J', 'H', 'K']+'.fits.gz']
+    endif 
+    if (keyword_set(wise) gt 0) then begin
+        imfiles=[imfiles, prefix+'-'+['3.4', '4.6', '12', '22']+'.fits.gz']
     endif 
     allthere=1
     for j=0L, n_elements(imfiles)-1L do $
