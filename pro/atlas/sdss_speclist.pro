@@ -17,7 +17,13 @@
 ;------------------------------------------------------------------------------
 pro sdss_speclist, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
+if(file_test(rootdir, /dir) eq 0) then $
+   message, 'No root directory for '+version+': '+rootdir
+
+spawn, /nosh, ['mkdir', '-p', rootdir+'/catalogs/sdss']
+
+info= atlas_version_info(version)
 
 ph_columns= ['run', 'camcol', 'field', 'id', 'rerun', $
              'objc_type', 'objc_prob_psf', 'objc_flags', 'objc_flags2', $
@@ -42,18 +48,21 @@ sp_columns= ['survey', 'chunk', 'programname', 'platerun', 'platequality', $
              'mjd', 'tile', 'plug_ra', 'plug_dec', 'class', 'subclass', $
              'z', 'z_err', 'vdisp', 'vdisp_err', 'zwarning', 'sn_median']
 
-ph= hogg_mrdfits(getenv('SPECTRO_REDUX')+'/photoPlate-dr8.fits',1, $
+ph= hogg_mrdfits(getenv('SPECTRO_REDUX')+'/photoPlate-'+ $
+                 info.sdss_drname+'.fits',1, $
                  nrow=28800, columns= ph_columns)
-sp= hogg_mrdfits(getenv('SPECTRO_REDUX')+'/specObj-dr8.fits',1, $
+sp= hogg_mrdfits(getenv('SPECTRO_REDUX')+'/specObj-'+ $
+                 info.sdss_drname+'.fits',1, $
                  nrow=28800, columns= sp_columns)
 
-new0= create_struct(ph[0], sp[0])
+new0= create_struct({ispecobj:-1}, ph[0], sp[0])
 
 new= replicate(new0, n_elements(ph))
 struct_assign, ph, new
 struct_assign, sp, new,/nozero
+new.ispecobj= lindgen(n_elements(ph))
 
-mwrfits, new, rootdir+'/catalogs/sdss/specList-dr8.fits', $
+mwrfits, new, rootdir+'/catalogs/sdss/specList-'+info.sdss_drname+'.fits', $
   /create
 
 
