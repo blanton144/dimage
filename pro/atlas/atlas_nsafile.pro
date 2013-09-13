@@ -131,7 +131,7 @@ case info.imagetypes of
 endcase
 
 for i=0L, nband-1L do begin
-    all.nprof[outband[i]]= measure.profmean[inband[i]]
+    all.nprof[outband[i]]= measure.nprof[inband[i]]
     all.profmean[outband[i],*]= measure.profmean[inband[i],*]
     all.profmean_ivar[outband[i],*]= measure.profmean_ivar[inband[i],*]
     all.qstokes[outband[i],*]= measure.qstokes[inband[i],*]
