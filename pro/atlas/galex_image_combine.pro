@@ -11,7 +11,7 @@
 ;------------------------------------------------------------------------------
 pro galex_image_combine, version=version
 
-rootdir=atlas_rootdir(sample=sample, version=version)
+rootdir=atlas_rootdir(version=version)
 
 atlas= mrdfits(rootdir+'/catalogs/atlas.fits',1)
 
@@ -21,9 +21,10 @@ zp= [18.82, 20.08]
 for i=0L, n_elements(atlas)-1L do begin
     splog, i
     
-    indir= rootdir+'/galex-orig/'+strmid(strtrim(atlas[i].subdir,2), 0, 2)
-    outdir= rootdir+'/galex/'+strtrim(atlas[i].subdir,2)
+    indir= rootdir+'/detect/galex-orig/'+strmid(strtrim(atlas[i].subdir,2), 0, 2)
+    outdir= rootdir+'/detect/galex/'+strtrim(atlas[i].subdir,2)
     file_mkdir, outdir
+    print, outdir
     
     for j= 0L, n_elements(bands)-1L do begin
         files= file_search(indir+'/lowz_gr6_'+atlas[i].iauname+'*-'+ $
