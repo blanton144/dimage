@@ -30,11 +30,20 @@ end
 ;
 pro dmeasure_atlas, noclobber=noclobber
 
+nmax_sersic= 3000L
 sub='atlases'
 postfix=''
 
 spawn, /nosh, 'pwd', subdir
 subdir=subdir[0]
+
+if(keyword_set(noclobber) ne 0) then begin
+   dreadcen, measure=measure
+   if(n_tags(measure) gt 0) then begin
+      splog, 'Already found measurements, skipping.'
+      return
+   endif
+endif
 
 prefix= file_basename(subdir)
 
@@ -109,6 +118,9 @@ if(keyword_set(pim)) then begin
                 gz_file_test(mfile) eq 0) AND $
                keyword_set(nomeasure) eq 0) then begin
                 
+                rnx= (size(rimage, /dim))[0]
+                rny= (size(rimage, /dim))[1]
+
                 adxy, hdr, acat[m2].racen, acat[m2].deccen, xcen, ycen
 
                 psf= gz_mrdfits(psffiles[ref])
@@ -116,9 +128,12 @@ if(keyword_set(pim)) then begin
                 dmeasure, rimage, rinvvar, xcen=xcen, ycen=ycen, $
                   measure=r_measure
                 r_sersic=0
+                model=0
 ; jm13jul19siena - bug fix                
-                dsersic, rimage, rinvvar, xcen=r_measure.xcen, ycen=r_measure.ycen, sersic=r_sersic, $
-                  /fixcen, /fixsky, model=model, psf=psf
+                if(rnx lt nmax_sersic and rny lt nmax_sersic) then $
+                   dsersic, rimage, rinvvar, xcen=r_measure.xcen, $
+                            ycen=r_measure.ycen, sersic=r_sersic, $
+                            /fixcen, /fixsky, model=model, psf=psf
 
                 outhdr= hdr
                 sxdelpar, outhdr, 'XTENSION'
@@ -128,8 +143,6 @@ if(keyword_set(pim)) then begin
 
                 xyad, hdr, r_measure.xcen, r_measure.ycen, racen, deccen
                 cirrange, racen
-                
-                help,/st,r_measure
                 
                 mall= {racen:racen, $
                        deccen:deccen, $
@@ -156,15 +169,22 @@ if(keyword_set(pim)) then begin
                        phi90:r_measure.phi90, $
                        sersicflux:fltarr(nbands), $
                        sersicflux_ivar:fltarr(nbands), $
-                       sersic_r50:r_sersic.sersicr50, $
-                       sersic_n:r_sersic.sersicn, $
-                       sersic_ba:r_sersic.axisratio, $
-                       sersic_phi:r_sersic.orientation, $
+                       sersic_r50:1., $
+                       sersic_n:1., $
+                       sersic_ba:1., $
+                       sersic_phi:0., $
                        asymmetry:fltarr(nbands), $
                        clumpy:fltarr(nbands), $
                        dflags:lonarr(nbands), $
                        aid:aid}
 
+                if(n_tags(r_sersic) gt 0) then begin
+                   sersic_r50=r_sersic.sersicr50
+                   sersic_n=r_sersic.sersicn
+                   sersic_ba=r_sersic.axisratio
+                   sersic_phi=r_sersic.orientation
+                endif
+                   
                 for iband=0L, nbands-1L do begin
                     image=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
                                       pstr+'-atlas-'+astr+'.fits', iband, hdr)
@@ -179,13 +199,17 @@ if(keyword_set(pim)) then begin
                       ycen=ycen, /fixcen, measure=tmp_measure, $
                       cpetrorad= mall.petrorad*scales[iband], $
                       faper= 7.57576*scales[iband]
-                    curr_sersic= r_sersic
-                    curr_sersic.xcen= xcen
-                    curr_sersic.ycen= ycen
-                    curr_sersic.sersicr50= r_sersic.sersicr50*scales[iband]
-                    dsersic, image, invvar, xcen=xcen, ycen=ycen, $
-                      sersic=curr_sersic, /onlyflux, /fixcen, /fixsky, $
-                      psf=psf, model=model
+                    if(rnx lt nmax_sersic and rny lt nmax_sersic) then begin
+                       curr_sersic= r_sersic
+                       curr_sersic.xcen= xcen
+                       curr_sersic.ycen= ycen
+                       curr_sersic.sersicr50= r_sersic.sersicr50*scales[iband]
+                       dsersic, image, invvar, xcen=xcen, ycen=ycen, $
+                                sersic=curr_sersic, /onlyflux, /fixcen, $
+                                /fixsky, psf=psf, model=model
+                    endif else begin
+                       curr_sersic=0
+                    endelse
                     
                     mall.nprof[iband]= tmp_measure.nprof
                     mall.profmean[iband,*]= $
@@ -202,8 +226,10 @@ if(keyword_set(pim)) then begin
                     mall.fiberflux[iband]= tmp_measure.fiberflux
                     mall.fiberflux_ivar[iband]= $
                       tmp_measure.fiberflux_ivar
-                    mall.sersicflux[iband]= curr_sersic.sersicflux
-                    mall.sersicflux_ivar[iband]= curr_sersic.sersicflux_ivar
+                    if(n_tags(curr_sersic) gt 0) then begin
+                       mall.sersicflux[iband]= curr_sersic.sersicflux
+                       mall.sersicflux_ivar[iband]= curr_sersic.sersicflux_ivar
+                    endif
                     mall.asymmetry[iband]= tmp_measure.asymmetry
                     mall.clumpy[iband]= tmp_measure.clumpy
                     mall.dflags[iband]= tmp_measure.dflags
