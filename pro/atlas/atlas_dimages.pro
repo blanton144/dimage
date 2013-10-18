@@ -18,7 +18,7 @@ pro atlas_dimages, seed=seed, st=st, nd=nd, clobber=clobber, version=version
   ikeep= where(flist.rerun eq '301' and flist.run ne 1473)
   run= (uniqtag(flist[ikeep], 'run')).run
   
-  rootdir= atlas_rootdir(sample=sample, version=version)
+  rootdir= atlas_rootdir(version=version)
   atlas=gz_mrdfits(rootdir+'/catalogs/atlas.fits', 1)
   
   if(NOT keyword_set(st)) then st=0L
@@ -26,7 +26,8 @@ pro atlas_dimages, seed=seed, st=st, nd=nd, clobber=clobber, version=version
   for i=st, nd do begin
      help,i
      subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
-                         prefix=prefix, rootdir=rootdir)
+                         prefix=prefix, rootdir=rootdir+'/detect', $
+                        subname='sdss')
      
      spawn, /nosh, ['mkdir', '-p' ,subdir]
      cd, subdir
