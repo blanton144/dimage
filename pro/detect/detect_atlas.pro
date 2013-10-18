@@ -29,6 +29,14 @@ pro detect_atlas, galex=galex, noclobber=noclobber, nsigma=nsigma, glim=glim, $
 spawn, 'pwd', cwd
 base=(file_basename(cwd))[0]
 
+if(keyword_set(noclobber) ne 0) then begin
+   dreadcen, acat=acat
+   if(n_tags(acat) gt 0) then begin
+      splog, 'Already found child catalog, skipping.'
+      return
+   endif
+endif
+
 imfiles=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
 if (keyword_set(galex) gt 0) then begin
     imfiles=[imfiles, base+'-'+['nd', 'fd']+'.fits.gz']
