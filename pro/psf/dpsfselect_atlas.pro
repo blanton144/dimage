@@ -24,7 +24,7 @@ function dpsfselect_atlas, image, ivar, x, y, amp=amp, psf=psf, flux=flux, $
                            dof=dof, subimage=subimage, noclip=noclip, $
                            clipsize=clipsize
 
-if(NOT keyword_set(clipsize)) then clipsize=5.
+if(NOT keyword_set(clipsize)) then clipsize=8.
 
 nx=(size(image,/dim))[0]
 ny=(size(image,/dim))[1]
@@ -63,15 +63,15 @@ cenpsf= psf[xst:xnd, yst:ynd]
 cmodel=fltarr(11,ncx*ncy)
 cmodel[0,*]=reform(cenpsf/max(psf), ncx*ncy)
 cmodel[1,*]=cc
-cmodel[2,*]=xx
-cmodel[3,*]=yy
-cmodel[4,*]=xx^2
-cmodel[5,*]=yy^2
-cmodel[6,*]=xx*yy
-cmodel[7,*]=xx^3
-cmodel[8,*]=xx^2*yy
-cmodel[9,*]=xx*yy^2
-cmodel[10,*]=yy^3
+cmodel[2,*]=(xx-ncx*0.5)
+cmodel[3,*]=(yy-ncy*0.5)
+cmodel[4,*]=(xx-ncx*0.5)^2
+cmodel[5,*]=(yy-ncy*0.5)^2
+cmodel[6,*]=(xx-ncx*0.5)*(yy-ncy*0.5)
+cmodel[7,*]=(xx-ncx*0.5)^3
+cmodel[8,*]=(xx-ncx*0.5)^2*(yy-ncy*0.5)
+cmodel[9,*]=(xx-ncx*0.5)*(yy-ncy*0.5)^2
+cmodel[10,*]=(yy-ncy*0.5)^3
 
 amp=fltarr(n_elements(x))
 flux=fltarr(n_elements(x))

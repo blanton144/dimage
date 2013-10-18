@@ -26,11 +26,13 @@
 ;-
 ;------------------------------------------------------------------------------
 function dpsfsub_atlas, imbase=imbase, image=image, ivar=ivar, psf=psf, $
-                        nsigma=nsigma, x=inout_x, y=inout_y, flux=flux, $
-                        nstars=nstars, exx=xex, exy=yex, exr=rex
+                        fsigma=fsigma, nsigma=nsigma, x=inout_x, y=inout_y, $
+                        flux=flux, nstars=nstars, exx=xex, exy=yex, exr=rex
 
 if(keyword_set(nsigma) eq 0) then $
    nsigma=20.
+if(keyword_set(fsigma) eq 0) then $
+   fsigma=10.
 
 ;; sanity checks and inputs
 if(keyword_set(image) eq 0 AND $
@@ -67,7 +69,7 @@ if(keyword_set(inout_x) eq 0 OR keyword_set(inout_y) eq 0) then begin
       if(n_elements(rex) gt 0) then begin
          inex= sqrt((x-xex)^2+(y-yex)^2) lt rex
       endif
-      istar= where(chi2 lt dof+nsigma*sqrt(2.*dof) AND inex eq 0, nstars)
+      istar= where(chi2 lt dof*fsigma+nsigma*sqrt(2.*dof) AND inex eq 0, nstars)
       if(nstars eq 0) then begin
          return, image
       endif 
