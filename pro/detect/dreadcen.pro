@@ -78,7 +78,8 @@ if(keyword_set(pim)) then begin
         if(arg_present(measure)) then begin
             measure=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+ $
                                pstr+'-measure'+postfix+'.fits',1, mhdr, /silent)
-            dversion= sxpar(mhdr, 'DVERSION')
+            if(n_tags(measure) ne 0) then $
+               dversion= sxpar(mhdr, 'DVERSION')
          endif
 
         if(arg_present(eye)) then begin
