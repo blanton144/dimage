@@ -13,14 +13,14 @@ pro atlas_gather, version=version
 
 rootdir=atlas_rootdir(version=version, cdir=cdir, mdir=mdir)
 
+file_mkdir, mdir
+
 infile=cdir+'/atlas.fits'
 outfile=mdir+'/atlas_measure.fits'
 
 atlas= gz_mrdfits(infile, 1)
 
 for i=0L, n_elements(atlas)-1L do begin
-;;for i=102500L, 104999L do begin
-    if((i mod 100) eq 0) then $
        splog, i
     
     atcd, i, version=version
