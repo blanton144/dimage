@@ -27,6 +27,7 @@ combine=mrdfits(rootdir+'/catalogs/atlas_combine.fits',1)
 iminfo=mrdfits(rootdir+'/catalogs/atlas_iminfo.fits',1)
 
 ikeep= where(iminfo.run gt 0 and iminfo.score ge 0.5, nkeep)
+
 combine=combine[ikeep]
 iminfo=iminfo[ikeep]
 
