@@ -16,10 +16,10 @@ common com_atcd, atlas, iauname
 rootdir=atlas_rootdir(version=version, cdir=cdir, subname=subname)
 atlasfile=cdir+'/atlas.fits'
 
-if(n_tags(atlas) eq 0) then $
-  atlas=mrdfits(atlasfile,1, /silent)
-if(n_elements(iauname) eq 0) then $
-  iauname= hogg_iau_name(atlas.ra, atlas.dec, '')
+if(n_tags(atlas) eq 0) then begin
+   atlas=mrdfits(atlasfile,1, /silent)
+   iauname= atlas.iauname
+endif
 
 if(n_elements(indx) eq 0) then begin
     if(keyword_set(name)) then begin
