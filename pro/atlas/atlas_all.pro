@@ -16,7 +16,23 @@ if(file_test(rootdir, /dir) eq 0) then $
    message, 'No root directory for '+version+': '+rootdir
 
 atlas_all_catalogs, version=version
-atlas_all_detect, version=version
-atlas_all_derived, version=version
+
+;; need PHOTO_SKY set
+atlas_dimages
+
+;; need galex-orig there
+galex_image_combine
+
+;; needs to get directories right
+;; make top-lvel detect directory
+atlas_detect_dirs
+
+detect_atlas_all
+
+;; make measure directory
+atlas_gather
+atlas_duplicates
+velmod_atlas
+atlas_kcorrect
 
 end
