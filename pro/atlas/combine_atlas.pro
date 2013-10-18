@@ -48,7 +48,9 @@ atlas0={ra:0.D, dec:0.D, $
         size:0.}
 
 sdss=mrdfits(rootdir+'/catalogs/sdss_atlas.fits', 1)
-sdss_size= ((sdss.petrotheta[2]*10L)/3600.) > 0.07
+zfrac= (((sdss.z-0.055)/(0.15-0.055))>0.)<1.
+sdss_size= ((sdss.petrotheta[2]*10L)/3600.) > $
+           (0.07-0.05*zfrac)
 sdss_atlas= replicate(atlas0, n_elements(sdss))
 sdss_atlas.ra= sdss.ra
 sdss_atlas.dec= sdss.dec
@@ -77,7 +79,8 @@ sixdf=mrdfits(rootdir+'/catalogs/sixdf_atlas.fits', 1)
 izero= where(sixdf.bj eq 0, nzero)
 if(nzero gt 0) then $
    sixdf[izero].bj=25.
-sixdf_size= ((-0.1*(sixdf.bj-10.)+0.5) > 0.10) < 0.5
+zfrac= (((sixdf.cz/299792.-0.055)/(0.15-0.055))>0.)<1.
+sixdf_size= ((-0.1*(sixdf.bj-10.)+0.5) > (0.10-0.08*zfrac)) < 0.5
 sixdf_atlas= replicate(atlas0, n_elements(sixdf))
 sixdf_atlas.ra= sixdf.ra
 sixdf_atlas.dec= sixdf.dec
@@ -88,7 +91,8 @@ sixdf_atlas.zsrc= 'sixdf'
 sixdf_atlas.size= sixdf_size
 
 twodf=mrdfits(rootdir+'/catalogs/twodf_atlas.fits', 1)
-twodf_size= ((-0.1*(twodf.bjg-10.)+0.5) > 0.10) < 0.5
+zfrac= (((twodf.z_helio-0.055)/(0.15-0.055))>0.)<1.
+twodf_size= ((-0.1*(twodf.bjg-10.)+0.5) > (0.10-0.08*zfrac)) < 0.5
 twodf_atlas= replicate(atlas0, n_elements(twodf))
 twodf_atlas.ra= twodf.ra
 twodf_atlas.dec= twodf.dec
@@ -113,7 +117,8 @@ zcat=mrdfits(rootdir+'/catalogs/zcat_atlas.fits', 1)
 izero= where(zcat.bmag eq 0, nzero)
 if(nzero gt 0) then $
    zcat[izero].bmag=25.
-zcat_size= ((-0.1*(zcat.bmag-10.)+0.5) > 0.10) < 0.5
+zfrac= (((zcat.z-0.055)/(0.15-0.055))>0.)<1.
+zcat_size= ((-0.1*(zcat.bmag-10.)+0.5) > (0.10-0.08*zfrac)) < 0.5
 zcat_atlas= replicate(atlas0, n_elements(zcat))
 zcat_atlas.ra= zcat.ra
 zcat_atlas.dec= zcat.dec
