@@ -269,12 +269,15 @@ opfile= subdir+'/'+ strtrim(string(iparent),2)+ $
   '/'+pbase+'.fits'
 for j=0L, nband-1L do begin
     bwjpgbase= subdir+'/'+strtrim(string(iparent),2)+ '/'+pbase+'-'+bands[j]
-    dim= gz_mrdfits(opfile, j)
-    nw_rgb_make, dim, dim, dim, name= bwjpgbase+'.jpg', $
-      scales=bwscales[j]*[1.,1.,1.], nonlinearity=nonlinearity, $
-      quality=100, /invert
-    spawn, /nosh, ['convert', '-resize', '130', bwjpgbase+'.jpg', $
-                   bwjpgbase+'.thumb.jpg']
+    if(file_test(bwjpgbase+'.jpg') eq 0 or $
+       keyword_set(noclobber) eq 0) then begin
+       dim= gz_mrdfits(opfile, j)
+       nw_rgb_make, dim, dim, dim, name= bwjpgbase+'.jpg', $
+                    scales=bwscales[j]*[1.,1.,1.], nonlinearity=nonlinearity, $
+                    quality=100, /invert
+       spawn, /nosh, ['convert', '-resize', '130', bwjpgbase+'.jpg', $
+                      bwjpgbase+'.thumb.jpg']
+    endif
 endfor
 
 abase= subdir+'/'+ strtrim(string(iparent),2)+ $
@@ -283,30 +286,36 @@ abase= subdir+'/'+ strtrim(string(iparent),2)+ $
 afile= abase+'.fits'
 for j=0L, nband-1L do begin
     bwjpgbase= abase+'-'+bands[j]
-    dim= gz_mrdfits(afile, j)
-    nw_rgb_make, dim, dim, dim, name= bwjpgbase+'.jpg', $
-      scales=bwscales[j]*[1.,1.,1.], nonlinearity=nonlinearity, $
-      quality=100, /invert
-    spawn, /nosh, ['convert', '-resize', '130', bwjpgbase+'.jpg', $
-                   bwjpgbase+'.thumb.jpg']
+    if(file_test(bwjpgbase+'.jpg') eq 0 or $
+       keyword_set(noclobber) eq 0) then begin
+       dim= gz_mrdfits(afile, j)
+       nw_rgb_make, dim, dim, dim, name= bwjpgbase+'.jpg', $
+                    scales=bwscales[j]*[1.,1.,1.], nonlinearity=nonlinearity, $
+                    quality=100, /invert
+       spawn, /nosh, ['convert', '-resize', '130', bwjpgbase+'.jpg', $
+                      bwjpgbase+'.thumb.jpg']
+    endif
 endfor
 
 sbase= subdir+'/'+ strtrim(string(iparent),2)+ $
   '/'+base+'-'+strtrim(string(iparent),2)+ $
   '-sersic'
-sfile= sbase+'.fits'
-mim= gz_mrdfits(sfile)
-dim= gz_mrdfits(afile, 2)
-nw_rgb_make, mim, mim, mim, name= sbase+'.jpg', $
-  scales=bwscales[2]*[1.,1.,1.], nonlinearity=nonlinearity, $
-  quality=100, /invert
-spawn, /nosh, ['convert', '-resize', '330', sbase+'.jpg', $
-               sbase+'.thumb.jpg']
-bwjpgfile= sbase+'-sub.jpg'
-nw_rgb_make, dim-mim+3.e-2, dim-mim+3.e-2, dim-mim+3.e-2, name= bwjpgfile, $
-  scales=bwscales[2]*[1.,1.,1.], nonlinearity=nonlinearity, $
-  quality=100, /invert
-spawn, /nosh, ['convert', '-resize', '330', sbase+'-sub.jpg', $
-               sbase+'-sub.thumb.jpg']
-
+if(file_test(sbase+'.jpg') eq 0 or $
+   keyword_set(noclobber) eq 0) then begin
+   sfile= sbase+'.fits'
+   mim= gz_mrdfits(sfile)
+   dim= gz_mrdfits(afile, 2)
+   nw_rgb_make, mim, mim, mim, name= sbase+'.jpg', $
+                scales=bwscales[2]*[1.,1.,1.], nonlinearity=nonlinearity, $
+                quality=100, /invert
+   spawn, /nosh, ['convert', '-resize', '330', sbase+'.jpg', $
+                  sbase+'.thumb.jpg']
+   bwjpgfile= sbase+'-sub.jpg'
+   nw_rgb_make, dim-mim+3.e-2, dim-mim+3.e-2, dim-mim+3.e-2, name= bwjpgfile, $
+                scales=bwscales[2]*[1.,1.,1.], nonlinearity=nonlinearity, $
+                quality=100, /invert
+   spawn, /nosh, ['convert', '-resize', '330', sbase+'-sub.jpg', $
+                  sbase+'-sub.thumb.jpg']
+endif
+   
 end
