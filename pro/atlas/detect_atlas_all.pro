@@ -11,7 +11,8 @@
 ;------------------------------------------------------------------------------
 pro detect_atlas_all, infile=infile, st=st, nd=nd, $
                       noclobber=noclobber, notrim=notrim, $
-                      nodetect=nodetect, version=version
+                      nodetect=nodetect, version=version, $
+                      nojpeg=nojpeg
 
 rootdir=atlas_rootdir(version=version, cdir=cdir, subname=subname)
 info= atlas_version_info(version)
@@ -44,6 +45,11 @@ for i=st, nd do begin
                         subname=subname)
     
     cd, subdir
+    finfo= file_info('.')
+    if(finfo.write eq 0) then begin
+       splog, 'Directory not writable, skipping!'
+       continue
+    endif
     
     imfiles=prefix+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz'
     if (keyword_set(galex) gt 0) then begin
@@ -63,9 +69,10 @@ for i=st, nd do begin
     if(allthere gt 0) then begin
         if(NOT keyword_set(nodetect)) then begin
             detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
-            atlas_jpeg, noclobber=noclobber, galex=galex, twomass=twomass
         endif
         dmeasure_atlas, noclobber=noclobber
+        if(NOT keyword_set(nojpeg)) then $
+           atlas_jpeg, noclobber=noclobber, galex=galex, twomass=twomass
         spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']
         
         if(NOT keyword_set(notrim)) then $
