@@ -9,15 +9,11 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_galex_images, st=st, nd=nd, sample=sample, clobber=clobber, $
+pro atlas_galex_images, st=st, nd=nd, clobber=clobber, $
                         version=version
 
-  rootdir=atlas_rootdir(sample=sample, version=version)
-  if(NOT keyword_set(sample)) then begin
-     atlas=gz_mrdfits(rootdir+'/catalogs/atlas.fits', 1)
-  endif else begin
-     atlas=gz_mrdfits(rootdir+'/catalogs/atlas_sample.fits', 1)
-  endelse
+  rootdir=atlas_rootdir(version=version)
+  atlas=gz_mrdfits(rootdir+'/catalogs/atlas_sample.fits', 1)
   
   bands=['nd', 'fd']
   
