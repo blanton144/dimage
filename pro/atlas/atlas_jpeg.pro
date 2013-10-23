@@ -305,6 +305,8 @@ if(file_test(sbase+'.jpg') eq 0 or $
    sfile= sbase+'.fits'
    mim= gz_mrdfits(sfile)
    dim= gz_mrdfits(afile, 2)
+   if(keyword_set(mim) eq 0) then $
+      mim=dim*0.
    nw_rgb_make, mim, mim, mim, name= sbase+'.jpg', $
                 scales=bwscales[2]*[1.,1.,1.], nonlinearity=nonlinearity, $
                 quality=100, /invert
