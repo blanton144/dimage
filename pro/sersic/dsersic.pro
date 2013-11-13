@@ -194,7 +194,7 @@ pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
   parinfo.limited[1]= $
      [      0,       0,      1,      1,     1,    1,    1,       1]
   parinfo.limits[0]=  $
-     [     0.,  -1000.,     0.,     0., -1.20,  0.5, 0.15,    0.00]
+     [     0.,  -1000.,     -1.,     -1., -1.20,  0.5, 0.15,    0.00]
   parinfo.limits[1]=  $
      [     1.,   1000.,     nx,     ny,  6.00,  6., 1.00,  360.00]
   parinfo.fixed=      $
@@ -208,6 +208,13 @@ pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
                        sersicfit.sersicn, $
                        sersicfit.axisratio, $
                        sersicfit.orientation]
+
+  if(NOT fixcen) then begin
+     parinfo.value[2]= (parinfo.value[2] > parinfo[2].limits[0])<parinfo[2].limits[1]
+     parinfo.value[2]= (parinfo.value[2] > parinfo[2].limits[0])<parinfo[2].limits[1]
+     parinfo.value[3]= (parinfo.value[3] > parinfo[3].limits[0])<parinfo[3].limits[1]
+     parinfo.value[3]= (parinfo.value[3] > parinfo[3].limits[0])<parinfo[3].limits[1]
+  endif
 
   if(keyword_set(onlyflux) eq 0) then begin 
 
