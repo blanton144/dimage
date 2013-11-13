@@ -19,7 +19,7 @@ words= strsplit(version, '_', /extr)
 vtop= words[0]
 vmeas= words[0]+'_'+words[1]
 
-rootdir='/global/data/sdss/atlas/'+vtop
+rootdir=getenv('ATLAS_DATA')+'/'+vtop
 
 cdir= rootdir+'/catalogs'
 mdir= rootdir+'/measure/'+vmeas
