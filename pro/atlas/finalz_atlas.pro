@@ -4,7 +4,7 @@
 ; PURPOSE:
 ;   Re-match to SDSS to derive final redshift
 ; CALLING SEQUENCE:
-;   finalz_atlas
+;   finalz_atlas [, version=, /nosdssline]
 ; COMMENTS:
 ;   Uses read_atlas() to get measure, atlas heliocentric redshift,
 ;     plus sdssline
@@ -21,7 +21,7 @@
 ;   15-Aug-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro finalz_atlas, version=version
+pro finalz_atlas, version=version, nosdssline=nosdssline
 
 rootdir=atlas_rootdir(version=version, cdir=cdir, ddir=ddir)
 
@@ -51,7 +51,10 @@ if(nok gt 0) then begin
         iend= iuniq[i]
         icurr= isort[istart:iend]
         fz[iok[m1[icurr[0]]]].isdssmatch= m2[icurr[0]]
-        fz[iok[m1[icurr[0]]]].z= sdssline[m2[icurr[0]]].z
+        if(NOT keyword_set(nosdssline)) then $
+           fz[iok[m1[icurr[0]]]].z= sdssline[m2[icurr[0]]].z $
+        else $
+           fz[iok[m1[icurr[0]]]].z= sdss[m2[icurr[0]]].z 
         fz[iok[m1[icurr[0]]]].zsrc= 'sdss'
         istart= iend+1L
     endfor
