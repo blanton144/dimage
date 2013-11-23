@@ -179,10 +179,10 @@ if(keyword_set(pim)) then begin
                        aid:aid}
 
                 if(n_tags(r_sersic) gt 0) then begin
-                   sersic_r50=r_sersic.sersicr50
-                   sersic_n=r_sersic.sersicn
-                   sersic_ba=r_sersic.axisratio
-                   sersic_phi=r_sersic.orientation
+                   mall.sersic_r50=r_sersic.sersicr50
+                   mall.sersic_n=r_sersic.sersicn
+                   mall.sersic_ba=r_sersic.axisratio
+                   mall.sersic_phi=r_sersic.orientation
                 endif
                    
                 for iband=0L, nbands-1L do begin
