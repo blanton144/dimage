@@ -31,8 +31,12 @@ detect_atlas_all
 
 ;; make measure directory
 atlas_gather
+;; make derived directory
 atlas_duplicates
+;; make sure sdssline_atlas is in place
+finalz_atlas
 velmod_atlas
+atlas_startrim
 atlas_kcorrect
 
 end
