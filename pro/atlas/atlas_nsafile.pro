@@ -11,7 +11,7 @@
 ;   15-Apr-2011  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_nsafile, version
+pro atlas_nsafile, version, nosdssline=nosdssline
 
 if(not keyword_set(version)) then $
   version= atlas_default_version()
@@ -29,16 +29,21 @@ sdss= mrdfits(cdir+'/sdss_atlas.fits',1)
 
 ;; now read in the SDSS line catalog, which needs to be sorted
 ;; correctly with respect to the full atlas
-osdssline= mrdfits(rootdir+'/misc/sdssline/'+version+'/sdssline_atlas.fits',1)
-osdssline0= osdssline[0]
-struct_assign, {junk:0}, osdssline0
-sdssline= replicate(osdssline0, n_elements(atlas))
-isdssmatch= where(finalz.isdssmatch ge 0, nsdssmatch)
-if(nsdssmatch gt 0) then $
-  sdssline[isdssmatch]= osdssline[finalz[isdssmatch].isdssmatch]
+if(NOT keyword_set(nosdssline)) then begin
+   osdssline= mrdfits(rootdir+'/misc/sdssline/'+version+ $
+                      '/sdssline_atlas.fits',1)
+   osdssline0= osdssline[0]
+   struct_assign, {junk:0}, osdssline0
+   sdssline= replicate(osdssline0, n_elements(atlas))
+   isdssmatch= where(finalz.isdssmatch ge 0, nsdssmatch)
+   if(nsdssmatch gt 0) then $
+      sdssline[isdssmatch]= osdssline[finalz[isdssmatch].isdssmatch]
+   sdssline0= struct_trimtags(sdssline[0], except=['RA', 'DEC', 'Z'])
+endif else begin
+   sdssline0= {plate:-1L, fiberid:-1, mjd:-1L}
+endelse
 
 atlas0= atlas[0]
-sdssline0= struct_trimtags(sdssline[0], except=['RA', 'DEC', 'Z'])
 measure0= struct_trimtags(measure[0], except=['RACEN', 'DECCEN', $
                                               'PROFRADIUS', $
                                               'PETRORAD', $
@@ -64,13 +69,15 @@ struct_assign, atlas, all
 struct_assign, velmod, all, /nozero
 struct_assign, measure, all, /nozero
 struct_assign, kcorrect, all, /nozero
-struct_assign, sdssline, all, /nozero
+if(NOT keyword_set(nosdssline)) then $
+   struct_assign, sdssline, all, /nozero
 
 all.ra= measure.racen
 all.dec= measure.deccen
 all.racat= atlas.ra
 all.deccat= atlas.dec
-all.zsdssline= sdssline.z
+if(NOT keyword_set(nosdssline)) then $
+   all.zsdssline= sdssline.z
 all.z= finalz.z
 all.zsrc= finalz.zsrc
 
