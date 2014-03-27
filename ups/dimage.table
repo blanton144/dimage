@@ -1,6 +1,6 @@
-setupOptional("idlutils")
+setupOptional("photoop")
 setupOptional("Montage")
-envSet(ATLAS_DATA,/global/data/sdss/atlas)
+envSet(ATLAS_DATA,/clusterfs/riemann/raid000/blanton/atlas)
 envAppend(PATH, ${PRODUCT_DIR}/bin)
 envPrepend(IDL_PATH, +${PRODUCT_DIR}/pro)
 pathAppend(LD_LIBRARY_PATH, ${UPS_PROD_DIR}/lib)

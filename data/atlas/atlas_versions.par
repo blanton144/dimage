@@ -14,4 +14,4 @@ ATLAS_VERSION v0_1_2 "SDSS GALEX" "galex" 0.055 dr8 "SDSS and GALEX images, high
 ATLAS_VERSION v0_2_0 "SDSS GALEX 2MASS WISE" "galex" 0.055 dr8 "SDSS, GALEX, 2MASS, and WISE images; otherwise like v0_1_2" 
 ATLAS_VERSION v1b_0_0 "SDSS GALEX" "galex" 0.15 dr10 "SDSS, GALEX images; test version including wider redshift range" 
 ATLAS_VERSION v1c_0_0 "SDSS GALEX" "galex" 0.15 dr10 "SDSS, GALEX images; test version including wider redshift range, smaller images" 
-ATLAS_VERSION v1_0_0 "SDSS" "sdss" 0.15 dr11 "SDSS images; DR9 astrometry, DR13 calibrations" 
+ATLAS_VERSION v1_0_0 "SDSS GALEX" "galex" 0.15 dr11 "SDSS images; DR9 astrometry, DR13 calibrations" 

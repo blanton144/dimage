@@ -9,7 +9,7 @@
 ;   23-Apr-2010  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro galex_image_combine, version=version
+pro galex_image_combine, version=version, st=st, nd=nd
 
 rootdir=atlas_rootdir(version=version)
 
@@ -18,16 +18,20 @@ atlas= mrdfits(rootdir+'/catalogs/atlas.fits',1)
 bands= ['fd', 'nd']
 zp= [18.82, 20.08]
 
-for i=0L, n_elements(atlas)-1L do begin
+if(n_elements(st) eq 0) then $
+  st=0L
+if(n_elements(nd) eq 0) then $
+  nd=n_elements(atlas)-1L 
+for i=st, nd do begin
     splog, i
     
-    indir= rootdir+'/detect/galex-orig/'+strmid(strtrim(atlas[i].subdir,2), 0, 2)
+    indir= rootdir+'/detect/galex-ds/'+strmid(strtrim(atlas[i].subdir,2), 0, 2)
     outdir= rootdir+'/detect/galex/'+strtrim(atlas[i].subdir,2)
     file_mkdir, outdir
     print, outdir
     
     for j= 0L, n_elements(bands)-1L do begin
-        files= file_search(indir+'/lowz_gr6_'+atlas[i].iauname+'*-'+ $
+        files= file_search(indir+'/atlas_full_gr7_'+atlas[i].iauname+'*-'+ $
                            bands[j]+'-glxstamp.fits')
         if(keyword_set(files) gt 0) then begin
             hdrs= ptrarr(n_elements(files))
@@ -37,10 +41,10 @@ for i=0L, n_elements(atlas)-1L do begin
             expt= fltarr(n_elements(files))
 
             for k=0L, n_elements(files)-1L do begin
-                hdrs[k]= ptr_new(headfits(files[k]))
-                ims[k]= ptr_new(mrdfits(files[k],0))
-                skies[k]= ptr_new(mrdfits(files[k],1))
-                rrhrs[k]= ptr_new(mrdfits(files[k],2))
+                hdrs[k]= ptr_new(gz_headfits(files[k]))
+                ims[k]= ptr_new(gz_mrdfits(files[k],0))
+                skies[k]= ptr_new(gz_mrdfits(files[k],1))
+                rrhrs[k]= ptr_new(gz_mrdfits(files[k],2))
                 expt[k]= float(sxpar(*hdrs[k], 'EXPTIME'))
             endfor
             isort= reverse(sort(expt))

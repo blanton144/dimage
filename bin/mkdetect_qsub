@@ -1,0 +1,35 @@
+#!/bin/csh -f 
+
+set i = 0 
+
+while ($i < 80)
+
+@ st = $i * 8750
+@ nd = ( $i + 1 ) * 8750 - 1
+
+cat << EOF >! detect_$i.qsub
+#!/bin/csh
+
+#PBS -l nodes=1:ppn=1
+#PBS -q batch 
+#PBS -N dimages_$i
+#PBS -j oe
+#PBS -o dimages_$i.out
+#PBS -M michael.blanton@gmail.com
+#PBS -m abe
+#PBS -V
+#PBS -r n
+
+echo Running on `hostname`
+
+setup dimage v2_1_13
+setup photoop v1_12_1
+setup photolog dr10
+setup tree ebosswork
+
+echo atlas_detect_all, version=\'v1_0_0\', st=$st, nd=$nd |  idl
+EOF
+
+@ i = $i + 1
+
+end

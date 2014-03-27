@@ -343,6 +343,7 @@ if(n_tags(acat) eq 0) then begin
             strtrim(string(parent),2)+ '.fits'
    acat= gz_mrdfits(acatfile,1,/silent)
 endif
+
 if(n_tags(acat) gt 0) then begin
     ig=where(acat.good gt 0 and acat.type eq 0L, ng)
     
@@ -503,7 +504,7 @@ if(n_tags(eyeball) eq 0) then begin
 endif
 
 w_eyeball = WIDGET_BASE(/COLUMN, /BASE_ALIGN_TOP, /SCROLL, $
-                        xoff=300, ysize=700, scr_xsize=200, scr_ysize=700)
+                        xoff=300, ysize=900, scr_xsize=200, scr_ysize=900)
 
 w_label = WIDGET_LABEL(w_eyeball, VALUE='Flag values')
 
@@ -645,7 +646,7 @@ for i=0L, n_elements(imagenames)-1L do begin
 endfor
 
 ;; set up base widget
-w_base = WIDGET_BASE(xoff=60, ROW=14)  
+w_base = WIDGET_BASE(xoff=60, ROW=20)
 w_next = WIDGET_BUTTON(w_base, value='Next')  
 w_previous = WIDGET_BUTTON(w_base, value='Previous')  
 w_finish = WIDGET_BUTTON(w_base, value='Finish')  
@@ -684,14 +685,14 @@ w_parent = CW_FIELD(w_base, TITLE = "parent", $
 
 stash = {next: w_next, previous:w_previous, finish:w_finish}
 
-WIDGET_CONTROL, w_base, /REALIZE, set_uvalue=stash
-
 if(parent ge 0) then begin
     dexplore_read_parent
     dexplore_parent_display
     dexplore_child_list
     dexplore_mark_children
 endif
+
+WIDGET_CONTROL, w_base, /REALIZE, set_uvalue=stash
 
 XMANAGER, 'dexplore', w_base
 
