@@ -22,7 +22,7 @@ cat << EOF >! detect_$i.qsub
 
 echo Running on `hostname`
 
-setup dimage v2_1_13
+setup dimage v2_1_14
 setup photoop v1_12_1
 setup photolog dr10
 setup tree ebosswork
