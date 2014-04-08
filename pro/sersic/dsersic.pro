@@ -210,10 +210,10 @@ pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
                        sersicfit.orientation]
 
   if(NOT fixcen) then begin
-     parinfo.value[2]= (parinfo.value[2] > parinfo[2].limits[0])<parinfo[2].limits[1]
-     parinfo.value[2]= (parinfo.value[2] > parinfo[2].limits[0])<parinfo[2].limits[1]
-     parinfo.value[3]= (parinfo.value[3] > parinfo[3].limits[0])<parinfo[3].limits[1]
-     parinfo.value[3]= (parinfo.value[3] > parinfo[3].limits[0])<parinfo[3].limits[1]
+     parinfo[2].value= (parinfo[2].value > parinfo[2].limits[0])<parinfo[2].limits[1]
+     parinfo[2].value= (parinfo[2].value > parinfo[2].limits[0])<parinfo[2].limits[1]
+     parinfo[3].value= (parinfo[3].value > parinfo[3].limits[0])<parinfo[3].limits[1]
+     parinfo[3].value= (parinfo[3].value > parinfo[3].limits[0])<parinfo[3].limits[1]
   endif
 
   if(keyword_set(onlyflux) eq 0) then begin 
