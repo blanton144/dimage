@@ -30,13 +30,15 @@ atlas_detect_dirs
 detect_atlas_all
 
 ;; make measure directory
-atlas_gather
+atlas_gather, version= version
 ;; make derived directory
-atlas_duplicates
+atlas_duplicates, version= version
 ;; make sure sdssline_atlas is in place
-finalz_atlas
-velmod_atlas
-atlas_startrim
-atlas_kcorrect
+finalz_atlas, version= version
+velmod_atlas, version= version
+atlas_startrim, version= version
+atlas_kcorrect, version= version
+;; make sure sdssline_atlas is in place
+atlas_nsafile, version= version
 
 end
