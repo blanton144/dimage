@@ -214,7 +214,16 @@ pro dsersic,in_image,in_invvar,xcen=in_xcen,ycen=in_ycen,psf=in_psf, $
      parinfo[2].value= (parinfo[2].value > parinfo[2].limits[0])<parinfo[2].limits[1]
      parinfo[3].value= (parinfo[3].value > parinfo[3].limits[0])<parinfo[3].limits[1]
      parinfo[3].value= (parinfo[3].value > parinfo[3].limits[0])<parinfo[3].limits[1]
-  endif
+ endif else begin
+     if(parinfo[2].value lt parinfo[2].limits[0]) then $
+       parinfo[2].limits[0]= parinfo[2].value-1.
+     if(parinfo[2].value gt parinfo[2].limits[1]) then $
+       parinfo[2].limits[1]= parinfo[2].value+1.
+     if(parinfo[3].value lt parinfo[3].limits[0]) then $
+       parinfo[3].limits[0]= parinfo[3].value-1.
+     if(parinfo[3].value gt parinfo[3].limits[1]) then $
+       parinfo[3].limits[1]= parinfo[3].value+1.
+ endelse
 
   if(keyword_set(onlyflux) eq 0) then begin 
 
