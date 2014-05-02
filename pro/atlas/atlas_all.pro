@@ -41,4 +41,7 @@ atlas_kcorrect, version= version
 ;; make sure sdssline_atlas is in place
 atlas_nsafile, version= version
 
+;; make sure sdssline_atlas is in place
+atlas_nsafile
+
 end

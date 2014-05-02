@@ -50,7 +50,10 @@ measure0= struct_trimtags(measure[0], except=['RACEN', 'DECCEN', $
                                               'PETROR50', $
                                               'PETROR90', $
                                               'SERSIC_R50'])
-kcorrect0= struct_trimtags(kcorrect[0], except=['ZDIST', 'RA', 'DEC'])
+if(NOT keyword_set(nosdssline)) then $
+  kcorrect0= struct_trimtags(kcorrect[0], except=['ZDIST', 'RA', 'DEC']) $
+else $
+  kcorrect0= struct_trimtags(kcorrect[0], except=['RA', 'DEC'])
 
 all0= create_struct(atlas0, kcorrect0, measure0, $
                     'PROFTHETA', 0.*measure[0].profradius, $

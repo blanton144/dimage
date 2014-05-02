@@ -47,8 +47,8 @@ rr= sqrt(xx^2+yy^2)
 rrsquash= sqrt(xx^2+(yy/ba)^2)
 rrrot= polywarp_rotate(rrsquash, phi, center=[xcen, ycen]) 
   
-simage= dmedsmooth(image, box=smooth)
-snimage= dmedsmooth(nimage, box=smooth)
+simage= dmedsmooth(image, box=long(smooth))
+snimage= dmedsmooth(nimage, box=long(smooth))
 imeas= where(rrrot lt annulus[1] and rrrot gt annulus[0] AND ivar gt 0, nmeas)
 if(nmeas gt 0) then begin
     totimage= total(image[imeas])

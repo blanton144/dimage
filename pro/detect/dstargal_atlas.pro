@@ -27,7 +27,7 @@ if(NOT keyword_set(maxnstar)) then maxnstar=3000L
 if(NOT keyword_set(maxmem)) then maxmem=2.e+9
 
 ;; default to use base name same as directory name
-spawn, 'pwd', cwd
+spawn, 'pwd', cwd , /nosh
 base=(file_basename(cwd))[0]
 
 ;; read in pset

@@ -31,7 +31,7 @@ subdir='atlases'
 sersic=1
 
 ;; default to use base name same as directory name
-spawn, 'pwd', cwd
+spawn, 'pwd', cwd , /nosh
 base=(file_basename(cwd))[0]
 
 ;; find center object

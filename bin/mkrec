@@ -2,19 +2,19 @@
 
 set i = 0 
 
-while ($i < 1000)
+while ($i < 25)
 
-@ st = $i * 700
-@ nd = ( $i + 1 ) * 700 - 1
+@ st = $i * 28000
+@ nd = ( $i + 1 ) * 28000 - 1
 
-cat << EOF >! detect_$i.qsub
+cat << EOF >! rec_$i.qsub
 #!/bin/csh
 
 #PBS -l nodes=1:ppn=1
 #PBS -q batch 
-#PBS -N detect_$i
+#PBS -N rec_$i
 #PBS -j oe
-#PBS -o detect_$i.out
+#PBS -o rec_$i.out
 #PBS -M michael.blanton@gmail.com
 #PBS -m abe
 #PBS -V
@@ -24,10 +24,10 @@ echo Running on `hostname`
 
 setup photoop v1_12_1
 setup photolog dr10
-setup dimage v2_1_14
+setup -r ~/dimage 
 setup tree ebosswork
 
-echo detect_atlas_all, /noclobber, version=\'v1_0_0\', st=${st}L, nd=${nd}L |  idl
+echo mk_recovery_galex, st=${st}L, nd=${nd}L |  idl
 EOF
 
 @ i = $i + 1

@@ -26,7 +26,7 @@ pro detect_atlas, galex=galex, noclobber=noclobber, nsigma=nsigma, glim=glim, $
                   gsmooth=gsmooth, twomass=twomass
 
 ;; default to use base name same as directory name
-spawn, 'pwd', cwd
+spawn, 'pwd', cwd, /nosh
 base=(file_basename(cwd))[0]
 
 if(keyword_set(noclobber) ne 0) then begin

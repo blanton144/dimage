@@ -41,7 +41,7 @@ if(NOT keyword_set(plim)) then plim=10. ;; for detecting parents
 if(NOT keyword_set(pbuffer)) then pbuffer=0.5 ;; for detecting parents
 
 ;; default to use base name same as directory name
-spawn, 'pwd', cwd
+spawn, 'pwd', cwd, /nosh
 base=(file_basename(cwd))[0]
 
 ;; use SDSS images, plus GALEX

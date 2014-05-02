@@ -25,7 +25,7 @@ if(NOT keyword_set(seed0)) then seed0=11L ;; random seed
 if(NOT keyword_set(plim)) then plim=10. ;; for detecting parents
 
 ;; default to use base name same as directory name
-spawn, 'pwd', cwd
+spawn, 'pwd', cwd , /nosh
 base=(file_basename(cwd))[0]
 
 ;; read in pset

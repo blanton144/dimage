@@ -12,7 +12,7 @@
 pro detect_atlas_all, infile=infile, st=st, nd=nd, $
                       noclobber=noclobber, notrim=notrim, $
                       nodetect=nodetect, version=version, $
-                      nojpeg=nojpeg
+                      nojpeg=nojpeg, recoverfile=recoverfile
 
 rootdir=atlas_rootdir(version=version, cdir=cdir, subname=subname)
 info= atlas_version_info(version)
@@ -33,13 +33,28 @@ if(NOT keyword_set(infile)) then $
 
 atlas= gz_mrdfits(infile, 1)
 
+if(keyword_set(recoverfile)) then $
+  recoverlist= mrdfits(recoverfile, 1)
+
 if(NOT keyword_set(st)) then st=0L
 if(NOT keyword_set(nd)) then nd=n_elements(atlas)-1L
 nd= nd < (n_elements(atlas)-1)
 for i=st, nd do begin
     
     help, i
-    
+
+    if(keyword_set(recoverfile)) then begin
+        irecover=where(recoverlist.nsaid eq i, nrecover) 
+        if(nrecover gt 0) then begin
+            if(recoverlist[irecover[0]].why eq 3) then $
+              atlas_dimages, st=i, nd=i
+            atlas_detect_dirs, st=i, nd=i, version=version
+        endif
+    endif else begin
+        nrecover=1
+    endelse
+    if(nrecover eq 0) then continue
+
     subdir=image_subdir(atlas[i].ra, atlas[i].dec, $
                         prefix=prefix, rootdir=rootdir, $
                         subname=subname)
@@ -78,6 +93,8 @@ for i=st, nd do begin
         if(NOT keyword_set(notrim)) then $
           dtrim_atlas
     endif
+    heap_gc
+    help,/mem
 endfor
  
 end
