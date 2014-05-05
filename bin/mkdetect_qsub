@@ -2,10 +2,10 @@
 
 set i = 0 
 
-while ($i < 1000)
+while ($i < 2000)
 
-@ st = $i * 700
-@ nd = ( $i + 1 ) * 700 - 1
+@ st = $i * 350
+@ nd = ( $i + 1 ) * 350 - 1
 
 cat << EOF >! detect_$i.qsub
 #!/bin/csh
@@ -23,11 +23,11 @@ cat << EOF >! detect_$i.qsub
 echo Running on `hostname`
 
 setup photoop v1_12_1
+setup dimage v2_1_17
 setup photolog dr10
-setup dimage v2_1_14
 setup tree ebosswork
 
-echo detect_atlas_all, /noclobber, version=\'v1_0_0\', st=${st}L, nd=${nd}L |  idl
+echo detect_atlas_all, recoverfile=\'recovery_galex.fits\', version=\'v1_0_0\', st=${st}L, nd=${nd}L |  idl
 EOF
 
 @ i = $i + 1
