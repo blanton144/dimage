@@ -1,0 +1,32 @@
+#!/bin/csh -f 
+
+set i = 0 
+
+while ($i < 200)
+
+cat << EOF >! detect_$i.qsub
+#!/bin/csh
+
+#PBS -l nodes=1:ppn=1
+#PBS -q batch 
+#PBS -N detect_$i
+#PBS -j oe
+#PBS -o detect_$i.out
+#PBS -M michael.blanton@gmail.com
+#PBS -m abe
+#PBS -V
+#PBS -r n
+
+echo Running on `hostname`
+
+setup photoop v1_12_1
+setup dimage v2_1_17
+setup photolog dr10
+setup tree ebosswork
+
+echo recovery, indx=$i | idl
+EOF
+
+@ i = $i + 1
+
+end
