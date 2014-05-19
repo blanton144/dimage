@@ -1,0 +1,59 @@
+#!/Library/Frameworks/EPD64.framework/Versions/Current/bin/python 
+
+#
+# Calculate 2D Petrosian quantities for all NSA galaxies
+#
+# MRB 2014-05-14 
+# 
+
+import os
+import sys
+import numpy as np
+import astropy.io.fits as pyfits
+import astropy.wcs as wcs
+import dimage
+
+def read_petro2d(galaxy):
+    # Get directory with atlas images
+    iauname=galaxy['iauname']
+    aid=galaxy['aid']
+    pid=galaxy['pid']
+    adir= os.path.join(os.getenv('ATLAS_DATA'),
+                       'v1', 'detect', 'v1_0', 
+                       galaxy['subdir'], 'atlases',
+                       str(pid))
+    filebase= os.path.join(adir, iauname+'-'+
+                           str(pid))
+    pfile= filebase+'-petro.fits'
+    if(os.path.exists(pfile)):
+        print pfile
+        fp= pyfits.open(pfile)
+        return fp[1].data
+    return None
+        
+def main(argv):
+    version='v1_0_0'
+    nsafile= os.getenv('ATLAS_DATA')+'/v1/nsa_v1_0_0.fits'
+    nsafp= pyfits.open(nsafile, memmap=True)
+    nsa= nsafp[1].data
+    nsa=nsa[np.nonzero((nsa['ra'] > 180.)*(nsa['ra'] < 195.)* 
+                       (nsa['dec'] > 20.)*(nsa['dec'] < 22.))]
+    print nsa.size
+    data=None
+    indx=0
+    for galaxy in nsa:
+        tmp_data= read_petro2d(galaxy)
+        if(tmp_data is not None):
+            tmp_data= np.array(tmp_data)
+            if(data is None):
+                data= np.zeros(nsa.size, dtype=tmp_data.dtype)
+            data[indx]= tmp_data
+        indx+=1
+
+    hdu0= pyfits.PrimaryHDU()
+    hdu1= pyfits.BinTableHDU(data=data, name='Petrosian Quantities')
+    hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
+    hdus.writeto('petro_'+version+'.fits', clobber=True)
+
+if __name__ == "__main__": 
+    main(sys.argv[1:])

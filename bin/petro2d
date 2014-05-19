@@ -1,0 +1,110 @@
+#!/Library/Frameworks/EPD64.framework/Versions/Current/bin/python 
+
+#
+# Calculate 2D Petrosian quantities for all NSA galaxies
+#
+# MRB 2014-05-14 
+# 
+
+import os
+import sys
+import numpy as np
+import astropy.io.fits as pyfits
+import astropy.wcs as wcs
+import dimage
+
+def calc_petro2d(galaxy):
+    # Get directory with atlas images
+    iauname=galaxy['iauname']
+    aid=galaxy['aid']
+    pid=galaxy['pid']
+    nsaid=galaxy['nsaid']
+    adir= os.path.join(os.getenv('ATLAS_DATA'),
+                       'v1', 'detect', 'v1_0', 
+                       galaxy['subdir'], 'atlases',
+                       str(pid))
+    filebase= os.path.join(adir, iauname+'-'+
+                           str(pid))
+    measfile= filebase+'-measure.fits.gz'
+    pfile= filebase+'-petro.fits'
+    imbase= filebase+'-atlas-'+str(aid)
+    imfile= imbase+'.fits.gz'
+    if(os.path.exists(imfile)):
+        print imfile
+        fp= pyfits.open(imfile)
+        image= fp[2].data
+        header= fp[2].header
+        imwcs= wcs.WCS(header)
+        fp.close()
+        fp= pyfits.open(measfile)
+        measure= fp[1].data
+        fp.close()
+        racen= measure['racen']
+        deccen= measure['deccen']
+        (xcen, ycen)= imwcs.wcs_world2pix(racen, deccen, 0)
+        ba_p= measure['ba90']
+        phi_p= measure['phi90']
+        petro_p= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                              ba=ba_p, phi=phi_p)
+        ba_s= measure['sersic_ba']
+        phi_s= measure['sersic_phi']
+        petro_s= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                              ba=ba_s, phi=phi_s)
+        ba_b= measure['sersic_ba']
+        phi_b= measure['sersic_phi']
+        petro_b= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                              ba=ba_s, phi=phi_s, npetro=2.5)
+        ba_f= measure['sersic_ba']
+        phi_f= measure['sersic_phi']
+        flux_f= measure['sersicflux'][:,2]
+        petro_f= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                              ba=ba_f, phi=phi_f, forceflux=flux_f)
+        dtype=[('nsaid', np.int), ('pid', np.int), ('aid', np.int), 
+               ('racen', np.float64), ('deccen', np.float64), 
+               ('xcen', np.float32), ('ycen', np.float32), 
+               ('ba_p', np.float32), ('phi_p', np.float32), 
+               ('petroflux_p', np.float32), ('petrorad_p', np.float32), 
+               ('petror50_p', np.float32), ('petror90_p', np.float32), 
+               ('ba_s', np.float32), ('phi_s', np.float32), 
+               ('petroflux_s', np.float32), ('petrorad_s', np.float32), 
+               ('petror50_s', np.float32), ('petror90_s', np.float32), 
+               ('ba_b', np.float32), ('phi_b', np.float32), 
+               ('petroflux_b', np.float32), ('petrorad_b', np.float32), 
+               ('petror50_b', np.float32), ('petror90_b', np.float32), 
+               ('ba_f', np.float32), ('phi_f', np.float32), 
+               ('petroflux_f', np.float32), ('petrorad_f', np.float32), 
+               ('petror50_f', np.float32), ('petror90_f', np.float32), 
+               ]
+        data= np.array([(nsaid, pid,aid,racen,deccen, 
+                         xcen,ycen,
+                         ba_p,phi_p,
+                         petro_p['flux'],petro_p['rad'],
+                         petro_p['r50'],petro_p['r90'],
+                         ba_s,phi_s,
+                         petro_s['flux'],petro_s['rad'],
+                         petro_s['r50'],petro_s['r90'],
+                         ba_b,phi_b,
+                         petro_b['flux'],petro_b['rad'],
+                         petro_b['r50'],petro_b['r90'],
+                         ba_f,phi_f,
+                         petro_f['flux'],petro_f['rad'],
+                         petro_f['r50'],petro_f['r90'])], 
+                       dtype=dtype)
+        hdu0= pyfits.PrimaryHDU()
+        hdu1= pyfits.BinTableHDU(data=data, name='Petrosian Quantities')
+        hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
+        hdus.writeto(pfile, clobber=True)
+        
+def main(argv):
+    version='v1_0_0'
+    nsafile= os.getenv('ATLAS_DATA')+'/v1/nsa_v1_0_0.fits'
+    nsafp= pyfits.open(nsafile, memmap=True)
+    nsa= nsafp[1].data
+    nsa=nsa[np.nonzero((nsa['ra'] > 180.)*(nsa['ra'] < 195.)* 
+                       (nsa['dec'] > 20.)*(nsa['dec'] < 22.))]
+    print nsa.size
+    for galaxy in nsa:
+        calc_petro2d(galaxy)
+
+if __name__ == "__main__": 
+    main(sys.argv[1:])
