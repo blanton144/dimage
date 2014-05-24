@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+
+#
+# Calculate 2D Petrosian quantities for all NSA galaxies
+#
+# MRB 2014-05-14 
+# 
+
+import pdb
+import os
+import sys
+import numpy as np
+import astropy.io.fits as pyfits
+import astropy.wcs as wcs
+import dimage
+
+def calc_petro2d(indx):
+    # Get directory with atlas images
+    vN='vB'
+    testdir= os.path.join(os.getenv('ATLAS_DATA'),
+                          'test', 'simard', vN) 
+    imfile= os.path.join(testdir, vN+'-'+str(indx)+'.fits')
+    measfile= os.path.join(testdir, vN+'-nsa-'+str(indx)+'.fits')
+    pfile= os.path.join(testdir, vN+'-petro-'+str(indx)+'.fits')
+    if(os.path.exists(imfile)):
+        fp= pyfits.open(imfile)
+        image= fp[0].data
+        fp.close()
+        fp= pyfits.open(measfile)
+        measure= fp[1].data
+        fp.close()
+        xcen= measure['xcen']
+        ycen= measure['ycen']
+        ba_p= measure['ba90']
+        phi_p= 90.-measure['phi90']
+        petro_p= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                              ba=ba_p, phi=phi_p)
+        ba_b= measure['ba90']
+        phi_b= 90.-measure['phi90']
+        petro_b= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                              ba=ba_b, phi=phi_b, npetro=4.)
+        dtype=[('indx', np.int), 
+               ('xcen', np.float32), ('ycen', np.float32), 
+               ('ba_p', np.float32), ('phi_p', np.float32), 
+               ('petroflux_p', np.float32), ('petrorad_p', np.float32), 
+               ('petror50_p', np.float32), ('petror90_p', np.float32), 
+               ('ba_b', np.float32), ('phi_b', np.float32), 
+               ('petroflux_b', np.float32), ('petrorad_b', np.float32), 
+               ('petror50_b', np.float32), ('petror90_b', np.float32), 
+               ]
+        data= np.array([(indx, 
+                         xcen,ycen,
+                         ba_p,phi_p,
+                         petro_p['flux'],petro_p['rad'],
+                         petro_p['r50'],petro_p['r90'], 
+                         ba_b,phi_b,
+                         petro_b['flux'],petro_b['rad'],
+                         petro_b['r50'],petro_b['r90'])],
+                       dtype=dtype)
+        hdu0= pyfits.PrimaryHDU()
+        hdu1= pyfits.BinTableHDU(data=data, name='Petrosian Quantities')
+        hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
+        hdus.writeto(pfile, clobber=True)
+        
+def main(argv):
+    for indx in range(10000):
+        calc_petro2d(indx)
+
+if __name__ == "__main__": 
+    try:
+        main(sys.argv[1:])
+    except:
+        import sys
+        tb = sys.exc_info()[2]
+        pdb.post_mortem(tb)
