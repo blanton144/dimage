@@ -39,10 +39,11 @@ return, model
 
 end
 ;
-pro dfit_mult_gauss2d, image, in_xcen, in_ycen, ngauss, amp, sigma, model=model, quiet=quiet
+pro dfit_mult_gauss2d, in_image, in_xcen, in_ycen, ngauss, amp, sigma, model=model, quiet=quiet
 
 common com_dfit_mult_gauss2d_func
 
+image= in_image
 xcen= in_xcen
 ycen= in_ycen
 
