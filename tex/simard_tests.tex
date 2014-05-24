@@ -1,0 +1,116 @@
+\documentclass[10pt,preprint]{aastex}
+\usepackage{psboxit}
+
+\newcommand{\kms}{\,km~s$^{-1}$}
+\def\squig{\sim\!\!}
+\newcommand{\Msun}{\mbox{\,$M_{\odot}$}}
+\newcommand{\Lsun}{\mbox{\,$L_{\odot}$}}
+
+\PScommands
+\newcommand{\graybox}[1]{\psboxit{box 0.7 setgray fill}{\spbox{#1}}}
+
+\newcommand{\mdmlimit}{0.5}
+\newcommand{\vmaxmean}{56}
+\newcommand{\mrmean}{-14.7}
+
+\newcommand{\latin}[1]{{#1}}
+\newcommand{\ie}{\latin{i.e.}}
+\newcommand{\eg}{\latin{e.g.}}
+\newcommand{\cf}{\latin{c.f.}}
+\newcommand{\Sersic}{S\'ersic}
+\newcommand{\vv}[1]{{\bf #1}}
+\newcommand{\df}{\delta}
+\newcommand{\dfft}{{\tilde{\delta}}}
+\newcommand{\betaft}{{\tilde{\beta}}}
+\newcommand{\erf}{{\mathrm{erf}}}
+\newcommand{\erfc}{{\mathrm{erfc}}}
+\newcommand{\Step}{{\mathrm{Step}}}
+\newcommand{\ee}[1]{\times 10^{#1}}
+\newcommand{\avg}[1]{{\langle{#1}\rangle}}
+\newcommand{\Avg}[1]{{\left\langle{#1}\right\rangle}}
+\def\simless{\mathbin{\lower 3pt\hbox
+    {$\,\rlap{\raise 5pt\hbox{$\char'074$}}\mathchar"7218\,$}}} % < or of order
+\def\simgreat{\mathbin{\lower 3pt\hbox
+    {$\,\rlap{\raise 5pt\hbox{$\char'076$}}\mathchar"7218\,$}}} % > or of order
+\newcommand{\iras}{{\sl IRAS\/}}
+\newcommand{\petroratio}{{{\mathcal{R}}_P}}
+\newcommand{\petroradius}{{{r}_P}}
+\newcommand{\petronumber}{{{N}_P}}
+\newcommand{\petroratiolim}{{{\mathcal{R}}_{P,\mathrm{lim}}}}
+\newcommand{\band}[2]{\ensuremath{^{#1}\!{#2}}}
+\newcommand{\Vmax}{\ensuremath{V_\mmax}}
+\newcommand{\mmax}{\ensuremath{\mathrm{max}}}
+\newcommand{\mmin}{\ensuremath{\mathrm{min}}}
+\newcommand{\minmax}{\ensuremath{\mathrm{\left\{^{min}_{max}\right\}}}}
+\newcommand{\fixMr}{\ensuremath{M_\fixr}}
+\newcommand{\fixr}{\ensuremath{{r}}}
+\newcommand{\fixredshift}{0.1}
+\newcommand{\fixmag}[1]{\ensuremath{{^{\fixredshift}\!{#1}}}}
+
+\setlength{\footnotesep}{9.6pt}
+
+\newcounter{thefigs}
+\newcommand{\fignum}{\arabic{thefigs}}
+
+\newcounter{thetabs}
+\newcommand{\tabnum}{\arabic{thetabs}}
+
+\newcounter{address}
+
+\shortauthors{Blanton {\it et al.} (2006)}
+\shorttitle{Notes on NSA tests with Simard Catalog}
+
+\begin{document}
+
+\title{Notes on Tests of NASA-Sloan Atlas Fluxes:\\
+Tests against Simard GIM2D Models and Measurements}
+
+
+\author{
+Michael R. Blanton\altaffilmark{\ref{NYU}}
+}
+
+%\altaffiltext{1}{Based on observations obtained with the
+%Sloan Digital Sky Survey\label{SDSS}}
+\setcounter{address}{1}
+\altaffiltext{\theaddress}{
+    \stepcounter{address}
+    Center for Cosmology and Particle Physics, Department of Physics, New
+    York University, 4 Washington Place, New
+    York, NY 10003
+    \label{NYU}}
+
+\begin{abstract}
+I test the NASA-Sloan Atlas measurements of flux and sizes against
+those of \citet{simard11a}, concentrating on galaxies brighter than
+$r\sim16.5$. First, for galaxies from the \citet{simard11a} catalog, I
+create a set of 5000 simulated images, to which I apply the NSA flux
+and size measurement procedure. From these measurements I demonstrate
+that for these models Petrosian quantities defined with elliptical
+apertures, including the flux and $r_{50}$ values, agree well with the
+intrinsic properties of the models.  {\bf Should I try to find pure
+Petro quantity?}.  The trends in the measured quantities as a function
+of size seem to be due to intrinsic correlations between angular size
+and the galaxy profile properties {\bf test this}. Circularized
+Petrosian quantities have several biases that affect them, as do
+single-component \Sersic\ model fits. Second, we match the
+\citet{simard11a} catalog to the NSA catalog and test the differences
+between the analysis techniques for real data. The differences reflect
+the differences seen for the model data.
+\end{abstract}
+
+\section{Code and Methods} 
+\label{sec:code}
+
+These tests were done using the {\tt dimage} software used for the
+NASA-Sloan Atlas processing, described in \citet{blanton11a}. 
+
+\section{Tests against models} 
+\label{sec:models}
+
+
+
+\bibliographystyle{apj}
+\bibliography{../../ccpp-latex/ccpp}
+
+\end{document}
