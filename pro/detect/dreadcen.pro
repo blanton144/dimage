@@ -9,7 +9,8 @@
 ;------------------------------------------------------------------------------
 pro dreadcen, image, invvar, psf=psf, band=band, measure=measure, $
               hand=hand, acat=acat, eye=eye, typeeye=typeeye, aid=aid, $
-              pid=pid, parent=parent, hdr=hdr, dversion=dversion
+              pid=pid, parent=parent, hdr=hdr, dversion=dversion, $
+              sersic=sersic, model=model
 
 if(NOT keyword_set(band)) then band=2
 if(NOT keyword_set(subdir)) then subdir='.'
@@ -80,7 +81,19 @@ if(keyword_set(pim)) then begin
                                pstr+'-measure'+postfix+'.fits',1, mhdr, /silent)
             if(n_tags(measure) ne 0) then $
                dversion= sxpar(mhdr, 'DVERSION')
-         endif
+        endif
+
+        if(arg_present(model)) then begin
+            sfile=subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+pstr+ $
+              '-sersic'+postfix+'.fits'
+            model=gz_mrdfits(sfile, 0, shdr)
+        endif 
+
+        if(arg_present(sersic)) then begin
+            sfile=subdir+'/'+sub+'/'+pstr+'/'+prefix+'-'+pstr+ $
+              '-sersic'+postfix+'.fits'
+            sersic=gz_mrdfits(sfile, 1)
+        endif 
 
         if(arg_present(eye)) then begin
            eye=gz_mrdfits(subdir+'/'+sub+'/'+pstr+'/'+ $
