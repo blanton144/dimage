@@ -1,4 +1,4 @@
-#!/Library/Frameworks/EPD64.framework/Versions/Current/bin/python 
+#!/usr/bin/env python
 
 #
 # Calculate 2D Petrosian quantities for all NSA galaxies

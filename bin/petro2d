@@ -1,17 +1,21 @@
-#!/Library/Frameworks/EPD64.framework/Versions/Current/bin/python 
+#!/usr/bin/env python
 
 #
-# Calculate 2D Petrosian quantities for all NSA galaxies
+# Calculate 2D Petrosian quantities for NSA galaxies
 #
 # MRB 2014-05-14 
 # 
 
+import pdb
 import os
 import sys
 import numpy as np
 import astropy.io.fits as pyfits
 import astropy.wcs as wcs
 import dimage
+import getopt
+import random
+import scipy.ndimage.filters as filters
 
 def calc_petro2d(galaxy):
     # Get directory with atlas images
@@ -19,10 +23,13 @@ def calc_petro2d(galaxy):
     aid=galaxy['aid']
     pid=galaxy['pid']
     nsaid=galaxy['nsaid']
-    adir= os.path.join(os.getenv('ATLAS_DATA'),
+    fdir= os.path.join(os.getenv('ATLAS_DATA'),
                        'v1', 'detect', 'v1_0', 
-                       galaxy['subdir'], 'atlases',
+                       galaxy['subdir'])
+    adir= os.path.join(fdir, 'atlases',
                        str(pid))
+    pimagefile= os.path.join(fdir, iauname+'-pimage.fits.gz')
+    rimagefile= os.path.join(fdir, iauname+'-r.fits.gz')
     filebase= os.path.join(adir, iauname+'-'+
                            str(pid))
     measfile= filebase+'-measure.fits.gz'
@@ -30,7 +37,28 @@ def calc_petro2d(galaxy):
     imbase= filebase+'-atlas-'+str(aid)
     imfile= imbase+'.fits.gz'
     if(os.path.exists(imfile)):
-        print imfile
+        print "NSAID= "+str(nsaid)+" "+imfile
+        sys.stdout.flush()
+
+        # Try to mitigate residual bad sky subtraction; a median will be
+        # determined, that will be applied to the Petrosian radius determination,
+        # but not to the actual flux determination
+        fp= pyfits.open(pimagefile)
+        pimage= fp[0].data
+        fp.close()
+        fp= pyfits.open(rimagefile)
+        rimage= fp[0].data
+        fp.close()
+        oimage= np.float32(pimage >= 0.)
+        osimage= filters.uniform_filter(oimage, 41)
+        osimage= np.float32(osimage > 0.)
+        izero= np.nonzero(osimage.flat == 0.)
+        if(len(izero)>0):
+            median_image= np.median(rimage.flat[izero])
+        else:
+            median_image= 0.
+        
+        # Now call Petrosian for various cases
         fp= pyfits.open(imfile)
         image= fp[2].data
         header= fp[2].header
@@ -43,22 +71,22 @@ def calc_petro2d(galaxy):
         deccen= measure['deccen']
         (xcen, ycen)= imwcs.wcs_world2pix(racen, deccen, 0)
         ba_p= measure['ba90']
-        phi_p= measure['phi90']
+        phi_p= 90.-measure['phi90']
         petro_p= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                              ba=ba_p, phi=phi_p)
+                              ba=ba_p, phi=phi_p, fixmedian=median_image)
         ba_s= measure['sersic_ba']
-        phi_s= measure['sersic_phi']
+        phi_s= 90.-measure['sersic_phi']
         petro_s= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                              ba=ba_s, phi=phi_s)
+                              ba=ba_s, phi=phi_s, fixmedian=median_image)
         ba_b= measure['sersic_ba']
-        phi_b= measure['sersic_phi']
+        phi_b= 90.-measure['sersic_phi']
         petro_b= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                              ba=ba_s, phi=phi_s, npetro=2.5)
+                              ba=ba_s, phi=phi_s, npetro=2.5, fixmedian=median_image)
         ba_f= measure['sersic_ba']
-        phi_f= measure['sersic_phi']
+        phi_f= 90.-measure['sersic_phi']
         flux_f= measure['sersicflux'][:,2]
         petro_f= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                              ba=ba_f, phi=phi_f, forceflux=flux_f)
+                              ba=ba_f, phi=phi_f, forceflux=flux_f, fixmedian=median_image)
         dtype=[('nsaid', np.int), ('pid', np.int), ('aid', np.int), 
                ('racen', np.float64), ('deccen', np.float64), 
                ('xcen', np.float32), ('ycen', np.float32), 
@@ -94,17 +122,59 @@ def calc_petro2d(galaxy):
         hdu1= pyfits.BinTableHDU(data=data, name='Petrosian Quantities')
         hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
         hdus.writeto(pfile, clobber=True)
-        
+
 def main(argv):
+    # Set defaults
     version='v1_0_0'
-    nsafile= os.getenv('ATLAS_DATA')+'/v1/nsa_v1_0_0.fits'
+    istart=0
+    iend=-1
+    randomize=0
+
+    # Parse header
+    helpstr='petro2d -v <version> -s <start> -e <end>'
+    try:
+        opts, args = getopt.getopt(argv,"hv:s:e:r:",["help=","version=","start=","end=","random="])
+    except getopt.GetoptError:
+        print helpstr
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == ("-h", "--help"):
+            print helpstr;
+            sys.exit()
+        elif opt in ("-s", "--start"):
+            istart = int(arg)
+        elif opt in ("-e", "--end"):
+            iend = int(arg)
+        elif opt in ("-v", "--version"):
+            version = arg
+        elif opt in ("-r", "--randomize"):
+            randomize = int(arg)
+            
+    # Read in appropriate section of NSA file        
+    vN= (version.split('_'))[0]
+    nsafile= os.getenv('ATLAS_DATA')+'/'+vN+'/nsa_'+version+'.fits'
     nsafp= pyfits.open(nsafile, memmap=True)
-    nsa= nsafp[1].data
-    nsa=nsa[np.nonzero((nsa['ra'] > 180.)*(nsa['ra'] < 195.)* 
-                       (nsa['dec'] > 20.)*(nsa['dec'] < 22.))]
-    print nsa.size
+    if(randomize <= 0):
+        # slice out part of interest
+        if(iend == -1):
+            iend=(nsafp[1].header['NAXIS2'])-1
+        nsa= nsafp[1].data[istart:iend+1]
+    else:
+        # or random sample 
+        indx=np.arange(nsafp[1].header['NAXIS2'])
+        random.shuffle(indx)
+        nsa= nsafp[1].data[indx[0:randomize]]
+        
+    nsafp.close()
+            
+    # Calculate Petrosian quantities for each galaxy
     for galaxy in nsa:
         calc_petro2d(galaxy)
 
 if __name__ == "__main__": 
-    main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    except:
+        import sys
+        tb = sys.exc_info()[2]
+        pdb.post_mortem(tb)
