@@ -6,11 +6,12 @@ Michael R. Blanton, 2014-05-14
 
 import numpy as np
 from scipy import interpolate
-from astroML import filters
+from dimage.savitzky_golay import savitzky_golay
+import matplotlib.pyplot as plt
 
 def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2, 
-          npetro=2., minpetrorad=10., nfilter=201, ofilter=3, 
-          petrorad=None, forceflux=None):
+          npetro=2., minpetrorad=2., nfilter=11, ofilter=1, 
+          petrorad=None, forceflux=None, fixmedian=0.):
     """Calculates Petrosian quantities for an image, returning dict of parameters
     
     Parameters
@@ -50,6 +51,10 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
         xcen=float(nx)*0.5
     if(ycen is None): 
         ycen=float(ny)*0.5
+    if(ba > 0.2):
+        ba_use= ba
+    else:
+        ba_use= 0.2
 
     # Set default return
     rdict=dict()
@@ -64,53 +69,101 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     x= x-xcen
     y= np.outer(np.arange(nx),np.ones(ny))
     y= y-ycen
-    xp= (np.cos(PI/180.*phi)*x - np.sin(PI/180.*phi)*y)/ba
+    xp= (np.cos(PI/180.*phi)*x - np.sin(PI/180.*phi)*y)/ba_use
     yp= (np.sin(PI/180.*phi)*x + np.cos(PI/180.*phi)*y)
     r2= xp**2+yp**2
+
+    #ibad= np.nonzero(r2 > 10000.)
+    #image[ibad]=np.max(image)
+    #plt.imshow(image)
+    #plt.show()
     
     # Sort the pixels by that radius, storing the pixel flux, 
-    # the pixel index, and the radius of the pixel
+    # the pixel index, the radius of the pixel, and the flux
+    # up to and including that pixel
     isort= np.argsort(r2, axis=None)
-    pix=image.flat[isort]
-    ipix= np.arange(len(pix))
+    pix=image.flat[isort]-fixmedian
     radius= np.sqrt(r2.flat[isort])
+    ipix= np.arange(len(pix))
+    flux= np.cumsum(pix)
+    if(radius[0] != 0.0):
+        radius= np.append(np.zeros(1), radius)
+        ipix= np.append(np.zeros(1), ipix)
+        flux= np.append(np.zeros(1), flux)
+
+    # Choose outer radii of apertures, and calculate flux and area within,
+    # and also calculate an annular flux and area around each radius.
+    # Inner bins are special cased; note that this method is not strictly
+    # integrating the interpolated image, so may have artifacts in inner
+    # regions.
+    rbins= np.arange(int(max(radius)/1.25-1.))+1.
+    rlo= rbins*0.8
+    rlo[0:4]=np.array([0., 0., 2., 3])
+    rhi= rbins*1.25
+    rhi[0:4]=np.array([2., 2., 4., 5])
+    interper= interpolate.interp1d(radius,flux) 
+    fbins= interper(rbins)
+    flobins= interper(rlo)
+    fhibins= interper(rhi)
+    interper= interpolate.interp1d(radius,ipix) 
+    abins= interper(rbins)
+    abins[0:4]= ba*PI*rbins[0:4]**2
+    alobins= interper(rlo)
+    alobins[0:4]= ba*PI*rlo[0:4]**2
+    ahibins= interper(rhi)
+    ahibins[0:4]= ba*PI*rhi[0:4]**2
 
     # Find surface brightness, enclosed flux, mean surface brightness, 
     # and Petrosian ratio
-    sb= filters.savitzky_golay(pix, nfilter, ofilter)
-    flux= np.cumsum(pix)
-    meansb= flux/(ipix+1.)
+    meansb= fbins/abins
+    sb= (fhibins-flobins)/(ahibins-alobins)
     petroratio= sb/meansb
 
-    # Get the Petrosian ratio, if it is not given
+    # Get the Petrosian radius, if it is not given; look only out to first
+    # time ratio crosses below threshold. 
     if(petrorad is None and forceflux is None):
         ratiop0= petroratio0+np.zeros(len(petroratio))
-        ibelow= np.nonzero((petroratio < ratiop0) * (radius > minpetrorad))
-        petrorad= radius[np.min(ibelow)]
+        ibelow= (np.nonzero((petroratio < ratiop0) * (rbins >= minpetrorad)))[0]
+        if(len(ibelow) > 0):
+            ilowest= np.min(ibelow)
+            icheck= np.array((ilowest, ilowest-1))
+            interper=interpolate.interp1d(petroratio[icheck], rbins[icheck])
+            petrorad= interper(petroratio0)
+        else:
+            return rdict
 
-    # Now get the Petrosian fluxes
     if(forceflux is None):
+        # Now get the Petrosian fluxes
         aprad= petrorad*npetro
-        if(aprad>max(radius)):
-            aprad=max(radius)
-        interper= interpolate.interp1d(radius, flux)
+        if(aprad>max(rbins)):
+            aprad=max(rbins)
+        interper= interpolate.interp1d(rbins, fbins) 
         petroflux=interper(aprad)
     else:
+        # If we have forced a given flux, and are calculating sizes
+        # relative to that, we calculate the equivalent Petrosian radius
         petroflux=forceflux
-        irad=np.arange(flux.argmax())
-        if(petroflux>0. and petroflux < max(flux[irad])):
-            interper= interpolate.interp1d(flux[irad], radius[irad])
-            print petroflux 
-            print max(flux[irad]) 
+        imax=fbins.argmax()
+        irad=np.arange(imax+1)
+        if(petroflux>0. and petroflux < max(fbins[irad])):
+            interper= interpolate.interp1d(fbins[irad], rbins[irad],
+                                           bounds_error=False,
+                                           fill_value=rbins[imax]) 
             aprad= interper(petroflux)
             petrorad=aprad/npetro
-
+                
     # Given the Petrosian fluxes, get the 50% and 90% light radii
-    if(petroflux>0. and petroflux < max(flux)):
-        irad= np.nonzero(radius<aprad)
-        interper= interpolate.interp1d(flux[irad], radius[irad])
-        petror50=interper(petroflux*0.5)
-        petror90=interper(petroflux*0.9)
+    if(petroflux>0. and petroflux < max(fbins)):
+        irad= np.arange(np.nonzero(rbins<aprad)[0].max()+2)
+        interper= interpolate.interp1d(fbins[irad], rbins[irad]) 
+        try:
+            petror50=interper(petroflux*0.5)
+        except:
+            petror50=-9999.
+        try:
+            petror90=interper(petroflux*0.9)
+        except:
+            petror90=-9999.
     else:
         petror50=-9999.
         petror90=-9999.
