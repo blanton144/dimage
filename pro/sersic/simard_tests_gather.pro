@@ -13,7 +13,7 @@
 ;------------------------------------------------------------------------------
 pro simard_tests_gather, include_sersic=include_sersic
 
-filebase='vA'
+filebase='vB'
 sim= mrdfits('sim-test.fits', 1)
 
 for i=0L, n_elements(sim)-1L do begin
