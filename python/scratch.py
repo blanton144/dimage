@@ -191,3 +191,5 @@ print np.median(rimage.flat[izero])
 
 import numpy as np
 import astropy.io.fits as pyfits
+fp= pyfits.open('nsa_v1_0_0.fits')
+print np.nonzero(fp[1].data['nsaid'] == 592028)
