@@ -26,9 +26,10 @@ def read_petro2d(galaxy):
                            str(pid))
     pfile= filebase+'-petro.fits'
     if(os.path.exists(pfile)):
-        print pfile
         fp= pyfits.open(pfile)
-        return fp[1].data
+        data=fp[1].data
+        fp.close()
+        return data
     return None
         
 def main(argv):
@@ -36,18 +37,18 @@ def main(argv):
     nsafile= os.getenv('ATLAS_DATA')+'/v1/nsa_v1_0_0.fits'
     nsafp= pyfits.open(nsafile, memmap=True)
     nsa= nsafp[1].data
-    nsa=nsa[np.nonzero((nsa['ra'] > 180.)*(nsa['ra'] < 195.)* 
-                       (nsa['dec'] > 20.)*(nsa['dec'] < 22.))]
-    print nsa.size
     data=None
     indx=0
     for galaxy in nsa:
+        if((indx % 1000) == 0):
+            print str(galaxy['nsaid'])
+            sys.stdout.flush()
         tmp_data= read_petro2d(galaxy)
         if(tmp_data is not None):
-            tmp_data= np.array(tmp_data)
             if(data is None):
+                tmp_data= np.array(tmp_data)
                 data= np.zeros(nsa.size, dtype=tmp_data.dtype)
-            data[indx]= tmp_data
+            data.put(indx, tmp_data)
         indx+=1
 
     hdu0= pyfits.PrimaryHDU()

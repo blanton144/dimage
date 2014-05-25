@@ -1,0 +1,40 @@
+#!/bin/csh -f 
+
+set i = 0 
+
+while ($i < 100)
+
+@ st = $i * 7000
+@ nd = ( $i + 1 ) * 7000 - 1
+
+cat << EOF >! petro_$i.qsub
+#!/bin/csh
+
+#PBS -l nodes=1:ppn=1
+#PBS -q batch 
+#PBS -N petro_$i
+#PBS -j oe
+#PBS -o petro_$i.out
+#PBS -M michael.blanton@gmail.com
+#PBS -m abe
+#PBS -V
+#PBS -r n
+
+echo Running on `hostname`
+
+module load python/2.7.1
+module load astropy
+module load scipy
+module load numpy
+module load matplotlib
+setup photoop v1_12_1
+setup -r ~/dimage
+setup photolog dr10
+setup tree ebosswork
+
+petro2d -s $st -e $nd
+EOF
+
+@ i = $i + 1
+
+end
