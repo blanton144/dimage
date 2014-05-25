@@ -12,7 +12,7 @@ $(NAME).pdf: $(NAME).dvi
 	ps2pdf $(NAME).ps
 	rm $(NAME).ps
 
-$(NAME).dvi: $(NAME).tex ../../ccpp-latex/ccpp.bib \
+$(NAME).dvi: $(NAME).tex ../../ccpp-latex/ccpp.bib 
 	latex $(NAME); bibtex $(NAME); latex $(NAME); latex $(NAME)
 
 clean:
