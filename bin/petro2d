@@ -17,6 +17,41 @@ import getopt
 import random
 import scipy.ndimage.filters as filters
 
+# Band names
+bands=['fd', 'nd', 'u', 'g', 'r', 'i', 'z']
+bnums=[5,6,0,1,2,3,4]
+
+def image_median(imagebase, band='r'):
+    "Determines median image outside detected objects"
+    num= bnums[bands.index(band)]
+    pimagefile= imagebase+'-'+str(num)+'-pimage.fits.gz'
+    imagefile= imagebase+'-'+band+'.fits.gz'
+    fp= pyfits.open(pimagefile)
+    pimage= fp[0].data
+    fp.close()
+    fp= pyfits.open(imagefile)
+    image= fp[0].data
+    fp.close()
+    oimage= np.float32(pimage >= 0.)
+    osimage= filters.uniform_filter(oimage, 41)
+    osimage= np.float32(osimage > 0.)
+    izero= (np.nonzero(osimage.flat == 0.))[0]
+    if(len(izero)>0):
+        median_image= np.median(image.flat[izero])
+    else:
+        median_image= 0.
+    return median_image
+
+def get_pixscale(imwcs, ra, dec):
+    "Returns pixel scale in arcsec/pixel"
+    arcsectest= 10.
+    degtest=arcsectest/3600.
+    (x0, y0)= imwcs.wcs_world2pix(ra, dec, 0)
+    (x1, y1)= imwcs.wcs_world2pix(ra, dec+degtest, 0)
+    pixtest= np.sqrt((x0-x1)**2+(y0-y1)**2)
+    scale= arcsectest/pixtest
+    return scale
+
 def calc_petro2d(galaxy):
     # Get directory with atlas images
     iauname=galaxy['iauname']
@@ -28,10 +63,8 @@ def calc_petro2d(galaxy):
                        galaxy['subdir'])
     adir= os.path.join(fdir, 'atlases',
                        str(pid))
-    pimagefile= os.path.join(fdir, iauname+'-pimage.fits.gz')
-    rimagefile= os.path.join(fdir, iauname+'-r.fits.gz')
-    filebase= os.path.join(adir, iauname+'-'+
-                           str(pid))
+    fullbase= os.path.join(fdir, iauname)
+    filebase= os.path.join(adir, iauname+'-'+str(pid))
     measfile= filebase+'-measure.fits.gz'
     pfile= filebase+'-petro.fits'
     imbase= filebase+'-atlas-'+str(aid)
@@ -40,28 +73,26 @@ def calc_petro2d(galaxy):
         print "NSAID= "+str(nsaid)+" "+imfile
         sys.stdout.flush()
 
+        # Set reference band
+        bref='r'
+        iref= bnums[bands.index(bref)]
+
         # Try to mitigate residual bad sky subtraction; a median will be
-        # determined, that will be applied to the Petrosian radius determination,
-        # but not to the actual flux determination
-        fp= pyfits.open(pimagefile)
-        pimage= fp[0].data
-        fp.close()
-        fp= pyfits.open(rimagefile)
-        rimage= fp[0].data
-        fp.close()
-        oimage= np.float32(pimage >= 0.)
-        osimage= filters.uniform_filter(oimage, 41)
-        osimage= np.float32(osimage > 0.)
-        izero= np.nonzero(osimage.flat == 0.)
-        if(len(izero)>0):
-            median_image= np.median(rimage.flat[izero])
-        else:
-            median_image= 0.
+        # determined, that will be applied to the Petrosian radius
+        # determination, but not to the actual flux determination
+        median_image= image_median(fullbase, band=bref)
+
+        # Set defaults
+        petro_default= dict()
+        petro_default['flux']=-9999.
+        petro_default['rad']=-9999.
+        petro_default['r50']=-9999.
+        petro_default['r90']=-9999.
         
-        # Now call Petrosian for various cases
+        # Now determine Petrosian quantities for reference band
         fp= pyfits.open(imfile)
-        image= fp[2].data
-        header= fp[2].header
+        image= fp[iref].data
+        header= fp[iref].header
         imwcs= wcs.WCS(header)
         fp.close()
         fp= pyfits.open(measfile)
@@ -70,84 +101,71 @@ def calc_petro2d(galaxy):
         racen= measure['racen']
         deccen= measure['deccen']
         (xcen, ycen)= imwcs.wcs_world2pix(racen, deccen, 0)
-        petro_default= dict()
-        petro_default['flux']=-9999.
-        petro_default['rad']=-9999.
-        petro_default['r50']=-9999.
-        petro_default['r90']=-9999.
-        ba_p= measure['ba90']
-        phi_p= 90.-measure['phi90']
+        rpixscale= get_pixscale(imwcs, racen, deccen)
+        ba= measure['ba90']
+        phi= 90.-measure['phi90']
         try:
-            petro_p= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                                  ba=ba_p, phi=phi_p, fixmedian=median_image)
+            petro= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                                  ba=ba, phi=phi, fixmedian=median_image)
         except:
-            petro_p= petro_default
-        ba_nm= measure['ba90']
-        phi_nm= 90.-measure['phi90']
-        try:
-            petro_nm= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                                   ba=ba_nm, phi=phi_nm)
-        except:
-            petro_nm= petro_default
-        ba_s= measure['sersic_ba']
-        phi_s= 90.-measure['sersic_phi']
-        try:
-            petro_s= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                                  ba=ba_s, phi=phi_s, fixmedian=median_image)
-        except:
-            petro_s= petro_default
-        ba_b= measure['ba90']
-        phi_b= 90.-measure['phi90']
-        try:
-            petro_b= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                                  ba=ba_b, phi=phi_b, npetro=2.5,
-                                  fixmedian=median_image)
-        except:
-            petro_b= petro_default
-        ba_f= measure['sersic_ba']
-        phi_f= 90.-measure['sersic_phi']
-        flux_f= measure['sersicflux'][:,2]
-        try:
-            petro_f= dimage.petro(image, xcen=xcen, ycen=ycen, 
-                                  ba=ba_f, phi=phi_f, forceflux=flux_f, fixmedian=median_image)
-        except:
-            petro_f= petro_default
+            petro= petro_default
+
+        # Set aperture radius in arcsec (handle case where undefined)
+        if(petro['rad'] == -9999.):
+            prad= 5.
+        else :
+            prad=petro['rad']*rpixscale
+
+        # Measure Petrosian fluxes using same aperture in other bands.    
+        fp= pyfits.open(imfile)
+        petroflux=np.zeros(len(bands))-9999.
+        petroth50=np.zeros(len(bands))-9999.
+        petroth90=np.zeros(len(bands))-9999.
+        pixscale=np.zeros(len(bands))
+        for band in bands:
+            iband=bnums[bands.index(band)]
+            median_image= image_median(fullbase, band=band)
+            image= fp[iband].data
+            header= fp[iband].header
+            imwcs= wcs.WCS(header)
+            (xcen, ycen)= imwcs.wcs_world2pix(racen, deccen, 0)
+            cpixscale= get_pixscale(imwcs, racen, deccen)
+            petrorad= prad/cpixscale
+            try:
+                cpetro= dimage.petro(image, xcen=xcen, ycen=ycen, 
+                                    ba=ba, phi=phi, petrorad=petrorad, 
+                                    fixmedian=median_image)
+            except:
+                cpetro= petro_default
+            petroflux[bands.index(band)]= cpetro['flux']
+            if(cpetro['r50'] != -9999.):
+                petroth50[bands.index(band)]= cpetro['r50']*cpixscale
+            if(cpetro['r90'] != -9999.):
+                petroth90[bands.index(band)]= cpetro['r90']*cpixscale
+            pixscale[bands.index(band)]= cpixscale
+        fp.close()
+            
         dtype=[('nsaid', np.int), ('pid', np.int), ('aid', np.int), 
                ('racen', np.float64), ('deccen', np.float64), 
                ('xcen', np.float32), ('ycen', np.float32), 
-               ('ba_p', np.float32), ('phi_p', np.float32), 
-               ('petroflux_p', np.float32), ('petrorad_p', np.float32), 
-               ('petror50_p', np.float32), ('petror90_p', np.float32), 
-               ('ba_nm', np.float32), ('phi_nm', np.float32), 
-               ('petroflux_nm', np.float32), ('petrorad_nm', np.float32), 
-               ('petror50_nm', np.float32), ('petror90_nm', np.float32), 
-               ('ba_s', np.float32), ('phi_s', np.float32), 
-               ('petroflux_s', np.float32), ('petrorad_s', np.float32), 
-               ('petror50_s', np.float32), ('petror90_s', np.float32), 
-               ('ba_b', np.float32), ('phi_b', np.float32), 
-               ('petroflux_b', np.float32), ('petrorad_b', np.float32), 
-               ('petror50_b', np.float32), ('petror90_b', np.float32), 
-               ('ba_f', np.float32), ('phi_f', np.float32), 
-               ('petroflux_f', np.float32), ('petrorad_f', np.float32), 
-               ('petror50_f', np.float32), ('petror90_f', np.float32), 
+               ('ba', np.float32), ('phi', np.float32), 
+               ('petroflux_r', np.float32), ('petrotheta_r', np.float32), 
+               ('petroth50_r', np.float32), ('petroth90_r', np.float32), 
+               ('petrotheta', np.float32), 
+               ('petroflux', np.float32, (len(bands),)),
+               ('petroth50', np.float32, (len(bands),)),
+               ('petroth90', np.float32, (len(bands),)), 
                ]
-        data= np.array([(nsaid, pid,aid,racen,deccen, 
+        data= np.array([(nsaid, pid,aid,
+                         racen,deccen, 
                          xcen,ycen,
-                         ba_p,phi_p,
-                         petro_p['flux'],petro_p['rad'],
-                         petro_p['r50'],petro_p['r90'],
-                         ba_nm,phi_nm,
-                         petro_nm['flux'],petro_nm['rad'],
-                         petro_nm['r50'],petro_nm['r90'],
-                         ba_s,phi_s,
-                         petro_s['flux'],petro_s['rad'],
-                         petro_s['r50'],petro_s['r90'],
-                         ba_b,phi_b,
-                         petro_b['flux'],petro_b['rad'],
-                         petro_b['r50'],petro_b['r90'],
-                         ba_f,phi_f,
-                         petro_f['flux'],petro_f['rad'],
-                         petro_f['r50'],petro_f['r90'])], 
+                         ba,phi,
+                         petro['flux'],petro['rad']*rpixscale,
+                         petro['r50']*rpixscale,petro['r90']*rpixscale,
+                         prad, 
+                         petroflux,
+                         petroth50,
+                         petroth90)],
                        dtype=dtype)
         hdu0= pyfits.PrimaryHDU()
         hdu1= pyfits.BinTableHDU(data=data, name='Petrosian Quantities')

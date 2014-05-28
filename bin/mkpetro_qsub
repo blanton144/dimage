@@ -2,10 +2,10 @@
 
 set i = 0 
 
-while ($i < 100)
+while ($i < 50)
 
-@ st = $i * 7000
-@ nd = ( $i + 1 ) * 7000 - 1
+@ st = $i * 14000
+@ nd = ( $i + 1 ) * 14000 - 1
 
 cat << EOF >! petro_$i.qsub
 #!/bin/csh
