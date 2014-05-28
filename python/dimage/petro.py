@@ -73,11 +73,6 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     yp= (np.sin(PI/180.*phi)*x + np.cos(PI/180.*phi)*y)
     r2= xp**2+yp**2
 
-    #ibad= np.nonzero(r2 > 10000.)
-    #image[ibad]=np.max(image)
-    #plt.imshow(image)
-    #plt.show()
-    
     # Sort the pixels by that radius, storing the pixel flux, 
     # the pixel index, the radius of the pixel, and the flux
     # up to and including that pixel
