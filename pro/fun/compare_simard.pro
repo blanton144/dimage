@@ -13,11 +13,13 @@ nsagd= (nsa.isdss ge 0 and $
         petro.petror50_p ne -9999.)
 insagd= where(nsagd, nnsagd)
 rpetro_new= 22.5-2.5*alog10(petro[insagd].petroflux_p)
+rpetro_nm= 22.5-2.5*alog10(petro[insagd].petroflux_nm)
 rpetro_nsa= 22.5-2.5*alog10(nsa[insagd].petroflux[4])
 rsersic_nsa= 22.5-2.5*alog10(nsa[insagd].sersicflux[4])
 r50s_nsa= nsa[insagd].sersic_th50
 r50p_nsa= nsa[insagd].petroth50
 r50p_new= petro[insagd].petror50_p*0.396
+r50p_nm= petro[insagd].petror50_nm*0.396
 n_nsa= nsa[insagd].sersic_n
 
 simgd= (sim.rhlr gt 0. and $
@@ -127,6 +129,34 @@ hogg_scatterplot, alog10(r50_sim[m2]), rpetro_new[m1]-r_sim[m2], /cond, $
   xcharsize=charsize, ycharsize=charsize
 djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
 hogg_scatterplot, bt_sim[m2], rpetro_new[m1]-r_sim[m2], /cond, $
+  quantiles=quantiles, exp=0.25, xra=[-0.05, 1.05], yra=yra, $
+  xtitle='B/T (GIM2D)', ytitle=textoidl('m_r :: Petro - GIM2D'), $
+  xcharsize=charsize, ycharsize=charsize
+djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
+k_end_print
+spawn, /nosh, ['convert', filebase+'.ps', filebase+'.png']
+
+;; Make elliptical Petro flux comparisons (nm)
+filebase=getenv('DIMAGE_DIR')+'/tex/simard-petronm-flux'
+k_print, filename=filebase+'.ps'
+!P.MULTI=[3,1,3]
+!Y.MARGIN=5
+!X.OMARGIN=[20, 0]
+!Y.OMARGIN=[4, 0]
+yra=[-0.3, 0.3]
+charsize=2.5
+hogg_scatterplot, r_sim[m2], rpetro_nm[m1]-r_sim[m2], /cond, $
+  quantiles=quantiles, exp=0.25, xra=[13.8, 16.7], yra=yra, $
+  xtitle=textoidl('m_r (GIM2D)'), ytitle=textoidl('m_r :: Petro - GIM2D'), $
+  xcharsize=charsize, ycharsize=charsize
+djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
+hogg_scatterplot, alog10(r50_sim[m2]), rpetro_nm[m1]-r_sim[m2], /cond, $
+  quantiles=quantiles, exp=0.25, xra=[-0.1, 1.5], yra=yra, $
+  xtitle=textoidl('log_{10}(r_{50}) (GIM2D)'), $
+  ytitle=textoidl('m_r :: Petro - GIM2D'), $
+  xcharsize=charsize, ycharsize=charsize
+djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
+hogg_scatterplot, bt_sim[m2], rpetro_nm[m1]-r_sim[m2], /cond, $
   quantiles=quantiles, exp=0.25, xra=[-0.05, 1.05], yra=yra, $
   xtitle='B/T (GIM2D)', ytitle=textoidl('m_r :: Petro - GIM2D'), $
   xcharsize=charsize, ycharsize=charsize
@@ -258,6 +288,37 @@ hogg_scatterplot, alog10(r50_sim[m2]), alog(r50p_new[m1]/r50_sim[m2]), /cond, $
   xcharsize=charsize, ycharsize=charsize
 djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
 hogg_scatterplot, bt_sim[m2], alog(r50p_new[m1]/r50_sim[m2]), /cond, $
+  quantiles=quantiles, exp=0.25, xra=[-0.05, 1.05], yra=yra, $
+  xtitle='B/T (GIM2D)', $
+  ytitle=textoidl('r_{50} :: ln(Petro/GIM2D)'), $
+  xcharsize=charsize, ycharsize=charsize
+djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
+k_end_print
+spawn, /nosh, ['convert', filebase+'.ps', filebase+'.png']
+
+
+;; Make elliptical Petro size comparisons
+filebase=getenv('DIMAGE_DIR')+'/tex/simard-petronm-r50'
+k_print, filename=filebase+'.ps'
+!P.MULTI=[3,1,3]
+!Y.MARGIN=5
+!X.OMARGIN=[20, 0]
+!Y.OMARGIN=[4, 0]
+yra=[-0.6, 0.6]
+charsize=2.5
+hogg_scatterplot, r_sim[m2], alog(r50p_nm[m1]/r50_sim[m2]), /cond, $
+  quantiles=quantiles, exp=0.25, xra=[13.8, 16.7], yra=yra, $
+  xtitle=textoidl('m_r (GIM2D)'), $
+  ytitle=textoidl('r_{50} :: ln(Petro/GIM2D)'), $
+  xcharsize=charsize, ycharsize=charsize
+djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
+hogg_scatterplot, alog10(r50_sim[m2]), alog(r50p_nm[m1]/r50_sim[m2]), /cond, $
+  quantiles=quantiles, exp=0.25, xra=[-0.1, 1.5], yra=yra, $
+  xtitle=textoidl('log_{10}(r_{50}) (GIM2D)'), $
+  ytitle=textoidl('r_{50} :: ln(Petro/GIM2D)'), $
+  xcharsize=charsize, ycharsize=charsize
+djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
+hogg_scatterplot, bt_sim[m2], alog(r50p_nm[m1]/r50_sim[m2]), /cond, $
   quantiles=quantiles, exp=0.25, xra=[-0.05, 1.05], yra=yra, $
   xtitle='B/T (GIM2D)', $
   ytitle=textoidl('r_{50} :: ln(Petro/GIM2D)'), $

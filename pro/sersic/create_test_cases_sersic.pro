@@ -11,7 +11,7 @@
 ;   19-May-2014  Written by Mike Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro create_test_cases_sersic, filebase, nn
+pro create_test_cases_sersic, filebase, nn, st
 
 if(keyword_set(psf) eq 0) then begin
     npsf=61L
@@ -26,7 +26,9 @@ if(keyword_set(psf) eq 0) then begin
       psf= psf+amp[i]*exp(-0.5*r2/sigma[i]^2)/(2.*!DPI*sigma[i]^2)
 endif
 
-for i=0L, nn-1L do begin
+if(not keyword_set(st)) then $
+  st=0L
+for i=st, st+nn-1L do begin
     filename= filebase+'-'+strtrim(string(i),2)+'.fits'
     image= mrdfits(filename)
     measure= mrdfits(filebase+'-nsa-'+strtrim(string(i),2)+'.fits',1)
