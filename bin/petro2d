@@ -19,7 +19,7 @@ import scipy.ndimage.filters as filters
 
 # Band names
 bands=['fd', 'nd', 'u', 'g', 'r', 'i', 'z']
-bnums=[5,6,0,1,2,3,4]
+bnums=[6,5,0,1,2,3,4]
 
 def image_median(imagebase, band='r'):
     "Determines median image outside detected objects"
@@ -32,6 +32,11 @@ def image_median(imagebase, band='r'):
     fp= pyfits.open(imagefile)
     image= fp[0].data
     fp.close()
+    if(image.shape != pimage.shape):
+        nx=min([image.shape[0], pimage.shape[0]])
+        ny=min([image.shape[1], pimage.shape[1]])
+        image= image[0:nx, 0:ny]
+        pimage= pimage[0:nx, 0:ny]
     oimage= np.float32(pimage >= 0.)
     osimage= filters.uniform_filter(oimage, 41)
     osimage= np.float32(osimage > 0.)
