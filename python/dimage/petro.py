@@ -112,11 +112,11 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     # and Petrosian ratio
     meansb= fbins/abins
     sb= (fhibins-flobins)/(ahibins-alobins)
-    petroratio= sb/meansb
 
     # Get the Petrosian radius, if it is not given; look only out to first
     # time ratio crosses below threshold. 
     if(petrorad is None and forceflux is None):
+        petroratio= sb/meansb
         ratiop0= petroratio0+np.zeros(len(petroratio))
         ibelow= (np.nonzero((petroratio < ratiop0) * (rbins >= minpetrorad)))[0]
         if(len(ibelow) > 0):
