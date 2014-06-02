@@ -4,8 +4,8 @@ set i = 0
 
 while ($i < 50)
 
-@ st = $i * 14000
-@ nd = ( $i + 1 ) * 14000 - 1
+@ st = $i * 13000
+@ nd = ( $i + 1 ) * 13000 - 1
 
 cat << EOF >! petro_$i.qsub
 #!/bin/csh
