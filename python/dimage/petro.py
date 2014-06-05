@@ -9,7 +9,7 @@ from scipy import interpolate
 from dimage.savitzky_golay import savitzky_golay
 import matplotlib.pyplot as plt
 
-def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2, 
+def petro(image, ivar, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2, 
           npetro=2., minpetrorad=2., nfilter=11, ofilter=1, 
           petrorad=None, forceflux=None, fixmedian=0.):
     """Calculates Petrosian quantities for an image, returning dict of parameters
@@ -59,9 +59,22 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     # Set default return
     rdict=dict()
     rdict['flux']=-9999.
+    rdict['ivar']=-9999.
     rdict['rad']=-9999.
     rdict['r50']=-9999.
     rdict['r90']=-9999.
+    rdict['rbins']=[]
+    rdict['rlobins']=[]
+    rdict['rhibins']=[]
+    rdict['abins']=[]
+    rdict['ahibins']=[]
+    rdict['alobins']=[]
+    rdict['sb']=[]
+    rdict['meansb']=[]
+    rdict['fbins']=[]
+    rdict['fhibins']=[]
+    rdict['flobins']=[]
+    rdict['vbins']=[]
 
     # Create radius array defining how far pixels are from center, 
     # accounting for axis ratio.
@@ -78,13 +91,19 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     # up to and including that pixel
     isort= np.argsort(r2, axis=None)
     pix=image.flat[isort]-fixmedian
+    ivarsort=ivar.flat[isort]
+    ivarsort[(ivarsort<0.).nonzero()]=0.
+    varpix= (((ivarsort != 0.).astype(np.float32))/
+             (ivarsort+(ivarsort == 0.).astype(np.float32)))
     radius= np.sqrt(r2.flat[isort])
     ipix= np.arange(len(pix))
     flux= np.cumsum(pix)
+    var= np.cumsum(varpix)
     if(radius[0] != 0.0):
         radius= np.append(np.zeros(1), radius)
         ipix= np.append(np.zeros(1), ipix)
         flux= np.append(np.zeros(1), flux)
+        var= np.append(np.zeros(1), var)
 
     # Choose outer radii of apertures, and calculate flux and area within,
     # and also calculate an annular flux and area around each radius.
@@ -100,6 +119,8 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     fbins= interper(rbins)
     flobins= interper(rlo)
     fhibins= interper(rhi)
+    interper= interpolate.interp1d(radius,var) 
+    vbins= interper(rbins)
     interper= interpolate.interp1d(radius,ipix) 
     abins= interper(rbins)
     abins[0:4]= ba*PI*rbins[0:4]**2
@@ -113,8 +134,22 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     meansb= fbins/abins
     sb= (fhibins-flobins)/(ahibins-alobins)
 
+    # Put data into return dictionary
+    rdict['rbins']= rbins
+    rdict['fbins']= fbins
+    rdict['abins']= abins
+    rdict['meansb']= meansb
+    rdict['sb']= sb
+    rdict['rlobins']= rlo
+    rdict['rhibins']= rhi
+    rdict['alobins']= alobins
+    rdict['ahibins']= ahibins
+    rdict['flobins']= flobins
+    rdict['fhibins']= fhibins
+    rdict['vbins']= vbins
+
     # Get the Petrosian radius, if it is not given; look only out to first
-    # time ratio crosses below threshold. 
+    # time ratio crosses below threshold.  
     if(petrorad is None and forceflux is None):
         petroratio= sb/meansb
         ratiop0= petroratio0+np.zeros(len(petroratio))
@@ -134,10 +169,15 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
             aprad=max(rbins)
         interper= interpolate.interp1d(rbins, fbins) 
         petroflux=interper(aprad)
+        interper= interpolate.interp1d(rbins, vbins) 
+        petrovar=interper(aprad)
+        petroivar= ((petrovar != 0.).astype(np.float32)/
+                    (petrovar+(petrovar == 0.).astype(np.float32)))
     else:
         # If we have forced a given flux, and are calculating sizes
         # relative to that, we calculate the equivalent Petrosian radius
         petroflux=forceflux
+        petroivar=0.
         imax=fbins.argmax()
         irad=np.arange(imax+1)
         if(petroflux>0. and petroflux < max(fbins[irad])):
@@ -164,8 +204,10 @@ def petro(image, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
         petror90=-9999.
         
     rdict['flux']=petroflux
+    rdict['ivar']=petroivar
     rdict['rad']=petrorad
     rdict['r50']=petror50
     rdict['r90']=petror90
 
-    return rdict
+    return rdict 
+ 
