@@ -6,7 +6,6 @@ Michael R. Blanton, 2014-05-14
 
 import numpy as np
 from scipy import interpolate
-from dimage.savitzky_golay import savitzky_golay
 import matplotlib.pyplot as plt
 
 def petro(image, ivar, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2, 
