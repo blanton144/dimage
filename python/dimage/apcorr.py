@@ -6,10 +6,9 @@ Michael R. Blanton, 2014-05-14
 
 import gc
 import numpy as np
-from scipy.ndimage import filters
-from scipy.signal import fftconvolve
 import dimage
 import matplotlib.pyplot as plt
+from astropy.convolution import convolve_fft
 
 def apcorr(radius, sb, aprad, psf, ba=1., phi=0.):
     """Calculates an aperture correction given elliptical profile
@@ -44,41 +43,24 @@ def apcorr(radius, sb, aprad, psf, ba=1., phi=0.):
     xcen= np.float32(nx/2)
     ycen= np.float32(ny/2)
     gc.collect()
-    print dimage.memory()
     image= dimage.curve2image(radius, sb, nx, ny, 
                               xcen= xcen, ycen=ycen, 
                               ba=ba, phi=phi)
-    print "here"
-    gc.collect()
-    print dimage.memory()
     ivar= np.ones(image.shape, dtype=np.float32)
-    print "here0"
-    gc.collect()
-    print dimage.memory()
 
     # Measure image
     petro_orig= dimage.petro(image, ivar, ba=ba, phi=phi,
                              xcen=xcen, ycen=ycen,
                              npetro=1., petrorad=aprad)
-    print "here1"
-    gc.collect()
-    print dimage.memory()
 
     # Convolve image with PSF
     psf2= np.float32(psf)
-    cimage= fftconvolve(image, psf2, mode='same')
-    help(cimage)
-    print "here2"
-    gc.collect()
-    print dimage.memory()
+    cimage= convolve_fft(image, psf2)
 
     # Measure convolved image
     petro_convolved= dimage.petro(cimage, ivar, ba=ba, phi=phi,
                                   xcen=xcen, ycen=ycen,
                                   npetro=1., petrorad=aprad)
-    print "here3"
-    gc.collect()
-    print dimage.memory()
 
     if(petro_orig['flux'] == -9999.):
         return -9999.
@@ -88,8 +70,11 @@ def apcorr(radius, sb, aprad, psf, ba=1., phi=0.):
         return -9999.
 
     apcorr= petro_orig['flux']/petro_convolved['flux']
-    print "here4"
-    gc.collect()
-    print dimage.memory()
-    
+
+    del petro_orig
+    del petro_convolved
+    del cimage
+    del image
+    del ivar
+
     return apcorr 
