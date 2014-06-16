@@ -6,42 +6,65 @@
 # MRB 2014-05-14 
 # 
 
+import pdb
 import os
 import sys
 import numpy as np
-import astropy.io.fits as pyfits
+import fitsio
 import astropy.wcs as wcs
 import dimage
 
 def read_petro2d(galaxy):
     # Get directory with atlas images
-    iauname=galaxy['iauname']
-    aid=galaxy['aid']
-    pid=galaxy['pid']
+    iauname=galaxy['IAUNAME']
+    aid=galaxy['AID']
+    pid=galaxy['PID']
     adir= os.path.join(os.getenv('ATLAS_DATA'),
                        'v1', 'detect', 'v1_0', 
-                       galaxy['subdir'], 'atlases',
+                       galaxy['SUBDIR'], 'atlases',
                        str(pid))
     filebase= os.path.join(adir, iauname+'-'+
                            str(pid))
     pfile= filebase+'-petro.fits'
-    if(os.path.exists(pfile)):
-        fp= pyfits.open(pfile)
-        data=fp[1].data
-        fp.close()
+    afile= filebase+'-petro-apcorr.fits'
+    if(os.path.exists(pfile) and os.path.exists(afile)):
+        pdata= fitsio.read(pfile)
+        adata= fitsio.read(afile)
+        dtype= np.dtype([('nsaid', np.int), ('pid', np.int), ('aid', np.int), 
+                         ('racen', np.float64), ('deccen', np.float64), 
+                         ('xcen', np.float32), ('ycen', np.float32), 
+                         ('ba', np.float32), ('phi', np.float32), 
+                         ('petroflux_r', np.float32), ('petroivar_r', np.float32),
+                         ('petrotheta_r', np.float32), 
+                         ('petroth50_r', np.float32), ('petroth90_r', np.float32), 
+                         ('petrotheta', np.float32), 
+                         ('petroflux', np.float32, (len(pdata['petroflux'][0]),)),
+                         ('petroivar', np.float32, (len(pdata['petroflux'][0]),)),
+                         ('petroth50', np.float32, (len(pdata['petroflux'][0]),)),
+                         ('petroth90', np.float32, (len(pdata['petroflux'][0]),)),
+                         ('apcorr_r', np.float32), 
+                         ('apcorr', np.float32, (len(adata['apcorr'][0]),)),
+                         ('apcorr_self', np.float32, (len(adata['apcorr'][0]),)),])
+        data= np.zeros(1, dtype=dtype)
+        for name in adata.dtype.names:
+            data[name]= adata[name]
+        for name in pdata.dtype.names:
+            data[name]= pdata[name]
+        data['petroflux']= data['petroflux']*data['apcorr']
+
         return data
     return None
         
 def main(argv):
     version='v1_0_0'
     nsafile= os.getenv('ATLAS_DATA')+'/v1/nsa_v1_0_0.fits'
-    nsafp= pyfits.open(nsafile, memmap=True)
-    nsa= nsafp[1].data
+    nsa= fitsio.read(nsafile,
+                     columns=['nsaid', 'iauname', 'aid', 'pid', 'subdir'])
     data=None
     indx=0
     for galaxy in nsa:
         if((indx % 1000) == 0):
-            print str(galaxy['nsaid'])
+            print str(galaxy['NSAID'])
             sys.stdout.flush()
         tmp_data= read_petro2d(galaxy)
         if(tmp_data is not None):
@@ -51,10 +74,13 @@ def main(argv):
             data.put(indx, tmp_data)
         indx+=1
 
-    hdu0= pyfits.PrimaryHDU()
-    hdu1= pyfits.BinTableHDU(data=data, name='Petrosian Quantities')
-    hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
-    hdus.writeto('petro_'+version+'.fits', clobber=True)
+    data= data.view(np.recarray)
+    fitsio.write('petro_'+version+'.fits', data, clobber=True)
 
 if __name__ == "__main__": 
-    main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    except:
+        import sys
+        tb = sys.exc_info()[2]
+        pdb.post_mortem(tb)

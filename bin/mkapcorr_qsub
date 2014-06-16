@@ -2,19 +2,19 @@
 
 set i = 0 
 
-while ($i < 200)
+while ($i < 100)
 
-@ st = $i * 3250
-@ nd = ( $i + 1 ) * 3250 - 1
+@ st = $i * 6500
+@ nd = ( $i + 1 ) * 6500 - 1
 
-cat << EOF >! petro_$i.qsub
+cat << EOF >! apcorr_$i.qsub
 #!/bin/csh
 
 #PBS -l nodes=1:ppn=1
 #PBS -q batch 
-#PBS -N petro_$i
+#PBS -N apcorr_$i
 #PBS -j oe
-#PBS -o petro_$i.out
+#PBS -o apcorr_$i.out
 #PBS -M michael.blanton@gmail.com
 #PBS -m abe
 #PBS -V
@@ -34,7 +34,7 @@ setup -r ~/dimage
 setup photolog dr10
 setup tree ebosswork
 
-petro2d -s $st -e $nd
+apcorr2d -s $st -e $nd
 EOF
 
 @ i = $i + 1

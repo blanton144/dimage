@@ -10,7 +10,7 @@ import pdb
 import os
 import sys
 import numpy as np
-import astropy.io.fits as pyfits
+import fitsio
 import astropy.wcs as wcs
 import dimage
 import getopt
@@ -26,12 +26,8 @@ def image_median(imagebase, band='r'):
     num= bnums[bands.index(band)]
     pimagefile= imagebase+'-'+str(num)+'-pimage.fits.gz'
     imagefile= imagebase+'-'+band+'.fits.gz'
-    fp= pyfits.open(pimagefile)
-    pimage= fp[0].data
-    fp.close()
-    fp= pyfits.open(imagefile)
-    image= fp[0].data
-    fp.close()
+    pimage= fitsio.read(pimagefile)
+    image= fitsio.read(imagefile)
     if(image.shape != pimage.shape):
         nx=min([image.shape[0], pimage.shape[0]])
         ny=min([image.shape[1], pimage.shape[1]])
@@ -81,10 +77,8 @@ def output_cog_file(outfile, nsaid, racen, deccen, pixscale, petro):
                     petro['flobins'],
                     petro['fhibins'])], 
                   dtype=dtype)
-   hdu0= pyfits.PrimaryHDU()
-   hdu1= pyfits.BinTableHDU(data=data, name='Elliptical curve of growth')
-   hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
-   hdus.writeto(outfile, clobber=True)
+   data= data.view(np.recarray)
+   fitsio.write(outfile, data=data, clobber=True)
 
 def get_pixscale(imwcs, ra, dec):
     "Returns pixel scale in arcsec/pixel"
@@ -98,13 +92,13 @@ def get_pixscale(imwcs, ra, dec):
 
 def calc_petro2d(galaxy):
     # Get directory with atlas images
-    iauname=galaxy['iauname']
-    aid=galaxy['aid']
-    pid=galaxy['pid']
-    nsaid=galaxy['nsaid']
+    iauname=galaxy['IAUNAME']
+    aid=galaxy['AID']
+    pid=galaxy['PID']
+    nsaid=galaxy['NSAID']
     fdir= os.path.join(os.getenv('ATLAS_DATA'),
                        'v1', 'detect', 'v1_0', 
-                       galaxy['subdir'])
+                       galaxy['SUBDIR'])
     adir= os.path.join(fdir, 'atlases',
                        str(pid))
     fullbase= os.path.join(fdir, iauname)
@@ -148,23 +142,16 @@ def calc_petro2d(galaxy):
         petro_default['vbins']=[]
         
         # Now determine Petrosian quantities for reference band
-        fp= pyfits.open(imfile)
-        image= fp[iref].data
-        header= fp[iref].header
+        (image, header)= fitsio.read(imfile, ext=iref, header=True)
         imwcs= wcs.WCS(header)
-        fp.close()
-        fp= pyfits.open(ivarfile)
-        ivar= fp[iref].data
-        fp.close()
-        fp= pyfits.open(measfile)
-        measure= fp[1].data
-        fp.close()
-        racen= measure['racen']
-        deccen= measure['deccen']
+        ivar= fitsio.read(ivarfile, ext=iref)
+        measure= fitsio.read(measfile)
+        racen= measure['RACEN']
+        deccen= measure['DECCEN']
         (xcen, ycen)= imwcs.wcs_world2pix(racen, deccen, 0)
         rpixscale= get_pixscale(imwcs, racen, deccen)
-        ba= measure['ba90']
-        phi= 90.-measure['phi90']
+        ba= measure['BA90']
+        phi= 90.-measure['PHI90']
         try:
             petro= dimage.petro(image, ivar, xcen=xcen, ycen=ycen, 
                                 ba=ba, phi=phi, fixmedian=median_image)
@@ -178,8 +165,6 @@ def calc_petro2d(galaxy):
             prad=petro['rad']*rpixscale
 
         # Measure Petrosian fluxes using same aperture in other bands.    
-        fp= pyfits.open(imfile)
-        ifp= pyfits.open(ivarfile)
         petroflux=np.zeros(len(bands))-9999.
         petroivar=np.zeros(len(bands))
         petroth50=np.zeros(len(bands))-9999.
@@ -188,9 +173,8 @@ def calc_petro2d(galaxy):
         for band in bands:
             iband=bnums[bands.index(band)]
             median_image= image_median(fullbase, band=band)
-            image= fp[iband].data
-            ivar= ifp[iband].data
-            header= fp[iband].header
+            (image, header)= fitsio.read(imfile, ext=iband, header=True)
+            ivar= fitsio.read(ivarfile, ext=iband)
             imwcs= wcs.WCS(header)
             (xcen, ycen)= imwcs.wcs_world2pix(racen, deccen, 0)
             cpixscale= get_pixscale(imwcs, racen, deccen)
@@ -210,8 +194,7 @@ def calc_petro2d(galaxy):
             pixscale[bands.index(band)]= cpixscale
             cfile= filebase+'-'+band+'-cog.fits'
             output_cog_file(cfile, nsaid, racen, deccen, cpixscale, cpetro)
-        fp.close()
-        ifp.close()
+            del cpetro
             
         # Output catalog file
         dtype=[('nsaid', np.int), ('pid', np.int), ('aid', np.int), 
@@ -240,10 +223,8 @@ def calc_petro2d(galaxy):
                          petroth50,
                          petroth90)],
                        dtype=dtype)
-        hdu0= pyfits.PrimaryHDU()
-        hdu1= pyfits.BinTableHDU(data=data, name='Petrosian Quantities')
-        hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
-        hdus.writeto(pfile, clobber=True)
+        data= data.view(np.recarray)
+        fitsio.write(pfile, data=data, clobber=True)
 
 def main(argv):
     # Set defaults
@@ -274,33 +255,34 @@ def main(argv):
             nsaid = np.int(arg)
         elif opt in ("-r", "--randomize"):
             randomize = int(arg)
-            
+
     # Read in appropriate section of NSA file        
     vN= (version.split('_'))[0]
     nsafile= os.getenv('ATLAS_DATA')+'/'+vN+'/nsa_'+version+'.fits'
-    nsafp= pyfits.open(nsafile, memmap=True)
     if(nsaid>=0): 
-        ipick= (np.nonzero(nsafp[1].data['NSAID'] == nsaid))[0]
+        nsa= fitsio.read(nsafile)
+        ipick= (np.nonzero(nsa['NSAID'] == nsaid))[0]
         if(len(ipick)==0):
             print "No such NSAID "+str(nsaid)
             sys.exit(2)
-        nsa= nsafp[1].data[ipick]
+        nsa= nsa[ipick]
     elif(randomize <= 0):
         # slice out part of interest
         if(iend == -1):
             iend=(nsafp[1].header['NAXIS2'])-1
-        nsa= nsafp[1].data[istart:iend+1]
+        indx= istart+ np.arange(iend-istart+1)
+        nsa=fitsio.read(nsafile, rows=indx)
     else:
         # or random sample 
         indx=np.arange(nsafp[1].header['NAXIS2'])
         random.shuffle(indx)
-        nsa= nsafp[1].data[indx[0:randomize]]
-        
-    nsafp.close()
+        nsa= fitsio.read(nsafile, rows=indx[0:randomize])
             
     # Calculate Petrosian quantities for each galaxy
+    print dimage.memory()/1.e+9
     for galaxy in nsa:
         calc_petro2d(galaxy)
+        print dimage.memory()/1.e+9
 
 if __name__ == "__main__": 
     try:
