@@ -15,11 +15,11 @@ pro petro_kcorrect_sdss_maggies, measure, extinction, nmgy, nmgy_ivar
 errband=[0.05,0.02,0.02,0.02,0.03]
 
 nmgy= measure.petroflux[2:6]*10.^(0.4*extinction)
-;;nmgy_ivar= measure.sersicflux_ivar[2:6]*10.^(-0.8*extinction)
-nmgy_ivar= fltarr(5, n_elements(measure))
-for i=0L, 4L do $
-  nmgy_ivar[i,*]= float(nmgy[i,*] ne 0.)/ $
-  ((errband[i]^2*nmgy[i,*])+float(nmgy[i,*] eq 0.))
+nmgy_ivar= measure.petroivar[2:6]*10.^(-0.8*extinction)
+;;nmgy_ivar= fltarr(5, n_elements(measure))
+;;for i=0L, 4L do $
+;;  nmgy_ivar[i,*]= float(nmgy[i,*] ne 0.)/ $
+;;  ((errband[i]^2*nmgy[i,*])+float(nmgy[i,*] eq 0.))
 k_minerror, nmgy, nmgy_ivar
 k_abfix, nmgy, nmgy_ivar
 
@@ -33,11 +33,11 @@ nmgy= fltarr(2, n_elements(measure))
 nmgy_ivar= fltarr(2, n_elements(measure))
 nmgy[0,*]= measure.petroflux[0]*10.^(0.4*extinction[0,*])
 nmgy[1,*]= measure.petroflux[1]*10.^(0.4*extinction[1,*])
-;;nmgy_ivar[0,*]= measure.sersicflux_ivar[0]*10.^(-0.8*extinction[0,*])
-;;nmgy_ivar[1,*]= measure.sersicflux_ivar[1]*10.^(-0.8*extinction[1,*])
-for i=0L, 1L do $
-  nmgy_ivar[i,*]= float(nmgy[i,*] ne 0.)/ $
-  ((errband[i]^2*nmgy[i,*])+float(nmgy[i,*] eq 0.))
+nmgy_ivar[0,*]= measure.petroivar[0]*10.^(-0.8*extinction[0,*])
+nmgy_ivar[1,*]= measure.petroivar[1]*10.^(-0.8*extinction[1,*])
+;;for i=0L, 1L do $
+;;nmgy_ivar[i,*]= float(nmgy[i,*] ne 0.)/ $
+;;((errband[i]^2*nmgy[i,*])+float(nmgy[i,*] eq 0.))
 k_minerror, nmgy, nmgy_ivar, errband
 
 end
