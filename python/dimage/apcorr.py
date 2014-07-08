@@ -4,13 +4,14 @@ Calculate an approximate
 Michael R. Blanton, 2014-05-14
 """
 
+import fitsio
 import gc
 import numpy as np
 import dimage
 import matplotlib.pyplot as plt
 from astropy.convolution import convolve_fft
 
-def apcorr(radius, sb, aprad, psf, ba=1., phi=0.):
+def apcorr(radius, sb, aprad, psf, ba=1., phi=0., apmin=1.e-10, apmax=1.e+10):
     """Calculates an aperture correction given elliptical profile
     
     Parameters
@@ -22,6 +23,8 @@ def apcorr(radius, sb, aprad, psf, ba=1., phi=0.):
     ba : axis ratio (b/a) between 0 and 1 (default 1)
     phi : position angle in deg (default 0)
          (direction of major axis, defined s.t. tan(phi) = -x/y)
+    apmin : minimum aperture correction (default 1.e-10)
+    apmax : maximum aperture correction (default 1.e+10)
 
     Returns
     -------
@@ -36,7 +39,7 @@ def apcorr(radius, sb, aprad, psf, ba=1., phi=0.):
 
     # Make image
     factor=1.5
-    nx= int(aprad*factor/2.)*2+1
+    nx= int(aprad*2.*factor/2.)*2+1
     if(nx < 71):
         nx= 71
     ny= nx
@@ -70,6 +73,11 @@ def apcorr(radius, sb, aprad, psf, ba=1., phi=0.):
         return -9999.
 
     apcorr= petro_orig['flux']/petro_convolved['flux']
+
+    if(apcorr<apmin):
+        apcorr=apmin
+    if(apcorr>apmax):
+        apcorr=apmax
 
     del petro_orig
     del petro_convolved
