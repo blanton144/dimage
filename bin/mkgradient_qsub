@@ -1,0 +1,42 @@
+#!/bin/csh -f 
+
+set i = 0 
+
+while ($i < 25)
+
+@ st = $i * 26000
+@ nd = ( $i + 1 ) * 26000 - 1
+
+cat << EOF >! gradient_$i.qsub
+#!/bin/csh
+
+#PBS -l nodes=1:ppn=1
+#PBS -q batch 
+#PBS -N gradient_$i
+#PBS -j oe
+#PBS -o gradient_$i.out
+#PBS -M michael.blanton@gmail.com
+#PBS -m abe
+#PBS -V
+#PBS -r n
+
+echo Running on `hostname`
+
+module use /home/boss/software/modulefiles
+module load python/2.7.1
+module load astropy
+module load scipy
+module load numpy
+module load matplotlib
+module load fitsio
+setup photoop v1_12_1
+setup -r ~/dimage
+setup photolog dr10
+setup tree ebosswork
+
+gradient -s $st -e $nd
+EOF
+
+@ i = $i + 1
+
+end

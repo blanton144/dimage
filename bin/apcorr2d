@@ -50,6 +50,13 @@ def calc_apcorr2d(galaxy):
         iref= bnums[bands.index(bref)]
 
         if(petro['petrotheta_r'] > 0.):
+            
+            # Set reasonability limit
+            apmin=0.9
+            apmax_offsets= [1.2, 1.2, 1.1, 1.1, 1.1, 1.1, 1.1]
+            apmax_scale= [3., 3., 0., 0., 0., 0., 0.]
+            apmax= apmax_offsets+apmax_scale/(1.+petro['petroth50_r']**2)
+
             # Measure the aperture correction for the r-band
             cfile= filebase+'-'+bref+'-cog.fits'
             cog_r= fitsio.read(cfile)
@@ -58,8 +65,9 @@ def calc_apcorr2d(galaxy):
             rpixscale=cog_r['pixscale']
             aprad= petro['petrotheta_r']/cog_r['pixscale']*2.
             apcorr_r= dimage.apcorr(cog_r['rbins'][0], cog_r['sb'][0], aprad, psf, 
-                                    ba=petro['ba'], phi=petro['phi'])
-            
+                                    ba=petro['ba'], phi=petro['phi'],
+                                    apmin=apmin, apmax=apmax[4])
+
             apcorr=np.zeros(len(bands))
             apcorr_self=np.zeros(len(bands))
             for band in bands:
@@ -72,12 +80,15 @@ def calc_apcorr2d(galaxy):
                 iband= bands.index(band)
                 apcorr[iband]= dimage.apcorr(cog_r['rbins'][0]*rpixscale/pixscale,
                                              cog_r['sb'][0], aprad, psf, 
-                                             ba=petro['ba'], phi=petro['phi'])
+                                             ba=petro['ba'], phi=petro['phi'],
+                                             apmin=apmin, apmax=apmax[iband])
                 apcorr_self[iband]= dimage.apcorr(cog['rbins'][0], 
                                                   cog['sb'][0], aprad, psf, 
-                                                  ba=petro['ba'], phi=petro['phi'])
+                                                  ba=petro['ba'], phi=petro['phi'],
+                                                  apmin=apmin, apmax=apmax[iband])
             apcorr=apcorr/apcorr_r
             apcorr_self=apcorr_self/apcorr_r
+
         else:
             # Bail if no good measurement
             apcorr_r= 1.
