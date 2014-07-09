@@ -157,6 +157,15 @@ def calc_petro2d(galaxy):
                                 ba=ba, phi=phi, fixmedian=median_image)
         except:
             petro= petro_default
+        petrotheta_r=-9999.
+        petroth50_r=-9999.
+        petroth90_r=-9999.
+        if(petro['rad'] != -9999.):
+            petrotheta_r=petro['rad']*rpixscale
+        if(petro['r50'] != -9999.):
+            petroth50_r=petro['r50']*rpixscale
+        if(petro['r90'] != -9999.):
+            petroth90_r=petro['r90']*rpixscale
 
         # Set aperture radius in arcsec (handle case where undefined)
         if(petro['rad'] == -9999.):
@@ -215,8 +224,9 @@ def calc_petro2d(galaxy):
                          xcen,ycen,
                          ba,phi,
                          petro['flux'], petro['ivar'],
-                         petro['rad']*rpixscale,
-                         petro['r50']*rpixscale,petro['r90']*rpixscale,
+                         petrotheta_r,
+                         petroth50_r,
+                         petroth90_r, 
                          prad, 
                          petroflux,
                          petroivar,
