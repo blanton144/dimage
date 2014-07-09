@@ -76,6 +76,13 @@ def read_petro2d(galaxy):
             data['petroflux']= data['petroflux']*data['apcorr']
             data['petroivar']= data['petroivar']/data['apcorr']**2
 
+        if(data['petroth50_r'] < 0.):
+            data['petroth50_r']=-9999.
+        if(data['petroth90_r'] < 0.):
+            data['petroth90_r']=-9999.
+        if(data['petrotheta_r'] < 0.):
+            data['petrotheta_r']=-9999.
+
         return data
     return None
         
