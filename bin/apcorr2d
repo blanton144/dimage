@@ -19,6 +19,9 @@ import random
 bands=['fd', 'nd', 'u', 'g', 'r', 'i', 'z']
 bnums=[6,5,0,1,2,3,4]
 
+# Limit on size above which we assume no correction (arcsec)
+maxtheta= 100.
+
 def calc_apcorr2d(galaxy):
     # Get directory with atlas images
     iauname=galaxy['IAUNAME']
@@ -49,14 +52,14 @@ def calc_apcorr2d(galaxy):
         bref='r'
         iref= bnums[bands.index(bref)]
 
-        if(petro['petrotheta_r'] > 0.):
+        if(petro['petrotheta_r'] > 0. and petro['petrotheta_r'] < maxtheta):
             
             # Set reasonability limit
             apmin=0.9
             apmax_offsets= [1.2, 1.2, 1.1, 1.1, 1.1, 1.1, 1.1]
             apmax_scale= [3., 3., 0., 0., 0., 0., 0.]
             apmax= apmax_offsets+apmax_scale/(1.+petro['petroth50_r']**2)
-
+            
             # Measure the aperture correction for the r-band
             cfile= filebase+'-'+bref+'-cog.fits'
             cog_r= fitsio.read(cfile)
@@ -90,7 +93,7 @@ def calc_apcorr2d(galaxy):
             apcorr_self=apcorr_self/apcorr_r
 
         else:
-            # Bail if no good measurement
+            # Bail if no good measurement or if very large
             apcorr_r= 1.
             apcorr=np.ones(len(bands))
             apcorr_self=np.ones(len(bands))
