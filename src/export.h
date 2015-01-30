@@ -2464,8 +2464,8 @@ typedef struct {
  * Solaris has these functions starting with Solaris 8. No one else
  * does yet. So, use our version everywhere for now.
  */
-#define IDL_SUPPLIES_STRLCPY
-#define IDL_SUPPLIES_STRLCAT
+	/* #define IDL_SUPPLIES_STRLCPY
+		 #define IDL_SUPPLIES_STRLCAT */
 
 /*
  * strbcopy() is our own invention, so of course we supply the implemenation.

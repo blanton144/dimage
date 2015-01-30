@@ -15,6 +15,9 @@ SHELL = /bin/sh
 INC = ../../include
 CFLAGS  = $(SDSS_CFLAGS) -DCHECK_LEAKS -I$(INC)
 
+SO_EXT=so
+LD=libtool -dynamic -L/usr/lib -lc
+
 BIN = $(DIMAGE_DIR)/bin
 LIB = $(DIMAGE_DIR)/lib
 
@@ -74,6 +77,7 @@ OBJECTS = \
 	nmf.o \
 	dran3.o \
 	dshift.o \
+	hello.o \
 	dkernel_linear.o \
 	dkernel_puresinc.o \
 	dkernel_dampsinc.o \

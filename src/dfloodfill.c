@@ -65,7 +65,7 @@ int dfloodfill(int *image,
 	Segment stack[MAX], *sp = stack;	/* stack of filled segments */
 	
 	ov = pixelread(x, y);		/* read pv at seed point */
-	if (ov==nv || x<xst || x>xnd|| y<yst || y>ynd) return;
+	if (ov==nv || x<xst || x>xnd|| y<yst || y>ynd) return(1);
 	PUSH(y, x, x, 1);			/* needed in some cases */
 	PUSH(y+1, x, x, -1);		/* seed segment (popped 1st) */
 	
@@ -91,4 +91,5 @@ int dfloodfill(int *image,
 	    l = x;
 		} while (x<=x2);
 	}
+	return(0);
 }

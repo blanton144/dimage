@@ -40,7 +40,7 @@ IDL_LONG idl_dshift (int      argc,
 		kernel= dkernel_bicubic;
 		nk= dkernel_bicubic_size();
 	} else {
-		printf("No such kernel type: %d\n", ktype);
+		printf("No such kernel type: %ld\n", ktype);
 		printf("Possible values:\n");
 		printf(" 0 - linear (not recommended)\n");
 		printf(" 1 - pure sinc (not recommended)\n");
