@@ -14,149 +14,81 @@
 
 #define PI 3.14159265358979
 
+static int *indx=NULL;
+static int *isort=NULL;
+
 #define FREEVEC(a) {if((a)!=NULL) free((char *) (a)); (a)=NULL;}
+
+int dresample_pixel_sort(const void *first, const void *second)
+{
+  float v1,v2;
+  v1=isort[*((int *) first)];
+  v2=isort[*((int *) second)];
+  if(v1>v2) return(-1);
+  if(v1<v2) return(1);
+  return(0);
+}
 
 void dresample(float *image,
 							 int nx,
 							 int ny,
-							 float sigma,
-							 float *smooth)
+							 float *xx, 
+							 float *yy, 
+							 int nn,
+							 float *samples, 
+							 float (*kernel)(float),
+							 int nk)
 {
-	int i, j, npix, half, start, end, sample;
-	float neghalfinvvar, total, scale, dx, sum;
-	float* kernel1D;
-	float* kernel_shifted;
-	float* smooth_temp;
+	float xcurr, ycurr, dx, dy, xkernel, ykernel;
+	int k, i, j, xst, xnd, yst, ynd;
 
-	// make the kernel
-	npix = 2 * ((int) ceilf(3. * sigma)) + 1;
-	half = npix / 2;
-	kernel1D =  malloc(npix * sizeof(float));
-	neghalfinvvar = -1.0 / (2.0 * sigma * sigma);
-	for (i=0; i<npix; i++) {
-		dx = ((float) i - 0.5 * ((float)npix - 1.));
-		kernel1D[i] = exp((dx * dx) * neghalfinvvar);
-	}
+	isort=NULL;
+	indx=NULL;
 
-	// normalize the kernel
-	total = 0.0;
-	for (i=0; i<npix; i++)
-		total += kernel1D[i];
-	scale = 1. / total;
-	for (i=0; i<npix; i++)
-		kernel1D[i] *= scale;
+	/* sort desired samples by memory location */ 
+	isort= (int *) malloc(nn*sizeof(int));
+	for(k=0;k<nn;k++)
+		isort[k]= ((int) yy[k])+ny*((int) xx[k]);
+  indx=(int *) malloc(sizeof(int)*nn);
+  for(k=0;k<nn;k++)
+		indx[k]=k;
+	qsort((void *) indx, nn, sizeof(int), dresample_pixel_sort);
 
-	smooth_temp = malloc(sizeof(float) * MAX(nx, ny));
+	/* for each sample */
+	for(k=0;k<nn;k++) {
+		xcurr= xx[indx[k]];
+		ycurr= yy[indx[k]];
 
-	// Here's some trickery: we set "kernel_shifted" to be an array where:
-	//   kernel_shifted[0] is the middle of the array,
-	//   kernel_shifted[-half] is the left edge (ie the first sample),
-	//   kernel_shifted[half] is the right edge (last sample)
-	kernel_shifted = kernel1D + half;
+		/* get x range */
+		xst= (int) ceil(xcurr-(float) (nk/2));
+		if(xst<0) xst=0;
+		if(xst>(nx-1)) xst=(nx-1);
+		xnd= (int) floor(xcurr+(float) (nk/2));
+		if(xnd<0) xst=0;
+		if(xnd>(nx-1)) xnd=(nx-1);
 
-	// convolve in x direction, dumping results into smooth_temp
-	for (j=0; j<ny; j++) {
-		float* imagerow = image + j*nx;
-		for (i=0; i<nx; i++) {
-			/*
-				The outer loops are over OUTPUT pixels;
-				the "sample" loop is over INPUT pixels.
+		/* get y range */
+		yst= (int) ceil(ycurr-(float) (nk/2));
+		if(yst<0) yst=0;
+		if(yst>(ny-1)) yst=(ny-1);
+		ynd= (int) floor(ycurr+(float) (nk/2));
+		if(ynd<0) yst=0;
+		if(ynd>(ny-1)) ynd=(ny-1);
 
-				We're summing over the input pixels that contribute to the value
-				of the output pixel.
-			*/
-			start = i - half;
-			start = MAX(start, 0);
-			end = i + half;
-			end = MIN(end, nx-1);
-			sum = 0.0;
-			for (sample=start; sample <= end; sample++)
-				sum += imagerow[sample] * kernel_shifted[sample - i];
-			smooth_temp[i] = sum;
-		}
-		memcpy(smooth + j*nx, smooth_temp, nx * sizeof(float));
-	}
+		/* loop over image */
+		samples[indx[k]]=0.;
+		for(j=yst;j<=ynd;j++) {
+			dy= ycurr- (float) j;
+			ykernel= (*kernel)(dy);
+			for(i=xst;i<=xnd;i++) {
+				dx= xcurr- (float) i;
+				xkernel= (*kernel)(dx);
+				samples[indx[k]]+= image[j+ny*i]*xkernel*ykernel;
+			} /* end for j */
+		} /* end for i */
+	} /* end for k */
 
-	// convolve in the y direction, dumping results into smooth
-	for (i=0; i<nx; i++) {
-		float* imagecol = smooth + i;
-		for (j=0; j<ny; j++) {
-			start = j - half;
-			start = MAX(start, 0);
-			end = j + half;
-			end = MIN(end, ny-1);
-			sum = 0.0;
-			for (sample=start; sample<=end; sample++)
-				sum += imagecol[sample*nx] * kernel_shifted[sample - j];
-			smooth_temp[j] = sum;
-		}
-		for (j=0; j<ny; j++)
-			smooth[i + j*nx] = smooth_temp[j];
-	}
-
-	FREEVEC(smooth_temp);
-	FREEVEC(kernel1D);
-} /* end dsmooth */
-
-#if 0
-
-int dsmooth(float *image, 
-            int nx, 
-            int ny,
-            float sigma,
-            float *smooth)
-{
-  int i,j,npix,half,ip,jp,ist,jst,isto,jsto,ind,jnd,ioff,joff;
-  float invvar,total,scale,dx,dy;
-
-  /* make kernel */
-  npix=2*((int) ceilf(3.*sigma))+1;
-  half=npix/2;
-  kernel=(float *) malloc(npix*npix*sizeof(float));
-  invvar=1./sigma/sigma;
-  for(i=0;i<npix;i++)
-    for(j=0;j<npix;j++) {
-      dx=((float) i - 0.5*((float)npix-1.));
-      dy=((float) j - 0.5*((float)npix-1.));
-      kernel[i+j*npix]= exp(-0.5*(dx*dx+dy*dy)*invvar);
-    }
-  total=0.;
-  for(i=0;i<npix;i++)
-    for(j=0;j<npix;j++) 
-      total+=kernel[i+j*npix];
-  scale=1./total;
-  for(i=0;i<npix;i++)
-    for(j=0;j<npix;j++) 
-      kernel[i+j*npix]*=scale;
-
-  for(j=0;j<ny;j++) 
-    for(i=0;i<nx;i++) 
-      smooth[i+j*nx]=0.;
-
-  for(j=0;j<ny;j++) {
-    jsto=jst=j-half;
-    jnd=j+half;
-    if(jst<0) jst=0;
-    if(jnd>ny-1) jnd=ny-1;
-    for(i=0;i<nx;i++) {
-      isto=ist=i-half;
-      ind=i+half;
-      if(ist<0) ist=0;
-      if(ind>nx-1) ind=nx-1;
-      for(jp=jst;jp<=jnd;jp++) 
-        for(ip=ist;ip<=ind;ip++) {
-          ioff=ip-isto;
-          joff=jp-jsto;
-          smooth[ip+jp*nx]+=image[i+j*nx]* 
-            kernel[ioff+joff*npix];
-        }
-    }
-  }
-  
-  FREEVEC(kernel);
-  
-	return(1);
-} /* end photfrac */
-
-#endif
+	FREEVEC(indx);
+	FREEVEC(isort);
+} /* end dresample */
 

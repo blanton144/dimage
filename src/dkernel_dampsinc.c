@@ -15,8 +15,16 @@
 #define PI 3.14159265358979
 #define INVSIG2 (0.1632)
 
+static float invsig2=INVSIG2;
+
 #define FREEVEC(a) {if((a)!=NULL) free((char *) (a)); (a)=NULL;}
 
+int dkernel_dampsinc_scale(float scale) {
+	invsig2=(1./(scale*scale));
+	return 0;
+} /* end dkernel_dampsinc_scale */
+
+/* return size of kernel to use */
 int dkernel_dampsinc_size() {
 	return(21);
 } /* end dkernel_dampsinc_size */
@@ -27,7 +35,7 @@ float dkernel_dampsinc(float dx)
 
 	if(dx<=-10.5 || dx>=10.5) return(0.);
 	if(fabs(dx)<1.e-6) return(1.);
-	val= sin(dx*PI)/(dx*PI)*exp(-0.5*dx*dx*INVSIG2);
+	val= sin(dx*PI)/(dx*PI)*exp(-0.5*dx*dx*invsig2);
 	return(val);
 	
 } /* end dkernel_dampsinc */

@@ -44,7 +44,7 @@ IDL_LONG idl_dshift (int      argc,
 		printf("Possible values:\n");
 		printf(" 0 - linear (not recommended)\n");
 		printf(" 1 - pure sinc (not recommended)\n");
-		printf(" 2 - damped sinc (* recommended work horse)\n");
+		printf(" 2 - damped sinc (recommended work horse)\n");
 		printf(" 3 - bicubic sinc (* recommended for speed)\n");
 		return 1;
 	}

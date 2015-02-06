@@ -44,6 +44,7 @@ OBJECTS = \
 	dmsmooth.o \
 	idl_dtemplates.o \
 	dtemplates.o \
+	dresample.o \
 	dnonneg.o \
 	dcholdc.o \
 	dcholsl.o \
@@ -77,11 +78,11 @@ OBJECTS = \
 	nmf.o \
 	dran3.o \
 	dshift.o \
-	hello.o \
 	dkernel_linear.o \
 	dkernel_puresinc.o \
 	dkernel_dampsinc.o \
 	dkernel_bicubic.o \
+	dkernel_lanczos.o \
 	idl_dshift.o \
 	idl_dpeaks.o
 
