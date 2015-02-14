@@ -62,16 +62,21 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
            ;; get image 
            cmd= ['mExec', $
                  '-l', $
+                 '-k', $
                  '-o', filename, $
-                 '-d', '2', $
+                 '-d', '4', $
                  '-f', hdrname, $
                  '2mass', mexecbands[iband], dirname]
            spawn, /nosh, cmd
            
            spawn, 'gzip -vf '+filename
-        endfor
+       endfor
         
-        montage_recal, prefix, bands=bands, vega2ab=vega2ab
+       montage_recal, prefix, bands=bands, vega2ab=vega2ab
+       for iband=0L, n_elements(bands)-1L do begin
+           dirname= prefix+'-'+bands[iband]+'-work'
+           file_delete, dirname, /recurs, /allow_nonexistent
+       endfor
      endif
         
      runjpg=0
@@ -96,15 +101,16 @@ pro atlas_2mass_images, st=st, nd=nd, sample=sample, clobber=clobber, $
         words= strsplit(outstr, /extr)
         if(words[1] eq 'FAILED:') then $
            try=0
-        if(try) then $
-           djs_rgb_make, prefix[0]+'-K.fits.gz', $
-                         prefix[0]+'-H.fits.gz', $
-                         prefix[0]+'-J.fits.gz', $
-                         name=filename, $
-                         scales=scales, $
-                         nonlinearity=nonlinearity, satvalue=satvalue, $
-                         quality=100.
-     endif
+        if(try) then begin
+            djs_rgb_make, prefix[0]+'-K.fits.gz', $
+              prefix[0]+'-H.fits.gz', $
+              prefix[0]+'-J.fits.gz', $
+              name=filename, $
+              scales=scales, $
+              nonlinearity=nonlinearity, satvalue=satvalue, $
+              quality=100.
+        endif
+    endif
   endfor
   
 end

@@ -34,7 +34,7 @@ pro atlas_detect_dirs, sdss=sdss, justjpg=justjpg, galex=galex, $
      subname='detect-sdss'
   endif else begin
      galex=1
-     twomass=0
+     twomass=1
      wise=0
      sdss=1
      jpg=1
