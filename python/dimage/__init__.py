@@ -3,7 +3,9 @@ import models
 
 # dimage tools
 from dsigma import * 
+from dshift import * 
 from dfake import * 
+from dresample import * 
 
 # Petrosian tools
 from petro import * 
