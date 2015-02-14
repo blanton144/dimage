@@ -5,14 +5,13 @@ import sys
 from PIL import Image
 import os
 import numpy as np
-import astropy.io.fits as pyfits
-import dimage
+import esutil.io as io
 import getopt
 
 def main(argv):
     # Set defaults
-    bpar=0.1
-    scale=1.
+    bpar=0.03
+    scale=60.
     
     # Parse header			
     helpstr='fits2tiff -i <input> -o <output> -b <b param> -s <scale>'
@@ -36,8 +35,8 @@ def main(argv):
             scale = np.float32(arg)
             
     # Read in image
-    fp= pyfits.open(infile, memmap=True)
-    ndimage= np.arcsinh(fp[0].data/bpar)*scale
+    image= io.read_fits(infile)
+    ndimage= np.arcsinh(image/bpar)*scale
     ndimage[np.where(ndimage > 255.) ]=255.
     ndimage[np.where(ndimage < 0.) ]=0.
     ndimage= np.int8(255-ndimage)
