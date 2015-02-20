@@ -10,8 +10,8 @@ import subprocess
 
 def main(argv):
     # Set defaults
-    xminsize= int(816)
-    yminsize= int(1110)
+    xminsize= int(1122)
+    yminsize= int(1797)
 
     # Parse header
     helpstr='cutout2card -h -i <input> -o <output>'
@@ -33,7 +33,8 @@ def main(argv):
 
     subprocess.call(["convert", "-resize", str(yminsize)+"x"+str(yminsize),
                      infile, "tmp.png"])
-    subprocess.call(["convert", "-crop", "816x1110+147+0", "tmp.png", 
+    subprocess.call(["convert", "-crop", 
+                     str(xminsize)+"x"+str(yminsize)+"+337+0", "tmp.png", 
                      outfile])
 
 if __name__ == "__main__": 

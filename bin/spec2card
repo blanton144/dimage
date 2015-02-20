@@ -10,8 +10,8 @@ import subprocess
 
 def main(argv):
     # Set defaults
-    xminsize= int(816)
-    yminsize= int(1110)
+    xminsize= int(1122)
+    yminsize= int(1797)
 
     # Parse header
     helpstr='spec2card -h -i <input> -o <output>'
@@ -33,16 +33,18 @@ def main(argv):
     ysize= int((((infile_identity.split())[2]).split('x'))[0])
     xsize= int((((infile_identity.split())[2]).split('x'))[1])
 
-    ynew= yminsize
-    xnew= int(float(xsize)*float(ynew)/float(ysize))
-    print xnew
-    print ynew
+    xnew= xminsize-90
+    ynew= int(float(ysize)*float(xnew)/float(xsize))
 
     subprocess.call(["convert", "-rotate", "-90", "-resize", 
                      str(xnew)+"x"+str(ynew), infile, "tmp.png"])
     subprocess.call(["convert", "-extent", 
-                     str(xminsize)+"x"+str(yminsize)+"+0+40", 
-                     "tmp.png", outfile])
+                     str(xminsize)+"x"+str(yminsize)+"-60+40", 
+                     "tmp.png", "tmp2.png"])
+    subprocess.call(["composite", 
+                     "card-overlay.001.png",
+                     "tmp2.png", 
+                     outfile])
 
 if __name__ == "__main__": 
     try:
