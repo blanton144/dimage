@@ -17,7 +17,7 @@ outdir=getenv('DIMAGE_DIR')+'/tex'
 
 if(n_tags(nsa) eq 0) then begin
     nsa= read_nsa()
-    petro= mrdfits(getenv('ATLAS_DATA')+'/test/petro/petro_v1_0_0_a1.fits',1)
+    petro= mrdfits(getenv('ATLAS_DATA')+'/test/petro/petro_v1_0_0_a3.fits',1)
 endif
 
 igd= where(nsa.sersicflux[1] gt 1.d-20 AND $
@@ -31,7 +31,7 @@ igd= where(nsa.sersicflux[1] gt 1.d-20 AND $
 mpr= 22.5-2.5*alog10(petro[igd].petroflux[4])
 lth50= alog10(petro[igd].petroth50_r)
 ltheta= alog10(petro[igd].petrotheta_r)
-lth50_ratio= alog(petro[igd].petroth50[2]/petro[igd].petroth50[4])
+nmrgrad= petro[igd].nmr50-petro[igd].nmr90
 nmi_petro= -2.5*alog10(petro[igd].petroflux[1]/petro[igd].petroflux[5])
 nmi_sersic= -2.5*alog10(nsa[igd].sersicflux[1]/nsa[igd].sersicflux[5])
 
@@ -61,9 +61,9 @@ hogg_scatterplot, ltheta, nmi_petro-nmi_sersic, /cond, $
   ytitle=textoidl('\Delta(N-i) (Petro-Sersic)'), $
   xcharsize=charsize, ycharsize=charsize, xnpix=50, ynpix=50
 djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
-hogg_scatterplot, lth50_ratio, nmi_petro-nmi_sersic, /cond, $
+hogg_scatterplot, nmrgrad, nmi_petro-nmi_sersic, /cond, $
   quantiles=quantiles, exp=0.25, xra=[-1.1, 1.1], yra=yra, $
-  xtitle=textoidl('ln r_{50,u} / r_{50,r}'), $
+  xtitle=textoidl('(N-r)_{50} - (N-r)_{90}'), $
   ytitle=textoidl('\Delta(N-i) (Petro-Sersic)'), $
   xcharsize=charsize, ycharsize=charsize, xnpix=50, ynpix=50
 djs_oplot, !X.CRANGE, [0., 0.], th=4, color='red', linestyle=1
