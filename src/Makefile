@@ -16,7 +16,7 @@ INC = ../../include
 CFLAGS  = $(SDSS_CFLAGS) -DCHECK_LEAKS -I$(INC)
 
 SO_EXT=so
-LD=libtool -dynamic -L/usr/lib -lc
+#LD=libtool -dynamic -L/usr/lib -lc
 
 BIN = $(DIMAGE_DIR)/bin
 LIB = $(DIMAGE_DIR)/lib
