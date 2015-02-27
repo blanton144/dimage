@@ -4,7 +4,6 @@ Calculate an approximate
 Michael R. Blanton, 2014-05-14
 """
 
-import fitsio
 import gc
 import numpy as np
 import dimage
