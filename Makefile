@@ -6,8 +6,6 @@ SHELL = /bin/sh
 .c.o :
 	$(CC) -c $(CCCHK) $(CFLAGS) $*.c
 #
-CFLAGS  = $(SDSS_CFLAGS) -DCHECK_LEAKS -I../include
-
 SUBDIRS = pro src lib ups data docs
 
 all :
