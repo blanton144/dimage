@@ -8,6 +8,7 @@ Michael R. Blanton, 2015-02-04
 import os
 import numpy as np
 import dimage
+import astropy
 
 def dwcsproject(image, weight, wcs, ra, dec, kernel='lanczos', dampsinc=2.47,
                 lanczos=2.):
@@ -40,7 +41,10 @@ def dwcsproject(image, weight, wcs, ra, dec, kernel='lanczos', dampsinc=2.47,
 
     # Find bounding box of image in RA/Dec and get indices
     # of ra/dec grid within that box
-    ft= wcs.calc_footprint()
+    try:
+        ft= wcs.calc_footprint()
+    except AttributeError:
+        ft= wcs.calcFootprint()
     xy= wcs.all_world2pix(ft,0)
     radec= wcs.all_pix2world(xy[:,0], xy[:,1],0)
     ramin=ft[:,0].min()
