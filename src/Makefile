@@ -13,7 +13,8 @@ SHELL = /bin/sh
 #	$(F77) -c $(CCCHK) $(CFLAGS) $(X_CFLAGS) $*.f
 #
 INC = ../../include
-CFLAGS  = $(SDSS_CFLAGS) -DCHECK_LEAKS -I$(INC)
+CFLAGS  = -arch x86_64 -O2 -fPIC -no-cpp-precomp -dynamic -fno-common -D_REENTRANT -DCHECK_LEAKS -I$(INC)
+X_LD_FLAGS = -arch x86_64 -bundle -flat_namespace -undefined suppress
 
 SO_EXT=so
 #LD=libtool -dynamic -L/usr/lib -lc
