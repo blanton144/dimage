@@ -77,12 +77,12 @@ void dresample(float *image,
 
 		/* loop over image */
 		samples[indx[k]]=0.;
-		for(j=yst;j<=ynd;j++) {
-			dy= ycurr- (float) j;
-			ykernel= (*kernel)(dy);
-			for(i=xst;i<=xnd;i++) {
-				dx= xcurr- (float) i;
-				xkernel= (*kernel)(dx);
+		for(i=xst;i<=xnd;i++) {
+			dx= xcurr- (float) i;
+			xkernel= (*kernel)(dx);
+			for(j=yst;j<=ynd;j++) {
+				dy= ycurr- (float) j;
+				ykernel= (*kernel)(dy);
 				samples[indx[k]]+= image[j+ny*i]*xkernel*ykernel;
 			} /* end for j */
 		} /* end for i */
