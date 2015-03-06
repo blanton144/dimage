@@ -13,7 +13,7 @@ SHELL = /bin/sh
 #	$(F77) -c $(CCCHK) $(CFLAGS) $(X_CFLAGS) $*.f
 #
 INC = ../../include
-CFLAGS  = -O2 -fPIC -dynamic -fno-common -D_REENTRANT -DCHECK_LEAKS -I$(INC)
+CFLAGS  = -O2 -fPIC -fno-common -D_REENTRANT -DCHECK_LEAKS -I$(INC)
 X_LD_FLAGS = -shared
 
 UNAME = $(shell uname)
