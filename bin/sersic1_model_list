@@ -45,7 +45,7 @@ def main(argv):
         sys.exit()
 
     # Read in Simard file
-    # This is env var for the location of the (dropbox) Simard files
+    # This (COMP_DIR) is env var for the location of the (dropbox) Simard files
     simfile= os.path.join(os.getenv('COMP_DIR'), 'simard-sdss-pn.fits')
     fp= pyfits.open(simfile)
     data= fp[1].data
