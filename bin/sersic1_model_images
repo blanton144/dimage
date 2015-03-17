@@ -13,18 +13,21 @@ import numpy as np
 import astropy.io.fits as pyfits
 import dimage
 from dimage.models import sersic1
+from dimage.models import create_image as ci
+from dimage import dfake
 import random
 
 def main(argv):
     # Defaults
     take=None
     modelname=None
+    image_create=False
 
     # Parse header
     helpstr='sersic1d_model_list [-s seed] [-n number]'
     try:
-        opts, args = getopt.getopt(argv,"ht:m:",
-                                   ["help=","take=","modelname="])
+        opts, args = getopt.getopt(argv,"iht:m:",
+                                   ["image_create=", "help=","take=","modelname="])
     except getopt.GetoptError:
         print helpstr
         sys.exit(2)
@@ -32,6 +35,8 @@ def main(argv):
         if opt == ("-h", "--help"):
             print helpstr;
             sys.exit()
+        elif opt == ("-i"):
+            image_create=True
         elif opt in ("-t", "--take"):
             take = arg
         elif opt in ("-m", "--modelname"):
@@ -41,43 +46,39 @@ def main(argv):
         print "Must specify take with -t or --take"
         sys.exit()
 
-    if(take is None):
+    if(modelname is None):
         print "Must specify model name with -m or --modelname"
         sys.exit()
 
     # Read in model list
-    sersic1.readlist(take, modelname, rflux, r50, n, phi, ba)
-    listfile= os.path.join(os.getenv('DIMAGE_DIR'), 'data', 
-                           'cats', 'simard-sdss-pn.fits')
-    fp= pyfits.open(simfile)
-    data= fp[1].data
+    data = sersic1.readpar(take, modelname)
+
+    # Should this path generation go somewhere else as a function?
+    dest = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', 'simard-sersic1')
     
-    # Select a subset of good galaxies, put parameters into arcsec
-    indx= (np.where((data['Scale'] > 0)*(data['rg2d'] < 17.5)*
-                    (data['Rhlr'] > 0)))[0]
-    r50= data['Rhlr'][indx]/data['Scale'][indx]
-    rflux= 10.**(0.4*(22.5-data['rg2d'][indx]))
-    n= data['ng'][indx]
-    ba= 1.-data['e'][indx]
-    phi= data['phi'][indx]
-    
-    # Avoid stars in this sample
-    indx= (np.where(r50 > 1.))[0]
+    # Parse data and generate FITS image for each element
+    for i in range(20):
+        h = data[i][1]
+        w = data[i][2]
+        xcen_i = data[i][3]
+        ycen_i = data[i][4]
+        #flux = data[i][5]
+        r50_i = data[i][6]
+        n_i = data[i][7]
+        phi_i = data[i][8]
+        ba_i = data[i][9]
+        if n_i > 7.13:
+            continue
+            # Do nothing; go on to the next one
+        else:
+            image_i = dfake(h, w, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
+            hdu = pyfits.PrimaryHDU(image_i)
+            imdest = os.path.join(dest, ('fake-' + str(i) + '.fits'))
+            # clobber requires environment variable CLOBBER=1
+            hdu.writeto(imdest, clobber=os.getenv('CLOBBER'))
+            if image_create == True:
+                ci.create_image(imdest, take, modelname, i)
 
-    # Now pick subset 
-    random.shuffle(indx)
-    indx= indx[0:number]
-
-    # Select values of subset
-    r50= r50[indx]
-    rflux= rflux[indx]
-    n= n[indx]
-    ba= ba[indx]
-    phi= phi[indx]
-
-    # Write out file
-    modelname= 'simard-sersic1'
-    sersic1.writelist(take, modelname, rflux, r50, n, phi, ba)
 
 if __name__ == "__main__": 
     try:
