@@ -13,7 +13,14 @@ SHELL = /bin/sh
 #	$(F77) -c $(CCCHK) $(CFLAGS) $(X_CFLAGS) $*.f
 #
 INC = ../../include
-CFLAGS  = $(SDSS_CFLAGS) -DCHECK_LEAKS -I$(INC)
+CFLAGS  = -O2 -fPIC -fno-common -D_REENTRANT -DCHECK_LEAKS -I$(INC)
+X_LD_FLAGS = -shared
+
+UNAME = $(shell uname)
+ifeq ($(UNAME), Darwin)
+	CFLAGS = -arch x86_64 -O2 -fPIC -dynamic -fno-common -D_REENTRANT -DCHECK_LEAKS -I$(INC)
+	X_LD_FLAGS = -arch x86_64 -bundle -flat_namespace -undefined suppress
+endif
 
 SO_EXT=so
 #LD=libtool -dynamic -L/usr/lib -lc

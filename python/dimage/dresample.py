@@ -62,10 +62,10 @@ def dresample(image, x, y, kernel='dampsinc', dampsinc=2.47,
     else:
         print "No kernel: "+kernel
 
-    nx=image.shape[0]
-    ny=image.shape[1]
+    (nx, ny)=image.shape
     nn=len(x)
 
+    # Recast for ctypes
     samples= np.zeros(nn, dtype=np.float32)
     samples_ptr=samples.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
     if(x.dtype != np.float32):
@@ -79,6 +79,7 @@ def dresample(image, x, y, kernel='dampsinc', dampsinc=2.47,
     else:
         y_ptr=image.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
 
+    # Call C code for resampling
     dimage_lib.dresample(image_ptr, nx, ny, x_ptr, y_ptr, nn, 
                          samples_ptr, dkernel, 
                          ctypes.c_int(dkernel_size))
