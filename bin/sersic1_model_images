@@ -13,18 +13,21 @@ import numpy as np
 import astropy.io.fits as pyfits
 import dimage
 from dimage.models import sersic1
+from dimage.models import create_image as ci
+from dimage import dfake
 import random
 
 def main(argv):
     # Defaults
     take=None
     modelname=None
+    image_create=False
 
     # Parse header
     helpstr='sersic1d_model_list [-s seed] [-n number]'
     try:
-        opts, args = getopt.getopt(argv,"ht:m:",
-                                   ["help=","take=","modelname="])
+        opts, args = getopt.getopt(argv,"iht:m:",
+                                   ["image_create=", "help=","take=","modelname="])
     except getopt.GetoptError:
         print helpstr
         sys.exit(2)
@@ -32,6 +35,8 @@ def main(argv):
         if opt == ("-h", "--help"):
             print helpstr;
             sys.exit()
+        elif opt == ("-i"):
+            image_create=True
         elif opt in ("-t", "--take"):
             take = arg
         elif opt in ("-m", "--modelname"):
@@ -46,9 +51,34 @@ def main(argv):
         sys.exit()
 
     # Read in model list
-    data = sersic1.readlist(take, modelname)
+    data = sersic1.readpar(take, modelname)
+
+    # Should this path generation go somewhere else as a function?
+    dest = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', 'simard-sersic1')
     
-    
+    # Parse data and generate FITS image for each element
+    for i in range(20):
+        h = data[i][1]
+        w = data[i][2]
+        xcen_i = data[i][3]
+        ycen_i = data[i][4]
+        #flux = data[i][5]
+        r50_i = data[i][6]
+        n_i = data[i][7]
+        phi_i = data[i][8]
+        ba_i = data[i][9]
+        if n_i > 7.13:
+            continue
+            # Do nothing; go on to the next one
+        else:
+            image_i = dfake(h, w, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
+            hdu = pyfits.PrimaryHDU(image_i)
+            imdest = os.path.join(dest, ('fake-' + str(i) + '.fits'))
+            # clobber requires environment variable CLOBBER=1
+            hdu.writeto(imdest, clobber=os.getenv('CLOBBER'))
+            if image_create == True:
+                ci.create_image(imdest, take, modelname, i)
+
 
 if __name__ == "__main__": 
     try:
