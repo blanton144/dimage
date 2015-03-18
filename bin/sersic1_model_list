@@ -61,17 +61,30 @@ def main(argv):
     
     # Avoid stars in this sample
     indx= (np.where(r50 > 1.))[0]
-
+    
     # Now pick subset 
     random.shuffle(indx)
     indx= indx[0:number]
-
+    
     # Select values of subset
     r50= r50[indx]
     rflux= rflux[indx]
     n= n[indx]
     ba= ba[indx]
     phi= phi[indx]
+
+    # remove n > 7.13 (n>7.13 causes error in dfake)
+    i = 0
+    while i < len(n):
+        if(n[i] > 7.13):
+            n = np.delete(n, i)
+            # remove index value from other lists
+            r50 = np.delete(r50, i)
+            rflux = np.delete(rflux, i)
+            ba = np.delete(ba, i)
+            phi = np.delete(phi, i)
+            i -= 1
+        i += 1
 
     # Write out file
     modelname= 'simard-sersic1'

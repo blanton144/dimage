@@ -58,26 +58,24 @@ def main(argv):
     
     # Parse data and generate FITS image for each element
     for i in range(20):
-        h = data[i][1]
-        w = data[i][2]
-        xcen_i = data[i][3]
-        ycen_i = data[i][4]
-        #flux = data[i][5]
-        r50_i = data[i][6]
-        n_i = data[i][7]
-        phi_i = data[i][8]
-        ba_i = data[i][9]
-        if n_i > 7.13:
-            continue
-            # Do nothing; go on to the next one
-        else:
-            image_i = dfake(h, w, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
-            hdu = pyfits.PrimaryHDU(image_i)
-            imdest = os.path.join(dest, ('fake-' + str(i) + '.fits'))
-            # clobber requires environment variable CLOBBER=1
-            hdu.writeto(imdest, clobber=os.getenv('CLOBBER'))
-            if image_create == True:
-                ci.create_image(imdest, take, modelname, i)
+        print(len(data))
+        nx_i = data['nx'][i]
+        ny_i = data['ny'][i]
+        xcen_i = data['xcen'][i]
+        ycen_i = data['ycen'][i]
+        #flux = data['flux'][i]
+        r50_i = data['r50'][i]
+        n_i = data['n'][i]
+        phi_i = data['phi'][i]
+        ba_i = data['ba'][i]
+        
+        image_i = dfake(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
+        hdu = pyfits.PrimaryHDU(image_i)
+        imdest = os.path.join(dest, ('fake-' + str(i) + '.fits'))
+        # clobber requires environment variable CLOBBER=1
+        hdu.writeto(imdest, clobber=os.getenv('CLOBBER'))
+        if image_create == True:
+            ci.create_image(imdest, take, modelname, i)
 
 
 if __name__ == "__main__": 
