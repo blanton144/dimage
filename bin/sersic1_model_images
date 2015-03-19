@@ -58,7 +58,6 @@ def main(argv):
     
     # Parse data and generate FITS image for each element
     for i in range(20):
-        print(len(data))
         nx_i = data['nx'][i]
         ny_i = data['ny'][i]
         xcen_i = data['xcen'][i]

@@ -39,7 +39,7 @@ def create_image(imfile, take, modelname, i):
 
     base = 0
     # asinh stretch if $IMAGE_STRETCH isn't 0
-    if(os.getenv('IMAGE_STRETCH') == None, 0):
+    if(os.getenv('IMAGE_STRETCH') == None or os.getenv('IMAGE_STRETCH') == ''):
         stretch_data = im_data
     else:
         base = float(os.getenv('IMAGE_STRETCH'))
