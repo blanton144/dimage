@@ -3,6 +3,7 @@ Sersic 1D model utilities
 """
 
 import os
+import sys
 import numpy as np
 import astropy.io.fits as pyfits
 import random
@@ -77,11 +78,22 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     the two files:
        model-list-[modelname].fits
        model-params-[modelname].fits
+    Creates the directory if not already present (not including $FAKEPHOTOMETRY)
     """
+    
+    if(os.getenv('FAKEPHOTOMETRY') == None):
+        print('Must set $FAKEPHOTOMETRY to a valid directory')
+        sys.exit(1)
+    if os.path.exists(os.path.join(
+            os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname)) == False:
+        os.makedirs(os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models'))
+        f = open(os.path.join(
+            os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname))
+        f.close()
 
     outfile= listpath(take, modelname)
     parfile= parpath(take, modelname)
-
+    
     # Set index number
     indx= np.arange(len(rflux), dtype=np.int32) 
     
@@ -94,9 +106,9 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     xcen= np.zeros(len(rflux), dtype=np.float32)
     ycen= np.zeros(len(rflux), dtype=np.float32)
     for i in range(len(rflux)):
-        xcen[i]= np.float32(size[i]/2)-0.5+random.uniform(0., 1.)
-        ycen[i]= np.float32(size[i]/2)-0.5+random.uniform(0., 1.)
-
+       	xcen[i]= np.float32(size[i]/2)-0.5+random.uniform(0., 1.)
+       	ycen[i]= np.float32(size[i]/2)-0.5+random.uniform(0., 1.)
+        
     # put into recarray
     data= listrec(indx, rflux, size, size, xcen, ycen)
 
@@ -104,18 +116,18 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     hdu1= pyfits.BinTableHDU(data=data, name='Model list')
     hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
     hdus.writeto(outfile, clobber=True)
-
+    
     dtype=[('indx', np.int32), 
-           ('nx', np.int32), 
-           ('ny', np.int32), 
-           ('xcen', np.float32), 
-           ('ycen', np.float32), 
-           ('flux', np.float32), 
-           ('r50', np.float32), 
-           ('n', np.float32), 
-           ('phi', np.float32), 
-           ('ba', np.float32), 
-           ]
+       			 ('nx', np.int32), 
+       			 ('ny', np.int32), 
+       			 ('xcen', np.float32), 
+       			 ('ycen', np.float32), 
+       			 ('flux', np.float32), 
+       			 ('r50', np.float32), 
+       			 ('n', np.float32), 
+       			 ('phi', np.float32), 
+       			 ('ba', np.float32), 
+       			 ]
     data= np.empty(len(indx), dtype=dtype)
     data['indx']=indx
     data['nx']=size
@@ -127,11 +139,9 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     data['n']=n
     data['phi']=phi
     data['ba']=ba
-
+    
     hdu0= pyfits.PrimaryHDU()
     hdu1= pyfits.BinTableHDU(data=data, name='Model parameters list')
     hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
     hdus.writeto(parfile, clobber=True)
-    
-
     
