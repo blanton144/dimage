@@ -21,7 +21,7 @@ locally that is in $ATLAS_DATA:
 
 nsa= atlas()
 nsa.version= 'v1_0_0'
-mosaic= nsa.mosaic(iauname, band='g') 
+mosaic= pyfits.open(nsa.file('mosaic', iauname='J095641.38+005057.1', band='g'))
 
 To access the same mosaic remotely:
 
@@ -29,10 +29,16 @@ from dimage.atlas import atlas
 nsa= atlas()
 nsa.version= 'v1_0_0'
 nsa.http()
-mosaic= pyfits.open(nsa.mosaic('J095641.38+005057.1', band='g'))
+mosaic= pyfits.open(nsa.file('mosaic', iauname='J095641.38+005057.1', band='g'))
+mosaic= pyfits.open(nsa.file('mosaic', nsaid=15555, band='i'))
+mosaic= pyfits.open(nsa.file('mosaic', ra=15., dec=24., band='i'))
 
-The above uses the default http settings. You can instead include them
-as parameters, as shown below:
+The other sorts of files accessible are:
+
+nsa.file('atlas') - original atlas.fits file defining major version
+
+The example above uses the default http settings. You can instead
+include them as parameters, as shown below:
 
 nsa.http(baseurl=baseurl, username=username, password=password)
 
@@ -58,7 +64,7 @@ between local and remote. "access" may be useful in other contexts
 Depends on urllib2, os, and astropy v1.0 or later. Specifically it
 uses astropy.utils.data.download_file to handle remote access.
 
-To use caching, you may need to run (once):
+To have astropy.utils.data use caching, you may need to run (once):
 
 import astropy.config
 astropy.config.get_cache_dir
@@ -66,6 +72,13 @@ astropy.config.get_cache_dir
 which should create '~/.astropy/cache'
 
 """
+
+# Define paths of various files
+atlas_paths= dict([('atlas', 
+                    '[vN]/catalogs/atlas.fits'),
+                   ('mosaic', 
+                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-[band].fits.gz'),
+                   ])
 
 class access(object):
     """
@@ -254,7 +267,7 @@ def version_to_detectdir(version):
     vNM= "_".join((version.split('_'))[0:2])
     return vNM
     
-def radec_to_iauname(ra, dec):
+def radec_to_iauname(ra, dec, **kwargs):
     """
     Function to convert RA, Dec to an IAU-style name (JHHMMSS.SS[+-]DDMMSS.S)
 
@@ -276,7 +289,7 @@ def radec_to_iauname(ra, dec):
                                 pad=True, alwayssign=True)
     return 'J'+rastr+decstr
 
-def iauname_to_subdir(iauname):
+def iauname_to_subdir(iauname, **kwargs):
     """
     Function to convert IAUNAME to a subdirectory in NSA
 
@@ -321,20 +334,9 @@ class atlas(access):
     open() - Open a file for reading from remote or local
     copy() - Copy a file from http or local
 
-    mosaic() - Open or copy a mosaic file
-    mosaic_file() - Return file name of a mosaic file
-    mosaic_path() - Return path to a mosaic file
-    
-    atlas() - Open or copy atlas.fits file from NSA
-    atlas_file() - File name (full path) of atlas.fits
-
-    To use caching, you may need to run (once):
-    
-    import astropy.config
-    astropy.config.get_cache_dir
-    
-    which should create '~/.astropy/cache'
-    
+    filedir() - Return directory of a file
+    filename() - Return name of a file
+    file() - Return a file
     """
 
     _type='local'
@@ -370,26 +372,32 @@ class atlas(access):
         """
         Initializes translation table from NSAID to IAUNAME
         """
-        atlas=fits.open(self.atlas())
+        atlas=fits.open(self.file('atlas'))
         iauname=atlas[1].data['IAUNAME']
         nsaid=range(len(iauname))
         self.nsaid_to_iauname_dict= dict(zip(nsaid, iauname))
         self.iauname_to_nsaid_dict= dict(zip(iauname, nsaid))
         atlas.close()
 
-    def nsaid_to_iauname(self, nsaid):
+    def nsaid_to_iauname(self, nsaid, **kwargs):
         """
         Returns IAUNAME given NSAID
 
         Parameters:
         ==========
-        
+        nsaid : int, NSAID to infer IAUNAME from
+
+        Notes:
+        =====
+        Uses translation table set up by nsaid_init(),
+        which involves reading the original atlas.fits file.
+        Large overhead on first call.
         """
         if self.nsaid_to_iauname_dict is None:
             self.nsaid_init()
         return self.nsaid_to_iauname_dict[nsaid]
 
-    def iauname_to_nsaid(self, iauname):
+    def iauname_to_nsaid(self, iauname, **kwargs):
         """
         Returns IAUNAME given NSAID
         """
@@ -397,147 +405,72 @@ class atlas(access):
             self.nsaid_init()
         return self.iauname_to_nsaid_dict[iauname]
 
-    def id_to_iauname(self, id, id_type='IAUNAME'):
+    def filename(self, filetype, **kwargs):
         """
-        Function to convert id to an IAUNAME
-        
-        Parameters:
-        ==========
-        id : Identifier (IAUNAME or (RA,DEC) tuple)
-        id_type : Type of identifier for id_to_iauname() (default 'IAUNAME')
-        
-        Returns:
-        =======
-        IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
-        
-        Notes:
-        ======
-        Accepts types 'IAUNAME', 'NSAID', and 'RADEC'.
+        Method to return full name a given type of file
+        Takes same parameters as atlas.file()
         """
-        if(id_type == 'IAUNAME'):
-            return id
-        if(id_type == 'RADEC'):
-            return radec_to_iauname(id[0], id[1])
-        if(id_type == 'NSAID'):
-            return self.nsaid_to_iauname(id)
-        
-    def atlas_file(self):
-        """
-        Method to return path to atlas.fits
 
-        Returns:
-        =======
-        filename : path to directory with atlas.fits file defining 
-                   major version vN/catalogs/atlas.fits
-        """
-        return os.path.join(version_to_topdir(self.version), 
-                            'catalogs', 'atlas.fits')
+        template= atlas_paths[filetype]
 
-    def atlas(self, outfile=None):
-        """
-        Method to return atlas.fits
-
-        Parameters:
-        ==========
-        outfile : Output file if a copy desired (default None)
-
-        Returns:
-        =======
-        atlas : file object with atlas.fits in it
-
-        Notes:
-        =====
-        Depends on version attribute (should be of form vN_M_P)
-        If outfile specified, file copied to outfile, None returned
-        """
-        atlasfile= self.atlas_file()
-        if(outfile is None):
-            return self.open(atlasfile)
-        else:
-            return self.copy(atlasfile)
-
-    def mosaic_path(self, id, mosaic_type='detect', **kwargs):
-        """
-        Method to return path to directory with mosaic
-
-        Parameters:
-        ==========
-        
-        id : Identifier (IAUNAME or (RA,DEC) tuple)
-        mosaic_type : Subdirectory of mosaics (default 'detect')
-        id_type : Type of identifier for id_to_iauname() (default 'IAUNAME')
-
-        Returns:
-        =======
-        path : path to directory with mosaic:
-                 vN/[mosaic_type]/vN_M/[RA]/[DEC]/[IAUNAME]
-         where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]
-
-        Notes:
-        =====
-        Depends on version attribute (should be of form vN_M_P)
-        Accepts id_type values of 'IAUNAME', 'RADEC' and 'NSAID'
-        """
+        # Determine and replace basic directories
         topdir= version_to_topdir(self.version)
+        template=template.replace('[vN]', topdir)
         detectdir= version_to_detectdir(self.version)
-        iauname= self.id_to_iauname(id, **kwargs)
-        subdir= iauname_to_subdir(iauname)
-        return os.path.join(topdir, mosaic_type, detectdir, subdir)
-    
-    def mosaic_file(self, id, band='r', **kwargs):
+        template=template.replace('[vN_M]', detectdir)
+        
+        # Deal with identifiers
+        iauname= None
+        if kwargs.has_key('iauname'): # Set IAUNAME if given
+            iauname=kwargs['iauname']
+        else: # Use NSAID/RADEC to deduce IAUNAME if need be
+            if kwargs.has_key('ra') and kwargs.has_key('dec'):
+                iauname= radec_to_iauname(**kwargs)
+            if kwargs.has_key('nsaid'):
+                iauname= self.nsaid_to_iauname(**kwargs)
+        if iauname is not None:
+            subdir= iauname_to_subdir(iauname)
+            template=template.replace('[iauname]', iauname)
+            template=template.replace('[subdir]', subdir)
+
+        # Now replace 
+        exclude_list=[]
+        for key, value in kwargs.iteritems():
+            if exclude_list.count(key) == 0:
+                template=template.replace('['+key+']', str(value))
+        
+        return template
+
+    def filedir(self, filetype, **kwargs):
         """
-        Method to return path to directory with mosaic
+        Method to return directory of a given type of file
+        Takes same parameters as atlas.file()
+        """
+        filename=self.filename(filetype, **kwargs)
+        return "/".join(filename.split('/')[0:-1])
+
+    def file(self, filetype, outfile=None, **kwargs):
+        """
+        Method to open or copy a specific file
 
         Parameters:
-        ==========
-        
-        id : Identifier (IAUNAME or (RA,DEC) tuple)
-        band : Band name (default 'r')
-        mosaic_type : Subdirectory of mosaics (default 'detect')
-        id_type : Type of identifier for id_to_iauname() (default 'IAUNAME')
-
-        Returns:
         =======
-        file : filename with mosaic:
-          vN/[mosaic_type]/vN_M/[RA]/[DEC]/[IAUNAME]/[IAUNAME]-[BAND].fits.gz
-         where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]
-
-        Notes:
-        =====
-        Depends on version attribute (should be of form vN_M_P)
-        Accepts id_type values of 'IAUNAME', 'RADEC' and 'NSAID'
-        """
-        mosaic_dir= self.mosaic_path(id, **kwargs)
-        iauname= self.id_to_iauname(id, **kwargs)
-        mosaic_file= iauname+'-'+band+'.fits.gz'
-        mosaic_full= os.path.join(mosaic_dir, mosaic_file)
-        return mosaic_full
-
-    def mosaic(self, id, outfile=None, **kwargs):
-        """
-        Method to return path to directory with mosaic
-
-        Parameters:
-        ==========
-        
-        id : Identifier (IAUNAME or (RA,DEC) tuple)
-        band : Band name (default 'r')
-        mosaic_type : Subdirectory of mosaics (default 'detect')
-        id_type : Type of identifier for id_to_iauname() (default 'IAUNAME')
+        filetype : type of file to return 
+        keyword arguments for replacement:
+           nsaid, or iauname, or ra and dec
+           band 
         outfile : Output file if a copy desired (default None)
 
-        Returns:
-        =======
-        file : file object with mosaic
-
         Notes:
         =====
         Depends on version attribute (should be of form vN_M_P)
-        If outfile specified, file copied to outfile, None returned
-        Accepts id_type values of 'IAUNAME', 'RADEC' and 'NSAID'
+        Accepted file types:
+           'atlas'
+           'mosaic' (specify identifier and band)
         """
-        mosaic_full= self.mosaic_file(id, **kwargs)
+
+        filename= self.filename(filetype, **kwargs)
         if(outfile is None):
-            return self.open(mosaic_full)
+            return self.open(filename)
         else:
-            return self.copy(mosaic_full)
+            return self.copy(filename)
