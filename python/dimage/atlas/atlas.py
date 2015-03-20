@@ -77,7 +77,9 @@ which should create '~/.astropy/cache'
 atlas_paths= dict([('atlas', 
                     '[vN]/catalogs/atlas.fits'),
                    ('mosaic', 
-                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-[band].fits.gz'),
+                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-[band].fits'),
+                   ('original', 
+                    '[vN]/detect/[survey]/[subdir]/[iauname]-[band].fits'),
                    ])
 
 class access(object):
@@ -182,14 +184,13 @@ class access(object):
         """
         Internal method to open file with http
         """
-        url= self.baseurl+'/'+filename
-        return data.download_file(url, cache=self.cache)
+        return data.download_file(filename, cache=self.cache)
 
     def _open_local(self, filename):
         """
         Internal method to open file locally
         """
-        return file(os.path.join(self.localdir,filename), 'rb')
+        return file(filename, 'rb')
 
     def open(self, filename):
         """
@@ -412,6 +413,10 @@ class atlas(access):
         """
 
         template= atlas_paths[filetype]
+        if(self._type  == 'local'):
+            template=os.path.join(self.localdir, template)
+        else:
+            template=os.path.join(self.baseurl, template)
 
         # Determine and replace basic directories
         topdir= version_to_topdir(self.version)
