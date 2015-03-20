@@ -26,8 +26,8 @@ def subdir(ra, dec, subname=None, version=None, rootdir=None):
         rootdir= dimage.atlas.rootdir(version)
     if subname is None:
         subname= version.split('_')[0]+'_'+version.split('_')[1]
-    ihr= str(int(ra/15.))
-    idec= str(int(abs(dec)/2.)*2)
+    ihr= "%02d" % int(ra/15.)
+    idec= "%02d" % (int(abs(dec)/2.)*2)
     if dec<0.:
         dsign='m'
     else:
