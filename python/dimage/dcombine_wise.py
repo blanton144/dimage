@@ -27,8 +27,9 @@ def dcombine_wise(ra, dec, size, band,
 
     Returns
     -------
-    (image, wcs) : 
+    (image, ivar, wcs) : 
        [nx, ny] image
+       [nx, ny] image inverse variance
        WCS object
 
     """
@@ -45,20 +46,25 @@ def dcombine_wise(ra, dec, size, band,
     (indx, sep2d, sep3d)= coordinates.match_coordinates_sky(center_c, tile_c)
 
     # Construct file names in list
-    tile_files=[]
+    image_files=[]
+    ivar_files=[]
     indx= indx.reshape(indx.size)
     for i in indx:
         tile=alltiles['COADD_ID'][i]
         topdir=tile[0:3]
         botdir=tile
+        tiledir= os.path.join(os.getenv('UNWISE_DATA'), topdir, botdir)
         tmp_file= 'unwise-'+tile+'-'+band+'-'+'img-m.fits'
-        tmp_file=os.path.join(os.getenv('UNWISE_DATA'),
-                              topdir, botdir, tmp_file)
-        tile_files.append(tmp_file)
+        tmp_file=os.path.join(tiledir, tmp_file)
+        image_files.append(tmp_file)
+        tmp_file= 'unwise-'+tile+'-'+band+'-'+'invvar-m.fits.gz'
+        tmp_file=os.path.join(tiledir, tmp_file)
+        ivar_files.append(tmp_file)
 
     # Make combination
     pixscale=2.75
-    (image, wcs)= dimage.dcombine(ra, dec, size, pixscale, tile_files, kernel=kernel,
-                           dampsinc=dampsinc, edge=edge)
+    (image, ivar, wcs)= dimage.dcombine(ra, dec, size, pixscale, image_files,
+                                        ivar_files=ivar_files,kernel=kernel,
+                                        dampsinc=dampsinc, edge=edge)
 
-    return (image, wcs)
+    return (image, ivar, wcs)

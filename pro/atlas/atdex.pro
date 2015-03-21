@@ -9,7 +9,7 @@
 ;   3-Aug-2007  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atdex, indx, name=name, version=version, twomass=twomass
+pro atdex, indx, name=name, version=version, twomass=twomass, wise=wise
 
 common com_atdex, atlas
 
@@ -33,7 +33,8 @@ while (i lt nat) do begin
         atcd, tmp_indx, name=name[i], version=version
     endelse
     
-    dexplore, /cen, twomass=twomass, next=next, previous=previous, finish=finish, $
+    dexplore, /cen, twomass=twomass, wise=wise, $
+      next=next, previous=previous, finish=finish, $
       ra=atlas[tmp_indx].ra, dec=atlas[tmp_indx].dec
     delvarx, tmp_indx
     if(keyword_set(finish)) then return

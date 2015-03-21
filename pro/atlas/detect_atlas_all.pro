@@ -74,7 +74,7 @@ for i=st, nd do begin
         imfiles=[imfiles, prefix+'-'+['J', 'H', 'K']+'.fits.gz']
     endif 
     if (keyword_set(wise) gt 0) then begin
-        imfiles=[imfiles, prefix+'-'+['3.4', '4.6', '12', '22']+'.fits.gz']
+        imfiles=[imfiles, prefix+'-'+['w1', 'w2', 'w3', 'w4']+'.fits.gz']
     endif 
     allthere=1
     for j=0L, n_elements(imfiles)-1L do $
@@ -83,11 +83,13 @@ for i=st, nd do begin
     
     if(allthere gt 0) then begin
         if(NOT keyword_set(nodetect)) then begin
-            detect_atlas, galex=galex, twomass=twomass, noclobber=noclobber
+            detect_atlas, galex=galex, twomass=twomass, wise=wise, $
+              noclobber=noclobber
         endif
         dmeasure_atlas, noclobber=noclobber
         if(NOT keyword_set(nojpeg)) then $
-           atlas_jpeg, noclobber=noclobber, galex=galex, twomass=twomass
+          atlas_jpeg, noclobber=noclobber, galex=galex, twomass=twomass, $
+          wise=wise
         spawn, /nosh, ['find', '.', '-name', '*.fits', '-exec', 'gzip', '-vf', '{}', ';']
         
         if(NOT keyword_set(notrim)) then $

@@ -9,7 +9,8 @@
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_jpeg, noclobber=noclobber, twomass=twomass, galex=galex
+pro atlas_jpeg, noclobber=noclobber, twomass=twomass, galex=galex, $
+                wise=wise
 
 subdir='atlases'
 if(NOT keyword_set(nonlinearity)) then nonlinearity=3.
