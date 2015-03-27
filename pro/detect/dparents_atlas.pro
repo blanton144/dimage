@@ -33,7 +33,7 @@
 ;   11-Jan-2006  Written by Blanton, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro dparents_atlas, twomass=twomass, galex=galex, noclobber=noclobber
+pro dparents_atlas, twomass=twomass, galex=galex, wise=wise, noclobber=noclobber
   
 if(NOT keyword_set(seed0)) then seed0=11L ;; random seed
 if(NOT keyword_set(ref)) then ref=2L ;; use r-band as reference
@@ -59,6 +59,12 @@ if (keyword_set(twomass) gt 0) then begin
     imfiles=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd', 'J', 'H', 'K']+'.fits.gz'
     puse=long([1,1,1,1,1,0,0,0,0,0])
     dopsf=long([1,1,1,1,1,0,0,1,1,1])
+    ref=2L
+endif 
+if (keyword_set(wise) gt 0) then begin
+    imfiles=base+'-'+['u', 'g', 'r', 'i', 'z', 'nd', 'fd', 'J', 'H', 'K', 'w1', 'w2', 'w3', 'w4']+'.fits.gz'
+    puse=long([1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+    dopsf=long([1,1,1,1,1,0,0,1,1,1,0,0,0,0])
     ref=2L
 endif 
 

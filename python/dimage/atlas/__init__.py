@@ -2,4 +2,4 @@
 NSA tools
 """
 
-from dirs import *
+from atlas import *

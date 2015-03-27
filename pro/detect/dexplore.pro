@@ -14,7 +14,7 @@
 pro dexplore, base, lsb=lsb, twomass=twomass, eyeball_name=eyeball_name, $
               hidestars=hidestars, cen=cen, nogalex=nogalex, $
               ra=ra, dec=dec, next=next, previous=previous, finish=finish, $
-              _EXTRA=_extra_for_detect
+              wise=wise, _EXTRA=_extra_for_detect
 
 if(NOT keyword_set(base)) then begin
     spawn, 'pwd', cwd
@@ -37,8 +37,10 @@ if(keyword_set(nogalex)) then $
   images=base+'-'+['u', 'g', 'r', 'i', 'z']+'.fits.gz' 
 if(keyword_set(twomass)) then $
   images=[images, base+'-'+['J', 'H', 'K']+'.fits.gz' ]
+if(keyword_set(wise)) then $
+  images=[images, base+'-'+['w1', 'w2', 'w3', 'w4']+'.fits.gz' ]
 
-dexplore_widget, base, images, lsb=lsb, twomass=twomass, $
+dexplore_widget, base, images, lsb=lsb, twomass=twomass, wise=wise, $
   eyeball_name=eyeball_name, hidestars=hidestars, parent=icen, $
   nogalex=nogalex, cen=cen, ra=ra, dec=dec, next=next, $
   previous=previous, finish=finish, _EXTRA=_extra_for_detect

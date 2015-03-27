@@ -600,7 +600,8 @@ end
   
 ;; main
 pro dexplore_widget, in_basename, in_imagenames, lsb= in_lsb, $
-                     twomass=in_twomass, eyeball_name=in_eyeball_name, $
+                     twomass=in_twomass, wise=in_wise, $
+                     eyeball_name=in_eyeball_name, $
                      hidestars=in_hidestars, parent=in_parent, $
                      cen=cen, ra=in_ra, dec=in_dec, next=next, $
                      previous=previous, finish=finish, _EXTRA=_extra_for_detect
