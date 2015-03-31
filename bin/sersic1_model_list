@@ -60,12 +60,14 @@ def main(argv):
     phi= data['phi'][indx]
     
     # Avoid stars in this sample
+    # Avoid n > 7.13 (creates error with dfake)
     indx= (np.where(r50 > 1.))[0]
-
+    indx = (np.where(n < 7.13))[0]
+    
     # Now pick subset 
     random.shuffle(indx)
     indx= indx[0:number]
-
+    
     # Select values of subset
     r50= r50[indx]
     rflux= rflux[indx]
