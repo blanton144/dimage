@@ -97,7 +97,7 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     # Set index number
     indx= np.arange(len(rflux), dtype=np.int32) 
     
-    # Determine sizes 
+    # Determine sizes
     size= np.int32(2*np.int32(rlimit(n)*r50)+1)
     ilow= np.where(size < 151)
     size[ilow]=151
