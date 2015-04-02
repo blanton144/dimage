@@ -83,9 +83,9 @@ def main(argv):
         unwise_atlas_image(galaxy)
 
 if __name__ == "__main__": 
-    try:
-        main(sys.argv[1:])
-    except:
-        import sys
-        tb = sys.exc_info()[2]
-        pdb.post_mortem(tb)
+    main(sys.argv[1:])
+#    try:
+#    except:
+#        import sys
+#        tb = sys.exc_info()[2]
+#        pdb.post_mortem(tb)
