@@ -57,7 +57,6 @@ def main(argv):
     # Set length of data list
     # Override here for shorter run
     datalen = len(data)
-    datalen = 2
 
     # Should this path generation go somewhere else as a function?
     dest = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', 'simard-sersic1')
@@ -75,12 +74,13 @@ def main(argv):
         ba_i = data['ba'][i]
 
         # convert nx, ny to pixels from arcsec (5 pixel/arcsec)
+        pixperarc = 5.
+        r50_i = r50_i * pixperarc
         # generate wcs header to store resolution data
-
-        # get size of image in degrees (from size nx_i in pixels)
-        size = 0.2 * (1./3600) * nx_i
         
-        wcsheader = dwcssimple(180.,0.,size,0.2)[0]
+        # get size of image in degrees (from size nx_i in pixels)
+        size = 1./pixperarc * (1./3600) * nx_i
+        wcsheader = dwcssimple(180., 0., size, 1/pixperarc)[0]
         head = wcsheader.to_header()
         image_i = dfake(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
         
