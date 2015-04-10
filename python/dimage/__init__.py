@@ -12,6 +12,7 @@ from dwcsgrid import *
 from dcombine import * 
 from dcombine_wise import * 
 from dwcsproject import * 
+from simplexy import *
 
 # Petrosian tools
 from petro import * 
