@@ -12,6 +12,7 @@ import sys
 import numpy as np
 import astropy.io.fits as pyfits
 import dimage
+from dimage.dwcssimple import dwcssimple
 from dimage.models import sersic1
 from dimage.models import create_image as ci
 from dimage import dfake
@@ -53,23 +54,37 @@ def main(argv):
     # Read in model list
     data = sersic1.readpar(take, modelname)
 
+    # Set length of data list
+    # Override here for shorter run
+    datalen = len(data)
+    datalen = 2
+
     # Should this path generation go somewhere else as a function?
     dest = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', 'simard-sersic1')
     
     # Parse data and generate FITS image for each element
-    for i in range(20):
+    for i in range(datalen):
         nx_i = data['nx'][i]
         ny_i = data['ny'][i]
         xcen_i = data['xcen'][i]
         ycen_i = data['ycen'][i]
-        #flux = data['flux'][i]
+        flux = data['flux'][i]
         r50_i = data['r50'][i]
         n_i = data['n'][i]
         phi_i = data['phi'][i]
         ba_i = data['ba'][i]
+
+        # convert nx, ny to pixels from arcsec (5 pixel/arcsec)
+        # generate wcs header to store resolution data
+
+        # get size of image in degrees (from size nx_i in pixels)
+        size = 0.2 * (1./3600) * nx_i
         
+        wcsheader = dwcssimple(180.,0.,size,0.2)[0]
+        head = wcsheader.to_header()
         image_i = dfake(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
-        hdu = pyfits.PrimaryHDU(image_i)
+        
+        hdu = pyfits.PrimaryHDU(image_i, header=head)
         imdest = os.path.join(dest, ('fake-' + str(i) + '.fits'))
         # clobber requires environment variable CLOBBER=1
         hdu.writeto(imdest, clobber=os.getenv('CLOBBER'))
