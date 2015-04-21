@@ -1,5 +1,6 @@
 import urllib2
 import os
+import numpy as np
 import astropy.coordinates as coordinates
 import astropy.utils.data as data
 import astropy.io.fits as fits
@@ -76,10 +77,24 @@ which should create '~/.astropy/cache'
 # Define paths of various files
 atlas_paths= dict([('atlas', 
                     '[vN]/catalogs/atlas.fits'),
+                   ('pcat', 
+                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-pcat.fits.gz'),
+                   ('acat', 
+                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-acat-[pid].fits.gz'),
+                   ('measure', 
+                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-[pid]-measure.fits.gz'),
                    ('mosaic', 
                     '[vN]/detect/[vN_M]/[subdir]/[iauname]-[band].fits'),
+                   ('petro',
+                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-[pid]-petro.fits'),
                    ('original', 
                     '[vN]/detect/[survey]/[subdir]/[iauname]-[band].fits'),
+                   ('cutout_jpg', 
+                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-irg.cutout.jpg'),
+                   ('parent_jpg', 
+                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-parent-[pid]-[band].jpg'),
+                   ('atlas_jpg', 
+                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-[pid]-atlas-[aid]-[band].jpg'),
                    ])
 
 class access(object):
@@ -398,6 +413,41 @@ class atlas(access):
             self.nsaid_init()
         return self.nsaid_to_iauname_dict[nsaid]
 
+    def nsaid_to_pid(self, nsaid, **kwargs):
+        """
+        Returns PID value for NSAID
+
+        Parameters:
+        ==========
+        nsaid : int, NSAID 
+        
+        Returns:
+        =======
+        pid : parent IDs of processed objects in image
+        """
+        pcat= fits.open(self.file('pcat', nsaid=nsaid))
+        # Infers from where CRA isn't zero
+        indx= np.nonzero(pcat[1].data['CRA'])
+        return indx
+
+    def nsaid_to_aid(self, nsaid, pid, **kwargs):
+        """
+        Returns AID values for NSAID/PID
+
+        Parameters:
+        ==========
+        nsaid : int, NSAID 
+        pid : parent ID 
+        
+        Returns:
+        =======
+        aid : aid to use
+        """
+        measure= fits.open(self.file('measure', pid=pid, nsaid=nsaid))
+        # Infers from where measurements exist
+        aid= measure[1].data['AID']
+        return aid
+
     def iauname_to_nsaid(self, iauname, **kwargs):
         """
         Returns IAUNAME given NSAID
@@ -424,7 +474,7 @@ class atlas(access):
         detectdir= version_to_detectdir(self.version)
         template=template.replace('[vN_M]', detectdir)
         
-        # Deal with identifiers
+        # Deal with IAUNAME identifiers
         iauname= None
         if kwargs.has_key('iauname'): # Set IAUNAME if given
             iauname=kwargs['iauname']
@@ -434,9 +484,20 @@ class atlas(access):
             if kwargs.has_key('nsaid'):
                 iauname= self.nsaid_to_iauname(**kwargs)
         if iauname is not None:
+            # set subdirectories
             subdir= iauname_to_subdir(iauname)
             template=template.replace('[iauname]', iauname)
             template=template.replace('[subdir]', subdir)
+        
+            # For paths with IAUNAME, deal with PID identifiers
+            if "[pid]" in template: 
+                nsaid= self.iauname_to_nsaid(iauname)
+                pid= self.nsaid_to_pid(nsaid)[0][0]
+                template=template.replace('[pid]', str(pid))
+                # And if PID is needed, get AID too
+                if "[aid]" in template: 
+                    aid= self.nsaid_to_aid(nsaid, pid)[0]
+                    template=template.replace('[aid]', str(aid))
 
         # Now replace 
         exclude_list=[]

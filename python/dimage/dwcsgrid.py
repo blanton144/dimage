@@ -29,7 +29,7 @@ def dwcsgrid(wcs, nx, ny):
     xy= np.array([y, x]).transpose()
     
     # Run through WCS to get RA/Dec values
-    radec= wcs.all_pix2world(xy,1)
+    radec= wcs.all_pix2world(xy,0)
     ra= radec[:,0].reshape((nx, ny))
     dec= radec[:,1].reshape((nx, ny))
 

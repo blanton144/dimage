@@ -9,6 +9,10 @@ import os
 import numpy as np
 import astropy.wcs as wcs
 
+def sayhi():
+    print("hello, this works")
+    return
+
 def dwcssimple(ra, dec, size, pixscale):
     """Create simple astropy WCS object, with TAN projection
     
@@ -34,7 +38,7 @@ def dwcssimple(ra, dec, size, pixscale):
     xmid= naxis1//2
     ymid= naxis2//2
     w.wcs.crpix = [xmid, ymid]
-    w.wcs.cdelt = np.array([pixscale/3600., pixscale/3600.])
+    w.wcs.cdelt = np.array([-pixscale/3600., pixscale/3600.])
     w.wcs.crval = [ra, dec]
     w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
 
