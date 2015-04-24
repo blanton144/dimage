@@ -233,8 +233,6 @@ for iobj=obj_st, obj_nd do begin
           iimage[ii]=randomn(seed, nii)*sigma[k]
         iimage[io]=timage[io]
 
-        if(k eq 5) then stop
-
         if(k eq ref) then begin
             dpeaks, iimage, xc=xc, yc=yc, npeaks=1
             isort=reverse(sort(iimage[xc,yc]))

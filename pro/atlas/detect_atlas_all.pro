@@ -81,6 +81,8 @@ for i=st, nd do begin
       if(file_test(imfiles[j]) eq 0) then $
       allthere=0
     
+    print, imfiles
+    print, allthere
     if(allthere gt 0) then begin
         if(NOT keyword_set(nodetect)) then begin
             detect_atlas, galex=galex, twomass=twomass, wise=wise, $

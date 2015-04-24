@@ -45,12 +45,13 @@ def main(argv):
         sys.exit()
 
     # Read in Simard file
-    # This (COMP_DIR) is env var for the location of the (dropbox) Simard files
+    # COMP_DIR is env var for the location of the (dropbox) Simard files
     simfile= os.path.join(os.getenv('COMP_DIR'), 'simard-sdss-pn.fits')
     fp= pyfits.open(simfile)
     data= fp[1].data
     
     # Select a subset of good galaxies, put parameters into arcsec
+    # Should be converted into pixels
     indx= (np.where((data['Scale'] > 0)*(data['rg2d'] < 17.5)*
                     (data['Rhlr'] > 0)))[0]
     r50= data['Rhlr'][indx]/data['Scale'][indx]

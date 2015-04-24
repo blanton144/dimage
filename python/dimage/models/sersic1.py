@@ -95,9 +95,11 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     parfile= parpath(take, modelname)
     
     # Set index number
-    indx= np.arange(len(rflux), dtype=np.int32) 
+    indx= np.arange(len(rflux), dtype=np.int32)
     
     # Determine sizes
+    # should be 5 pixels/arcsec (r50 originally in arcsec)
+    # and r50 should be in pixels
     size= np.int32(2*np.int32(rlimit(n)*r50)+1)
     ilow= np.where(size < 151)
     size[ilow]=151
