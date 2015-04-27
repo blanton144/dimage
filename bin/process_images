@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+""" Process model images, based on set of conditions
+
+JPA 2015-04-27
+"""
