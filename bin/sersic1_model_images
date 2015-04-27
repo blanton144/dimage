@@ -28,7 +28,7 @@ def main(argv):
     pixperarc = 5.
 
     # Parse header
-    helpstr='sersic1d_model_list [-s seed] [-n number]'
+    helpstr='sersic1_model_images [-t take] [-m model] [-i <image_create>] [-c <clobber>] [-s stretch]'
     try:
         opts, args = getopt.getopt(argv,"ihct:m:s:",
                                    ["image_create=", "help=","take=","modelname=", "stretch=", "clobber="])
