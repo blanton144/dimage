@@ -95,7 +95,8 @@ def main(argv):
         # clobber requires environment variable CLOBBER=1
         hdu.writeto(imdest, clobber=clobber)
         if image_create == True:
-            ci.create_image(imdest, take, modelname, i, stretch)
+            pngpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname, 'png', 'image-'+str(i)+'.png')
+            ci.create_image(imdest, pngpath, stretch)
 
 
 if __name__ == "__main__": 

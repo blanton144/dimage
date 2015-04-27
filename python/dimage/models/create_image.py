@@ -10,7 +10,7 @@ from astropy.io import fits
 import os
 import numpy as np
 
-def create_image(imfile, take, modelname, i, base):
+def create_image(imfile, outfile, base=0):
     """ Renders and saves a .png file from a .fits image file
 
     Parameters
@@ -28,31 +28,28 @@ def create_image(imfile, take, modelname, i, base):
 
     Notes
     -----
-    Inputs from:
-       $FAKEPHOTOMETRY/[take]/fake/[modelname]/fake-*.fits
-    Outputs to:
-       $FAKEPHOTOMETRY/[take]/fake/images/fake-*.png
+    Inputs from imfile
+    Outputs to outfile
     """
 
-    # outpath should go to output directory, in <model>/png/image-<i>.png
-    outpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname, 'png', 'image-'+str(i)+'.png')
     hdulist = fits.open(imfile)
     im_data = hdulist[0].data
 
-    # change labels to stretched labels (if necessary)
     if(base != 0):
         stretch_data = np.arcsinh(im_data/base)
         plt.imshow(stretch_data, cmap='gray')
         cbr = plt.colorbar()
+        # labels should be stretched as well
         labels = cbr.ax.get_yticklabels()
         for l in range(len(labels)):
             labels[l] = np.sinh(float(labels[l].get_text()))*base
             labels[l] = '{0:f}'.format(labels[l])
         cbr.ax.set_yticklabels(labels)
     else:
+        # no stretching; default
         plt.imshow(im_data, cmap='gray')
         cbr = plt.colorbar()
     
-    plt.savefig(outpath)
+    plt.savefig(outfile)
     plt.clf()
-    return outpath
+    return outfile
