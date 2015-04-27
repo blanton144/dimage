@@ -36,7 +36,7 @@ def main(argv):
         print helpstr
         sys.exit(2)
     for opt, arg in opts:
-        if opt == ("-h", "--help"):
+        if opt in ("-h", "--help"):
             print helpstr;
             sys.exit()
         elif opt in ("-i", "--image_create"):

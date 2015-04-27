@@ -1,6 +1,7 @@
 # Fake models
 import models 
-import atlas 
+import atlas
+import conditions
 
 # dimage tools
 from dsigma import * 
