@@ -6,7 +6,7 @@ import os
 import numpy as np
 import astropy.io.fits as pyfits
 
-def listrec(indx, flux, nx, ny, xcen, ycen):
+def listrec(indx, flux, nx, ny, xcen, ycen, arcperpix):
     """Creates recarray associated with a list.
     
     Parameters
@@ -15,6 +15,7 @@ def listrec(indx, flux, nx, ny, xcen, ycen):
     flux : flux in model
     nx, ny : size of model image
     xcen, ycen : center for model image
+    arcperpix : arcsec per pixel for each image
 
     Returns
     -------
@@ -26,7 +27,8 @@ def listrec(indx, flux, nx, ny, xcen, ycen):
            ('nx', np.int32), 
            ('ny', np.int32), 
            ('xcen', np.float32), 
-           ('ycen', np.float32), 
+           ('ycen', np.float32),
+           ('arcperpix', np.float32)
            ]
     data= np.empty(len(indx), dtype=dtype)
     data['indx']=indx
@@ -35,6 +37,7 @@ def listrec(indx, flux, nx, ny, xcen, ycen):
     data['ny']=ny
     data['xcen']=xcen
     data['ycen']=ycen
+    data['arcperpix']=arcperpix
     return data
     
 def listpath(take, modelname):

@@ -58,7 +58,7 @@ def readpar(take, modelname):
     fp= pyfits.open(infile)
     return fp[1].data
 
-def writelist(take, modelname, rflux, r50, n, phi, ba):
+def writelist(take, modelname, rflux, r50, n, phi, ba, arcperpix):
     """Writes out Sersic 1D model list
     
     Parameters
@@ -70,6 +70,7 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     n : ndarray of Sersic indices
     phi : ndarray of position angles
     ba : ndarray of minor-to-major (b/a) axis ratios
+    arcperpix: ndarray of arcsec per pixel (default is 0.2)
 
     Notes
     -----
@@ -98,8 +99,6 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     indx= np.arange(len(rflux), dtype=np.int32)
     
     # Determine sizes
-    # should be 5 pixels/arcsec (r50 originally in arcsec)
-    # and r50 should be in pixels
     size= np.int32(2*np.int32(rlimit(n)*r50)+1)
     ilow= np.where(size < 151)
     size[ilow]=151
@@ -112,7 +111,7 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
        	ycen[i]= np.float32(size[i]/2)-0.5+random.uniform(0., 1.)
         
     # put into recarray
-    data= listrec(indx, rflux, size, size, xcen, ycen)
+    data= listrec(indx, rflux, size, size, xcen, ycen, arcperpix)
 
     hdu0= pyfits.PrimaryHDU()
     hdu1= pyfits.BinTableHDU(data=data, name='Model list')
@@ -120,16 +119,17 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     hdus.writeto(outfile, clobber=True)
     
     dtype=[('indx', np.int32), 
-       			 ('nx', np.int32), 
-       			 ('ny', np.int32), 
-       			 ('xcen', np.float32), 
-       			 ('ycen', np.float32), 
-       			 ('flux', np.float32), 
-       			 ('r50', np.float32), 
-       			 ('n', np.float32), 
-       			 ('phi', np.float32), 
-       			 ('ba', np.float32), 
-       			 ]
+           ('nx', np.int32), 
+           ('ny', np.int32), 
+           ('xcen', np.float32), 
+           ('ycen', np.float32), 
+           ('flux', np.float32), 
+           ('r50', np.float32), 
+           ('n', np.float32), 
+           ('phi', np.float32), 
+           ('ba', np.float32),
+           ('arcperpix', np.float32)
+           ]
     data= np.empty(len(indx), dtype=dtype)
     data['indx']=indx
     data['nx']=size
@@ -141,6 +141,7 @@ def writelist(take, modelname, rflux, r50, n, phi, ba):
     data['n']=n
     data['phi']=phi
     data['ba']=ba
+    data['arcperpix']=arcperpix
     
     hdu0= pyfits.PrimaryHDU()
     hdu1= pyfits.BinTableHDU(data=data, name='Model parameters list')
