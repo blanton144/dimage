@@ -1,0 +1,107 @@
+#!/usr/bin/env python
+
+# Process model images for a set of conditions
+# Passes each file in a given model to a given condition
+# Saves the output after condition processing in fake/model/cond
+#
+# JPA 2015-04-27
+
+import pdb
+import sys
+import os
+import getopt
+import numpy as np
+from astropy.io import fits
+
+import dimage
+from dimage.models import create_image as ci
+from dimage.conditions import * # nocond, noise (noise is horrible. ignore it)
+
+def main(argv):
+    # defaults
+    image_create=False
+    take=None
+    model=None
+    cond=None
+    stretch=0
+    clob=True # should always clobber?
+    
+    helpstr = 'process_conds [-t take] [-m model] [-c cond] [-i <image_create>]'
+
+    try:
+        opts, args = getopt.getopt(argv,"it:m:c:" , ["image_create=","take=","model=","conds="])
+    except getopt.GetoptError:
+        print helpstr
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            print helpstr
+            sys.exit()
+        elif opt in ('-i', '--image_create'):
+            image_create = True
+        elif opt in ('-s', '--stretch'):
+            stretch=arg
+        elif opt in ('-t', '--take'):
+            take=arg
+        elif opt in ('-m', '--model'):
+            model=arg
+        elif opt in ('-c', '--cond'):
+            cond=arg
+
+    if(take==None):
+        print "Must specify take with -t or --take"
+        sys.exit()
+    if(model==None):
+        print "Must specify model with -m or --model"
+        sys.exit()
+    if(cond==None):
+        print "Must specify condition with -c or --cond"
+        sys.exit()
+
+    inpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models', model, 'fits')
+    outpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', model, cond, 'fits')
+    ivarpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', model, cond, 'ivars')
+    # ** check for dirs, create them if necessary HERE ****
+
+    i = 0
+    fname = os.path.join(inpath, 'simser-'+str(i)+'.fits')
+    while(os.path.isfile(fname)):
+        # open file, pass to condition(s) file(s)
+        hdulist = fits.open(fname)
+        im_data = hdulist[0].data
+        oldheader = hdulist[0].header
+        if cond=='nocond':
+            new_data = nocond.nocond(im_data)
+        elif cond=='noise':
+            new_data = noise.noise(im_data)
+        # other conditions will go HERE
+
+        # store new data in outpath
+        newfile = os.path.join(outpath, 'output-'+str(i)+'.fits')
+        hdu = fits.PrimaryHDU(new_data, header = oldheader)
+        hdu.writeto(newfile, clobber=clob)
+
+        # generate nx by ny inverse variance map (for no conditions, all set to 1)
+        ivarfile = os.path.join(ivarpath, 'ivar-'+str(i)+'.fits')
+        nx = len(im_data[0])
+        ny = len(im_data)
+        ivmap = np.ones((nx, ny), np.float32)
+        hdu = fits.PrimaryHDU(ivmap)
+        hdu.writeto(ivarfile, clobber=clob)
+        
+        if image_create == True:
+            pngpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', model, cond, 'png', 'image-'+str(i)+'.png')
+            ci.create_image(newfile, pngpath, stretch)
+        
+        # update fname for while condition and next loop of processing
+        i += 1
+        fname = os.path.join(inpath, 'simser-'+str(i)+'.fits')
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except:
+        import sys
+        tb = sys.exc_info()[2]
+        pdb.post_mortem(tb)
