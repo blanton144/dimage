@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+#
+# Run petro on fake fits image files to find petrosian quantities
+# Requires take, model, and condition to locate files
+#
+# JPA 5/18/2015
+
+import pdb
+import sys
+import os
+import getopt
+from astropy.io import fits
+
+import dimage
+from dimage import petro
+
+def main(argv):
+    # defaults
+    take = None
+    model = None
+    cond = None
+
+    helpstr = 'runpetro [-t take] [-m model] [-c cond]'
+
+    try:
+        opts, args = getopt.getopt(argv, "t:m:c:", ["take=","model=", "cond="])
+    except getopt.GetoptError:
+        print(helpstr)
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            print(helpstr)
+            sys.exit()
+        elif opt in ('-t', '--take'):
+            take = arg
+        elif opt in ('-m', '--model'):
+            model = arg
+        elif opt in ('-c', '--cond'):
+            cond = arg
+
+    if(take == None):
+        print("must specify take with -t or --take")
+        sys.exit(1)
+    elif(model == None):
+        print("must specify model with -m or --model")
+        sys.exit(1)
+    elif(cond == None):
+        print("must specify model with -m or --model")
+        sys.exit(1)
+        
+
+    inpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', model, cond, 'fits')
+    ivarpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', model, cond, 'ivars')
+
+    i = 0
+    imname = os.path.join(inpath, 'output-'+str(i)+'.fits')
+    ivname = os.path.join(ivarpath, 'ivar-'+str(i)+'.fits')
+    print(imname)
+    print(str(os.path.isfile(imname)))
+    print(ivname)
+    print(str(os.path.isfile(ivname)))
+    while(os.path.isfile(imname) and os.path.isfile(ivname)):
+        # open files, pass to petro
+        hdulist = fits.open(imname)
+        # get x_cen, y_cen from header data
+        head = hdulist[0].header
+        x_cen = head["XCEN"]
+        y_cen = head["YCEN"]
+        im_data = hdulist[0].data
+        hdulist = fits.open(ivname)
+        iv_data = hdulist[0].data
+
+        # using default ba=1 and phi=0
+        p_dict = petro(im_data, iv_data, xcen=x_cen, ycen=y_cen)
+
+        for key in p_dict:
+            print(key + " = " + p_dict[key])
+        sys.exit(0)
+        
+        i += 1
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except:
+        import sys
+        tb = sys.exc_info()[2]
+        pdb.post_mortem(tb)

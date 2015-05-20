@@ -80,16 +80,13 @@ def main(argv):
         ba_i = data['ba'][i]
         app_i = data['arcperpix'][i]
 
-        if(i == 17):
-            print("index is 17")
-            print("r50 is " + str(r50_i))
-            print("n is " + str(n_i))
-
         # generate wcs header to store resolution data
         # get size of image in degrees (from size nx_i in pixels)
         size = app_i * (1./3600) * nx_i
         wcsheader = dwcssimple(180., 0., size, app_i)[0]
         head = wcsheader.to_header()
+        head['XCEN']=xcen_i
+        head['YCEN']=ycen_i
         image_i = dfake(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
         
         hdu = pyfits.PrimaryHDU(image_i, header=head)
