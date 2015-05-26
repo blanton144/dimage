@@ -1,5 +1,8 @@
 #!/bin/csh -f 
 
+# Script for looping over card images, for galaxy flash cards.
+# MRB, March 2015
+
 set i = 0
 
 while($i < 104)
