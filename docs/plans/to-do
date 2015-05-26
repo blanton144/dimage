@@ -1,12 +1,7 @@
-Finish 2MASS
-Get WISE PSF estimates
+Fix dimage_version
+Complete downloader package
 Test 2MASS+WISE detection/measurement
-
-Write downloader package
-
 Get DECALS
-
 Create database for v1
 Create host for v1
-
 Get UKIDSS images

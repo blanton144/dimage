@@ -26,7 +26,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2015-01-05 02:37:24 +0000</string>
+	<string>2015-04-24 20:23:37 +0000</string>
 	<key>Modifier</key>
 	<string>Michael Blanton</string>
 	<key>NotesVisible</key>
@@ -142,8 +142,8 @@
 					<integer>26</integer>
 					<key>Points</key>
 					<array>
-						<string>{132.2592812508409, 253.49928603792677}</string>
-						<string>{131.53392109623186, 277.00095194943123}</string>
+						<string>{132.25928004597253, 253.49928603792674}</string>
+						<string>{131.53391871147778, 277.000951949431}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -186,8 +186,8 @@
 					<integer>25</integer>
 					<key>Points</key>
 					<array>
-						<string>{134.4660790773531, 181.99904805056897}</string>
-						<string>{133.74071923828302, 205.50071396207326}</string>
+						<string>{134.00451260888838, 181.9980098658821}</string>
+						<string>{132.95528807542627, 205.50000258232618}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -394,8 +394,8 @@
 					<integer>19</integer>
 					<key>Points</key>
 					<array>
-						<string>{414.45942942291225, 437.49994208511174}</string>
-						<string>{413.96834641900438, 502.00005791510222}</string>
+						<string>{414.4594010530061, 437.49994208510549}</string>
+						<string>{413.96829227637107, 502.00005791489468}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -645,8 +645,8 @@
 					<integer>12</integer>
 					<key>Points</key>
 					<array>
-						<string>{415.49329814934765, 269.74993126047798}</string>
-						<string>{415.70678596103915, 295.50009905939055}</string>
+						<string>{415.25266128912665, 269.74998193962682}</string>
+						<string>{415.36200652099149, 295.50002597537633}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -689,8 +689,8 @@
 					<integer>11</integer>
 					<key>Points</key>
 					<array>
-						<string>{234.46274611987513, 330.84984251744817}</string>
-						<string>{293.26687450925266, 342.36026069133004}</string>
+						<string>{234.46251518753877, 330.91458795296023}</string>
+						<string>{293.24789254169639, 342.45797149100798}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -733,8 +733,8 @@
 					<integer>10</integer>
 					<key>Points</key>
 					<array>
-						<string>{415.00002999245072, 125.00000000000001}</string>
-						<string>{415.00004470303372, 150.75}</string>
+						<string>{415.00001404460374, 125.00000000000001}</string>
+						<string>{415.00002093314743, 150.75}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -777,8 +777,8 @@
 					<integer>9</integer>
 					<key>Points</key>
 					<array>
-						<string>{135.49998413868551, 90.499999999999986}</string>
-						<string>{135.49998413868551, 115}</string>
+						<string>{134.35727252898997, 90.499339716179733}</string>
+						<string>{133.62995795856719, 115.00310937044884}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1522,7 +1522,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{47, 42}, {396, 141}}</string>
+					<string>{{47, 42}, {396, 163}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -1546,9 +1546,11 @@
 \
 $FAKEPHOTOMETRY/[take]/\
    models/[model]/model-*\
+   models/[model]/fits/model-*\
+   models/[model]/png/model-*\
    conditions/[condition]/conditions-*\
    fake/[version]/fake-*.fits\
-   fake/[version]/images/fake-*\
+   fake/[version]/fits/fake-*\
    fake/[version]/catalogs/[fit]/fake-catalog-*}</string>
 					</dict>
 				</dict>
@@ -1612,7 +1614,7 @@ $FAKEPHOTOMETRY/[take]/\
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>0</integer>
+		<integer>1</integer>
 		<key>ExpandedCanvases</key>
 		<array>
 			<dict>
@@ -1621,7 +1623,7 @@ $FAKEPHOTOMETRY/[take]/\
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{107, 2}, {1253, 755}}</string>
+		<string>{{55, 21}, {1081, 998}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -1635,7 +1637,7 @@ $FAKEPHOTOMETRY/[take]/\
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{-264, 0}, {1104, 616}}</string>
+		<string>{{-185, -63}, {946, 859}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>
