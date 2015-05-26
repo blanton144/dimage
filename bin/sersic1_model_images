@@ -23,25 +23,31 @@ def main(argv):
     take=None
     modelname=None
     image_create=False
+    stretch = 0 # arcsinh stretching base
+    clobber = False
 
     # Parse header
-    helpstr='sersic1d_model_list [-s seed] [-n number]'
+    helpstr='sersic1_model_images [-t take] [-m model] [-i <image_create>] [-c <clobber>] [-s stretch]'
     try:
-        opts, args = getopt.getopt(argv,"iht:m:",
-                                   ["image_create=", "help=","take=","modelname="])
+        opts, args = getopt.getopt(argv,"ihct:m:s:",
+                                   ["image_create=", "help=","take=","modelname=", "stretch=", "clobber="])
     except getopt.GetoptError:
         print helpstr
         sys.exit(2)
     for opt, arg in opts:
-        if opt == ("-h", "--help"):
+        if opt in ("-h", "--help"):
             print helpstr;
             sys.exit()
-        elif opt == ("-i"):
+        elif opt in ("-i", "--image_create"):
             image_create=True
         elif opt in ("-t", "--take"):
             take = arg
         elif opt in ("-m", "--modelname"):
             modelname = arg
+        elif opt in ("-s", "--stretch"):
+            stretch = float(arg)
+        elif opt in ("-c", "--clobber"):
+            clobber = True
 
     if(take is None):
         print "Must specify take with -t or --take"
@@ -59,7 +65,7 @@ def main(argv):
     datalen = len(data)
 
     # Should this path generation go somewhere else as a function?
-    dest = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'fake', 'simard-sersic1')
+    dest = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models', 'simard-sersic1')
     
     # Parse data and generate FITS image for each element
     for i in range(datalen):
@@ -72,24 +78,24 @@ def main(argv):
         n_i = data['n'][i]
         phi_i = data['phi'][i]
         ba_i = data['ba'][i]
+        app_i = data['arcperpix'][i]
 
-        # convert nx, ny to pixels from arcsec (5 pixel/arcsec)
-        pixperarc = 5.
-        r50_i = r50_i * pixperarc
         # generate wcs header to store resolution data
-        
         # get size of image in degrees (from size nx_i in pixels)
-        size = 1./pixperarc * (1./3600) * nx_i
-        wcsheader = dwcssimple(180., 0., size, 1/pixperarc)[0]
+        size = app_i * (1./3600) * nx_i
+        wcsheader = dwcssimple(180., 0., size, app_i)[0]
         head = wcsheader.to_header()
+        head['XCEN']=xcen_i
+        head['YCEN']=ycen_i
         image_i = dfake(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
         
         hdu = pyfits.PrimaryHDU(image_i, header=head)
-        imdest = os.path.join(dest, ('fake-' + str(i) + '.fits'))
+        imdest = os.path.join(dest, 'fits', ('simser-' + str(i) + '.fits'))
         # clobber requires environment variable CLOBBER=1
-        hdu.writeto(imdest, clobber=os.getenv('CLOBBER'))
+        hdu.writeto(imdest, clobber=clobber)
         if image_create == True:
-            ci.create_image(imdest, take, modelname, i)
+            pngpath = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname, 'png', 'image-'+str(i)+'.png')
+            ci.create_image(imdest, pngpath, stretch)
 
 
 if __name__ == "__main__": 

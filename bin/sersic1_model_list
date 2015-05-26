@@ -19,6 +19,7 @@ def main(argv):
     # Defaults
     number=10000
     take=None
+    app=0.2 # converts from arcsec to pixels
 
     # Parse header
     helpstr='sersic1d_model_list [-s seed] [-n number]'
@@ -51,7 +52,6 @@ def main(argv):
     data= fp[1].data
     
     # Select a subset of good galaxies, put parameters into arcsec
-    # Should be converted into pixels
     indx= (np.where((data['Scale'] > 0)*(data['rg2d'] < 17.5)*
                     (data['Rhlr'] > 0)))[0]
     r50= data['Rhlr'][indx]/data['Scale'][indx]
@@ -59,6 +59,12 @@ def main(argv):
     n= data['ng'][indx]
     ba= 1.-data['e'][indx]
     phi= data['phi'][indx]
+
+    arcperpix = np.zeros(len(indx))
+    arcperpix += app
+    
+    # Immediately put r50 in pixels
+    r50=r50/arcperpix
     
     # Avoid stars in this sample
     # Avoid n > 7.13 (creates error with dfake)
@@ -75,10 +81,11 @@ def main(argv):
     n= n[indx]
     ba= ba[indx]
     phi= phi[indx]
+    arcperpix=arcperpix[indx]
 
     # Write out file
     modelname= 'simard-sersic1'
-    sersic1.writelist(take, modelname, rflux, r50, n, phi, ba)
+    sersic1.writelist(take, modelname, rflux, r50, n, phi, ba, arcperpix)
 
 if __name__ == "__main__": 
     try:
