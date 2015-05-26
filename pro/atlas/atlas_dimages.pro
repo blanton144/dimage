@@ -2,17 +2,27 @@
 ; NAME:
 ;   atlas_dimages
 ; PURPOSE:
-;   make the atlas dimages
+;   Make the atlas images for SDSS ugriz 
 ; CALLING SEQUENCE:
-;   atlas_dimages [, seed= ]
+;   atlas_dimages [, version=, st=, nd=, /clobber]
+; OPTIONAL INPUTS:
+;   version - version of atlas
+;   st - Starting NSAID to process
+;   nd - Ending NSAID to process
+; OPTIONAL KEYWORDS:
+;   /clobber - overwrite existing data
 ; COMMENTS:
-;   Requires tree dr8
+;   Uses smosaic_make.
+;   Ignores data marked as unphotometric or otherwise bad, but still
+;     includes unprocessed frames. That is, a photo pipeline failure
+;     from SDSS doesn't exclude a frame. 
 ;   Ignores run 1473.
+;   Hardcodes rerun 301
 ; REVISION HISTORY:
 ;   3-Aug-2004  MRB, NYU
 ;-
 ;------------------------------------------------------------------------------
-pro atlas_dimages, seed=seed, st=st, nd=nd, clobber=clobber, version=version
+pro atlas_dimages, st=st, nd=nd, clobber=clobber, version=version
 
   window_read, flist=flist
   ikeep= where(flist.rerun eq '301' and flist.run ne 1473)

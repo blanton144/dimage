@@ -5,6 +5,8 @@
 ;   Wrapper script for producing NSA atlas
 ; CALLING SEQUENCE:
 ;   atlas_all, version=
+; COMMENTS:
+;   Actually, really just an outline of the procedure
 ; REVISION HISTORY:
 ;   31-Mar-2004  MRB, NYU
 ;-
@@ -22,6 +24,8 @@ atlas_dimages
 
 ;; need galex-orig there
 galex_image_combine
+
+;; need to create 2MASS & WISE
 
 ;; needs to get directories right
 ;; make top-lvel detect directory

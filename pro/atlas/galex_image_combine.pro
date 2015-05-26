@@ -4,7 +4,11 @@
 ; PURPOSE:
 ;   For each atlas object, combine GALEX images
 ; CALLING SEQUENCE:
-;   galex_image_combine
+;   galex_image_combine [, version=, st=, nd=]
+; OPTIONAL INPUTS:
+;   version - version of atlas
+;   st - Starting NSAID to process
+;   nd - Ending NSAID to process
 ; REVISION HISTORY:
 ;   23-Apr-2010  MRB, NYU
 ;-
