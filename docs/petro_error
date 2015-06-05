@@ -1,0 +1,10 @@
+Replicating petro error:
+
+Run sersic1_model_list -t <take>
+Run sersic1_model_images -m simard-sersic1 -t <take> -c
+Run process_conds -t <take> -m simard-sersic1 -c nocond
+Run runpetro -t <take> -m simard-sersic1 -c nocond
+
+A couple of errors come up:
+ - there's a divide-by-zero error that comes up in (only) one iteration on line 133 (meansb= fbins/abins
+ - most of the data stays at the initial condition values. I'm not sure why and I tried filtering out all of the points that stayed at the initial conditions, but even the values that were actually found by petro didn't seem to give any correlation between the generated r50 and the measured r50, which means something isn't working. The code currently shows a simple pyplot of r50 against measured r50, but I've also added code to output a text file with r50 and measured r50 for each image

@@ -65,6 +65,10 @@ def main(argv):
     # temporary graphing data (should eventually be saved output to file)
     fluxes = []
     r50s = []
+
+    # text file output for r50 and measured r50
+    tfile = open('petro_output.txt', 'w')
+    tfile.write(" r50 \t measured r50\n")
     
     while(os.path.isfile(imname) and os.path.isfile(ivname) and i < 100):
         # open files, pass to petro
@@ -79,17 +83,16 @@ def main(argv):
 
         # using default ba=1 and phi=0
         p_dict = petro(im_data, iv_data, xcen=x_cen, ycen=y_cen)
-        if(np.isnan(float(p_dict['flux'])) == False and float(p_dict['r50']) != -9999.0):
-            continue
-            #fluxes.append(float(p_dict['flux']))
-            #r50s.append(float(p_dict['r50']))
-        else:
-            print(datalist[i])
+        fluxes.append(float(p_dict['flux']))
+        r50s.append(float(p_dict['r50']))
+        tfile.write(" " + str(datalist['r50'][i]) + " \t"+str(p_dict['r50'])+"\n")
         
         i += 1
 
     ba = datalist['ba'][:len(fluxes)]
     r50 = datalist['r50'][:len(r50s)]
+
+    tfile.close()
     
     plt.plot(r50, r50s, 'p')
     plt.show()
