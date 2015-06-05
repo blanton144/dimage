@@ -62,7 +62,7 @@ def main(argv):
 
     # Set length of data list
     # Override here for shorter run
-    datalen = len(data)
+    datalen = 100 # default should be len(data)
 
     # Should this path generation go somewhere else as a function?
     dest = os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models', 'simard-sersic1')
@@ -85,8 +85,6 @@ def main(argv):
         size = app_i * (1./3600) * nx_i
         wcsheader = dwcssimple(180., 0., size, app_i)[0]
         head = wcsheader.to_header()
-        head['XCEN']=xcen_i
-        head['YCEN']=ycen_i
         image_i = dfake(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
         
         hdu = pyfits.PrimaryHDU(image_i, header=head)
