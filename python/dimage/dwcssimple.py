@@ -37,7 +37,7 @@ def dwcssimple(ra, dec, size, pixscale):
     naxis2= naxis1
     xmid= naxis1//2
     ymid= naxis2//2
-    w.wcs.crpix = [xmid, ymid]
+    w.wcs.crpix = [xmid+1, ymid+1]
     w.wcs.cdelt = np.array([-pixscale/3600., pixscale/3600.])
     w.wcs.crval = [ra, dec]
     w.wcs.ctype = ["RA---TAN", "DEC--TAN"]

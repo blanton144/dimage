@@ -17,6 +17,7 @@ import dimage
 from dimage.atlas import atlas
 import getopt
 import random
+import gzip
 
 # Band names
 bands=['w1', 'w2', 'w3', 'w4']
@@ -26,6 +27,13 @@ wise2abs= [2.683,3.319,5.242,6.604]
 
 nsa=atlas()
 
+def gzip_file(filename):
+    f_in = open(filename, 'rb')
+    f_out = gzip.open(filename+'.gz', 'wb')
+    f_out.writelines(f_in)
+    f_out.close()
+    f_in.close()
+    
 def unwise_atlas_image(galaxy):
     # Get directory with atlas images, make if necessary
     iauname=galaxy['IAUNAME']
@@ -41,14 +49,17 @@ def unwise_atlas_image(galaxy):
     # Make each image
     for (band, wise2ab) in zip(bands, wise2abs):
         (image, ivar, wcs)= dimage.dcombine_wise(ra, dec, size, band)
-        image= image*wise2ab
-        ivar= ivar/wise2ab/wise2ab
+        factor= 10.**(-0.4*wise2ab)
+        image= image*factor
+        ivar= ivar/factor**2
         hdu0= pyfits.PrimaryHDU(data=image, header=wcs.to_header())
         hdu1= pyfits.ImageHDU(data=ivar, header=wcs.to_header())
         hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
         outfile=nsa.filename('original', iauname=iauname, band=band,
                              survey='wise')
+        print outfile
         hdus.writeto(outfile, clobber=True)
+        gzip_file(outfile)
 
 def main(argv):
     # Set defaults
@@ -77,7 +88,7 @@ def main(argv):
     # Read in appropriate section of NSA file        
     atlasfile= nsa.file('atlas')
     atlas= pyfits.open(atlasfile)[1].data
-    atlas=atlas[istart:iend]
+    atlas=atlas[istart:iend+1]
     for galaxy in atlas:
         print galaxy['IAUNAME']
         unwise_atlas_image(galaxy)

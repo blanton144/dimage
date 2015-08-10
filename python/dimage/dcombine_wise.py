@@ -14,7 +14,8 @@ import math
 
 def dcombine_wise(ra, dec, size, band, 
                   kernel='lanczos', dampsinc=2.47,
-                  lanczos=2., edge=10):
+                  lanczos=2., edge=10, pixscale=2.75,
+                  unmasked=False):
     """Combine WISE images onto a desired footprint
     
     Parameters
@@ -24,6 +25,8 @@ def dcombine_wise(ra, dec, size, band,
     band : band name ('W1', 'W2', 'W3', 'W4')
     edge : pixel width of apodized edge to use (default 10)
     kernel, dampsinc, lanczos : parameters for dresample
+    pixscale: output pixel scale in arcsec/pixel (default 2.75)
+    unmasked: if true, use unmasked coadds (default False)
 
     Returns
     -------
@@ -41,28 +44,33 @@ def dcombine_wise(ra, dec, size, band,
     # Find those related to this location 
     wise_size= 2048.*2.75/3600.
     radius= (wise_size+size)*math.sqrt(2.)/2.
-    center_c = coordinates.SkyCoord(ra, dec, unit="deg")
+    center_c = coordinates.SkyCoord([ra], [dec], unit="deg")
     tile_c = coordinates.SkyCoord(alltiles['RA'], alltiles['Dec'], unit="deg")
-    (indx, sep2d, sep3d)= coordinates.match_coordinates_sky(center_c, tile_c)
+    (indx, sep2d, sep3d)= coordinates.match_coordinates_sky(tile_c, center_c)
+
+    # define postfix (m for masked, u for unmasked)
+    postfix="m"
+    if(unmasked):
+        postfix="u"
 
     # Construct file names in list
     image_files=[]
     ivar_files=[]
     indx= indx.reshape(indx.size)
-    for i in indx:
-        tile=alltiles['COADD_ID'][i]
-        topdir=tile[0:3]
-        botdir=tile
-        tiledir= os.path.join(os.getenv('UNWISE_DATA'), topdir, botdir)
-        tmp_file= 'unwise-'+tile+'-'+band+'-'+'img-m.fits'
-        tmp_file=os.path.join(tiledir, tmp_file)
-        image_files.append(tmp_file)
-        tmp_file= 'unwise-'+tile+'-'+band+'-'+'invvar-m.fits.gz'
-        tmp_file=os.path.join(tiledir, tmp_file)
-        ivar_files.append(tmp_file)
+    for (i,sep2d_curr) in zip(range(len(tile_c)), sep2d):
+        if(sep2d_curr.deg<radius):
+            tile=alltiles['COADD_ID'][i]
+            topdir=tile[0:3]
+            botdir=tile
+            tiledir= os.path.join(os.getenv('UNWISE_DATA'), topdir, botdir)
+            tmp_file= 'unwise-'+tile+'-'+band+'-'+'img-'+postfix+'.fits'
+            tmp_file=os.path.join(tiledir, tmp_file)
+            image_files.append(tmp_file)
+            tmp_file= 'unwise-'+tile+'-'+band+'-'+'invvar-'+postfix+'.fits.gz'
+            tmp_file=os.path.join(tiledir, tmp_file)
+            ivar_files.append(tmp_file)
 
     # Make combination
-    pixscale=2.75
     (image, ivar, wcs)= dimage.dcombine(ra, dec, size, pixscale, image_files,
                                         ivar_files=ivar_files,kernel=kernel,
                                         dampsinc=dampsinc, edge=edge)

@@ -12,11 +12,12 @@ def main(argv):
     # Set defaults
     bpar=0.03
     scale=60.
+    dpi=1200
     
     # Parse header			
-    helpstr='fits2tiff -i <input> -o <output> -b <b param> -s <scale>'
+    helpstr='fits2tiff -i <input> -o <output> -b <b param> -s <scale> -d <dpi>'
     try:
-        opts, args = getopt.getopt(argv,"hi:o:b:s:",["help=","input=","output=","start=","end=","b=","scale="])
+        opts, args = getopt.getopt(argv,"hi:o:b:s:d:",["help=","input=","output=","start=","end=","b=","scale=","dpi="])
     except getopt.GetoptError:
         print helpstr
         sys.exit(2)
@@ -33,6 +34,8 @@ def main(argv):
             bpar = np.float32(arg)
         elif opt in ("-s", "--scale"):
             scale = np.float32(arg)
+        elif opt in ("-d", "--dpi"):
+            dpi = int(arg)
             
     # Read in image
     image= io.read_fits(infile)
@@ -41,7 +44,7 @@ def main(argv):
     ndimage[np.where(ndimage < 0.) ]=0.
     ndimage= np.int8(255-ndimage)
     image= Image.fromarray(ndimage, mode='L')
-    image.save(outfile, dpi=(1200,1200), format='png')
+    image.save(outfile, dpi=(dpi,dpi), format='png')
 		
 if __name__ == "__main__": 
     try:
