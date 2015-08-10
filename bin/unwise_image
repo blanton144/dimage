@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+
+#
+# Clip unWISE images and inverse variances
+# out at locations for atlas.
+#
+# MRB 2015-03-11 
+# 
+
+import pdb
+import os
+import sys
+import numpy as np
+import astropy.io.fits as pyfits
+import dimage
+import getopt
+import random
+import gzip
+
+# Band names
+bands=['w1', 'w2', 'w3', 'w4']
+
+# Standard WISE AB corrections
+wise2abs= [2.683,3.319,5.242,6.604]
+
+def gzip_file(filename):
+    f_in = open(filename, 'rb')
+    f_out = gzip.open(filename+'.gz', 'wb')
+    f_out.writelines(f_in)
+    f_out.close()
+    f_in.close()
+    
+def unwise_image(ra=None, dec=None, size=None, base=None, pixscale=2.75):
+    # Make each image
+    for (band, wise2ab) in zip(bands, wise2abs):
+        (image, ivar, wcs)= dimage.dcombine_wise(ra, dec, size, band,
+                                                 unmasked=True,
+                                                 pixscale=pixscale)
+        factor= 10.**(-0.4*wise2ab)
+        image= image*factor
+        ivar= ivar/factor**2
+        hdu0= pyfits.PrimaryHDU(data=image, header=wcs.to_header())
+        hdu1= pyfits.ImageHDU(data=ivar, header=wcs.to_header())
+        hdus= pyfits.HDUList(hdus=[hdu0,hdu1])
+        outfile= base+'-'+band+'.fits'
+        hdus.writeto(outfile, clobber=True)
+        gzip_file(outfile)
+        os.remove(outfile)
+
+def main(argv):
+    pixscale=np.float32(2.75)
+    
+    # Parse header
+    helpstr='unwise_image --ra <ra> --dec <dec> --size <size> --pixscale <arcsec/pix> --base <filebase>' 
+    try:
+        opts, args = getopt.getopt(argv,"hr:d:s:b:p:",["help=","ra=","dec=","size=","base=","pixscale="])
+    except getopt.GetoptError:
+        print helpstr
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == ("-h", "--help"):
+            print helpstr;
+            sys.exit() 
+        elif opt in ("-s", "--size"):
+            size = np.float32(arg) 
+        elif opt in ("-r", "--ra"):
+            ra = np.float64(arg) 
+        elif opt in ("-d", "--dec"):
+            dec = np.float64(arg) 
+        elif opt in ("-b", "--base"):
+            base = arg
+        elif opt in ("-p", "--pixscale"):
+            pixscale = np.float32(arg)
+
+    unwise_image(ra=ra, dec=dec, size=size, base=base, pixscale=pixscale)
+
+if __name__ == "__main__": 
+    main(sys.argv[1:])
+#    try:
+#    except:
+#        import sys
+#        tb = sys.exc_info()[2]
+#        pdb.post_mortem(tb)
