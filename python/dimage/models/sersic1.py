@@ -9,6 +9,9 @@ import astropy.io.fits as pyfits
 import random
 import scipy
 from dimage.models.list import *
+from dimage.atlas import atlas_path
+
+apath= atlas_path()
 
 def rlimit(n, frac=0.99):
     bn= scipy.special.gammaincinv(2.*n, 0.5)
@@ -32,7 +35,7 @@ def readlist(take, modelname):
        $FAKEPHOTOMETRY/[take]/models/[modelname]/model-list-[modelname].fits
     """
 
-    infile= listpath(take, modelname)
+    infile= apath.full('model-list', take=take, model=modelname)
     fp= pyfits.open(infile)
     return fp[1].data
 
