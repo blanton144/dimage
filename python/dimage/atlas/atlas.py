@@ -4,6 +4,7 @@ import numpy as np
 import astropy.coordinates as coordinates
 import astropy.utils.data as data
 import astropy.io.fits as fits
+from sdss.files.path import base_path
 
 """
 Module for accessing NASA-Sloan Atlas images and catalogs, either
@@ -11,15 +12,13 @@ locally or remotely.
 
 Use the "atlas" class to set up an access point for the data. You can
 set the version of atlas and also set up the access information for
-it. By default, it assumes the data is local, in the root directory is
-in $ATLAS_DATA (an environmental variable).
-
-If the data is remote, the remote access point can be set using the
-http() method.
+it. By default, it assumes the data is local, and the root directory
+is in $ATLAS_DATA (an environmental variable).
 
 For example, to access the mosaic for an NSA object with IAUNAME
 locally that is in $ATLAS_DATA:
 
+from dimage.atlas import atlas
 nsa= atlas()
 nsa.version= 'v1_0_0'
 mosaic= pyfits.open(nsa.file('mosaic', iauname='J095641.38+005057.1', band='g'))
@@ -74,29 +73,132 @@ which should create '~/.astropy/cache'
 
 """
 
-# Define paths of various files
-atlas_paths= dict([('atlas', 
-                    '[vN]/catalogs/atlas.fits'),
-                   ('pcat', 
-                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-pcat.fits.gz'),
-                   ('acat', 
-                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-acat-[pid].fits.gz'),
-                   ('measure', 
-                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-[pid]-measure.fits.gz'),
-                   ('mosaic', 
-                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-[band].fits'),
-                   ('petro',
-                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-[pid]-petro.fits'),
-                   ('original', 
-                    '[vN]/detect/[survey]/[subdir]/[iauname]-[band].fits'),
-                   ('cutout_jpg', 
-                    '[vN]/detect/[vN_M]/[subdir]/[iauname]-irg.cutout.jpg'),
-                   ('parent_jpg', 
-                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-parent-[pid]-[band].jpg'),
-                   ('atlas_jpg', 
-                    '[vN]/detect/[vN_M]/[subdir]/atlases/[pid]/[iauname]-[pid]-atlas-[aid]-[band].jpg'),
-                   ])
+def version_to_topdir(version):
+    """
+    Function to convert version into top directory of atlas
 
+    Parameters:
+    ==========
+    version : version of NSA (vN_M_P)
+
+    Returns:
+    =======
+    topid : top directory name vN
+    """
+    vN= (version.split('_'))[0]
+    return vN
+
+def version_to_detectdir(version):
+    """
+    Function to convert version into detection subdirectory
+
+    Parameters:
+    ==========
+    version : version of NSA (vN_M_P)
+
+    Returns:
+    =======
+    detectdir : detection subdirectory vN_M
+    """
+    vNM= "_".join((version.split('_'))[0:2])
+    return vNM
+    
+def radec_to_iauname(ra, dec, **kwargs):
+    """
+    Function to convert RA, Dec to an IAU-style name (JHHMMSS.SS[+-]DDMMSS.S)
+
+    Parameters:
+    ==========
+    ra : Right ascension, in deg
+    dec : Declination, in deg
+
+    Returns:
+    =======
+    iauname : IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
+    """
+    precision=2
+    ra_angle= coordinates.Angle(ra, unit='degree')
+    rastr= ra_angle.to_string(unit='hour', sep='', precision=precision,
+                              pad=True)
+    dec_angle= coordinates.Angle(dec, unit='degree')
+    decstr= dec_angle.to_string(unit='degree', sep='', precision=precision-1,
+                                pad=True, alwayssign=True)
+    return 'J'+rastr+decstr
+
+def iauname_to_subdir(iauname, **kwargs):
+    """
+    Function to convert IAUNAME to a subdirectory in NSA
+
+    Parameters:
+    ==========
+    iauname : IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
+
+    Returns:
+    =======
+    subdir : subdirectory based on IAU-style name
+        [RA]/[DEC]/[IAUNAME]
+      where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]
+    """
+    ra_dir= iauname[1:3]+'h'
+    dec_dir= "%02d" % (int(abs(float(iauname[11:13]))/2.)*2)
+    if iauname[10] == '+':
+        dec_dir= 'p'+dec_dir
+    else:
+        dec_dir= 'm'+dec_dir
+    return os.path.join(ra_dir, dec_dir, iauname)
+
+class atlas_path(base_path):
+    """Class for construction of NASA-Sloan Atlas paths
+    """
+    def __init__(self):
+        pathfile=os.path.join(os.getenv('DIMAGE_DIR'),
+                              'data', 'dimage_paths.ini')
+        super(atlas_path,self).__init__(pathfile)
+
+    def vN(self, filetype, **kwargs):
+        try:
+            return version_to_topdir(kwargs['version'])
+        except KeyError:
+            return None
+
+    def vN_M(self, filetype, **kwargs):
+        try:
+            return version_to_detectdir(kwargs['version'])
+        except KeyError:
+            return None
+    
+    def iauname(self, filetype, **kwargs):    
+        if kwargs.has_key('iauname'): # Set IAUNAME if given
+            return kwargs['iauname']
+        else: # Use NSAID/RADEC to deduce IAUNAME if need be
+            if kwargs.has_key('ra') and kwargs.has_key('dec'):
+                return radec_to_iauname(**kwargs)
+            if kwargs.has_key('nsaid'):
+                return self.nsaid_to_iauname(**kwargs)
+
+    def subdir(self, filetype, **kwargs):
+        iauname= self.iauname(filetype, **kwargs)
+        return iauname_to_subdir(iauname)
+
+    def pid(self, filetype, **kwargs):
+        iauname= self.iauname(filetype, **kwargs)
+        nsaid= self.iauname_to_nsaid(iauname)
+        return self.nsaid_to_pid(nsaid)[0][0]
+
+    def aid(self, filetype, **kwargs):
+        iauname= self.iauname(filetype, **kwargs)
+        nsaid= self.iauname_to_nsaid(iauname)
+        pid= self.nsaid_to_pid(nsaid)[0][0]
+        return self.nsaid_to_aid(nsaid,pid)[0][0]
+        
+        # For paths with IAUNAME, deal with PID identifiers
+        if "[pid]" in template: 
+            template=template.replace('[pid]', str(pid))
+            # And if PID is needed, get AID too
+            if "[aid]" in template: 
+                aid= self.nsaid_to_aid(nsaid, pid)[0]
+                template=template.replace('[aid]', str(aid))
+        
 class access(object):
     """
     Class for accessing remote (http) or local data identically
@@ -253,79 +355,6 @@ class access(object):
         ofp.close()
         return None
 
-def version_to_topdir(version):
-    """
-    Function to convert version into top directory of atlas
-
-    Parameters:
-    ==========
-    version : version of NSA (vN_M_P)
-
-    Returns:
-    =======
-    topid : top directory name vN
-    """
-    vN= (version.split('_'))[0]
-    return vN
-
-def version_to_detectdir(version):
-    """
-    Function to convert version into detection subdirectory
-
-    Parameters:
-    ==========
-    version : version of NSA (vN_M_P)
-
-    Returns:
-    =======
-    detectdir : detection subdirectory vN_M
-    """
-    vNM= "_".join((version.split('_'))[0:2])
-    return vNM
-    
-def radec_to_iauname(ra, dec, **kwargs):
-    """
-    Function to convert RA, Dec to an IAU-style name (JHHMMSS.SS[+-]DDMMSS.S)
-
-    Parameters:
-    ==========
-    ra : Right ascension, in deg
-    dec : Declination, in deg
-
-    Returns:
-    =======
-    iauname : IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
-    """
-    precision=2
-    ra_angle= coordinates.Angle(ra, unit='degree')
-    rastr= ra_angle.to_string(unit='hour', sep='', precision=precision,
-                              pad=True)
-    dec_angle= coordinates.Angle(dec, unit='degree')
-    decstr= dec_angle.to_string(unit='degree', sep='', precision=precision-1,
-                                pad=True, alwayssign=True)
-    return 'J'+rastr+decstr
-
-def iauname_to_subdir(iauname, **kwargs):
-    """
-    Function to convert IAUNAME to a subdirectory in NSA
-
-    Parameters:
-    ==========
-    iauname : IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
-
-    Returns:
-    =======
-    subdir : subdirectory based on IAU-style name
-        [RA]/[DEC]/[IAUNAME]
-      where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]
-    """
-    ra_dir= iauname[1:3]+'h'
-    dec_dir= "%02d" % (int(abs(float(iauname[11:13]))/2.)*2)
-    if iauname[10] == '+':
-        dec_dir= 'p'+dec_dir
-    else:
-        dec_dir= 'm'+dec_dir
-    return os.path.join(ra_dir, dec_dir, iauname)
 
 class atlas(access):
     """
@@ -462,7 +491,7 @@ class atlas(access):
         Takes same parameters as atlas.file()
         """
 
-        template= atlas_paths[filetype]
+        template= atlas_path[filetype]
         if(self._type  == 'local'):
             template=os.path.join(self.localdir, template)
         else:
