@@ -147,13 +147,13 @@ def iauname_to_subdir(iauname, **kwargs):
         dec_dir= 'm'+dec_dir
     return os.path.join(ra_dir, dec_dir, iauname)
 
-class atlas_path(base_path):
+class path(base_path):
     """Class for construction of NASA-Sloan Atlas paths
     """
     def __init__(self):
         pathfile=os.path.join(os.getenv('DIMAGE_DIR'),
                               'data', 'dimage_paths.ini')
-        super(atlas_path,self).__init__(pathfile)
+        super(path,self).__init__(pathfile)
 
     def vN(self, filetype, **kwargs):
         try:
@@ -491,7 +491,7 @@ class atlas(access):
         Takes same parameters as atlas.file()
         """
 
-        template= atlas_path[filetype]
+        template= path[filetype]
         if(self._type  == 'local'):
             template=os.path.join(self.localdir, template)
         else:

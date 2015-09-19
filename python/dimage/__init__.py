@@ -4,6 +4,7 @@ import atlas
 import conditions
 
 # dimage tools
+from path import * 
 from dsigma import * 
 from dshift import * 
 from dfake import * 
@@ -23,5 +24,3 @@ from curve2image import *
 # Memory utilities 
 from memory import * 
 
-# Test utilities
-import test
