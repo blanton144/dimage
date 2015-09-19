@@ -22,3 +22,6 @@ from curve2image import *
 
 # Memory utilities 
 from memory import * 
+
+# Test utilities
+import test
