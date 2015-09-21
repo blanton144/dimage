@@ -9,7 +9,7 @@ import ctypes
 import os
 import numpy as np
 
-def dsigma(image, sp=10):
+def sigma(image, sp=10):
     """Calculates standard deviation in image by checking pixel pairs
     
     Parameters
