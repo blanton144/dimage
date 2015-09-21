@@ -1,6 +1,5 @@
 """
-NSA tools
+Tools related to NSA
 """
 
-from atlas import *
-from utils import *
+from match_versions import *

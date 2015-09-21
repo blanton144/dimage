@@ -2,5 +2,5 @@
 Model creation tools.
 """
 
-import list
-import sersic1
+from list import *
+from sersic1 import *

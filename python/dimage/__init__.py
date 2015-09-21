@@ -1,27 +1,7 @@
 # Fake models
-import path
-import models 
 import atlas
-import conditions
-
-# dimage tools
-from path import * 
-from dsigma import * 
-from dshift import * 
-from dfake import * 
-from dresample import * 
-from dwcssimple import * 
-from dwcsgrid import * 
-from dcombine import * 
-from dcombine_wise import * 
-from dwcsproject import * 
-from simplexy import *
-
-# Petrosian tools
-from petro import * 
-from curve2image import * 
-#from apcorr import * 
-
-# Memory utilities 
-from memory import * 
-
+import combine
+import fake
+import measure 
+import test
+import utils
