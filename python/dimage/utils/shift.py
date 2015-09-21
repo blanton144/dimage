@@ -8,7 +8,7 @@ import ctypes
 import os
 import numpy as np
 
-def dshift(image, dx, dy, kernel='dampsinc', dampsinc=2.47,
+def shift(image, dx, dy, kernel='dampsinc', dampsinc=2.47,
            lanczos=2.):
     """Shifts a two-dimensional ndarray image in x, y 
     

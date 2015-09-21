@@ -1,5 +1,6 @@
 import urllib2
 import os
+import re
 import numpy as np
 import astropy.coordinates as coordinates
 import astropy.utils.data as data
@@ -147,21 +148,121 @@ def iauname_to_subdir(iauname, **kwargs):
         dec_dir= 'm'+dec_dir
     return os.path.join(ra_dir, dec_dir, iauname)
 
+def local_to_url(local, local_base='/data', remote_base='http://data.sdss.org'):
+    """
+    Function to convert a local path to the remote URL
+    
+    Parameters:
+    ==========
+
+    local : path to convert
+
+    local_base : Base path on local system
+
+    remote_base : Corresponding base path on remote system
+
+    """
+    return re.sub("^"+local_base, remote_base, local)
+
+def download_file(url, filename):
+    u = urllib2.urlopen(url)
+
+    if(os.path.isfile(filename) is True):
+        return filename
+
+    filedir= os.path.dirname(filename)
+    if(os.path.isdir(filedir) is False):
+        os.makedirs(filedir)
+    
+    with open(filename, 'wb') as f:
+        meta = u.info()
+        meta_func = meta.getheaders if hasattr(meta, 'getheaders') else meta.get_all
+        meta_length = meta_func("Content-Length")
+        file_size = None
+        if meta_length:
+            file_size = int(meta_length[0])
+        print("Downloading: {0} Bytes: {1}".format(url, file_size))
+
+        file_size_dl = 0
+        block_sz = 8192
+        while True:
+            buffer = u.read(block_sz)
+            if not buffer:
+                break
+
+            file_size_dl += len(buffer)
+            f.write(buffer)
+
+    return filename
+
 class path(base_path):
     """Class for construction of NASA-Sloan Atlas paths
     """
+
     def __init__(self):
         pathfile=os.path.join(os.getenv('DIMAGE_DIR'),
                               'data', 'dimage_paths.ini')
         super(path,self).__init__(pathfile)
+        self.nsaid_to_iauname_dict= None
+        self.iauname_to_nsaid_dict= None
+        self._remote= False
 
-    def vN(self, filetype, **kwargs):
+    def _reset(self):
+        self.nsaid_to_iauname_dict=None
+        self.iauname_to_nsaid_dict=None
+
+    def _nsaid_init(self, **kwargs):
+        """
+        Initializes translation table from NSAID to IAUNAME
+        """
+        atlas=fits.open(self.get('atlas', version=kwargs['version']))
+        iauname=atlas[1].data['IAUNAME']
+        nsaid=range(len(iauname))
+        self.nsaid_to_iauname_dict= dict(zip(nsaid, iauname))
+        self.iauname_to_nsaid_dict= dict(zip(iauname, nsaid))
+        atlas.close()
+
+    def remote(self, remote_base='http://data.sdss.org', local_base='/data', 
+               username=None, password=None):
+        self.remote_base= remote_base
+        self.local_base= local_base
+        self._remote= True
+        if((username is not None) and (password is not None)):
+            passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+            passman.add_password(None, self.remote_base, 
+                                 username, password)
+            authhandler = urllib2.HTTPBasicAuthHandler(passman)
+            opener = urllib2.build_opener(authhandler)
+            urllib2.install_opener(opener)
+
+    def nsaid_to_iauname(self, nsaid, **kwargs):
+        """
+        Returns IAUNAME given NSAID
+
+        Parameters:
+        ==========
+        nsaid : int, NSAID to infer IAUNAME from
+
+        Notes:
+        =====
+        Uses translation table set up by _nsaid_init(),
+        which involves reading the original atlas.fits file.
+        Large overhead on first call.
+        """
+        if self.nsaid_to_iauname_dict is None:
+            self._nsaid_init()
+        return self.nsaid_to_iauname_dict[nsaid]
+
+    def local(self):
+        self._remote= False
+
+    def v1(self, filetype, **kwargs):
         try:
             return version_to_topdir(kwargs['version'])
         except KeyError:
             return None
 
-    def vN_M(self, filetype, **kwargs):
+    def v2(self, filetype, **kwargs):
         try:
             return version_to_detectdir(kwargs['version'])
         except KeyError:
@@ -198,6 +299,14 @@ class path(base_path):
             if "[aid]" in template: 
                 aid= self.nsaid_to_aid(nsaid, pid)[0]
                 template=template.replace('[aid]', str(aid))
+
+    def get(self, filetype, **kwargs):
+        filename=self.full(filetype, **kwargs)
+        if(self._remote is True):
+            url= local_to_url(filename, local_base=self.local_base,
+                              remote_base=self.remote_base)
+            download_file(url, filename)
+        return(filename)
         
 class access(object):
     """
@@ -390,8 +499,6 @@ class atlas(access):
     password = '2.5-meters'
     localdir = os.getenv('ATLAS_DATA')
     version= 'v1_0_0'
-    nsaid_to_iauname_dict= None
-    iauname_to_nsaid_dict= None
     cache=True
 
     def _reset(self):
@@ -501,7 +608,7 @@ class atlas(access):
         topdir= version_to_topdir(self.version)
         template=template.replace('[vN]', topdir)
         detectdir= version_to_detectdir(self.version)
-        template=template.replace('[vN_M]', detectdir)
+        template=template.replace('[vNM]', detectdir)
         
         # Deal with IAUNAME identifiers
         iauname= None

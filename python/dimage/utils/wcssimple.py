@@ -13,7 +13,7 @@ def sayhi():
     print("hello, this works")
     return
 
-def dwcssimple(ra, dec, size, pixscale):
+def wcssimple(ra, dec, size, pixscale):
     """Create simple astropy WCS object, with TAN projection
     
     Parameters
