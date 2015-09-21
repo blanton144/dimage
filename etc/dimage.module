@@ -1,0 +1,40 @@
+#%Module1.0
+#
+proc ModulesHelp { } {
+    global product version
+    puts stderr "This module adds $product/$version to your environment."
+}
+#
+# Define variables
+#
+set product dimage 
+set version trunk
+#
+# This prevents other versions of this product being loaded simultaneously
+#
+conflict $product
+#
+# module-whatis
+#
+module-whatis "Sets up $product/$version in your environment."
+#
+# Load modules
+#
+#module load python/2.7.1
+#
+# Set environment
+#
+set PRODUCT_DIR /usr/local/products/$product/$version
+setenv DIMAGE_DIR $PRODUCT_DIR
+prepend-path PATH $PRODUCT_DIR/bin/cards
+prepend-path PATH $PRODUCT_DIR/bin/qsub
+prepend-path PATH $PRODUCT_DIR/bin/petro
+prepend-path PATH $PRODUCT_DIR/bin/fake
+prepend-path PATH $PRODUCT_DIR/bin/utils
+prepend-path PATH $PRODUCT_DIR/bin/test
+prepend-path IDL_PATH $PRODUCT_DIR/pro
+prepend-path PYTHONPATH $PRODUCT_DIR/python
+prepend-path LD_LIBRARY_PATH $PRODUCT_DIR/lib
+setenv ATLAS_DATA /data/sas/sdsswork/atlas
+setenv UNWISE_DATA /data/unwise/unwise-comp
+
