@@ -61,6 +61,14 @@ class TestPathsAtlas(unittest.TestCase):
     def test_atlas_iminfo(self):
         path= self.dpath.full('atlas_iminfo', version='v1_0_0')
         self.assertEqual(path, '/atlas/v1/catalogs/atlas_iminfo.fits')
+
+    def test_atlas_pcat_iauname(self):
+        path= self.dpath.full('pcat', version='v1_0_0', iauname='J000000.00+000000.0')
+        self.assertEqual(path, '/atlas/v1/detect/v1_0/00h/p00/J000000.00+000000.0/J000000.00+000000.0-pcat.fits.gz')
+
+    def test_atlas_pcat_nsaid(self):
+        path= self.dpath.full('pcat', version='v1_0_0', nsaid=10)
+        self.assertEqual(path, '/atlas/v1/detect/v1_0/00h/p00/J000000.00+000000.0/J000000.00+000000.0-pcat.fits.gz')
         
 
     
