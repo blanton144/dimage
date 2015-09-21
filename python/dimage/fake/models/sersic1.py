@@ -8,10 +8,10 @@ import numpy as np
 import astropy.io.fits as pyfits
 import random
 import scipy
-from dimage.models.list import *
-from dimage.atlas import atlas_path
+import dimage.fake.models 
+import dimage.utils.path
 
-apath= atlas_path()
+apath= dimage.utils.path()
 
 def rlimit(n, frac=0.99):
     bn= scipy.special.gammaincinv(2.*n, 0.5)
@@ -57,7 +57,7 @@ def readpar(take, modelname):
        $FAKEPHOTOMETRY/[take]/models/[modelname]/model-list-[modelname].fits
     """
 
-    infile= parpath(take, modelname)
+    infile= dimage.fake.models.parpath(take, modelname)
     fp= pyfits.open(infile)
     return fp[1].data
 
@@ -95,8 +95,8 @@ def writelist(take, modelname, rflux, r50, n, phi, ba, arcperpix):
             os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname))
         f.close()
 
-    outfile= listpath(take, modelname)
-    parfile= parpath(take, modelname)
+    outfile= dimage.fake.models.listpath(take, modelname)
+    parfile= dimage.fake.models.parpath(take, modelname)
     
     # Set index number
     indx= np.arange(len(rflux), dtype=np.int32)

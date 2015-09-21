@@ -165,14 +165,14 @@ def local_to_url(local, local_base='/data', remote_base='http://data.sdss.org'):
     return re.sub("^"+local_base, remote_base, local)
 
 def download_file(url, filename):
-    u = urllib2.urlopen(url)
-
     if(os.path.isfile(filename) is True):
         return filename
 
     filedir= os.path.dirname(filename)
     if(os.path.isdir(filedir) is False):
         os.makedirs(filedir)
+
+    u = urllib2.urlopen(url)
     
     with open(filename, 'wb') as f:
         meta = u.info()
@@ -205,6 +205,8 @@ class path(base_path):
         super(path,self).__init__(pathfile)
         self.nsaid_to_iauname_dict= None
         self.iauname_to_nsaid_dict= None
+        self.remote_base='http://data.sdss.org'
+        self.local_base='/data'
         self._remote= False
 
     def _reset(self):
@@ -222,10 +224,12 @@ class path(base_path):
         self.iauname_to_nsaid_dict= dict(zip(iauname, nsaid))
         atlas.close()
 
-    def remote(self, remote_base='http://data.sdss.org', local_base='/data', 
+    def remote(self, remote_base=None, local_base=None,
                username=None, password=None):
-        self.remote_base= remote_base
-        self.local_base= local_base
+        if(remote_base is not None):
+            self.remote_base= remote_base
+        if(local_base is not None):
+            self.local_base= local_base
         self._remote= True
         if((username is not None) and (password is not None)):
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -241,7 +245,8 @@ class path(base_path):
 
         Parameters:
         ==========
-        nsaid : int, NSAID to infer IAUNAME from
+        nsaid : int
+          NSAID to infer IAUNAME from
 
         Notes:
         =====
@@ -250,8 +255,69 @@ class path(base_path):
         Large overhead on first call.
         """
         if self.nsaid_to_iauname_dict is None:
-            self._nsaid_init()
+            self._nsaid_init(**kwargs)
         return self.nsaid_to_iauname_dict[nsaid]
+
+    def iauname_to_nsaid(self, iauname, **kwargs):
+        """
+        Returns NSAID given IAUNAME
+
+        Parameters:
+        ==========
+        IAUNAME : str
+          IAUNAME to infer NSAID from
+
+        Notes:
+        =====
+        Uses translation table set up by _nsaid_init(),
+        which involves reading the original atlas.fits file.
+        Large overhead on first call.
+        """
+        if self.iauname_to_nsaid_dict is None:
+            self.nsaid_init()
+        return self.iauname_to_nsaid_dict[iauname]
+
+    def nsaid_to_pid(self, nsaid, **kwargs):
+        """
+        Returns PID value for NSAID
+
+
+        
+        Parameters:
+        ==========
+        nsaid : int
+          NSAID 
+        
+        Returns:
+        =======
+        pid : int
+          parent IDs of processed objects in image
+        """
+        pcat= fits.open(self.get('pcat', nsaid=nsaid, **kwargs))
+        # Infers from where CRA isn't zero
+        indx= np.nonzero(pcat[1].data['CRA'])
+        return indx
+
+    def nsaid_to_aid(self, nsaid, pid, **kwargs):
+        """
+        Returns AID values for NSAID/PID
+
+        Parameters:
+        ==========
+        nsaid : int
+          NSAID 
+        pid : int 
+          parent ID 
+        
+        Returns:
+        =======
+        aid : aid to use
+        """
+        measure= fits.open(self.get('measure', pid=pid, nsaid=nsaid,
+                                    **kwargs))
+        # Infers from where measurements exist
+        aid= measure[1].data['AID']
+        return aid
 
     def local(self):
         self._remote= False
@@ -283,396 +349,22 @@ class path(base_path):
 
     def pid(self, filetype, **kwargs):
         iauname= self.iauname(filetype, **kwargs)
-        nsaid= self.iauname_to_nsaid(iauname)
-        return self.nsaid_to_pid(nsaid)[0][0]
+        kwargs['nsaid']= self.iauname_to_nsaid(iauname)
+        return str(self.nsaid_to_pid(**kwargs)[0][0])
 
     def aid(self, filetype, **kwargs):
         iauname= self.iauname(filetype, **kwargs)
-        nsaid= self.iauname_to_nsaid(iauname)
-        pid= self.nsaid_to_pid(nsaid)[0][0]
-        return self.nsaid_to_aid(nsaid,pid)[0][0]
-        
-        # For paths with IAUNAME, deal with PID identifiers
-        if "[pid]" in template: 
-            template=template.replace('[pid]', str(pid))
-            # And if PID is needed, get AID too
-            if "[aid]" in template: 
-                aid= self.nsaid_to_aid(nsaid, pid)[0]
-                template=template.replace('[aid]', str(aid))
+        kwargs['nsaid']= self.iauname_to_nsaid(iauname)
+        kwargs['pid']= self.nsaid_to_pid(**kwargs)[0][0]
+        return str(self.nsaid_to_aid(**kwargs)[0])
 
-    def get(self, filetype, **kwargs):
+    def url(self, filetype, **kwargs):
         filename=self.full(filetype, **kwargs)
+        return(local_to_url(filename, local_base=self.local_base,
+                            remote_base=self.remote_base))
+        
+    def get(self, filetype, **kwargs):
+        filename= self.full(filetype, **kwargs)
         if(self._remote is True):
-            url= local_to_url(filename, local_base=self.local_base,
-                              remote_base=self.remote_base)
-            download_file(url, filename)
+            download_file(self.url(filetype, **kwargs), filename)
         return(filename)
-        
-class access(object):
-    """
-    Class for accessing remote (http) or local data identically
-
-    Attributes:
-    ==========
-    _type : 'local' or 'http'
-    localdir : Local base directory for access
-    baseurl : Base url for http access
-    username : User name for http access
-    password : Password for http access
-    cache : bool, whether to cache results for download_file
-
-    Methods:
-    =======
-
-    local() - Sets a local source of data (overrides) 
-    http() - Sets a remote http source of data
-
-    open() - Open a file for reading from remote or local
-    copy() - Copy a file from remote or local
-
-    Notes:
-    =====
-
-    May be useful for other applications, but for NSA normally you
-    should just use the atlas class.
-
-    Depends on urllib2, os, and astropy v1.0 or later. Specifically it
-    uses astropy.utils.data.download_file to handle remote access. The
-    only nontrivial part of this is the password handling.
-
-    To use caching, you may need to run (once):
-    
-    import astropy.config
-    astropy.config.get_cache_dir
-    
-    which should create '~/.astropy/cache'
-    """
-
-    _type='local'
-    cache=True
-
-    def http(self, baseurl=None, username=None, password=None,
-             urlfile=None):
-        """
-        Sets up class for remote access
-
-        Parameters:
-        ==========
-
-        baseurl : url to serve as base for remote access
-        username : user name for password access
-        password : password for password access
-        urlfile : three-line file with baseurl, password, urlfile
-
-        """
-
-        # Read info from urlfile
-        if(urlfile is not None):
-            try:
-                fp=file.open(urlfile)
-                self.baseurl=fp.readline()
-                self.username=fp.readline()
-                self.password=fp.readline()
-                fp.close()
-            except:
-                print "Problem with URL file "+urlfile+", not setting remote."
-                return
-        
-        try:
-            # this creates a password manager
-            passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            passman.add_password(None, self.baseurl, self.username, 
-                                 self.password)
-            # create the AuthHandler
-            authhandler = urllib2.HTTPBasicAuthHandler(passman)
-            opener = urllib2.build_opener(authhandler)
-            # All calls to urllib2.urlopen will now use our handler
-            # Make sure not to include the protocol in with the URL, or
-            # HTTPPasswordMgrWithDefaultRealm will be very confused.
-            # You must (of course) use it when fetching the page though.
-            urllib2.install_opener(opener)
-            self._type='http'
-        except:
-            print "Problem opening URL "+self.baseurl
-            
-    def local(self, localdir):
-        """
-        Method to set up access class for local access
-        
-        Parameters:
-        ==========
-        localdir : top-level local directory for access point
-        """
-        self.localdir= localdir
-        self._type='local'
-
-    def _open_http(self, filename):
-        """
-        Internal method to open file with http
-        """
-        return data.download_file(filename, cache=self.cache)
-
-    def _open_local(self, filename):
-        """
-        Internal method to open file locally
-        """
-        return file(filename, 'rb')
-
-    def open(self, filename):
-        """
-        Method to open file
-
-        Parameters:
-        ==========
-        
-        filename : file name
-
-        Notes:
-        =====
-
-        If type of access set to http, opens [baseurl]/[filename]
-        If type of access set to local, opens [localdir]/[filename]
-
-        """
-        if(self._type == 'local'):
-            return self._open_local(filename)
-        if(self._type == 'http'):
-            return self._open_http(filename)
-            
-    def copy(self, filename, outfile=None):
-        """
-        Method to copy file
-
-        Parameters:
-        ==========
-        
-        filename : file name
-        outfile : output file
-
-        Notes:
-        =====
-        
-        Calls open() method
-
-        """
-        if(outfile is None):
-            outfile= filename.split('/')[-1]
-        ifp=self.open(filename)
-        ofp=file(outfile, 'wb')
-        ofp.write(ifp.read())
-        ifp.close()
-        ofp.close()
-        return None
-
-
-class atlas(access):
-    """
-    Class for accessing remote or local data identically
-
-    Attributes:
-    ==========
-    type : 'local' or 'http'
-    localdir : Local base directory for access
-    baseurl : Base url for http access
-    username : User name for http access
-    password : Password for http access
-    version : version number of atlas
-    cache : bool, whether or not to cache in astropy's download_file
-
-    Methods:
-    =======
-
-    local() - Sets a local source of atlas data (overrides) 
-    http() - Sets a http source of atlas data
-
-    open() - Open a file for reading from remote or local
-    copy() - Copy a file from http or local
-
-    filedir() - Return directory of a file
-    filename() - Return name of a file
-    file() - Return a file
-    """
-
-    _type='local'
-    baseurl= 'http://data.mirror.sdss.org/sas/sdsswork/atlas'
-    username = 'sdss'
-    password = '2.5-meters'
-    localdir = os.getenv('ATLAS_DATA')
-    version= 'v1_0_0'
-    cache=True
-
-    def _reset(self):
-        self.nsaid_to_iauname_dict=None
-        self.iauname_to_nsaid_dict=None
-        
-    def local(self, localdir=None):
-        """
-        Sets up access class for local access based on $ATLAS_DATA
-
-        Parameters:
-        ==========
-        localdir : if set, overrides $ATLAS_DATA
-        """
-        if(localdir is None):
-            self.localdir= os.getenv('ATLAS_DATA')
-        else:
-            self.localdir= localdir
-        self._type='local'
-        self._reset()
-
-    def nsaid_init(self):
-        """
-        Initializes translation table from NSAID to IAUNAME
-        """
-        atlas=fits.open(self.file('atlas'))
-        iauname=atlas[1].data['IAUNAME']
-        nsaid=range(len(iauname))
-        self.nsaid_to_iauname_dict= dict(zip(nsaid, iauname))
-        self.iauname_to_nsaid_dict= dict(zip(iauname, nsaid))
-        atlas.close()
-
-    def nsaid_to_iauname(self, nsaid, **kwargs):
-        """
-        Returns IAUNAME given NSAID
-
-        Parameters:
-        ==========
-        nsaid : int, NSAID to infer IAUNAME from
-
-        Notes:
-        =====
-        Uses translation table set up by nsaid_init(),
-        which involves reading the original atlas.fits file.
-        Large overhead on first call.
-        """
-        if self.nsaid_to_iauname_dict is None:
-            self.nsaid_init()
-        return self.nsaid_to_iauname_dict[nsaid]
-
-    def nsaid_to_pid(self, nsaid, **kwargs):
-        """
-        Returns PID value for NSAID
-
-        Parameters:
-        ==========
-        nsaid : int, NSAID 
-        
-        Returns:
-        =======
-        pid : parent IDs of processed objects in image
-        """
-        pcat= fits.open(self.file('pcat', nsaid=nsaid))
-        # Infers from where CRA isn't zero
-        indx= np.nonzero(pcat[1].data['CRA'])
-        return indx
-
-    def nsaid_to_aid(self, nsaid, pid, **kwargs):
-        """
-        Returns AID values for NSAID/PID
-
-        Parameters:
-        ==========
-        nsaid : int, NSAID 
-        pid : parent ID 
-        
-        Returns:
-        =======
-        aid : aid to use
-        """
-        measure= fits.open(self.file('measure', pid=pid, nsaid=nsaid))
-        # Infers from where measurements exist
-        aid= measure[1].data['AID']
-        return aid
-
-    def iauname_to_nsaid(self, iauname, **kwargs):
-        """
-        Returns IAUNAME given NSAID
-        """
-        if self.iauname_to_nsaid_dict is None:
-            self.nsaid_init()
-        return self.iauname_to_nsaid_dict[iauname]
-
-    def filename(self, filetype, **kwargs):
-        """
-        Method to return full name a given type of file
-        Takes same parameters as atlas.file()
-        """
-
-        template= path[filetype]
-        if(self._type  == 'local'):
-            template=os.path.join(self.localdir, template)
-        else:
-            template=os.path.join(self.baseurl, template)
-
-        # Determine and replace basic directories
-        topdir= version_to_topdir(self.version)
-        template=template.replace('[vN]', topdir)
-        detectdir= version_to_detectdir(self.version)
-        template=template.replace('[vNM]', detectdir)
-        
-        # Deal with IAUNAME identifiers
-        iauname= None
-        if kwargs.has_key('iauname'): # Set IAUNAME if given
-            iauname=kwargs['iauname']
-        else: # Use NSAID/RADEC to deduce IAUNAME if need be
-            if kwargs.has_key('ra') and kwargs.has_key('dec'):
-                iauname= radec_to_iauname(**kwargs)
-            if kwargs.has_key('nsaid'):
-                iauname= self.nsaid_to_iauname(**kwargs)
-        if iauname is not None:
-            # set subdirectories
-            subdir= iauname_to_subdir(iauname)
-            template=template.replace('[iauname]', iauname)
-            template=template.replace('[subdir]', subdir)
-        
-            # For paths with IAUNAME, deal with PID identifiers
-            if "[pid]" in template: 
-                nsaid= self.iauname_to_nsaid(iauname)
-                pid= self.nsaid_to_pid(nsaid)[0][0]
-                template=template.replace('[pid]', str(pid))
-                # And if PID is needed, get AID too
-                if "[aid]" in template: 
-                    aid= self.nsaid_to_aid(nsaid, pid)[0]
-                    template=template.replace('[aid]', str(aid))
-
-        # Now replace 
-        exclude_list=[]
-        for key, value in kwargs.iteritems():
-            if exclude_list.count(key) == 0:
-                template=template.replace('['+key+']', str(value))
-        
-        return template
-
-    def filedir(self, filetype, **kwargs):
-        """
-        Method to return directory of a given type of file
-        Takes same parameters as atlas.file()
-        """
-        filename=self.filename(filetype, **kwargs)
-        return "/".join(filename.split('/')[0:-1])
-
-    def file(self, filetype, outfile=None, **kwargs):
-        """
-        Method to open or copy a specific file
-
-        Parameters:
-        =======
-        filetype : type of file to return 
-        keyword arguments for replacement:
-           nsaid, or iauname, or ra and dec
-           band 
-        outfile : Output file if a copy desired (default None)
-
-        Notes:
-        =====
-        Depends on version attribute (should be of form vN_M_P)
-        Accepted file types:
-           'atlas'
-           'mosaic' (specify identifier and band)
-        """
-
-        filename= self.filename(filetype, **kwargs)
-        if(outfile is None):
-            return self.open(filename)
-        else:
-            return self.copy(filename)

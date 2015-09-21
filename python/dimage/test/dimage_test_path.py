@@ -1,6 +1,6 @@
 import unittest
 import os
-import dimage.path
+import dimage.utils.path 
 
 class TestPathsFake(unittest.TestCase):
 
@@ -9,7 +9,7 @@ class TestPathsFake(unittest.TestCase):
           self.oldfake= os.environ['FAKEPHOTOMETRY']
       except:
           pass
-      self.dpath= dimage.path()
+      self.dpath= dimage.utils.path()
       os.environ['FAKEPHOTOMETRY']='/fake'
 
   def tearDown(self):
@@ -41,8 +41,9 @@ class TestPathsAtlas(unittest.TestCase):
             self.oldatlas= os.environ['ATLAS_DATA']
         except:
             pass
-        self.dpath= dimage.path()
-        os.environ['ATLAS_DATA']='/atlas'
+        self.dpath= dimage.utils.path()
+        os.environ['ATLAS_DATA']=os.path.join(os.environ['DIMAGE_DIR'], 
+                                              'data', 'test', 'atlas')
 
     def tearDown(self):
         try:
@@ -52,23 +53,40 @@ class TestPathsAtlas(unittest.TestCase):
 
     def test_atlas(self):
         path= self.dpath.full('atlas', version='v1_0_0')
-        self.assertEqual(path, '/atlas/v1/catalogs/atlas.fits')
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/catalogs/atlas.fits'))
 
     def test_atlas_source(self):
         path= self.dpath.full('atlas_source', version='v1_0_0', source='source')
-        self.assertEqual(path, '/atlas/v1/catalogs/source_atlas.fits')
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/catalogs/source_atlas.fits'))
 
     def test_atlas_iminfo(self):
         path= self.dpath.full('atlas_iminfo', version='v1_0_0')
-        self.assertEqual(path, '/atlas/v1/catalogs/atlas_iminfo.fits')
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/catalogs/atlas_iminfo.fits'))
 
     def test_atlas_pcat_iauname(self):
         path= self.dpath.full('pcat', version='v1_0_0', iauname='J000000.00+000000.0')
-        self.assertEqual(path, '/atlas/v1/detect/v1_0/00h/p00/J000000.00+000000.0/J000000.00+000000.0-pcat.fits.gz')
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/detect/v1_0/00h/p00/J000000.00+000000.0/J000000.00+000000.0-pcat.fits.gz'))
 
     def test_atlas_pcat_nsaid(self):
-        path= self.dpath.full('pcat', version='v1_0_0', nsaid=10)
-        self.assertEqual(path, '/atlas/v1/detect/v1_0/00h/p00/J000000.00+000000.0/J000000.00+000000.0-pcat.fits.gz')
-        
+        path= self.dpath.full('pcat', version='v1_0_0', nsaid=1)
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/detect/v1_0/09h/m00/J094630.85-004554.5/J094630.85-004554.5-pcat.fits.gz'))
 
-    
+    def test_atlas_acat_nsaid(self):
+        path= self.dpath.full('acat', version='v1_0_0', nsaid=1)
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/detect/v1_0/09h/m00/J094630.85-004554.5/atlases/29/J094630.85-004554.5-acat-29.fits.gz'))
+
+    def test_atlas_measure_nsaid(self):
+        path= self.dpath.full('measure', version='v1_0_0', nsaid=1)
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/detect/v1_0/09h/m00/J094630.85-004554.5/atlases/29/J094630.85-004554.5-29-measure.fits.gz'))
+
+    def test_atlas_atlas_jpg_nsaid(self):
+        path= self.dpath.full('atlas_jpg', version='v1_0_0', nsaid=1, band='g')
+        self.assertEqual(path, os.path.join(os.environ['ATLAS_DATA'],
+                                            'v1/detect/v1_0/09h/m00/J094630.85-004554.5/atlases/29/J094630.85-004554.5-29-atlas-0-g.jpg'))
