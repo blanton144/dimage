@@ -2,76 +2,36 @@ import urllib2
 import os
 import re
 import numpy as np
-import astropy.coordinates as coordinates
-import astropy.utils.data as data
-import astropy.io.fits as fits
+import fitsio
 from sdss.files.path import base_path
 
 """
 Module for accessing NASA-Sloan Atlas images and catalogs, either
 locally or remotely.
 
-Use the "atlas" class to set up an access point for the data. You can
-set the version of atlas and also set up the access information for
-it. By default, it assumes the data is local, and the root directory
-is in $ATLAS_DATA (an environmental variable).
+Use the "path" class. It requires the environmental variable $ATLAS_DATA 
+to be set to the root of the NSA data tree.
 
-For example, to access the mosaic for an NSA object with IAUNAME
-locally that is in $ATLAS_DATA:
+import fitsio
+import dimage.utils.path 
+apath= dimage.utils.path()
+filename= apath.get('original', iauname='J095641.38+005057.1', band='g',
+                     survey='sdss', version='v1_0_0')
+image= fitsio.read(filename)
 
-from dimage.atlas import atlas
-nsa= atlas()
-nsa.version= 'v1_0_0'
-mosaic= pyfits.open(nsa.file('mosaic', iauname='J095641.38+005057.1', band='g'))
+To access the same mosaic remotely, the code will download from 
+the server at http://data.sdss.org into your local $ATLAS_DATA 
+directory. Then you will be able to access the file.
 
-To access the same mosaic remotely:
+import dimage.utils.path
+apath= dimage.utils.path()
+# insert SDSS username and password as strings below!
+apath.remote(username=, password=) 
+filename= apath.get('original', iauname='J095641.38+005057.1', band='g',
+                     survey='sdss', version='v1_0_0')
+image= fitsio.read(filename)
 
-from dimage.atlas import atlas
-nsa= atlas()
-nsa.version= 'v1_0_0'
-nsa.http()
-mosaic= pyfits.open(nsa.file('mosaic', iauname='J095641.38+005057.1', band='g'))
-mosaic= pyfits.open(nsa.file('mosaic', nsaid=15555, band='i'))
-mosaic= pyfits.open(nsa.file('mosaic', ra=15., dec=24., band='i'))
-
-The other sorts of files accessible are:
-
-nsa.file('atlas') - original atlas.fits file defining major version
-
-The example above uses the default http settings. You can instead
-include them as parameters, as shown below:
-
-nsa.http(baseurl=baseurl, username=username, password=password)
-
-If you need to return to local access, you can reset the object to
-local access:
-
-nsa.local(localdir=localdir)
-
-where if localdir is not given or None then $ATLAS_DATA is assumed.
-
-Several functions in this module may be of more general use (but
-should usually only be used by functions in the atlas class):
-
-  version_to_topdir()
-  version_to_detectdir()
-  radec_to_iauname()
-  iauname_to_subdir()
-  
-The "atlas" class is a subclass of "access", which wraps the switch
-between local and remote. "access" may be useful in other contexts
-(though it is just a very thin layer over urllib2).
-
-Depends on urllib2, os, and astropy v1.0 or later. Specifically it
-uses astropy.utils.data.download_file to handle remote access.
-
-To have astropy.utils.data use caching, you may need to run (once):
-
-import astropy.config
-astropy.config.get_cache_dir
-
-which should create '~/.astropy/cache'
-
+Depends on urllib2, os, and astropy v1.0 or later. 
 """
 
 def version_to_topdir(version):
@@ -117,6 +77,7 @@ def radec_to_iauname(ra, dec, **kwargs):
     =======
     iauname : IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
     """
+    import astropy.coordinates as coordinates
     precision=2
     ra_angle= coordinates.Angle(ra, unit='degree')
     rastr= ra_angle.to_string(unit='hour', sep='', precision=precision,
@@ -217,8 +178,8 @@ class path(base_path):
         """
         Initializes translation table from NSAID to IAUNAME
         """
-        atlas=fits.open(self.get('atlas', version=kwargs['version']))
-        iauname=atlas[1].data['IAUNAME']
+        atlas=fitsio.read(self.get('atlas', version=kwargs['version']))
+        iauname=atlas['IAUNAME']
         nsaid=range(len(iauname))
         self.nsaid_to_iauname_dict= dict(zip(nsaid, iauname))
         self.iauname_to_nsaid_dict= dict(zip(iauname, nsaid))
@@ -280,8 +241,6 @@ class path(base_path):
     def nsaid_to_pid(self, nsaid, **kwargs):
         """
         Returns PID value for NSAID
-
-
         
         Parameters:
         ==========
@@ -293,9 +252,9 @@ class path(base_path):
         pid : int
           parent IDs of processed objects in image
         """
-        pcat= fits.open(self.get('pcat', nsaid=nsaid, **kwargs))
+        pcat= fitsio.read(self.get('pcat', nsaid=nsaid, **kwargs))
         # Infers from where CRA isn't zero
-        indx= np.nonzero(pcat[1].data['CRA'])
+        indx= np.nonzero(pcat['CRA'])
         return indx
 
     def nsaid_to_aid(self, nsaid, pid, **kwargs):
@@ -313,10 +272,10 @@ class path(base_path):
         =======
         aid : aid to use
         """
-        measure= fits.open(self.get('measure', pid=pid, nsaid=nsaid,
+        measure= fitsio.read(self.get('measure', pid=pid, nsaid=nsaid,
                                     **kwargs))
         # Infers from where measurements exist
-        aid= measure[1].data['AID']
+        aid= measure['AID']
         return aid
 
     def local(self):
