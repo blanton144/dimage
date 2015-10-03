@@ -8,21 +8,17 @@ import astropy.io.fits as fits
 from sdss.files.path import base_path
 
 """
-Module for accessing NASA-Sloan Atlas images and catalogs, either
-locally or remotely.
+Module for NASA-Sloan Atlas images and catalogs locally or remotely.
 
-Use the "atlas" class to set up an access point for the data. You can
-set the version of atlas and also set up the access information for
-it. By default, it assumes the data is local, and the root directory
-is in $ATLAS_DATA (an environmental variable).
+An instance of the "path" class allows the generation of URLs and file
+paths. By default, it assumes the data is local. 
 
-For example, to access the mosaic for an NSA object with IAUNAME
-locally that is in $ATLAS_DATA:
+Example:
 
-from dimage.atlas import atlas
-nsa= atlas()
-nsa.version= 'v1_0_0'
-mosaic= pyfits.open(nsa.file('mosaic', iauname='J095641.38+005057.1', band='g'))
+import dimage
+nsa= dimage.utils.path()
+nsa.remote(username='username', password='password')
+mosaic= pyfits.open(nsa.get('mosaic', iauname='J095641.38+005057.1', band='g', version='v1_0_0'))
 
 To access the same mosaic remotely:
 
@@ -199,9 +195,10 @@ class path(base_path):
     """Class for construction of NASA-Sloan Atlas paths
     """
 
-    def __init__(self):
-        pathfile=os.path.join(os.getenv('DIMAGE_DIR'),
-                              'data', 'dimage_paths.ini')
+    def __init__(self, pathfile=None):
+        if(pathfile is None):
+            pathfile=os.path.join(os.getenv('DIMAGE_DIR'),
+                                  'data', 'dimage_paths.ini')
         super(path,self).__init__(pathfile)
         self.nsaid_to_iauname_dict= None
         self.iauname_to_nsaid_dict= None
@@ -302,16 +299,17 @@ class path(base_path):
         """
         Returns AID values for NSAID/PID
 
-        Parameters:
-        ==========
+        Parameters
+        ----------
         nsaid : int
           NSAID 
         pid : int 
           parent ID 
-        
-        Returns:
-        =======
-        aid : aid to use
+
+        Returns
+        -------
+        aid : int
+          aid of detected object
         """
         measure= fits.open(self.get('measure', pid=pid, nsaid=nsaid,
                                     **kwargs))
@@ -333,7 +331,7 @@ class path(base_path):
             return version_to_detectdir(kwargs['version'])
         except KeyError:
             return None
-    
+
     def iauname(self, filetype, **kwargs):    
         if kwargs.has_key('iauname'): # Set IAUNAME if given
             return kwargs['iauname']
