@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.combine.wcsproject &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimage.html">dimage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dimage.combine.wcsproject</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dimage.combine.wcsproject</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Reproject an image at a new set of RA and Dec positions, based on a</span>
+<span class="sd">WCS header. </span>
+
+<span class="sd">Michael R. Blanton, 2015-02-04</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">dimage</span>
+<span class="kn">import</span> <span class="nn">astropy</span>
+
+<div class="viewcode-block" id="wcsproject"><a class="viewcode-back" href="../../../dimage.combine.html#dimage.combine.wcsproject">[docs]</a><span class="k">def</span> <span class="nf">wcsproject</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">wcs</span><span class="p">,</span> <span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s">&#39;lanczos&#39;</span><span class="p">,</span> <span class="n">dampsinc</span><span class="o">=</span><span class="mf">2.47</span><span class="p">,</span>
+                <span class="n">lanczos</span><span class="o">=</span><span class="mf">2.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Resamples a two-dimensional ndarray image in RA, Dec</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image : [nx, ny] 2-D ndarray </span>
+<span class="sd">    weight : [nx, ny] weight 2-D ndarray </span>
+<span class="sd">    wcs : WCS object</span>
+<span class="sd">    ra, dec : [N] locations for samples</span>
+<span class="sd">    kernel : Kernel to use in resampling (default &#39;dampsinc&#39;)</span>
+<span class="sd">    dampsinc : Gaussian scale used for &#39;dampsinc&#39; (default 2.47)</span>
+<span class="sd">    lanczos : Lanczos scale parameter &quot;a&quot; (default 2)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    samples, weights, inbox : [M] samples, weights, and indices into ra,dec</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Calls dresample.</span>
+<span class="sd">    Will NOT work for very wide angle input images (180. deg or more), because  </span>
+<span class="sd">     0/360 case checking is too simple.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Make sure RA/Dec are flat</span>
+    <span class="n">ra_flat</span><span class="o">=</span><span class="n">ra</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">dec_flat</span><span class="o">=</span><span class="n">dec</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="c"># Find bounding box of image in RA/Dec and get indices</span>
+    <span class="c"># of ra/dec grid within that box</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ft</span><span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">calc_footprint</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">ft</span><span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">calcFootprint</span><span class="p">()</span>
+    <span class="n">xy</span><span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">all_world2pix</span><span class="p">(</span><span class="n">ft</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">radec</span><span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">all_pix2world</span><span class="p">(</span><span class="n">xy</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">xy</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ramin</span><span class="o">=</span><span class="n">ft</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">ramax</span><span class="o">=</span><span class="n">ft</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">decmin</span><span class="o">=</span><span class="n">ft</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">decmax</span><span class="o">=</span><span class="n">ft</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ramax</span><span class="o">-</span><span class="n">ramin</span> <span class="o">&gt;</span> <span class="mf">180.</span><span class="p">):</span>
+        <span class="c"># Case that image straddles 0/360. (</span>
+        <span class="n">inbox</span><span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(((</span><span class="n">ra_flat</span><span class="o">&lt;</span><span class="n">ramin</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">ra_flat</span><span class="o">&gt;</span><span class="n">ramax</span><span class="p">))</span> <span class="o">&amp;</span>
+                           <span class="p">(</span><span class="n">dec_flat</span><span class="o">&gt;</span><span class="n">decmin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dec_flat</span><span class="o">&lt;</span><span class="n">decmax</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># Case that image doesn&#39;t straddle</span>
+        <span class="n">inbox</span><span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">((</span><span class="n">ra_flat</span><span class="o">&gt;</span><span class="n">ramin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">ra_flat</span><span class="o">&lt;</span><span class="n">ramax</span><span class="p">)</span> <span class="o">&amp;</span>
+                          <span class="p">(</span><span class="n">dec_flat</span><span class="o">&gt;</span><span class="n">decmin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dec_flat</span><span class="o">&lt;</span><span class="n">decmax</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Bail if no pixels</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inbox</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">inbox</span><span class="p">)</span>
+            
+    <span class="c"># Get X and Y for points within bounding box</span>
+    <span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">all_world2pix</span><span class="p">(</span><span class="n">ra_flat</span><span class="p">[</span><span class="n">inbox</span><span class="p">],</span> <span class="n">dec_flat</span><span class="p">[</span><span class="n">inbox</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c"># Actually resample. </span>
+    <span class="c"># (Could be somewhere more efficient if dresample took image </span>
+    <span class="c"># and weight simultaneously.)</span>
+    <span class="n">rimage</span><span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">dampsinc</span><span class="o">=</span><span class="n">dampsinc</span><span class="p">,</span>
+                             <span class="n">lanczos</span><span class="o">=</span><span class="n">lanczos</span><span class="p">)</span>
+    <span class="n">rweight</span><span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">dampsinc</span><span class="o">=</span><span class="n">dampsinc</span><span class="p">,</span>
+                              <span class="n">lanczos</span><span class="o">=</span><span class="n">lanczos</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">rimage</span><span class="p">,</span> <span class="n">rweight</span><span class="p">,</span> <span class="n">inbox</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.combine.combine &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimage.html">dimage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dimage.combine.combine</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dimage.combine.combine</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">astropy.io.fits</span> <span class="kn">as</span> <span class="nn">pyfits</span>
+<span class="kn">import</span> <span class="nn">astropy.wcs</span> <span class="kn">as</span> <span class="nn">wcs</span>
+<span class="kn">import</span> <span class="nn">dimage</span>
+
+
+<div class="viewcode-block" id="combine_apodize"><a class="viewcode-back" href="../../../dimage.combine.html#dimage.combine.combine_apodize">[docs]</a><span class="k">def</span> <span class="nf">combine_apodize</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create apodized weight image</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nx, ny : int</span>
+<span class="sd">        dimensions of image</span>
+<span class="sd">    edge : int</span>
+<span class="sd">        pixel width of apodized edge (default 10)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    weight : np.float32</span>
+<span class="sd">        [nx, ny] ndarray weighted image</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses a cos() function transition from zero to unity in</span>
+<span class="sd">    each dimension along each edge.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">edgeweight</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span>
+                                     <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">edge</span><span class="p">))))</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">weight</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">edge</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">weight</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">edge</span><span class="p">]</span> <span class="o">*</span>
+                         <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">edgeweight</span><span class="p">))</span>
+    <span class="n">weight</span><span class="p">[:,</span> <span class="p">(</span><span class="n">ny</span> <span class="o">-</span> <span class="n">edge</span><span class="p">):</span><span class="n">ny</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">weight</span><span class="p">[:,</span> <span class="p">(</span><span class="n">ny</span> <span class="o">-</span> <span class="n">edge</span><span class="p">):</span><span class="n">ny</span><span class="p">]</span> <span class="o">*</span>
+                                 <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                                          <span class="n">edgeweight</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">weight</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">edge</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">weight</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">edge</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span>
+                         <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">edgeweight</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)))</span>
+    <span class="n">weight</span><span class="p">[(</span><span class="n">nx</span> <span class="o">-</span> <span class="n">edge</span><span class="p">):</span><span class="n">nx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">(</span><span class="n">weight</span><span class="p">[(</span><span class="n">nx</span> <span class="o">-</span> <span class="n">edge</span><span class="p">):</span><span class="n">nx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span>
+                                 <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">edgeweight</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                          <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">weight</span>
+
+</div>
+<div class="viewcode-block" id="dcombine"><a class="viewcode-back" href="../../../dimage.combine.html#dimage.combine.dcombine">[docs]</a><span class="k">def</span> <span class="nf">dcombine</span><span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">pixscale</span><span class="p">,</span> <span class="n">image_files</span><span class="p">,</span> <span class="n">ivar_files</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">kernel</span><span class="o">=</span><span class="s">&#39;lanczos&#39;</span><span class="p">,</span> <span class="n">dampsinc</span><span class="o">=</span><span class="mf">2.47</span><span class="p">,</span>
+             <span class="n">lanczos</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combine a list of images onto a desired footprint</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ra, dec : np.float64</span>
+<span class="sd">        center of image (J2000 deg)</span>
+<span class="sd">    size : float</span>
+<span class="sd">        size of square image (deg)</span>
+<span class="sd">    pixelscale : float</span>
+<span class="sd">        pixel scale (arcsec)</span>
+<span class="sd">    image_files : str</span>
+<span class="sd">        [N] list of image file names</span>
+<span class="sd">    ivar_files : str</span>
+<span class="sd">        [N] list of inverse variance file names (default none)</span>
+<span class="sd">    edge : int</span>
+<span class="sd">        pixel width of apodized edge to use (default 10)</span>
+<span class="sd">    kernel, dampsinc, lanczos :</span>
+<span class="sd">        parameters for dresample</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (image, ivar, wcs) : (float32, float32, WCS)</span>
+<span class="sd">       [nx, ny] image</span>
+<span class="sd">       [nx, ny] image of estimated inverse variance</span>
+<span class="sd">       WCS object</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Uses a weighted combination with apodized edges of images to</span>
+<span class="sd">      ensure smooth transitions.</span>
+<span class="sd">    Uses inverse variance to estimate final inverse variance, but</span>
+<span class="sd">      doesn&#39;t track covariance and doesn&#39;t use inverse variance</span>
+<span class="sd">      as a weight.</span>
+<span class="sd">    Calls dwcsproject for projection, which calls dresample.</span>
+<span class="sd">    Assumes WCS for images and inverse variance files are identical;</span>
+<span class="sd">      otherwise unpredictable results!</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Create simple WCS</span>
+    <span class="p">(</span><span class="n">target_wcs</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span> <span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">wcssimple</span><span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">pixscale</span><span class="p">)</span>
+
+    <span class="c"># Create grid of RA/Dec values for each pixel</span>
+    <span class="p">(</span><span class="n">ragrid</span><span class="p">,</span> <span class="n">decgrid</span><span class="p">)</span> <span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">wcsgrid</span><span class="p">(</span><span class="n">target_wcs</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
+
+    <span class="c"># If inverse variance isn&#39;t given, set to Nones</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ivar_files</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span> 
+        <span class="n">ivar_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_files</span><span class="p">)</span>
+
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">ivar_file</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">image_files</span><span class="p">,</span> <span class="n">ivar_files</span><span class="p">):</span>
+        <span class="c"># Get image from file</span>
+        <span class="n">hdus</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+        <span class="n">tile_image</span> <span class="o">=</span> <span class="n">hdus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">tile_wcs</span> <span class="o">=</span> <span class="n">wcs</span><span class="o">.</span><span class="n">WCS</span><span class="p">(</span><span class="n">hdus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+
+        <span class="c"># Create apodized weight</span>
+        <span class="n">tile_weight</span> <span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">combine</span><span class="o">.</span><span class="n">combine_apodize</span><span class="p">(</span><span class="n">tile_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                     <span class="n">tile_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                     <span class="n">edge</span><span class="o">=</span><span class="n">edge</span><span class="p">)</span>
+
+        <span class="c"># Interpolate actual image image</span>
+        <span class="p">(</span><span class="n">tmp_image</span><span class="p">,</span> <span class="n">tmp_weight</span><span class="p">,</span> <span class="n">inbox</span><span class="p">)</span> <span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">combine</span><span class="o">.</span><span class="n">wcsproject</span><span class="p">(</span>
+            <span class="n">tile_image</span><span class="p">,</span> <span class="n">tile_weight</span><span class="p">,</span> <span class="n">tile_wcs</span><span class="p">,</span> <span class="n">ragrid</span><span class="p">,</span> <span class="n">decgrid</span><span class="p">,</span>
+            <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">dampsinc</span><span class="o">=</span><span class="n">dampsinc</span><span class="p">,</span> <span class="n">lanczos</span><span class="o">=</span><span class="n">lanczos</span><span class="p">)</span>
+
+        <span class="c"># Add weighted image and weights to sum</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">tmp_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">image</span><span class="p">[</span><span class="n">inbox</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="n">inbox</span><span class="p">]</span> <span class="o">+</span> <span class="n">tmp_image</span> <span class="o">*</span> <span class="n">tmp_weight</span><span class="p">)</span>
+            <span class="n">weight</span><span class="p">[</span><span class="n">inbox</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">weight</span><span class="p">[</span><span class="n">inbox</span><span class="p">]</span> <span class="o">+</span> <span class="n">tmp_weight</span><span class="p">)</span>
+
+        <span class="c"># If inverse variance exists do the same; note this</span>
+        <span class="c"># does not track the covariance</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">ivar_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">hdus</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">ivar_file</span><span class="p">)</span>
+            <span class="n">tile_ivar</span> <span class="o">=</span> <span class="n">hdus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+            <span class="p">(</span><span class="n">tmp_ivar</span><span class="p">,</span> <span class="n">tmp_weight</span><span class="p">,</span> <span class="n">inbox</span><span class="p">)</span> <span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">combine</span><span class="o">.</span><span class="n">wcsproject</span><span class="p">(</span>
+                <span class="n">tile_ivar</span><span class="p">,</span> <span class="n">tile_weight</span><span class="p">,</span> <span class="n">tile_wcs</span><span class="p">,</span> <span class="n">ragrid</span><span class="p">,</span> <span class="n">decgrid</span><span class="p">,</span>
+                <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span> <span class="n">dampsinc</span><span class="o">=</span><span class="n">dampsinc</span><span class="p">,</span> <span class="n">lanczos</span><span class="o">=</span><span class="n">lanczos</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">tmp_ivar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+                <span class="n">tmp_ivar</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tmp_ivar</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.</span>
+                <span class="n">tmp_var</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">tmp_ivar</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">)</span> <span class="o">/</span>
+                           <span class="p">(</span><span class="n">tmp_ivar</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">tmp_ivar</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">)))</span>
+                <span class="n">var</span><span class="p">[</span><span class="n">inbox</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">var</span><span class="p">[</span><span class="n">inbox</span><span class="p">]</span> <span class="o">+</span> <span class="n">tmp_var</span> <span class="o">*</span> <span class="n">tmp_weight</span><span class="p">)</span>
+
+    <span class="c"># For all pixels with some weight in them, evaluate weighted</span>
+    <span class="c"># average (image/weight)</span>
+    <span class="n">nz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+    <span class="n">image</span><span class="p">[</span><span class="n">nz</span><span class="p">]</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">nz</span><span class="p">]</span> <span class="o">/</span> <span class="n">weight</span><span class="p">[</span><span class="n">nz</span><span class="p">]</span>
+    <span class="n">var</span><span class="p">[</span><span class="n">nz</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span><span class="p">[</span><span class="n">nz</span><span class="p">]</span> <span class="o">/</span> <span class="n">weight</span><span class="p">[</span><span class="n">nz</span><span class="p">]</span>
+
+    <span class="c"># Invert variance to inverse variance</span>
+    <span class="n">var</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">var</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">ivar</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">var</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">var</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">var</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">),</span> <span class="n">ivar</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">),</span> <span class="n">target_wcs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

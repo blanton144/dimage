@@ -1,6 +1,0 @@
-initdb -D database
-pg_ctl -D initdb -l logfile start
-createdb atlas
-createuser
-[ then give postgres as role name ]
-psql -h localhost -U postgres atlas

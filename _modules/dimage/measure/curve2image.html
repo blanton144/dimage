@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.measure.curve2image &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimage.html">dimage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dimage.measure.curve2image</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dimage.measure.curve2image</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculate an approximate</span>
+
+<span class="sd">Michael R. Blanton, 2014-05-14</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+
+
+<div class="viewcode-block" id="curve2image"><a class="viewcode-back" href="../../../dimage.measure.html#dimage.measure.curve2image">[docs]</a><span class="k">def</span> <span class="nf">curve2image</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">sb</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">ba</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">xcen</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ycen</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts an elliptical surface brightness distribution to an image.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    radius : np.float32</span>
+<span class="sd">        1-D ndarray with radii</span>
+<span class="sd">    sb : np.float32</span>
+<span class="sd">        1-D ndarray with surface brightness</span>
+<span class="sd">    nx : int</span>
+<span class="sd">        x size of image</span>
+<span class="sd">    ny : int</span>
+<span class="sd">        y size of image</span>
+<span class="sd">    ba : float</span>
+<span class="sd">        axis ratio (b/a) between 0.2 and 1 (default 1); if input &lt; 0.2</span>
+<span class="sd">        then 0.2 is used.</span>
+<span class="sd">    phi : float</span>
+<span class="sd">        position angle in deg (default 0); direction of major axis,</span>
+<span class="sd">        is defined such that tan(phi) = -x/y</span>
+<span class="sd">    xcen : float</span>
+<span class="sd">        X center to use (default float(nx)*0.5)</span>
+<span class="sd">    ycen : float</span>
+<span class="sd">        Y center to use (default float(ny)*0.5)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    image : np.float32</span>
+<span class="sd">        [nx, ny] 2-D array with image in it</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The resulting image has an axis ratio and position angle as input,</span>
+<span class="sd">    with the given surface brightness distribution.</span>
+
+<span class="sd">    For a North-up (+y), East-left (-x) image, position angle phi</span>
+<span class="sd">    definition corresponds to astronomical standard (deg East of North).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Interpret input</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">xcen</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">xcen</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nx</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ycen</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">ycen</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ny</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ba</span> <span class="o">&gt;</span> <span class="mf">0.2</span><span class="p">):</span>
+        <span class="n">ba_use</span> <span class="o">=</span> <span class="n">ba</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ba_use</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+    <span class="c"># Create radius array defining how far pixels are from center,</span>
+    <span class="c"># accounting for axis ratio.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ny</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">xcen</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ny</span><span class="p">))</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">ycen</span>
+    <span class="n">xp</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span>
+           <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">ba_use</span><span class="p">)</span>
+    <span class="n">yp</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.</span> <span class="o">*</span> <span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">rimage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">xp</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">yp</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c"># Now create image</span>
+    <span class="n">sb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">sb</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">radius</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+    <span class="n">interper</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">sb</span><span class="p">)</span>
+    <span class="n">indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">rimage</span><span class="o">.</span><span class="n">flat</span> <span class="o">&lt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span><span class="p">)</span>
+    <span class="n">image</span><span class="p">[</span><span class="n">indx</span><span class="p">]</span> <span class="o">=</span> <span class="n">interper</span><span class="p">(</span><span class="n">rimage</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">indx</span><span class="p">])</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">))</span>
+
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">image</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

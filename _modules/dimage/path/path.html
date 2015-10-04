@@ -1,0 +1,589 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.path.path &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimage.html">dimage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dimage.path.path</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dimage.path.path</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">fitsio</span>
+<span class="kn">from</span> <span class="nn">sdss.files.path</span> <span class="kn">import</span> <span class="n">base_path</span>
+
+
+<div class="viewcode-block" id="version_to_topdir"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.version_to_topdir">[docs]</a><span class="k">def</span> <span class="nf">version_to_topdir</span><span class="p">(</span><span class="n">version</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert version name into top directory of atlas</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    version : str</span>
+<span class="sd">        version of NSA (vN_M_P)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    topid :  str</span>
+<span class="sd">        top directory name vN</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vN</span> <span class="o">=</span> <span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">vN</span>
+
+</div>
+<div class="viewcode-block" id="version_to_detectdir"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.version_to_detectdir">[docs]</a><span class="k">def</span> <span class="nf">version_to_detectdir</span><span class="p">(</span><span class="n">version</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert version name into detection subdirectory</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    version : str</span>
+<span class="sd">        version of NSA (vN_M_P)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    detectdir : str</span>
+<span class="sd">        detection subdirectory vN_M</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vNM</span> <span class="o">=</span> <span class="s">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">version</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">vNM</span>
+
+</div>
+<div class="viewcode-block" id="radec_to_iauname"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.radec_to_iauname">[docs]</a><span class="k">def</span> <span class="nf">radec_to_iauname</span><span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to convert RA, Dec to an IAU-style name (JHHMMSS.SS[+-]DDMMSS.S)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ra : float</span>
+<span class="sd">        Right ascension, in deg</span>
+<span class="sd">    dec : float</span>
+<span class="sd">        Declination, in deg</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    iauname : str</span>
+<span class="sd">        IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">astropy.coordinates</span> <span class="kn">as</span> <span class="nn">coordinates</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ra_angle</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">Angle</span><span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s">&#39;degree&#39;</span><span class="p">)</span>
+    <span class="n">rastr</span> <span class="o">=</span> <span class="n">ra_angle</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s">&#39;hour&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span>
+                               <span class="n">pad</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">dec_angle</span> <span class="o">=</span> <span class="n">coordinates</span><span class="o">.</span><span class="n">Angle</span><span class="p">(</span><span class="n">dec</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s">&#39;degree&#39;</span><span class="p">)</span>
+    <span class="n">decstr</span> <span class="o">=</span> <span class="n">dec_angle</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s">&#39;degree&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                                 <span class="n">precision</span><span class="o">=</span><span class="n">precision</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                                 <span class="n">pad</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">alwayssign</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">&#39;J&#39;</span> <span class="o">+</span> <span class="n">rastr</span> <span class="o">+</span> <span class="n">decstr</span>
+
+</div>
+<div class="viewcode-block" id="iauname_to_subdir"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.iauname_to_subdir">[docs]</a><span class="k">def</span> <span class="nf">iauname_to_subdir</span><span class="p">(</span><span class="n">iauname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert IAUNAME to a subdirectory name in NASA-Sloan Atlas</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    iauname : str</span>
+<span class="sd">        IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    subdir : str</span>
+<span class="sd">        subdirectory based on IAU-style name</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Subdirectory is of the form: [RA]/[DEC]/[IAUNAME],</span>
+<span class="sd">    where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ra_dir</span> <span class="o">=</span> <span class="n">iauname</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;h&#39;</span>
+    <span class="n">dec_dir</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%02d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">iauname</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">13</span><span class="p">]))</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">iauname</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span><span class="p">:</span>
+        <span class="n">dec_dir</span> <span class="o">=</span> <span class="s">&#39;p&#39;</span> <span class="o">+</span> <span class="n">dec_dir</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dec_dir</span> <span class="o">=</span> <span class="s">&#39;m&#39;</span> <span class="o">+</span> <span class="n">dec_dir</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ra_dir</span><span class="p">,</span> <span class="n">dec_dir</span><span class="p">,</span> <span class="n">iauname</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="local_to_url"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.local_to_url">[docs]</a><span class="k">def</span> <span class="nf">local_to_url</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="n">local_base</span><span class="o">=</span><span class="s">&#39;/data&#39;</span><span class="p">,</span>
+                 <span class="n">remote_base</span><span class="o">=</span><span class="s">&#39;http://data.sdss.org&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a local path to the remote URL</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    local : str</span>
+<span class="sd">        path to convert</span>
+
+<span class="sd">    local_base : str</span>
+<span class="sd">        base path on local system</span>
+
+<span class="sd">    remote_base : str</span>
+<span class="sd">        corresponding base path on remote system</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;^&quot;</span> <span class="o">+</span> <span class="n">local_base</span><span class="p">,</span> <span class="n">remote_base</span><span class="p">,</span> <span class="n">local</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="download_file"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.download_file">[docs]</a><span class="k">def</span> <span class="nf">download_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download a file at a url and put it into a local location</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    url : str</span>
+<span class="sd">        URL of file to download</span>
+
+<span class="sd">    filename : str</span>
+<span class="sd">        local path to put file in</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">filename</span>
+
+    <span class="n">filedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">filedir</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">filedir</span><span class="p">)</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+        <span class="n">meta_func</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">getheaders</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s">&#39;getheaders&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">meta</span><span class="o">.</span><span class="n">get_all</span>
+        <span class="n">meta_length</span> <span class="o">=</span> <span class="n">meta_func</span><span class="p">(</span><span class="s">&quot;Content-Length&quot;</span><span class="p">)</span>
+        <span class="n">file_size</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">meta_length</span><span class="p">:</span>
+            <span class="n">file_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta_length</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Downloading: {0} Bytes: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">file_size</span><span class="p">))</span>
+
+        <span class="n">file_size_dl</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">block_sz</span> <span class="o">=</span> <span class="mi">8192</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="nb">buffer</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">block_sz</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">buffer</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">file_size_dl</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">filename</span>
+
+</div>
+<div class="viewcode-block" id="Path"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path">[docs]</a><span class="k">class</span> <span class="nc">Path</span><span class="p">(</span><span class="n">base_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class for supporting construction of NASA-Sloan Atlas paths.</span>
+<span class="sd">    Typical usage relies on the get() method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathfile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">pathfile</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="n">pathfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;DIMAGE_DIR&#39;</span><span class="p">),</span>
+                                    <span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="s">&#39;dimage_paths.ini&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Path</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">pathfile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_iauname_dict</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iauname_to_nsaid_dict</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_base</span> <span class="o">=</span> <span class="s">&#39;http://data.sdss.org&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_base</span> <span class="o">=</span> <span class="s">&#39;/data&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remote</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_iauname_dict</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iauname_to_nsaid_dict</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">_nsaid_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes translation table from NSAID to IAUNAME.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atlas</span> <span class="o">=</span> <span class="n">fitsio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;atlas&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;version&#39;</span><span class="p">]))</span>
+        <span class="n">iauname</span> <span class="o">=</span> <span class="n">atlas</span><span class="p">[</span><span class="s">&#39;IAUNAME&#39;</span><span class="p">]</span>
+        <span class="n">nsaid</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iauname</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_iauname_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">nsaid</span><span class="p">,</span> <span class="n">iauname</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iauname_to_nsaid_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">iauname</span><span class="p">,</span> <span class="n">nsaid</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Path.remote"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.remote">[docs]</a>    <span class="k">def</span> <span class="nf">remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_base</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">local_base</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+               <span class="n">username</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configures remote access for NASA-Sloan Atlas.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        remote_base : str</span>
+<span class="sd">            base URL path for remote repository</span>
+<span class="sd">        local_base : str</span>
+<span class="sd">            base file path for local repository</span>
+<span class="sd">        username : str</span>
+<span class="sd">            user name for remote repository</span>
+<span class="sd">        password : str</span>
+<span class="sd">            password for local repository</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">remote_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remote_base</span> <span class="o">=</span> <span class="n">remote_base</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">local_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_base</span> <span class="o">=</span> <span class="n">local_base</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remote</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span><span class="p">((</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">)):</span>
+            <span class="n">passman</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPPasswordMgrWithDefaultRealm</span><span class="p">()</span>
+            <span class="n">passman</span><span class="o">.</span><span class="n">add_password</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_base</span><span class="p">,</span>
+                                 <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+            <span class="n">authhandler</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPBasicAuthHandler</span><span class="p">(</span><span class="n">passman</span><span class="p">)</span>
+            <span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">authhandler</span><span class="p">)</span>
+            <span class="n">urllib2</span><span class="o">.</span><span class="n">install_opener</span><span class="p">(</span><span class="n">opener</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Path.nsaid_to_iauname"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.nsaid_to_iauname">[docs]</a>    <span class="k">def</span> <span class="nf">nsaid_to_iauname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsaid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns IAUNAME given NSAID</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nsaid : int</span>
+<span class="sd">          NSAID to infer IAUNAME from</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        iauname : str</span>
+<span class="sd">          IAUNAME to infer NSAID from</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Uses translation table set up by _nsaid_init(),</span>
+<span class="sd">        which involves reading the original atlas.fits file.</span>
+<span class="sd">        Large overhead on first call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_iauname_dict</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nsaid_init</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_iauname_dict</span><span class="p">[</span><span class="n">nsaid</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Path.iauname_to_nsaid"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.iauname_to_nsaid">[docs]</a>    <span class="k">def</span> <span class="nf">iauname_to_nsaid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iauname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns NSAID given IAUNAME</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        iauname : str</span>
+<span class="sd">          IAUNAME to infer NSAID from</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        nsaid : np.int32</span>
+<span class="sd">            NSAID index</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Uses translation table set up by _nsaid_init(),</span>
+<span class="sd">        which involves reading the original atlas.fits file.</span>
+<span class="sd">        Large overhead on first call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iauname_to_nsaid_dict</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_init</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iauname_to_nsaid_dict</span><span class="p">[</span><span class="n">iauname</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Path.nsaid_to_pid"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.nsaid_to_pid">[docs]</a>    <span class="k">def</span> <span class="nf">nsaid_to_pid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsaid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns PID value for NSAID</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nsaid : int</span>
+<span class="sd">          NSAID</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pid : int</span>
+<span class="sd">          parent IDs of processed objects in image</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pcat</span> <span class="o">=</span> <span class="n">fitsio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;pcat&#39;</span><span class="p">,</span> <span class="n">nsaid</span><span class="o">=</span><span class="n">nsaid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="c"># Infers from where CRA isn&#39;t zero</span>
+        <span class="n">indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">pcat</span><span class="p">[</span><span class="s">&#39;CRA&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">indx</span>
+</div>
+<div class="viewcode-block" id="Path.nsaid_to_aid"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.nsaid_to_aid">[docs]</a>    <span class="k">def</span> <span class="nf">nsaid_to_aid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsaid</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns AID values for NSAID/PID</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nsaid : int</span>
+<span class="sd">          NSAID</span>
+<span class="sd">        pid : int</span>
+<span class="sd">          parent ID</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        aid : int</span>
+<span class="sd">          aid of detected object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">measure</span> <span class="o">=</span> <span class="n">fitsio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;measure&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="n">pid</span><span class="p">,</span> <span class="n">nsaid</span><span class="o">=</span><span class="n">nsaid</span><span class="p">,</span>
+                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="c"># Infers from where measurements exist</span>
+        <span class="n">aid</span> <span class="o">=</span> <span class="n">measure</span><span class="p">[</span><span class="s">&#39;AID&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">aid</span>
+</div>
+<div class="viewcode-block" id="Path.local"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.local">[docs]</a>    <span class="k">def</span> <span class="nf">local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configures local access for NASA-Sloan Atlas</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remote</span> <span class="o">=</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="Path.v1"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.v1">[docs]</a>    <span class="k">def</span> <span class="nf">v1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path utility to interpret %v1 directive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">version_to_topdir</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;version&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="Path.v2"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.v2">[docs]</a>    <span class="k">def</span> <span class="nf">v2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path utility to interpret %v2 directive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">version_to_detectdir</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;version&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="Path.iauname"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.iauname">[docs]</a>    <span class="k">def</span> <span class="nf">iauname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path utility to interpret %iauname directive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;iauname&#39;</span><span class="p">):</span>  <span class="c"># Set IAUNAME if given</span>
+            <span class="k">return</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;iauname&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c"># Use NSAID/RADEC to deduce IAUNAME if need be</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;ra&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;dec&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">radec_to_iauname</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;nsaid&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_iauname</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Path.subdir"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.subdir">[docs]</a>    <span class="k">def</span> <span class="nf">subdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path utility to interpret %subdir directive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iauname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iauname</span><span class="p">(</span><span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">iauname_to_subdir</span><span class="p">(</span><span class="n">iauname</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Path.pid"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.pid">[docs]</a>    <span class="k">def</span> <span class="nf">pid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path utility to interpret %pid directive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iauname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iauname</span><span class="p">(</span><span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;nsaid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iauname_to_nsaid</span><span class="p">(</span><span class="n">iauname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_pid</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="Path.aid"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.aid">[docs]</a>    <span class="k">def</span> <span class="nf">aid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Path utility to interpret %aid directive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iauname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iauname</span><span class="p">(</span><span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;nsaid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iauname_to_nsaid</span><span class="p">(</span><span class="n">iauname</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;pid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_pid</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsaid_to_aid</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="Path.url"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.url">[docs]</a>    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructs URL based on file name</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filetype : str</span>
+<span class="sd">            type of file</span>
+
+<span class="sd">        keyword arguments :</span>
+<span class="sd">            keywords to fully specify URL</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Path templates are defined in $DIMAGE_DIR/data/dimage_paths.ini</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">local_to_url</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">local_base</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">local_base</span><span class="p">,</span>
+                            <span class="n">remote_base</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_base</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Path.get"><a class="viewcode-back" href="../../../dimage.path.html#dimage.path.Path.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns file name, downloading if remote access configured.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filetype : str</span>
+<span class="sd">            type of file</span>
+
+<span class="sd">        keyword arguments :</span>
+<span class="sd">            keywords to fully specify path</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Path templates are defined in $DIMAGE_DIR/data/dimage_paths.ini</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_remote</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">):</span>
+            <span class="n">download_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">filetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,448 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.combine package &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="index.html"/>
+        <link rel="up" title="dimage package" href="dimage.html"/>
+        <link rel="next" title="dimage.fake package" href="dimage.fake.html"/>
+        <link rel="prev" title="dimage.atlas package" href="dimage.atlas.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dimage.html">dimage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dimage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="dimage.atlas.html">dimage.atlas package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">dimage.combine package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#notes-and-to-do">Notes and to-do:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.fake.html">dimage.fake package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.measure.html">dimage.measure package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.path.html">dimage.path package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.utils.html">dimage.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="dimage.html">dimage package</a> &raquo;</li>
+      
+    <li>dimage.combine package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/dimage.combine.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-dimage.combine">
+<span id="dimage-combine-package"></span><h1>dimage.combine package<a class="headerlink" href="#module-dimage.combine" title="Permalink to this headline">¶</a></h1>
+<p>Tools to combine a desired set of images onto a common footprint.
+Can use various resampling kernels; see documentation for dresample.</p>
+<div class="section" id="notes-and-to-do">
+<h2>Notes and to-do:<a class="headerlink" href="#notes-and-to-do" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Does not adjust for pixel area changes; keeps image in whatever units
+it was input in.</li>
+<li>Uses simple TAN projection and square image; doesn&#8217;t yet take arbitrary
+WCS inputs.</li>
+<li>Will fail on images which span &gt; 180 deg in RA, due to simplistic
+handling of 0/360 boundary</li>
+</ul>
+</div></blockquote>
+<dl class="function">
+<dt id="dimage.combine.combine_apodize">
+<code class="descclassname">dimage.combine.</code><code class="descname">combine_apodize</code><span class="sig-paren">(</span><em>nx</em>, <em>ny</em>, <em>edge=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/combine/combine.html#combine_apodize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.combine.combine_apodize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create apodized weight image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nx, ny</strong> : int</p>
+<blockquote>
+<div><p>dimensions of image</p>
+</div></blockquote>
+<p><strong>edge</strong> : int</p>
+<blockquote>
+<div><p>pixel width of apodized edge (default 10)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>weight</strong> : np.float32</p>
+<blockquote class="last">
+<div><p>[nx, ny] ndarray weighted image</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses a cos() function transition from zero to unity in
+each dimension along each edge.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.combine.combine_wise">
+<code class="descclassname">dimage.combine.</code><code class="descname">combine_wise</code><span class="sig-paren">(</span><em>ra</em>, <em>dec</em>, <em>size</em>, <em>band</em>, <em>kernel='lanczos'</em>, <em>dampsinc=2.47</em>, <em>lanczos=2.0</em>, <em>edge=10</em>, <em>pixscale=2.75</em>, <em>unmasked=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/combine/combine_wise.html#combine_wise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.combine.combine_wise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine WISE images onto a desired footprint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ra, dec</strong> : fp.float64</p>
+<blockquote>
+<div><p>center of image (J2000 deg)</p>
+</div></blockquote>
+<p><strong>size</strong> : float</p>
+<blockquote>
+<div><p>size of square image (deg)</p>
+</div></blockquote>
+<p><strong>band</strong> : str</p>
+<blockquote>
+<div><p>band name (&#8216;W1&#8217;, &#8216;W2&#8217;, &#8216;W3&#8217;, &#8216;W4&#8217;)</p>
+</div></blockquote>
+<p><strong>edge</strong> : int</p>
+<blockquote>
+<div><p>pixel width of apodized edge to use (default 10)</p>
+</div></blockquote>
+<p><strong>kernel, dampsinc, lanczos</strong> : parameters for dresample</p>
+<p><strong>pixscale</strong> : float</p>
+<blockquote>
+<div><p>output pixel scale in arcsec/pixel (default 2.75)</p>
+</div></blockquote>
+<p><strong>unmasked</strong> : bool</p>
+<blockquote>
+<div><p>if True, use unmasked coadds (default False)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>(image, ivar, wcs)</strong> : (np.float32, np.float32, WCS)</p>
+<blockquote class="last">
+<div><p>[nx, ny] image
+[nx, ny] image inverse variance
+WCS object</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.combine.dcombine">
+<code class="descclassname">dimage.combine.</code><code class="descname">dcombine</code><span class="sig-paren">(</span><em>ra</em>, <em>dec</em>, <em>size</em>, <em>pixscale</em>, <em>image_files</em>, <em>ivar_files=None</em>, <em>kernel='lanczos'</em>, <em>dampsinc=2.47</em>, <em>lanczos=2.0</em>, <em>edge=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/combine/combine.html#dcombine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.combine.dcombine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine a list of images onto a desired footprint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ra, dec</strong> : np.float64</p>
+<blockquote>
+<div><p>center of image (J2000 deg)</p>
+</div></blockquote>
+<p><strong>size</strong> : float</p>
+<blockquote>
+<div><p>size of square image (deg)</p>
+</div></blockquote>
+<p><strong>pixelscale</strong> : float</p>
+<blockquote>
+<div><p>pixel scale (arcsec)</p>
+</div></blockquote>
+<p><strong>image_files</strong> : str</p>
+<blockquote>
+<div><p>[N] list of image file names</p>
+</div></blockquote>
+<p><strong>ivar_files</strong> : str</p>
+<blockquote>
+<div><p>[N] list of inverse variance file names (default none)</p>
+</div></blockquote>
+<p><strong>edge</strong> : int</p>
+<blockquote>
+<div><p>pixel width of apodized edge to use (default 10)</p>
+</div></blockquote>
+<p><strong>kernel, dampsinc, lanczos :</strong></p>
+<blockquote>
+<div><p>parameters for dresample</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>(image, ivar, wcs)</strong> : (float32, float32, WCS)</p>
+<blockquote class="last">
+<div><p>[nx, ny] image
+[nx, ny] image of estimated inverse variance
+WCS object</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>Uses a weighted combination with apodized edges of images to</dt>
+<dd>ensure smooth transitions.</dd>
+<dt>Uses inverse variance to estimate final inverse variance, but</dt>
+<dd>doesn&#8217;t track covariance and doesn&#8217;t use inverse variance
+as a weight.</dd>
+</dl>
+<p>Calls dwcsproject for projection, which calls dresample.
+Assumes WCS for images and inverse variance files are identical;</p>
+<blockquote>
+<div>otherwise unpredictable results!</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.combine.resample">
+<code class="descclassname">dimage.combine.</code><code class="descname">resample</code><span class="sig-paren">(</span><em>image</em>, <em>x</em>, <em>y</em>, <em>kernel='dampsinc'</em>, <em>dampsinc=2.47</em>, <em>lanczos=2.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/combine/resample.html#resample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.combine.resample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resamples a two-dimensional ndarray image in x, y</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>image</strong> : np.float32</p>
+<blockquote>
+<div><p>[nx, ny] 2-D ndarray</p>
+</div></blockquote>
+<p><strong>x, y</strong> : [N] locations for samples</p>
+<p><strong>kernel</strong> : Kernel to use in resampling (default &#8216;dampsinc&#8217;)</p>
+<p><strong>dampsinc</strong> : Gaussian scale used for &#8216;dampsinc&#8217; (default 2.47)</p>
+<p><strong>lanczos</strong> : Lanczos scale parameter &#8220;a&#8221; (default 2)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>samples</strong> : [N] samples</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Calls dresample.c in libdimage.so</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.combine.wcsgrid">
+<code class="descclassname">dimage.combine.</code><code class="descname">wcsgrid</code><span class="sig-paren">(</span><em>wcs</em>, <em>nx</em>, <em>ny</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/combine/wcsgrid.html#wcsgrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.combine.wcsgrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create grid of RA/Dec corresponding to WCS pixels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wcs</strong> : WCS object</p>
+<p><strong>nx, ny</strong> : size of image referred to in each dimension</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>(ra, dec)</strong> : each member of tuple is [nx,ny] grid of</p>
+<blockquote class="last">
+<div><p>RA/Decs for each pixel</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.combine.wcsproject">
+<code class="descclassname">dimage.combine.</code><code class="descname">wcsproject</code><span class="sig-paren">(</span><em>image</em>, <em>weight</em>, <em>wcs</em>, <em>ra</em>, <em>dec</em>, <em>kernel='lanczos'</em>, <em>dampsinc=2.47</em>, <em>lanczos=2.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/combine/wcsproject.html#wcsproject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.combine.wcsproject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resamples a two-dimensional ndarray image in RA, Dec</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>image</strong> : [nx, ny] 2-D ndarray</p>
+<p><strong>weight</strong> : [nx, ny] weight 2-D ndarray</p>
+<p><strong>wcs</strong> : WCS object</p>
+<p><strong>ra, dec</strong> : [N] locations for samples</p>
+<p><strong>kernel</strong> : Kernel to use in resampling (default &#8216;dampsinc&#8217;)</p>
+<p><strong>dampsinc</strong> : Gaussian scale used for &#8216;dampsinc&#8217; (default 2.47)</p>
+<p><strong>lanczos</strong> : Lanczos scale parameter &#8220;a&#8221; (default 2)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>samples, weights, inbox</strong> : [M] samples, weights, and indices into ra,dec</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Calls dresample.
+Will NOT work for very wide angle input images (180. deg or more), because</p>
+<blockquote>
+<div>0/360 case checking is too simple.</div></blockquote>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dimage.fake.html" class="btn btn-neutral float-right" title="dimage.fake package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dimage.atlas.html" class="btn btn-neutral" title="dimage.atlas package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

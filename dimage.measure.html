@@ -1,0 +1,490 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.measure package &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="index.html"/>
+        <link rel="up" title="dimage package" href="dimage.html"/>
+        <link rel="next" title="dimage.path package" href="dimage.path.html"/>
+        <link rel="prev" title="dimage.fake.utils package" href="dimage.fake.utils.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dimage.html">dimage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dimage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="dimage.atlas.html">dimage.atlas package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.combine.html">dimage.combine package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.fake.html">dimage.fake package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">dimage.measure package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.path.html">dimage.path package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.utils.html">dimage.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="dimage.html">dimage package</a> &raquo;</li>
+      
+    <li>dimage.measure package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/dimage.measure.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-dimage.measure">
+<span id="dimage-measure-package"></span><h1>dimage.measure package<a class="headerlink" href="#module-dimage.measure" title="Permalink to this headline">¶</a></h1>
+<p>Package for measurements on images.</p>
+<p>Includes functions for elliptical Petrosian quantities:</p>
+<blockquote>
+<div><ul class="simple">
+<li>petro(): calculates elliptical Petrosian quantities</li>
+<li>apcorr(): calculates aperture corrections to Petrosian quantities</li>
+<li>curve2image(): utility used by apcorr()</li>
+</ul>
+</div></blockquote>
+<dl class="function">
+<dt id="dimage.measure.apcorr">
+<code class="descclassname">dimage.measure.</code><code class="descname">apcorr</code><span class="sig-paren">(</span><em>radius</em>, <em>sb</em>, <em>aprad</em>, <em>psf</em>, <em>ba=1.0</em>, <em>phi=0.0</em>, <em>apmin=1e-10</em>, <em>apmax=10000000000.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/measure/apcorr.html#apcorr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.measure.apcorr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates an aperture correction given elliptical profile</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>radius</strong> : np.float32 array</p>
+<blockquote>
+<div><p>1-D ndarray with radii in pixels</p>
+</div></blockquote>
+<p><strong>sb</strong> : np.float32 array</p>
+<blockquote>
+<div><p>1-D ndarray with surface brightness</p>
+</div></blockquote>
+<p><strong>aprad</strong> : int</p>
+<blockquote>
+<div><p>aperture radius, in pixels</p>
+</div></blockquote>
+<p><strong>psf</strong> : np.float32 array</p>
+<blockquote>
+<div><p>2-D ndarray with PSF to calculate for</p>
+</div></blockquote>
+<p><strong>ba</strong> : float</p>
+<blockquote>
+<div><p>axis ratio (b/a) between 0 and 1 (default 1)</p>
+</div></blockquote>
+<p><strong>phi</strong> : float</p>
+<blockquote>
+<div><p>position angle in deg (default 0); (direction of major axis,
+defined s.t. tan(phi) = -x/y)</p>
+</div></blockquote>
+<p><strong>apmin</strong> : float</p>
+<blockquote>
+<div><p>minimum aperture correction (default 1.e-10)</p>
+</div></blockquote>
+<p><strong>apmax</strong> : float</p>
+<blockquote>
+<div><p>maximum aperture correction (default 1.e+10)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>apcorr</strong> : np.float32</p>
+<blockquote class="last">
+<div><p>correction factor to apply to PSF-convolved flux for this aperture</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>For a North-up (+y), East-left (-x) image, position angle phi
+definition corresponds to astronomical standard (deg East of North).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.measure.curve2image">
+<code class="descclassname">dimage.measure.</code><code class="descname">curve2image</code><span class="sig-paren">(</span><em>radius</em>, <em>sb</em>, <em>nx</em>, <em>ny</em>, <em>ba=1.0</em>, <em>phi=0.0</em>, <em>xcen=None</em>, <em>ycen=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/measure/curve2image.html#curve2image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.measure.curve2image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an elliptical surface brightness distribution to an image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>radius</strong> : np.float32</p>
+<blockquote>
+<div><p>1-D ndarray with radii</p>
+</div></blockquote>
+<p><strong>sb</strong> : np.float32</p>
+<blockquote>
+<div><p>1-D ndarray with surface brightness</p>
+</div></blockquote>
+<p><strong>nx</strong> : int</p>
+<blockquote>
+<div><p>x size of image</p>
+</div></blockquote>
+<p><strong>ny</strong> : int</p>
+<blockquote>
+<div><p>y size of image</p>
+</div></blockquote>
+<p><strong>ba</strong> : float</p>
+<blockquote>
+<div><p>axis ratio (b/a) between 0.2 and 1 (default 1); if input &lt; 0.2
+then 0.2 is used.</p>
+</div></blockquote>
+<p><strong>phi</strong> : float</p>
+<blockquote>
+<div><p>position angle in deg (default 0); direction of major axis,
+is defined such that tan(phi) = -x/y</p>
+</div></blockquote>
+<p><strong>xcen</strong> : float</p>
+<blockquote>
+<div><p>X center to use (default float(nx)*0.5)</p>
+</div></blockquote>
+<p><strong>ycen</strong> : float</p>
+<blockquote>
+<div><p>Y center to use (default float(ny)*0.5)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>image</strong> : np.float32</p>
+<blockquote class="last">
+<div><p>[nx, ny] 2-D array with image in it</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The resulting image has an axis ratio and position angle as input,
+with the given surface brightness distribution.</p>
+<p>For a North-up (+y), East-left (-x) image, position angle phi
+definition corresponds to astronomical standard (deg East of North).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.measure.petro">
+<code class="descclassname">dimage.measure.</code><code class="descname">petro</code><span class="sig-paren">(</span><em>image</em>, <em>ivar</em>, <em>ba=1.0</em>, <em>phi=0.0</em>, <em>xcen=None</em>, <em>ycen=None</em>, <em>petroratio0=0.2</em>, <em>npetro=2.0</em>, <em>minpetrorad=2.0</em>, <em>nfilter=11</em>, <em>ofilter=1</em>, <em>petrorad=None</em>, <em>forceflux=None</em>, <em>fixmedian=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/measure/petro.html#petro"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.measure.petro" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates Petrosian quantities for an image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>image</strong> : np.float32</p>
+<blockquote>
+<div><p>2-D ndarray</p>
+</div></blockquote>
+<p><strong>ba</strong> : float</p>
+<blockquote>
+<div><p>axis ratio (b/a) between 0 and 1 (default 1)</p>
+</div></blockquote>
+<p><strong>phi</strong> : float</p>
+<blockquote>
+<div><p>position angle in deg (default 0); (direction of major axis,
+defined such that tan(phi) = -x/y)</p>
+</div></blockquote>
+<p><strong>petroratio0</strong> : float</p>
+<blockquote>
+<div><p>limit to use for Petrosian ratio to define radius</p>
+</div></blockquote>
+<p><strong>minpetrorad</strong> : float</p>
+<blockquote>
+<div><p>minimum Petrosian radius to use (default 10.)</p>
+</div></blockquote>
+<p><strong>npetro</strong> : int</p>
+<blockquote>
+<div><p>number of Petrosian radii for aperture definition</p>
+</div></blockquote>
+<p><strong>xcen</strong> : float</p>
+<blockquote>
+<div><p>X center to use (default center of image)</p>
+</div></blockquote>
+<p><strong>ycen</strong> : float</p>
+<blockquote>
+<div><p>Y center to use (default center of image)</p>
+</div></blockquote>
+<p><strong>nfilter</strong> : int</p>
+<blockquote>
+<div><p>number of pixels to filter over for surface brightness (must be odd)</p>
+</div></blockquote>
+<p><strong>ofilter</strong> : int</p>
+<blockquote>
+<div><p>order of Salizsky-Golay filter</p>
+</div></blockquote>
+<p><strong>petrorad</strong> : float</p>
+<blockquote>
+<div><p>if not None, uses this Petrosian radius by fiat (default None)</p>
+</div></blockquote>
+<p><strong>forceflux</strong> : float</p>
+<blockquote>
+<div><p>if not None, assumes this for total flux and only calculates
+r50 and r90</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote class="last">
+<div><p>File name for the corresponding dust model, or None if non-existent.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>For a North-up (+y), East-left (-x) image, position angle phi
+definition corresponds to astronomical standard (deg East of North).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.measure.sigma">
+<code class="descclassname">dimage.measure.</code><code class="descname">sigma</code><span class="sig-paren">(</span><em>image</em>, <em>sp=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/measure/sigma.html#sigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.measure.sigma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates standard deviation in image by checking pixel pairs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>image</strong> : np.float32</p>
+<blockquote>
+<div><p>2-D ndarray</p>
+</div></blockquote>
+<p><strong>sp</strong> : int</p>
+<blockquote>
+<div><p>spacing between pixel pairs (default 10)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sigma</strong> : np.float32</p>
+<blockquote class="last">
+<div><p>standard deviation</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Calls dsigma.c in libdimage.so</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.measure.simplexy">
+<code class="descclassname">dimage.measure.</code><code class="descname">simplexy</code><span class="sig-paren">(</span><em>image</em>, <em>psf_sigma=1.0</em>, <em>plim=8.0</em>, <em>dlim=1.0</em>, <em>saddle=3.0</em>, <em>maxper=1000</em>, <em>maxnpeaks=100000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/measure/simplexy.html#simplexy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.measure.simplexy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines positions of stars in an image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>image</strong> : np.float32</p>
+<blockquote>
+<div><p>2-D ndarray</p>
+</div></blockquote>
+<p><strong>psf_sigma</strong> : float</p>
+<blockquote>
+<div><p>sigma of Gaussian PSF to assume (default 1 pixel)</p>
+</div></blockquote>
+<p><strong>plim</strong> : float</p>
+<blockquote>
+<div><p>significance to select objects on (default 8)</p>
+</div></blockquote>
+<p><strong>dlim</strong> : float</p>
+<blockquote>
+<div><p>tolerance for closeness of pairs of objects (default 1 pixel)</p>
+</div></blockquote>
+<p><strong>saddle</strong> : float</p>
+<blockquote>
+<div><p>tolerance for depth of saddle point to separate sources
+(default 3 sigma)</p>
+</div></blockquote>
+<p><strong>maxper</strong> : int</p>
+<blockquote>
+<div><p>maximum number of children per parent (default 1000)</p>
+</div></blockquote>
+<p><strong>maxnpeaks</strong> : int</p>
+<blockquote>
+<div><p>maximum number of stars to find total (default 100000)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>(x, y, flux)</strong> : (np.float32, np.float32, np.float32)</p>
+<blockquote class="last">
+<div><p>ndarrays with pixel positions and peak pixel values of stars</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Calls simplexy.c in libdimage.so</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dimage.path.html" class="btn btn-neutral float-right" title="dimage.path package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dimage.fake.utils.html" class="btn btn-neutral" title="dimage.fake.utils package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

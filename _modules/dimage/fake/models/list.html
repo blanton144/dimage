@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.fake.models.list &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dimage.html">dimage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dimage.fake.models.list</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dimage.fake.models.list</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Galaxy model list utilities</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="listrec"><a class="viewcode-back" href="../../../../dimage.fake.models.html#dimage.fake.models.listrec">[docs]</a><span class="k">def</span> <span class="nf">listrec</span><span class="p">(</span><span class="n">indx</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">xcen</span><span class="p">,</span> <span class="n">ycen</span><span class="p">,</span> <span class="n">arcperpix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates recarray associated with a list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    indx : int</span>
+<span class="sd">        index number in model</span>
+<span class="sd">    flux : float</span>
+<span class="sd">        flux in model</span>
+<span class="sd">    nx, ny : int</span>
+<span class="sd">        size of model image (pixels)</span>
+<span class="sd">    xcen, ycen : float</span>
+<span class="sd">        center for model image (pixels)</span>
+<span class="sd">    arcperpix : float</span>
+<span class="sd">        arcsec per pixel for each image</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : ndarray</span>
+<span class="sd">        ndarray with above quantities so named</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dtype</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;indx&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">&#39;flux&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">&#39;nx&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">&#39;ny&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">&#39;xcen&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">&#39;ycen&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+             <span class="p">(</span><span class="s">&#39;arcperpix&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+             <span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">&#39;indx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indx</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">&#39;flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">&#39;nx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">&#39;ny&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ny</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">&#39;xcen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xcen</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">&#39;ycen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ycen</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">&#39;arcperpix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arcperpix</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+</div>
+<div class="viewcode-block" id="listpath"><a class="viewcode-back" href="../../../../dimage.fake.models.html#dimage.fake.models.listpath">[docs]</a><span class="k">def</span> <span class="nf">listpath</span><span class="p">(</span><span class="n">take</span><span class="p">,</span> <span class="n">modelname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the path to a model list</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    take : str</span>
+<span class="sd">        &quot;take&quot; to be implemented</span>
+<span class="sd">    modelname : str</span>
+<span class="sd">        Name of model</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to model</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Path is:</span>
+<span class="sd">      $FAKEPHOTOMETRY/[take]/model-list-[modelname].fits</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pathname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&quot;FAKEPHOTOMETRY&quot;</span><span class="p">),</span>
+                            <span class="n">take</span><span class="p">,</span> <span class="s">&#39;models&#39;</span><span class="p">,</span> <span class="n">modelname</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pathname</span><span class="p">,</span> <span class="s">&#39;model-list-&#39;</span> <span class="o">+</span> <span class="n">modelname</span> <span class="o">+</span> <span class="s">&#39;.fits&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">filename</span>
+
+</div>
+<div class="viewcode-block" id="parpath"><a class="viewcode-back" href="../../../../dimage.fake.models.html#dimage.fake.models.parpath">[docs]</a><span class="k">def</span> <span class="nf">parpath</span><span class="p">(</span><span class="n">take</span><span class="p">,</span> <span class="n">modelname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the path to a model parameter list</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    take : str</span>
+<span class="sd">        &quot;take&quot; to be implemented</span>
+<span class="sd">    modelname : str</span>
+<span class="sd">        Name of model</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        path to parameter list</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Path is of the form:</span>
+<span class="sd">      $FAKEPHOTOMETRY/[take]/model-params-[modelname].fits</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pathname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&quot;FAKEPHOTOMETRY&quot;</span><span class="p">),</span>
+                            <span class="n">take</span><span class="p">,</span> <span class="s">&#39;models&#39;</span><span class="p">,</span> <span class="n">modelname</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pathname</span><span class="p">,</span> <span class="s">&#39;model-params-&#39;</span> <span class="o">+</span> <span class="n">modelname</span> <span class="o">+</span> <span class="s">&#39;.fits&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">filename</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

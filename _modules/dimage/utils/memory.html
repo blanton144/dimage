@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.utils.memory &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimage.html">dimage package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>dimage.utils.memory</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for dimage.utils.memory</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">_proc_status</span> <span class="o">=</span> <span class="s">&#39;/proc/</span><span class="si">%d</span><span class="s">/status&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+
+<span class="n">_scale</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;kB&#39;</span><span class="p">:</span> <span class="mf">1024.0</span><span class="p">,</span> <span class="s">&#39;mB&#39;</span><span class="p">:</span> <span class="mf">1024.0</span><span class="o">*</span><span class="mf">1024.0</span><span class="p">,</span>
+          <span class="s">&#39;KB&#39;</span><span class="p">:</span> <span class="mf">1024.0</span><span class="p">,</span> <span class="s">&#39;MB&#39;</span><span class="p">:</span> <span class="mf">1024.0</span><span class="o">*</span><span class="mf">1024.0</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">_VmB</span><span class="p">(</span><span class="n">VmKey</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Private.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">global</span> <span class="n">_proc_status</span><span class="p">,</span> <span class="n">_scale</span>
+     <span class="c"># get pseudo file  /proc/&lt;pid&gt;/status</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">_proc_status</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>  <span class="c"># non-Linux?</span>
+     <span class="c"># get VmKey line e.g. &#39;VmRSS:  9999  kB\n ...&#39;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">VmKey</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c"># whitespace</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>  <span class="c"># invalid format?</span>
+     <span class="c"># convert Vm value to bytes</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">_scale</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+
+
+<div class="viewcode-block" id="memory"><a class="viewcode-back" href="../../../dimage.utils.html#dimage.utils.memory">[docs]</a><span class="k">def</span> <span class="nf">memory</span><span class="p">(</span><span class="n">since</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Return memory usage in bytes.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">_VmB</span><span class="p">(</span><span class="s">&#39;VmSize:&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">since</span>
+
+</div>
+<div class="viewcode-block" id="resident"><a class="viewcode-back" href="../../../dimage.utils.html#dimage.utils.resident">[docs]</a><span class="k">def</span> <span class="nf">resident</span><span class="p">(</span><span class="n">since</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Return resident memory usage in bytes.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">_VmB</span><span class="p">(</span><span class="s">&#39;VmRSS:&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">since</span>
+
+</div>
+<div class="viewcode-block" id="stacksize"><a class="viewcode-back" href="../../../dimage.utils.html#dimage.utils.stacksize">[docs]</a><span class="k">def</span> <span class="nf">stacksize</span><span class="p">(</span><span class="n">since</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Return stack size in bytes.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">_VmB</span><span class="p">(</span><span class="s">&#39;VmStk:&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">since</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

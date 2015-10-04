@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>dimage.path package &mdash; dimage  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="dimage  documentation" href="index.html"/>
+        <link rel="up" title="dimage package" href="dimage.html"/>
+        <link rel="next" title="dimage.utils package" href="dimage.utils.html"/>
+        <link rel="prev" title="dimage.measure package" href="dimage.measure.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> dimage
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="dimage.html">dimage package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dimage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="dimage.atlas.html">dimage.atlas package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.combine.html">dimage.combine package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.fake.html">dimage.fake package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.measure.html">dimage.measure package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">dimage.path package</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dimage.utils.html">dimage.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">dimage</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="dimage.html">dimage package</a> &raquo;</li>
+      
+    <li>dimage.path package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/dimage.path.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-dimage.path">
+<span id="dimage-path-package"></span><h1>dimage.path package<a class="headerlink" href="#module-dimage.path" title="Permalink to this headline">¶</a></h1>
+<p>Package for accessing NASA-Sloan Atlas locally or remotely.</p>
+<p>Includes the Path class. It requires the environmental variable
+$ATLAS_DATA to be set to the root of the NSA data tree, and finds
+templates for the file paths in $DIMAGE_DIR/data/dimage_paths.ini. The
+Path class has the method get() which returns the file name.</p>
+<p>A typical use case will be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">fitsio</span>
+<span class="kn">import</span> <span class="nn">dimage.path</span>
+<span class="n">apath</span><span class="o">=</span> <span class="n">dimage</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">Path</span><span class="p">()</span>
+<span class="n">filename</span><span class="o">=</span> <span class="n">apath</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;original&#39;</span><span class="p">,</span> <span class="n">iauname</span><span class="o">=</span><span class="s">&#39;J095641.38+005057.1&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="s">&#39;g&#39;</span><span class="p">,</span>
+                     <span class="n">survey</span><span class="o">=</span><span class="s">&#39;sdss&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s">&#39;v1_0_0&#39;</span><span class="p">)</span>
+<span class="n">image</span><span class="o">=</span> <span class="n">fitsio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To access the same mosaic remotely, the code will download from
+the server at <a class="reference external" href="http://data.sdss.org">http://data.sdss.org</a> into your local $ATLAS_DATA
+directory. Then you will be able to access the file:</p>
+<div class="highlight-python"><div class="highlight"><pre>import dimage.path
+apath= dimage.path.Path()
+# insert SDSS username and password as strings below!
+apath.remote(username=, password=)
+filename= apath.get(&#39;original&#39;, iauname=&#39;J095641.38+005057.1&#39;, band=&#39;g&#39;,
+                     survey=&#39;sdss&#39;, version=&#39;v1_0_0&#39;)
+image= fitsio.read(filename)
+</pre></div>
+</div>
+<p>The remote access configuration will build local &#8220;mirror&#8221; under
+$ATLAS_DATA of the remote site consisting of just the files that have
+been requested. This mirror is used as a cache and files are not
+downloaded again if they already appear there. This cache needs to be
+cleared manually to force a download.</p>
+<dl class="docutils">
+<dt>The template paths are defined as follows:</dt>
+<dd><ul class="first last simple">
+<li>pieces enclosed in {} are interpreted according to python&#8217;s string
+format() method, using input keywords</li>
+<li>environmental variables indicated by $ are substituted</li>
+<li>defined special functions can be called with % (they are given
+the input keywords)</li>
+</ul>
+</dd>
+</dl>
+<p>For example, the location of one of the original images for NASA-Sloan
+Atlas analysis is defined as:</p>
+<div class="highlight-python"><div class="highlight"><pre>original= $ATLAS_DATA/%v1/detect/{survey}/%subdir/%iauname-{band}.fits.gz
+</pre></div>
+</div>
+<p>Depends on urllib2, os, sdss, and astropy v1.0 or later. In
+particular, within sdss it utilizes the base_path class in
+sdss.files.path.</p>
+<dl class="class">
+<dt id="dimage.path.Path">
+<em class="property">class </em><code class="descclassname">dimage.path.</code><code class="descname">Path</code><span class="sig-paren">(</span><em>pathfile=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">sdss.files.path.base_path</span></code></p>
+<p>Class for supporting construction of NASA-Sloan Atlas paths.
+Typical usage relies on the get() method.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+</tbody>
+</table>
+<dl class="method">
+<dt id="dimage.path.Path.aid">
+<code class="descname">aid</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.aid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.aid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path utility to interpret %aid directive</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns file name, downloading if remote access configured.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filetype</strong> : str</p>
+<blockquote>
+<div><p>type of file</p>
+</div></blockquote>
+<p><strong>keyword arguments :</strong></p>
+<blockquote class="last">
+<div><p>keywords to fully specify path</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Path templates are defined in $DIMAGE_DIR/data/dimage_paths.ini</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.iauname">
+<code class="descname">iauname</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.iauname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.iauname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path utility to interpret %iauname directive</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.iauname_to_nsaid">
+<code class="descname">iauname_to_nsaid</code><span class="sig-paren">(</span><em>iauname</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.iauname_to_nsaid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.iauname_to_nsaid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns NSAID given IAUNAME</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>iauname</strong> : str</p>
+<blockquote>
+<div><p>IAUNAME to infer NSAID from</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsaid</strong> : np.int32</p>
+<blockquote class="last">
+<div><p>NSAID index</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses translation table set up by _nsaid_init(),
+which involves reading the original atlas.fits file.
+Large overhead on first call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.local">
+<code class="descname">local</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configures local access for NASA-Sloan Atlas</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.nsaid_to_aid">
+<code class="descname">nsaid_to_aid</code><span class="sig-paren">(</span><em>nsaid</em>, <em>pid</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.nsaid_to_aid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.nsaid_to_aid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns AID values for NSAID/PID</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nsaid</strong> : int</p>
+<blockquote>
+<div><p>NSAID</p>
+</div></blockquote>
+<p><strong>pid</strong> : int</p>
+<blockquote>
+<div><p>parent ID</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>aid</strong> : int</p>
+<blockquote class="last">
+<div><p>aid of detected object</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.nsaid_to_iauname">
+<code class="descname">nsaid_to_iauname</code><span class="sig-paren">(</span><em>nsaid</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.nsaid_to_iauname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.nsaid_to_iauname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns IAUNAME given NSAID</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nsaid</strong> : int</p>
+<blockquote>
+<div><p>NSAID to infer IAUNAME from</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>iauname</strong> : str</p>
+<blockquote class="last">
+<div><p>IAUNAME to infer NSAID from</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Uses translation table set up by _nsaid_init(),
+which involves reading the original atlas.fits file.
+Large overhead on first call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.nsaid_to_pid">
+<code class="descname">nsaid_to_pid</code><span class="sig-paren">(</span><em>nsaid</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.nsaid_to_pid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.nsaid_to_pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns PID value for NSAID</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nsaid</strong> : int</p>
+<blockquote>
+<div><p>NSAID</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>pid</strong> : int</p>
+<blockquote class="last">
+<div><p>parent IDs of processed objects in image</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.pid">
+<code class="descname">pid</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.pid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path utility to interpret %pid directive</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.remote">
+<code class="descname">remote</code><span class="sig-paren">(</span><em>remote_base=None</em>, <em>local_base=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.remote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.remote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configures remote access for NASA-Sloan Atlas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>remote_base</strong> : str</p>
+<blockquote>
+<div><p>base URL path for remote repository</p>
+</div></blockquote>
+<p><strong>local_base</strong> : str</p>
+<blockquote>
+<div><p>base file path for local repository</p>
+</div></blockquote>
+<p><strong>username</strong> : str</p>
+<blockquote>
+<div><p>user name for remote repository</p>
+</div></blockquote>
+<p><strong>password</strong> : str</p>
+<blockquote class="last">
+<div><p>password for local repository</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.subdir">
+<code class="descname">subdir</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.subdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.subdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path utility to interpret %subdir directive</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.url">
+<code class="descname">url</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs URL based on file name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filetype</strong> : str</p>
+<blockquote>
+<div><p>type of file</p>
+</div></blockquote>
+<p><strong>keyword arguments :</strong></p>
+<blockquote class="last">
+<div><p>keywords to fully specify URL</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Path templates are defined in $DIMAGE_DIR/data/dimage_paths.ini</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.v1">
+<code class="descname">v1</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path utility to interpret %v1 directive</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.Path.v2">
+<code class="descname">v2</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#Path.v2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.Path.v2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path utility to interpret %v2 directive</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="dimage.path.base_path">
+<em class="property">class </em><code class="descclassname">dimage.path.</code><code class="descname">base_path</code><span class="sig-paren">(</span><em>pathfile</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdss/files/path.html#base_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.base_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for construction of paths in general.</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="87%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>templates</td>
+<td>(dict) The set of templates read from the configuration file.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+</tbody>
+</table>
+<dl class="method">
+<dt id="dimage.path.base_path.dir">
+<code class="descname">dir</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdss/files/path.html#base_path.dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.base_path.dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the directory containing a file of a given type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filetype</strong> : str</p>
+<blockquote>
+<div><p>File type parameter.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dir</strong> : str</p>
+<blockquote class="last">
+<div><p>Directory containing the file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.base_path.full">
+<code class="descname">full</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdss/files/path.html#base_path.full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.base_path.full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the full name of a given type of file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filetype</strong> : str</p>
+<blockquote>
+<div><p>File type parameter.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>full</strong> : str</p>
+<blockquote class="last">
+<div><p>The full path to the file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="dimage.path.base_path.name">
+<code class="descname">name</code><span class="sig-paren">(</span><em>filetype</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sdss/files/path.html#base_path.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.base_path.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the directory containing a file of a given type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filetype</strong> : str</p>
+<blockquote>
+<div><p>File type parameter.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
+<blockquote class="last">
+<div><p>Name of a file with no directory information.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.path.download_file">
+<code class="descclassname">dimage.path.</code><code class="descname">download_file</code><span class="sig-paren">(</span><em>url</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#download_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.download_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file at a url and put it into a local location</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : str</p>
+<blockquote>
+<div><p>URL of file to download</p>
+</div></blockquote>
+<p><strong>filename</strong> : str</p>
+<blockquote class="last">
+<div><p>local path to put file in</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.path.iauname_to_subdir">
+<code class="descclassname">dimage.path.</code><code class="descname">iauname_to_subdir</code><span class="sig-paren">(</span><em>iauname</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#iauname_to_subdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.iauname_to_subdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert IAUNAME to a subdirectory name in NASA-Sloan Atlas</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>iauname</strong> : str</p>
+<blockquote>
+<div><p>IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>subdir</strong> : str</p>
+<blockquote class="last">
+<div><p>subdirectory based on IAU-style name</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Subdirectory is of the form: [RA]/[DEC]/[IAUNAME],
+where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.path.local_to_url">
+<code class="descclassname">dimage.path.</code><code class="descname">local_to_url</code><span class="sig-paren">(</span><em>local</em>, <em>local_base='/data'</em>, <em>remote_base='http://data.sdss.org'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#local_to_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.local_to_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a local path to the remote URL</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>local</strong> : str</p>
+<blockquote>
+<div><p>path to convert</p>
+</div></blockquote>
+<p><strong>local_base</strong> : str</p>
+<blockquote>
+<div><p>base path on local system</p>
+</div></blockquote>
+<p><strong>remote_base</strong> : str</p>
+<blockquote class="last">
+<div><p>corresponding base path on remote system</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.path.radec_to_iauname">
+<code class="descclassname">dimage.path.</code><code class="descname">radec_to_iauname</code><span class="sig-paren">(</span><em>ra</em>, <em>dec</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#radec_to_iauname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.radec_to_iauname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to convert RA, Dec to an IAU-style name (JHHMMSS.SS[+-]DDMMSS.S)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ra</strong> : float</p>
+<blockquote>
+<div><p>Right ascension, in deg</p>
+</div></blockquote>
+<p><strong>dec</strong> : float</p>
+<blockquote>
+<div><p>Declination, in deg</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>iauname</strong> : str</p>
+<blockquote class="last">
+<div><p>IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.path.version_to_detectdir">
+<code class="descclassname">dimage.path.</code><code class="descname">version_to_detectdir</code><span class="sig-paren">(</span><em>version</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#version_to_detectdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.version_to_detectdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert version name into detection subdirectory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>version</strong> : str</p>
+<blockquote>
+<div><p>version of NSA (vN_M_P)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>detectdir</strong> : str</p>
+<blockquote class="last">
+<div><p>detection subdirectory vN_M</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dimage.path.version_to_topdir">
+<code class="descclassname">dimage.path.</code><code class="descname">version_to_topdir</code><span class="sig-paren">(</span><em>version</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dimage/path/path.html#version_to_topdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dimage.path.version_to_topdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert version name into top directory of atlas</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>version</strong> : str</p>
+<blockquote>
+<div><p>version of NSA (vN_M_P)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>topid</strong> :  str</p>
+<blockquote class="last">
+<div><p>top directory name vN</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dimage.utils.html" class="btn btn-neutral float-right" title="dimage.utils package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dimage.measure.html" class="btn btn-neutral" title="dimage.measure package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

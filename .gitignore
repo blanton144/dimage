@@ -1,6 +1,0 @@
-*.o
-*#*#
-*~
-lib/libdimage.so
-ipynb/.ipynb_checkpoints
-*.pyc
