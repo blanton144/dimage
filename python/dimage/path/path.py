@@ -5,135 +5,142 @@ import numpy as np
 import fitsio
 from sdss.files.path import base_path
 
-"""
-Module for NASA-Sloan Atlas images and catalogs locally or remotely.
-
-Use the "path" class. It requires the environmental variable $ATLAS_DATA 
-to be set to the root of the NSA data tree.
-
-import fitsio
-import dimage.utils.path 
-apath= dimage.utils.path()
-filename= apath.get('original', iauname='J095641.38+005057.1', band='g',
-                     survey='sdss', version='v1_0_0')
-image= fitsio.read(filename)
-
-To access the same mosaic remotely, the code will download from 
-the server at http://data.sdss.org into your local $ATLAS_DATA 
-directory. Then you will be able to access the file.
-
-import dimage.utils.path
-apath= dimage.utils.path()
-# insert SDSS username and password as strings below!
-apath.remote(username=, password=) 
-filename= apath.get('original', iauname='J095641.38+005057.1', band='g',
-                     survey='sdss', version='v1_0_0')
-image= fitsio.read(filename)
-
-Depends on urllib2, os, and astropy v1.0 or later. 
-"""
 
 def version_to_topdir(version):
     """
-    Function to convert version into top directory of atlas
+    Convert version name into top directory of atlas
 
-    Parameters:
-    ==========
-    version : version of NSA (vN_M_P)
+    Parameters
+    ----------
+    version : str
+        version of NSA (vN_M_P)
 
-    Returns:
-    =======
-    topid : top directory name vN
+    Returns
+    -------
+    topid :  str
+        top directory name vN
     """
-    vN= (version.split('_'))[0]
+    vN = (version.split('_'))[0]
     return vN
+
 
 def version_to_detectdir(version):
     """
-    Function to convert version into detection subdirectory
+    Convert version name into detection subdirectory
 
-    Parameters:
-    ==========
-    version : version of NSA (vN_M_P)
+    Parameters
+    ----------
+    version : str
+        version of NSA (vN_M_P)
 
-    Returns:
-    =======
-    detectdir : detection subdirectory vN_M
+    Returns
+    -------
+    detectdir : str
+        detection subdirectory vN_M
     """
-    vNM= "_".join((version.split('_'))[0:2])
+    vNM = "_".join((version.split('_'))[0:2])
     return vNM
-    
+
+
 def radec_to_iauname(ra, dec, **kwargs):
     """
     Function to convert RA, Dec to an IAU-style name (JHHMMSS.SS[+-]DDMMSS.S)
 
-    Parameters:
-    ==========
-    ra : Right ascension, in deg
-    dec : Declination, in deg
+    Parameters
+    ----------
+    ra : float
+        Right ascension, in deg
+    dec : float
+        Declination, in deg
 
-    Returns:
-    =======
-    iauname : IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
+    Returns
+    -------
+    iauname : str
+        IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
     """
     import astropy.coordinates as coordinates
-    precision=2
-    ra_angle= coordinates.Angle(ra, unit='degree')
-    rastr= ra_angle.to_string(unit='hour', sep='', precision=precision,
-                              pad=True)
-    dec_angle= coordinates.Angle(dec, unit='degree')
-    decstr= dec_angle.to_string(unit='degree', sep='', precision=precision-1,
-                                pad=True, alwayssign=True)
-    return 'J'+rastr+decstr
+    precision = 2
+    ra_angle = coordinates.Angle(ra, unit='degree')
+    rastr = ra_angle.to_string(unit='hour', sep='', precision=precision,
+                               pad=True)
+    dec_angle = coordinates.Angle(dec, unit='degree')
+    decstr = dec_angle.to_string(unit='degree', sep='',
+                                 precision=precision - 1,
+                                 pad=True, alwayssign=True)
+    return 'J' + rastr + decstr
+
 
 def iauname_to_subdir(iauname, **kwargs):
     """
-    Function to convert IAUNAME to a subdirectory in NSA
+    Convert IAUNAME to a subdirectory name in NASA-Sloan Atlas
 
-    Parameters:
-    ==========
-    iauname : IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
+    Parameters
+    ----------
+    iauname : str
+        IAU-style name corresponding to ID (JHHMMSS.SS[+-]DDMMSS.S)
 
-    Returns:
-    =======
-    subdir : subdirectory based on IAU-style name
-        [RA]/[DEC]/[IAUNAME]
-      where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]
+    Returns
+    -------
+    subdir : str
+        subdirectory based on IAU-style name
+
+    Notes
+    -----
+    Subdirectory is of the form: [RA]/[DEC]/[IAUNAME],
+    where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]
     """
-    ra_dir= iauname[1:3]+'h'
-    dec_dir= "%02d" % (int(abs(float(iauname[11:13]))/2.)*2)
+    ra_dir = iauname[1:3] + 'h'
+    dec_dir = "%02d" % (int(abs(float(iauname[11:13])) / 2.) * 2)
     if iauname[10] == '+':
-        dec_dir= 'p'+dec_dir
+        dec_dir = 'p' + dec_dir
     else:
-        dec_dir= 'm'+dec_dir
+        dec_dir = 'm' + dec_dir
     return os.path.join(ra_dir, dec_dir, iauname)
 
-def local_to_url(local, local_base='/data', remote_base='http://data.sdss.org'):
+
+def local_to_url(local, local_base='/data',
+                 remote_base='http://data.sdss.org'):
     """
-    Function to convert a local path to the remote URL
-    
-    Parameters:
-    ==========
+    Convert a local path to the remote URL
 
-    local : path to convert
+    Parameters
+    ----------
 
-    local_base : Base path on local system
+    local : str
+        path to convert
 
-    remote_base : Corresponding base path on remote system
+    local_base : str
+        base path on local system
+
+    remote_base : str
+        corresponding base path on remote system
 
     """
-    return re.sub("^"+local_base, remote_base, local)
+    return re.sub("^" + local_base, remote_base, local)
+
 
 def download_file(url, filename):
+    """
+    Download a file at a url and put it into a local location
+
+    Parameters
+    ----------
+
+    url : str
+        URL of file to download
+
+    filename : str
+        local path to put file in
+    """
     if(os.path.isfile(filename) is True):
         return filename
 
-    filedir= os.path.dirname(filename)
+    filedir = os.path.dirname(filename)
     if(os.path.isdir(filedir) is False):
         os.makedirs(filedir)
 
     u = urllib2.urlopen(url)
-    
+
     with open(filename, 'wb') as f:
         meta = u.info()
         meta_func = meta.getheaders if hasattr(meta, 'getheaders') else meta.get_all
@@ -155,46 +162,60 @@ def download_file(url, filename):
 
     return filename
 
-class path(base_path):
-    """Class for construction of NASA-Sloan Atlas paths
+
+class Path(base_path):
+    """Class for supporting construction of NASA-Sloan Atlas paths.
+    Typical usage relies on the get() method.
     """
 
     def __init__(self, pathfile=None):
         if(pathfile is None):
-            pathfile=os.path.join(os.getenv('DIMAGE_DIR'),
-                                  'data', 'dimage_paths.ini')
-        super(path,self).__init__(pathfile)
-        self.nsaid_to_iauname_dict= None
-        self.iauname_to_nsaid_dict= None
-        self.remote_base='http://data.sdss.org'
-        self.local_base='/data'
-        self._remote= False
+            pathfile = os.path.join(os.getenv('DIMAGE_DIR'),
+                                    'data', 'dimage_paths.ini')
+        super(Path, self).__init__(pathfile)
+        self.nsaid_to_iauname_dict = None
+        self.iauname_to_nsaid_dict = None
+        self.remote_base = 'http://data.sdss.org'
+        self.local_base = '/data'
+        self._remote = False
 
     def _reset(self):
-        self.nsaid_to_iauname_dict=None
-        self.iauname_to_nsaid_dict=None
+        self.nsaid_to_iauname_dict = None
+        self.iauname_to_nsaid_dict = None
 
     def _nsaid_init(self, **kwargs):
+        """Initializes translation table from NSAID to IAUNAME.
         """
-        Initializes translation table from NSAID to IAUNAME
-        """
-        atlas=fitsio.read(self.get('atlas', version=kwargs['version']))
-        iauname=atlas['IAUNAME']
-        nsaid=range(len(iauname))
-        self.nsaid_to_iauname_dict= dict(zip(nsaid, iauname))
-        self.iauname_to_nsaid_dict= dict(zip(iauname, nsaid))
-        atlas.close()
+        atlas = fitsio.read(self.get('atlas', version=kwargs['version']))
+        iauname = atlas['IAUNAME']
+        nsaid = range(len(iauname))
+        self.nsaid_to_iauname_dict = dict(zip(nsaid, iauname))
+        self.iauname_to_nsaid_dict = dict(zip(iauname, nsaid))
 
     def remote(self, remote_base=None, local_base=None,
                username=None, password=None):
+        """
+        Configures remote access for NASA-Sloan Atlas.
+
+        Parameters
+        ----------
+        remote_base : str
+            base URL path for remote repository
+        local_base : str
+            base file path for local repository
+        username : str
+            user name for remote repository
+        password : str
+            password for local repository
+        """
         if(remote_base is not None):
-            self.remote_base= remote_base
+            self.remote_base = remote_base
         if(local_base is not None):
-            self.local_base= local_base
-        self._remote= True
+            self.local_base = local_base
+        self._remote = True
         if((username is not None) and (password is not None)):
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            passman.add_password(None, self.remote_base, 
+            passman.add_password(None, self.remote_base,
                                  username, password)
             authhandler = urllib2.HTTPBasicAuthHandler(passman)
             opener = urllib2.build_opener(authhandler)
@@ -204,13 +225,18 @@ class path(base_path):
         """
         Returns IAUNAME given NSAID
 
-        Parameters:
-        ==========
+        Parameters
+        ----------
         nsaid : int
           NSAID to infer IAUNAME from
 
-        Notes:
-        =====
+        Returns
+        -------
+        iauname : str
+          IAUNAME to infer NSAID from
+
+        Notes
+        -----
         Uses translation table set up by _nsaid_init(),
         which involves reading the original atlas.fits file.
         Large overhead on first call.
@@ -223,13 +249,18 @@ class path(base_path):
         """
         Returns NSAID given IAUNAME
 
-        Parameters:
-        ==========
-        IAUNAME : str
+        Parameters
+        ----------
+        iauname : str
           IAUNAME to infer NSAID from
 
-        Notes:
-        =====
+        Returns
+        -------
+        nsaid : np.int32
+            NSAID index
+
+        Notes
+        -----
         Uses translation table set up by _nsaid_init(),
         which involves reading the original atlas.fits file.
         Large overhead on first call.
@@ -241,20 +272,20 @@ class path(base_path):
     def nsaid_to_pid(self, nsaid, **kwargs):
         """
         Returns PID value for NSAID
-        
-        Parameters:
-        ==========
+
+        Parameters
+        ----------
         nsaid : int
-          NSAID 
-        
-        Returns:
-        =======
+          NSAID
+
+        Returns
+        -------
         pid : int
           parent IDs of processed objects in image
         """
-        pcat= fitsio.read(self.get('pcat', nsaid=nsaid, **kwargs))
+        pcat = fitsio.read(self.get('pcat', nsaid=nsaid, **kwargs))
         # Infers from where CRA isn't zero
-        indx= np.nonzero(pcat['CRA'])
+        indx = np.nonzero(pcat['CRA'])
         return indx
 
     def nsaid_to_aid(self, nsaid, pid, **kwargs):
@@ -264,67 +295,109 @@ class path(base_path):
         Parameters
         ----------
         nsaid : int
-          NSAID 
-        pid : int 
-          parent ID 
+          NSAID
+        pid : int
+          parent ID
 
         Returns
         -------
         aid : int
           aid of detected object
         """
-        measure= fitsio.read(self.get('measure', pid=pid, nsaid=nsaid,
-                                    **kwargs))
+        measure = fitsio.read(self.get('measure', pid=pid, nsaid=nsaid,
+                                       **kwargs))
         # Infers from where measurements exist
-        aid= measure['AID']
+        aid = measure['AID']
         return aid
 
     def local(self):
-        self._remote= False
+        """Configures local access for NASA-Sloan Atlas
+        """
+        self._remote = False
 
     def v1(self, filetype, **kwargs):
+        """Path utility to interpret %v1 directive
+        """
         try:
             return version_to_topdir(kwargs['version'])
         except KeyError:
             return None
 
     def v2(self, filetype, **kwargs):
+        """Path utility to interpret %v2 directive
+        """
         try:
             return version_to_detectdir(kwargs['version'])
         except KeyError:
             return None
 
-    def iauname(self, filetype, **kwargs):    
-        if kwargs.has_key('iauname'): # Set IAUNAME if given
+    def iauname(self, filetype, **kwargs):
+        """Path utility to interpret %iauname directive
+        """
+        if kwargs.has_key('iauname'):  # Set IAUNAME if given
             return kwargs['iauname']
-        else: # Use NSAID/RADEC to deduce IAUNAME if need be
+        else:  # Use NSAID/RADEC to deduce IAUNAME if need be
             if kwargs.has_key('ra') and kwargs.has_key('dec'):
                 return radec_to_iauname(**kwargs)
             if kwargs.has_key('nsaid'):
                 return self.nsaid_to_iauname(**kwargs)
 
     def subdir(self, filetype, **kwargs):
-        iauname= self.iauname(filetype, **kwargs)
+        """Path utility to interpret %subdir directive
+        """
+        iauname = self.iauname(filetype, **kwargs)
         return iauname_to_subdir(iauname)
 
     def pid(self, filetype, **kwargs):
-        iauname= self.iauname(filetype, **kwargs)
-        kwargs['nsaid']= self.iauname_to_nsaid(iauname)
+        """Path utility to interpret %pid directive
+        """
+        iauname = self.iauname(filetype, **kwargs)
+        kwargs['nsaid'] = self.iauname_to_nsaid(iauname)
         return str(self.nsaid_to_pid(**kwargs)[0][0])
 
     def aid(self, filetype, **kwargs):
-        iauname= self.iauname(filetype, **kwargs)
-        kwargs['nsaid']= self.iauname_to_nsaid(iauname)
-        kwargs['pid']= self.nsaid_to_pid(**kwargs)[0][0]
+        """Path utility to interpret %aid directive
+        """
+        iauname = self.iauname(filetype, **kwargs)
+        kwargs['nsaid'] = self.iauname_to_nsaid(iauname)
+        kwargs['pid'] = self.nsaid_to_pid(**kwargs)[0][0]
         return str(self.nsaid_to_aid(**kwargs)[0])
 
     def url(self, filetype, **kwargs):
-        filename=self.full(filetype, **kwargs)
+        """Constructs URL based on file name
+
+        Parameters
+        ----------
+        filetype : str
+            type of file
+
+        keyword arguments :
+            keywords to fully specify URL
+
+        Notes
+        -----
+        Path templates are defined in $DIMAGE_DIR/data/dimage_paths.ini
+        """
+        filename = self.full(filetype, **kwargs)
         return(local_to_url(filename, local_base=self.local_base,
                             remote_base=self.remote_base))
-        
+
     def get(self, filetype, **kwargs):
-        filename= self.full(filetype, **kwargs)
+        """Returns file name, downloading if remote access configured.
+
+        Parameters
+        ----------
+        filetype : str
+            type of file
+
+        keyword arguments :
+            keywords to fully specify path
+
+        Notes
+        -----
+        Path templates are defined in $DIMAGE_DIR/data/dimage_paths.ini
+        """
+        filename = self.full(filetype, **kwargs)
         if(self._remote is True):
             download_file(self.url(filetype, **kwargs), filename)
         return(filename)

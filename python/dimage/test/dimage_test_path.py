@@ -1,6 +1,6 @@
 import unittest
 import os
-import dimage.utils.path 
+import dimage.path 
 
 class TestPathsFake(unittest.TestCase):
 
@@ -9,7 +9,7 @@ class TestPathsFake(unittest.TestCase):
           self.oldfake= os.environ['FAKEPHOTOMETRY']
       except:
           pass
-      self.dpath= dimage.utils.path()
+      self.dpath= dimage.path.Path()
       os.environ['FAKEPHOTOMETRY']='/fake'
 
   def tearDown(self):
@@ -41,7 +41,7 @@ class TestPathsAtlas(unittest.TestCase):
             self.oldatlas= os.environ['ATLAS_DATA']
         except:
             pass
-        self.dpath= dimage.utils.path()
+        self.dpath= dimage.path.Path()
         os.environ['ATLAS_DATA']=os.path.join(os.environ['DIMAGE_DIR'], 
                                               'data', 'test', 'atlas')
 
