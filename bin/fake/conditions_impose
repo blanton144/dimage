@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+
+# Create perfect conditions file
+
+import getopt
+import os
+import sys
+import dimage.path
+import numpy as np
+import fitsio
+from dimage.fake.conditions.impose import impose_file
+
+
+def main(argv):
+
+    # Defaults
+    take = None
+    version = None
+    model = None
+    conditions = None
+    clobber = False
+
+    # Parse header
+    helpstr = 'conditions_apply -t take -v version'
+    try:
+        opts, args = getopt.getopt(argv, "ht:v:m:c",
+                                   ["help=", "take=", "version=",
+                                    "model=", "clobber="])
+    except getopt.GetoptError:
+        print helpstr
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print helpstr
+            sys.exit()
+        elif opt in ("-t", "--take"):
+            take = arg
+        elif opt in ("-v", "--version"):
+            version = arg
+        elif opt in ("-m", "--model"):
+            model = arg
+        elif opt in ("-x", "--conditions"):
+            conditions = arg
+        elif opt in ("-c", "--clobber"):
+            clobber = True
+
+    images = dpath.full('model-list', take=take, version=version,
+                        model=model)
+    for image in images:
+        image_file = dpath.full('model-fits', take=take, model=model, 
+                                index=image['indx'])
+        conditions_file = dpath.full('conditions', take=take, 
+                                     conditions=conditions)
+        fake_file = dpath.full('fake-fits', take=take, 
+                               version=version, index=image['indx'])
+        impose_file(image_file=image_file, conditions_file=conditions_file,
+                    new_file=fake_file)

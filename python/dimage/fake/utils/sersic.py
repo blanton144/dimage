@@ -9,8 +9,8 @@ import os
 import numpy as np
 
 
-def dfake(nx, ny, xcen=None, ycen=None, n=1., r50=3., ba=1., phi=0.,
-          simple=False):
+def sersic(nx, ny, xcen=None, ycen=None, n=1., r50=3., ba=1., phi=0.,
+           simple=False):
     """Create fake Sersic galaxy image.
 
     Parameters

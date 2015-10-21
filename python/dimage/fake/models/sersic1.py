@@ -133,7 +133,8 @@ def writelist(take, modelname, rflux, r50, n, phi, ba, arcperpix):
         ycen[i] = np.float32(size[i] / 2) - 0.5 + random.uniform(0., 1.)
 
     # put into recarray
-    data = listrec(indx, rflux, size, size, xcen, ycen, arcperpix)
+    data = dimage.fake.models.listrec(indx, rflux, size, size,
+                                      xcen, ycen, arcperpix)
 
     hdu0 = pyfits.PrimaryHDU()
     hdu1 = pyfits.BinTableHDU(data=data, name='Model list')

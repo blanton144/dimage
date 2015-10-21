@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+
+# Create perfect conditions file
+
+import pdb
+import getopt
+import os
+import sys
+import dimage.path
+import numpy as np
+import fitsio
+
+dpath = dimage.path.Path()
+
+
+def main(argv):
+
+    # Defaults
+    take = None
+    clobber = False
+
+    # Parse header
+    helpstr = 'conditions_perfect [-t take]'
+    try:
+        opts, args = getopt.getopt(argv, "ht:c",
+                                   ["help=", "take=", "clobber="])
+    except getopt.GetoptError:
+        print helpstr
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print helpstr
+            sys.exit()
+        elif opt in ("-t", "--take"):
+            take = arg
+        elif opt in ("-c", "--clobber"):
+            clobber = True
+
+    if(take is None):
+        print "Must specify take with -t or --take"
+        sys.exit()
+
+    conditions_file = dpath.full('conditions', take=take,
+                                 condition='perfect')
+    if(clobber is False):
+        if(os.path.exists(conditions_file)):
+            sys.exit()
+
+    dtype = [('indx', np.int32),
+             ('background', np.float32),
+             ('background_function', np.str_, 16),
+             ('psf_function', np.str_, 16),
+             ('resample_function', np.str_, 16),
+             ('calibration_function', np.str_, 16)]
+
+    data = np.recarray(1, dtype=dtype)
+    data['indx'] = 0
+    data['background'] = 0.
+    data['background_function'] = 'constant'
+    data['psf_function'] = 'none'
+    data['resample_function'] = 'none'
+    data['calibration_function'] = 'none'
+
+    fitsio.write(conditions_file, data, clobber=True)
+
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv[1:])
+    except:
+        import sys
+        tb = sys.exc_info()[2]
+        pdb.post_mortem(tb)

@@ -12,7 +12,7 @@ import sys
 import numpy as np
 import astropy.io.fits as pyfits
 import dimage
-from dimage.models import sersic1
+from dimage.fake.models import sersic1
 import random
 
 def main(argv):
@@ -47,7 +47,9 @@ def main(argv):
 
     # Read in Simard file
     # COMP_DIR is env var for the location of the (dropbox) Simard files
-    simfile= os.path.join(os.getenv('COMP_DIR'), 'simard-sdss-pn.fits')
+    simfile= os.path.join(os.getenv('DIMAGE_DATA'), 
+                          'comparison', 
+                          'simard-sdss-pn.fits')
     fp= pyfits.open(simfile)
     data= fp[1].data
     
@@ -88,9 +90,4 @@ def main(argv):
     sersic1.writelist(take, modelname, rflux, r50, n, phi, ba, arcperpix)
 
 if __name__ == "__main__": 
-    try:
-        main(sys.argv[1:])
-    except:
-        import sys
-        tb = sys.exc_info()[2]
-        pdb.post_mortem(tb)
+    main(sys.argv[1:])

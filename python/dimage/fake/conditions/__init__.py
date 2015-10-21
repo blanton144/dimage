@@ -2,4 +2,8 @@
 Conditions for model processing
 """
 
-from nocond import *
+import background
+import psf
+import resample
+import calibration
+import impose
