@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+
+# Create list of model galaxies to create
+#
+# MRB 2014-12-07
+#
+
+import os
+import getopt
+import sys
+import fitsio
+import dimage.path
+from dimage.fake.models.sersic1 import Sersic1
+
+dpath = dimage.path.Path()
+
+
+def main(argv):
+    # Defaults
+    take = None
+    modelname = None
+
+    # Parse header
+    helpstr = 'model_images -t <take> -m <modelname>'
+    try:
+        opts, args = getopt.getopt(argv, "ht:s:n:m:",
+                                   ["help=", "take=", "seed=",
+                                    "number=", "model="])
+    except getopt.GetoptError:
+        print helpstr
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == ("-h", "--help"):
+            print helpstr
+            sys.exit()
+        elif opt in ("-t", "--take"):
+            take = arg
+        elif opt in ("-m", "--model"):
+            modelname = arg
+
+    if(take is None):
+        print "Must specify take with -t or --take"
+        sys.exit()
+
+    if(modelname is None):
+        print "Must specify model name with -m or --model"
+        sys.exit()
+
+    if(modelname == 'sersic1_simard'):
+        model = Sersic1(modelname=modelname, take=take, read=True)
+        for indx in model.params['indx']:
+            image = model.image(indx=indx)
+            header = fitsio.FITSHDR(dict(model.header(indx=indx).items()))
+            filename = dpath.full('model-fits', take=take,
+                                  model=modelname, index=indx)
+            dirname = os.path.dirname(filename)
+            if(os.path.isdir(dirname) is False):
+                os.makedirs(dirname)
+            fitsio.write(filename, image, header=header, clobber=True)
+        sys.exit(0)
+
+    print "No such model name " + modelname
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

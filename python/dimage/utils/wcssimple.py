@@ -26,8 +26,12 @@ def wcssimple(ra, dec, size, pixscale):
     """
 
     w = wcs.WCS(naxis=2)
-    naxis1 = np.int32(size / (pixscale / 3600.))
-    naxis2 = naxis1
+    if(len(size) == 1):
+        naxis1 = np.int32(size / (pixscale / 3600.))
+        naxis2 = naxis1
+    else:
+        naxis1 = np.int32(size[0] / (pixscale / 3600.))
+        naxis2 = np.int32(size[1] / (pixscale / 3600.))
     xmid = naxis1 // 2
     ymid = naxis2 // 2
     w.wcs.crpix = [xmid + 1, ymid + 1]

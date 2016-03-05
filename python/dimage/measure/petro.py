@@ -207,7 +207,7 @@ def petro(image, ivar, ba=1., phi=0., xcen=None, ycen=None, petroratio0=0.2,
     else:
         petror50=-9999.
         petror90=-9999.
-        
+
     rdict['flux']=petroflux
     rdict['ivar']=petroivar
     rdict['rad']=petrorad

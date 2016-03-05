@@ -7,7 +7,7 @@ Michael R. Blanton, 2015-03-07
 
 import os
 import astropy.io.fits as pyfits
-import dimage
+import dimage.combine
 import astropy.coordinates as coordinates
 import math
 

@@ -2,16 +2,11 @@
 Sersic 1D model utilities
 """
 
-import os
-import sys
 import numpy as np
-import astropy.io.fits as pyfits
 import random
 import scipy
-import dimage.fake.models
-import dimage.path
-
-apath = dimage.path.Path()
+import dimage.fake.utils.sersic as sersic
+from dimage.fake.models.model import Model
 
 
 def rlimit(n, frac=0.99):
@@ -19,154 +14,82 @@ def rlimit(n, frac=0.99):
     return (scipy.special.gammaincinv(2. * n, frac) / bn)**n
 
 
-def readlist(take, modelname):
-    """Reads in Sersic 1D model list
+class Sersic1(Model):
+    def __init__(self, take=None, modelname=None, read=False):
+        super(Sersic1, self).__init__(take=take, modelname=modelname,
+                                      read=read)
 
-    Parameters
-    ----------
-    take : str
-        "take" to be implemented
-    modelname : str
-        Name of model
+    def image(self, indx=None):
+        simage = sersic(nx=self.params['nx'][indx],
+                        ny=self.params['ny'][indx],
+                        xcen=self.params['xcen'][indx],
+                        ycen=self.params['ycen'][indx],
+                        n=self.params['n'][indx],
+                        r50=self.params['r50'][indx],
+                        ba=self.params['ba'][indx],
+                        phi=self.params['phi'][indx],
+                        simple=False)
+        return simage
 
-    Returns
-    -------
-    list : ndarray
-        recarray containing list of image properties
+    def set_params(self, flux=None, r50=None, n=None,
+                   phi=None, ba=None):
+        """Inserts parameters into Sersic1.params
 
-    Notes
-    -----
-    Inputs from:
-       $FAKEPHOTOMETRY/[take]/models/[modelname]/model-list-[modelname].fits
-    """
+        Parameters
+        ----------
+        flux : np.float32
+            ndarray of fluxes
+        r50 : np.float32
+            ndarray of half-light radii
+        n : np.float32
+            ndarray of Sersic indices
+        phi : np.float32
+            ndarray of position angles
+        ba : np.float32
+            ndarray of minor-to-major (b/a) axis ratios
 
-    infile = apath.full('model-list', take=take, model=modelname)
-    fp = pyfits.open(infile)
-    return fp[1].data
+        Notes
+        -----
+        Infers the following:
+            indx
+            nx, ny
+            dxcen, dycen
+            xcen, ycen
+        """
+        dtype = [('indx', np.int32),
+                 ('nx', np.int32),
+                 ('ny', np.int32),
+                 ('dxcen', np.float32),
+                 ('dycen', np.float32),
+                 ('xcen', np.float32),
+                 ('ycen', np.float32),
+                 ('flux', np.float32),
+                 ('r50', np.float32),
+                 ('n', np.float32),
+                 ('phi', np.float32),
+                 ('ba', np.float32)
+                 ]
+        data = np.empty(len(flux), dtype=dtype)
+        data['indx'] = np.arange(len(flux))
+        data['flux'] = flux
+        data['r50'] = r50
+        data['n'] = n
+        data['phi'] = phi
+        data['ba'] = ba
 
+        # Determine jitter
+        for i in np.arange(len(data)):
+            data['dxcen'] = - 0.5 + random.uniform(0., 1.)
+            data['dycen'] = - 0.5 + random.uniform(0., 1.)
 
-def readpar(take, modelname):
-    """Reads in Sersic 1D model parameter list
+        # Determine sizes and centers based on Sersic parameters
+        size = np.int32(2 * np.int32(rlimit(data['n']) *
+                                     data['r50']) + 1)
+        ilow = np.where(size < 151)
+        size[ilow] = 151
+        data['nx'] = size
+        data['ny'] = size
+        data['xcen'] = np.float32(size / 2) + data['dxcen']
+        data['ycen'] = np.float32(size / 2) + data['dycen']
 
-    Parameters
-    ----------
-    take : str
-        "take" to be implemented
-    modelname : str
-        Name of model
-
-    Returns
-    -------
-    params : ndarray
-        ndarray containing list
-
-    Notes
-    -----
-    Inputs from:
-       $FAKEPHOTOMETRY/[take]/models/[modelname]/model-list-[modelname].fits
-    """
-
-    infile = dimage.fake.models.parpath(take, modelname)
-    fp = pyfits.open(infile)
-    return fp[1].data
-
-
-def writelist(take, modelname, rflux, r50, n, phi, ba, arcperpix):
-    """Writes out Sersic 1D model list
-
-    Parameters
-    ----------
-    take : str
-        "take" to be implemented
-    modelname : str
-        Name of model
-    rflux : np.float32
-        ndarray of fluxes
-    r50 : np.float32
-        ndarray of half-light radii
-    n : np.float32
-        ndarray of Sersic indices
-    phi : np.float32
-        ndarray of position angles
-    ba : np.float32
-        ndarray of minor-to-major (b/a) axis ratios
-    arcperpix: np.float32
-        ndarray of arcsec per pixel (default is 0.2)
-
-    Notes
-    -----
-    Outputs into dir
-       $FAKEPHOTOMETRY/[take]/models/[modelname]
-    the two files
-       model-list-[modelname].fits
-       model-params-[modelname].fits
-    Creates the directory if not already present (not including
-    $FAKEPHOTOMETRY)
-    """
-
-    if(os.getenv('FAKEPHOTOMETRY') == None):
-        print('Must set $FAKEPHOTOMETRY to a valid directory')
-        sys.exit(1)
-    if os.path.exists(os.path.join(
-            os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname)) == False:
-        os.makedirs(os.path.join(os.getenv('FAKEPHOTOMETRY'), take, 'models'))
-        f = open(os.path.join(
-            os.getenv('FAKEPHOTOMETRY'), take, 'models', modelname))
-        f.close()
-
-    outfile = dimage.fake.models.listpath(take, modelname)
-    parfile = dimage.fake.models.parpath(take, modelname)
-
-    # Set index number
-    indx = np.arange(len(rflux), dtype=np.int32)
-
-    # Determine sizes
-    size = np.int32(2 * np.int32(rlimit(n) * r50) + 1)
-    ilow = np.where(size < 151)
-    size[ilow] = 151
-
-    # Jitter centers
-    xcen = np.zeros(len(rflux), dtype=np.float32)
-    ycen = np.zeros(len(rflux), dtype=np.float32)
-    for i in range(len(rflux)):
-        xcen[i] = np.float32(size[i] / 2) - 0.5 + random.uniform(0., 1.)
-        ycen[i] = np.float32(size[i] / 2) - 0.5 + random.uniform(0., 1.)
-
-    # put into recarray
-    data = dimage.fake.models.listrec(indx, rflux, size, size,
-                                      xcen, ycen, arcperpix)
-
-    hdu0 = pyfits.PrimaryHDU()
-    hdu1 = pyfits.BinTableHDU(data=data, name='Model list')
-    hdus = pyfits.HDUList(hdus=[hdu0, hdu1])
-    hdus.writeto(outfile, clobber=True)
-
-    dtype = [('indx', np.int32),
-             ('nx', np.int32),
-             ('ny', np.int32),
-             ('xcen', np.float32),
-             ('ycen', np.float32),
-             ('flux', np.float32),
-             ('r50', np.float32),
-             ('n', np.float32),
-             ('phi', np.float32),
-             ('ba', np.float32),
-             ('arcperpix', np.float32)
-             ]
-    data = np.empty(len(indx), dtype=dtype)
-    data['indx'] = indx
-    data['nx'] = size
-    data['ny'] = size
-    data['xcen'] = xcen
-    data['ycen'] = ycen
-    data['flux'] = rflux
-    data['r50'] = r50
-    data['n'] = n
-    data['phi'] = phi
-    data['ba'] = ba
-    data['arcperpix'] = arcperpix
-
-    hdu0 = pyfits.PrimaryHDU()
-    hdu1 = pyfits.BinTableHDU(data=data, name='Model parameters list')
-    hdus = pyfits.HDUList(hdus=[hdu0, hdu1])
-    hdus.writeto(parfile, clobber=True)
+        self.params = data

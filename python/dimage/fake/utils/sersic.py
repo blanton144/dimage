@@ -1,5 +1,5 @@
 """
-Create fake Sersic galaxy image. 
+Create fake Sersic galaxy image.
 
 Michael R. Blanton, 2014-12-07
 """

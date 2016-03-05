@@ -86,7 +86,7 @@ def main(argv):
         wcsheader = wcssimple(180., 0., size, app_i)[0]
         head = wcsheader.to_header()
         image_i = sersic(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
-        
+
         hdu = pyfits.PrimaryHDU(image_i, header=head)
         imdest = os.path.join(dest, 'fits', ('simser-' + str(i) + '.fits'))
         # clobber requires environment variable CLOBBER=1

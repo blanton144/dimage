@@ -51,7 +51,8 @@ def main(argv):
              ('background_function', np.str_, 16),
              ('psf_function', np.str_, 16),
              ('resample_function', np.str_, 16),
-             ('calibration_function', np.str_, 16)]
+             ('calibration_function', np.str_, 16),
+             ('noise_function', np.str_, 16)]
 
     data = np.recarray(1, dtype=dtype)
     data['indx'] = 0
@@ -60,6 +61,7 @@ def main(argv):
     data['psf_function'] = 'none'
     data['resample_function'] = 'none'
     data['calibration_function'] = 'none'
+    data['noise_function'] = 'none'
 
     fitsio.write(conditions_file, data, clobber=True)
 

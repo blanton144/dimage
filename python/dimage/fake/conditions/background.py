@@ -18,6 +18,6 @@ def constant(image, parameters=None):
         2-D array, same shape as input, with background added
     """
 
-    image = image + parameters['background']
+    image = image + np.float32(parameters['background'])
 
     return image
