@@ -50,4 +50,4 @@ particular, within sdss it utilizes the base_path class in
 sdss.files.path.
 """
 
-from path import *
+from .path import *

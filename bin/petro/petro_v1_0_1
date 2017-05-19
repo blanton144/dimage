@@ -26,36 +26,36 @@ dpath = path.Path()
 # MSTAR in drpAll is Sersic MASS -> needs documented or removed
 # MSTAR_EL in drpAll is PETRO_MASS_EL -> needs documented or removed
 
-petro_dtype = np.dtype([('PETRO_BA_EL', np.float32),
-                        ('PETRO_PHI_EL', np.float32),
-                        ('PETROFLUX_R_EL', np.float32),
-                        ('PETROFLUX_IVAR_R_EL', np.float32),
-                        ('PETROTHETA_R_EL', np.float32),
-                        ('PETROTH50_R_EL', np.float32),
-                        ('PETROTH90_R_EL', np.float32),
-                        ('PETROTHETA_EL', np.float32),
-                        ('PETROFLUX_EL', np.float32, (7,)),
-                        ('PETROFLUX_IVAR_EL', np.float32, (7,)),
-                        ('PETROTH50_EL', np.float32, (7,)),
-                        ('PETROTH90_EL', np.float32, (7,)),
-                        ('APCORR_R_EL', np.float32),
-                        ('APCORR_EL', np.float32, (7,)),
-                        ('APCORR_SELF_EL', np.float32, (7,)),
+petro_dtype = np.dtype([('ELPETRO_BA', np.float32),
+                        ('ELPETRO_PHI', np.float32),
+                        ('ELPETRO_FLUX_R', np.float32),
+                        ('ELPETRO_FLUX_IVAR_R', np.float32),
+                        ('ELPETRO_THETA_R', np.float32),
+                        ('ELPETRO_TH50_R', np.float32),
+                        ('ELPETRO_TH90_R', np.float32),
+                        ('ELPETRO_THETA', np.float32),
+                        ('ELPETRO_FLUX', np.float32, (7,)),
+                        ('ELPETRO_FLUX_IVAR', np.float32, (7,)),
+                        ('ELPETRO_TH50', np.float32, (7,)),
+                        ('ELPETRO_TH90', np.float32, (7,)),
+                        ('ELPETRO_APCORR_R', np.float32),
+                        ('ELPETRO_APCORR', np.float32, (7,)),
+                        ('ELPETRO_APCORR_SELF', np.float32, (7,)),
                         ])
 
-kpetro_dtype = np.dtype([('PETRO_NMGY_EL', np.float32, (7,)),
-                         ('PETRO_NMGY_IVAR_EL', np.float32, (7,)),
-                         ('PETRO_OK_EL', np.int16),
-                         ('PETRO_RNMGY_EL', np.float32, (7,)),
-                         ('PETRO_ABSMAG_EL', np.float32, (7,)),
-                         ('PETRO_AMIVAR_EL', np.float32, (7,)),
-                         ('PETRO_KCORRECT_EL', np.float32, (7,)),
-                         ('PETRO_KCOEFF_EL', np.float32, (5,)),
-                         ('PETRO_MASS_EL', np.float32),
-                         ('PETRO_MTOL_EL', np.float32, (7,)),
-                         ('PETRO_B300_EL', np.float32),
-                         ('PETRO_B1000_EL', np.float32),
-                         ('PETRO_METS_EL', np.float32)])
+kpetro_dtype = np.dtype([('ELPETRO_NMGY', np.float32, (7,)),
+                         ('ELPETRO_NMGY_IVAR', np.float32, (7,)),
+                         ('ELPETRO_OK', np.int16),
+                         ('ELPETRO_RNMGY', np.float32, (7,)),
+                         ('ELPETRO_ABSMAG', np.float32, (7,)),
+                         ('ELPETRO_AMIVAR', np.float32, (7,)),
+                         ('ELPETRO_KCORRECT', np.float32, (7,)),
+                         ('ELPETRO_KCOEFF', np.float32, (5,)),
+                         ('ELPETRO_MASS', np.float32),
+                         ('ELPETRO_MTOL', np.float32, (7,)),
+                         ('ELPETRO_B300', np.float32),
+                         ('ELPETRO_B1000', np.float32),
+                         ('ELPETRO_METS', np.float32)])
 
 dr7flag_dtype = np.dtype([('IN_DR7_LSS', np.int8)])
 
@@ -103,6 +103,19 @@ def main(argv):
     replace_dtype_name(new_dtype, 'B300', 'SERSIC_B300')
     replace_dtype_name(new_dtype, 'B1000', 'SERSIC_B1000')
     replace_dtype_name(new_dtype, 'METS', 'SERSIC_METS')
+    replace_dtype_name(new_dtype, 'PETROTH50', 'PETRO_TH50')
+    replace_dtype_name(new_dtype, 'PETROTH90', 'PETRO_TH90')
+    replace_dtype_name(new_dtype, 'PETROTHETA', 'PETRO_THETA')
+    replace_dtype_name(new_dtype, 'BA50', 'PETRO_BA50')
+    replace_dtype_name(new_dtype, 'BA90', 'PETRO_BA90')
+    replace_dtype_name(new_dtype, 'PHI50', 'PETRO_PHI50')
+    replace_dtype_name(new_dtype, 'PHI90', 'PETRO_PHI90')
+    replace_dtype_name(new_dtype, 'PETROFLUX', 'PETRO_FLUX')
+    replace_dtype_name(new_dtype, 'PETROFLUX_IVAR', 'PETRO_FLUX_IVAR')
+    replace_dtype_name(new_dtype, 'FIBERFLUX', 'FIBER_FLUX')
+    replace_dtype_name(new_dtype, 'FIBERFLUX_IVAR', 'FIBER_FLUX_IVAR')
+    replace_dtype_name(new_dtype, 'SERSICFLUX', 'SERSIC_FLUX')
+    replace_dtype_name(new_dtype, 'SERSICFLUX_IVAR', 'SERSIC_FLUX_IVAR')
 
     # - append elliptical petro quantities
     new_dtype_descr = new_dtype.descr
@@ -116,22 +129,27 @@ def main(argv):
     for name in nsa.dtype.names:
         new_nsa[name] = nsa[name]
     for name in petro_dtype.names:
-        pname = re.sub('(_EL)', '', name).lower()
-        if(name == 'PETRO_BA_EL'):
+        pname = re.sub('(ELPETRO_)', 'PETRO', name).lower()
+        if(name == 'ELPETRO_BA'):
             pname = 'ba'
-        if(name == 'PETRO_PHI_EL'):
+        if(name == 'ELPETRO_PHI'):
             pname = 'phi'
-        if(name == 'PETROFLUX_IVAR_EL'):
+        if(name == 'ELPETRO_FLUX_IVAR'):
             pname = 'petroivar'
-        if(name == 'PETROFLUX_IVAR_R_EL'):
+        if(name == 'ELPETRO_FLUX_IVAR_R'):
             pname = 'petroivar_r'
+        if(name == 'ELPETRO_APCORR'):
+            pname = 'apcorr'
+        if(name == 'ELPETRO_APCORR_R'):
+            pname = 'apcorr_r'
+        if(name == 'ELPETRO_APCORR_SELF'):
+            pname = 'apcorr_self'
         new_nsa[name] = petro[pname]
     for name in kpetro_dtype.names:
-        kname = re.sub('(_EL)', '', name)
-        kname = re.sub('(PETRO_?)', '', kname)
+        kname = re.sub('(ELPETRO_?)', '', name)
         new_nsa[name] = kpetro[kname]
     new_nsa['IN_DR7_LSS'] = dr7flag
-    new_nsa['PETRO_PHI_EL'] = 180. - new_nsa['PETRO_PHI_EL']
+    new_nsa['ELPETRO_PHI'] = 180. - new_nsa['ELPETRO_PHI']
 
     # Write out file
     fitsio.write(newfile, new_nsa, clobber=True)

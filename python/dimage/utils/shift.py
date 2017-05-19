@@ -58,7 +58,7 @@ def shift(image, dx, dy, kernel='dampsinc', dampsinc=2.47,
         dimage_lib.dkernel_lanczos_scale(ctypes.c_float(lanczos))
         dkernel_size = dimage_lib.dkernel_lanczos_size()
     else:
-        print "No kernel: " + kernel
+        print("No kernel: " + kernel)
 
     nx = image.shape[0]
     ny = image.shape[1]

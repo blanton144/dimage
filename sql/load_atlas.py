@@ -1,16 +1,13 @@
-#!/usr/local/python-2.7/bin/python
+#!/usr/bin/env python
 
 import pyfits
 import os
 import sys
-import sqlalchemy
 from PGConnection import engine, Session
 from ModelClasses import *
 
 afile = os.environ['DIMAGE_DIR']+'/data/atlas/atlas_sample.fits'
-fhdu= pyfits.open(afile)
-agal= fhdu[1].data
-fhdu.close()
+agal= fitsio.read(afile)
 
 session = Session()
 

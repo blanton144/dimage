@@ -6,7 +6,7 @@ import os
 import fitsio
 import dimage.path
 import numpy as np
-import pydl.pydlutils.yanny.yanny as Yanny
+import pydl.pydlutils.yanny 
 import dimage.utils.wcssimple as wcssimple
 
 dpath = dimage.path.Path()
@@ -21,7 +21,7 @@ class Model(object):
         self.modelname = modelname
         self.filename = dpath.full('model-params', take=self.take,
                                    model=self.modelname)
-        self.take_params = Yanny(dpath.full('take-params', take=take))
+        self.take_params = pydl.pydlutils.yanny(dpath.full('take-params', take=take))
         imodel = np.nonzero(np.array(self.take_params['MODEL']['modelname']) ==
                             modelname)[0][0]
         self.nmodel = self.take_params['MODEL']['nmodel'][imodel]

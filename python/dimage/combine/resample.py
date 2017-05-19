@@ -67,7 +67,7 @@ def resample(image, x, y, kernel='dampsinc', dampsinc=2.47,
         dimage_lib.dkernel_lanczos_scale(ctypes.c_float(lanczos))
         dkernel_size = dimage_lib.dkernel_lanczos_size()
     else:
-        print "No kernel: " + kernel
+        print("No kernel: " + kernel)
 
     (nx, ny) = image.shape
     nn = len(x)

@@ -2,9 +2,9 @@
 Conditions for model processing
 """
 
-import background
-import psf
-import resample
-import calibration
-import noise
-import impose
+from . import background
+from . import psf
+from . import resample
+from . import calibration
+from . import noise
+from . import impose

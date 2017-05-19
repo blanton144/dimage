@@ -4,8 +4,8 @@ from __future__ import division, print_function, unicode_literals
 #__version__ = version('$HeadURL$')
 #del version
 
-import atlas
-import combine
-import fake
-import measure 
-import utils
+from . import atlas
+from . import combine
+from . import fake
+from . import measure 
+from . import utils

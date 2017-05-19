@@ -1,9 +1,9 @@
-import urllib2
 import os
 import re
 import numpy as np
 import fitsio
-from sdss.files.path import base_path
+import requests
+from .base_path import base_path
 
 
 def version_to_topdir(version):
@@ -89,13 +89,13 @@ def iauname_to_subdir(iauname, **kwargs):
     Subdirectory is of the form: [RA]/[DEC]/[IAUNAME],
     where RA is 00h, 01h, etc. and DEC is [..., m02, m00, p00, p02, ...]
     """
-    ra_dir = iauname[1:3] + 'h'
+    ra_dir = iauname[1:3].decode() + 'h'
     dec_dir = "%02d" % (int(abs(float(iauname[11:13])) / 2.) * 2)
-    if iauname[10] == '+':
+    if str(iauname)[12] == "+":
         dec_dir = 'p' + dec_dir
     else:
         dec_dir = 'm' + dec_dir
-    return os.path.join(ra_dir, dec_dir, iauname)
+    return os.path.join(ra_dir, dec_dir, iauname.decode())
 
 
 def local_to_url(local, local_base='/data',
@@ -139,26 +139,11 @@ def download_file(url, filename):
     if(os.path.isdir(filedir) is False):
         os.makedirs(filedir)
 
-    u = urllib2.urlopen(url)
+    response = requests.get(url)
 
-    with open(filename, 'wb') as f:
-        meta = u.info()
-        meta_func = meta.getheaders if hasattr(meta, 'getheaders') else meta.get_all
-        meta_length = meta_func("Content-Length")
-        file_size = None
-        if meta_length:
-            file_size = int(meta_length[0])
-        print("Downloading: {0} Bytes: {1}".format(url, file_size))
-
-        file_size_dl = 0
-        block_sz = 8192
-        while True:
-            buffer = u.read(block_sz)
-            if not buffer:
-                break
-
-            file_size_dl += len(buffer)
-            f.write(buffer)
+    with open(filename, 'wb') as fd:
+        for chunk in response.iter_content(chunk_size=128):
+            fd.write(chunk)
 
     return filename
 
@@ -213,13 +198,7 @@ class Path(base_path):
         if(local_base is not None):
             self.local_base = local_base
         self._remote = True
-        if((username is not None) and (password is not None)):
-            passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            passman.add_password(None, self.remote_base,
-                                 username, password)
-            authhandler = urllib2.HTTPBasicAuthHandler(passman)
-            opener = urllib2.build_opener(authhandler)
-            urllib2.install_opener(opener)
+        requests.get(self.remote_base, auth=(username, password))
 
     def nsaid_to_iauname(self, nsaid, **kwargs):
         """
@@ -334,12 +313,12 @@ class Path(base_path):
     def iauname(self, filetype, **kwargs):
         """Path utility to interpret %iauname directive
         """
-        if kwargs.has_key('iauname'):  # Set IAUNAME if given
+        if 'iauname' in kwargs:  # Set IAUNAME if given
             return kwargs['iauname']
         else:  # Use NSAID/RADEC to deduce IAUNAME if need be
-            if kwargs.has_key('ra') and kwargs.has_key('dec'):
+            if 'ra' in kwargs and 'dec' in kwargs:
                 return radec_to_iauname(**kwargs)
-            if kwargs.has_key('nsaid'):
+            if 'nsaid' in kwargs:
                 return self.nsaid_to_iauname(**kwargs)
 
     def subdir(self, filetype, **kwargs):

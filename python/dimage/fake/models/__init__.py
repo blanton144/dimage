@@ -2,4 +2,4 @@
 Model creation tools.
 """
 
-from model import *
+from .model import *
