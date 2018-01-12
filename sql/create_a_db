@@ -1,6 +1,20 @@
-initdb -D database
-pg_ctl -D initdb -l logfile start
+# initialize the db cluster
+setenv ATLASDB $HOME/databases/atlasdb
+initdb -D $ATLASDB
+
+# start the server
+pg_ctl -D $ATLASDB -l $HOME/databases/atlasdb.log start
+
+# create the db
 createdb atlas
-createuser
-[ then give postgres as role name ]
-psql -h localhost -U postgres atlas
+
+# run table creation comments
+psql -h localhost -U blanton atlas --file=$DIMAGE_DIR/sql/atlas_db_create.sql
+
+# to drop the db and start over
+dropdb -h localhost -U blanton atlas
+
+
+# check it out
+psql -h localhost -U blanton atlas
+

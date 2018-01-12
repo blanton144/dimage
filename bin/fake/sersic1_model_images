@@ -12,10 +12,10 @@ import sys
 import numpy as np
 import astropy.io.fits as pyfits
 import dimage
-from dimage.dwcssimple import dwcssimple
-from dimage.models import sersic1
-from dimage.models import create_image as ci
-from dimage import dfake
+from dimage.utils.wcssimple import wcssimple
+from dimage.fake.models import sersic1
+from dimage.fake.models import create_image as ci
+from dimage.fake.utils import sersic
 import random
 
 def main(argv):
@@ -83,10 +83,10 @@ def main(argv):
         # generate wcs header to store resolution data
         # get size of image in degrees (from size nx_i in pixels)
         size = app_i * (1./3600) * nx_i
-        wcsheader = dwcssimple(180., 0., size, app_i)[0]
+        wcsheader = wcssimple(180., 0., size, app_i)[0]
         head = wcsheader.to_header()
-        image_i = dfake(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
-        
+        image_i = sersic(nx_i, ny_i, xcen=xcen_i, ycen=ycen_i, n=n_i, r50=r50_i, ba=ba_i, phi=phi_i, simple=False)
+
         hdu = pyfits.PrimaryHDU(image_i, header=head)
         imdest = os.path.join(dest, 'fits', ('simser-' + str(i) + '.fits'))
         # clobber requires environment variable CLOBBER=1

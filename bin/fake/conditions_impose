@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+
+import getopt
+import os
+import fitsio
+import sys
+import dimage.path
+import random
+from dimage.fake.conditions.impose import impose_file
+import pydl.pydlutils.yanny.yanny as Yanny
+import numpy as np
+
+dpath = dimage.path.Path()
+
+
+def main(argv):
+
+    # Defaults
+    take = None
+    version = None
+    model = None
+    condition = None
+    clobber = False
+
+    # Parse header
+    helpstr = 'conditions_apply -t take -v version'
+    try:
+        opts, args = getopt.getopt(argv, "ht:v:c",
+                                   ["help=", "take=", "version=",
+                                    "clobber="])
+    except getopt.GetoptError:
+        print helpstr
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print helpstr
+            sys.exit()
+        elif opt in ("-t", "--take"):
+            take = arg
+        elif opt in ("-v", "--version"):
+            version = arg
+        elif opt in ("-c", "--clobber"):
+            clobber = True
+
+    if(take is None):
+        print "Must specify take with -t or --take"
+        sys.exit()
+
+    if(version is None):
+        print "Must specify version with -v or --version"
+        sys.exit()
+
+    take_params = Yanny(dpath.full('take-params', take=take))
+    iversion = np.nonzero(np.array(take_params['VERSION']['version']) ==
+                          version)[0][0]
+    modelname = take_params['VERSION']['modelname'][iversion]
+    condition = take_params['VERSION']['conditions'][iversion]
+    nfake = take_params['VERSION']['nfake'][iversion]
+    random.seed(take_params['seed'])
+
+    listfile = dpath.full('model-params', take=take, model=modelname)
+    models = fitsio.read(listfile)
+    nmodel = len(models)
+
+    conditions_file = dpath.full('conditions', take=take,
+                                 condition=condition)
+
+    fakelist_dtype = [('fake_indx', np.int32),
+                      ('model_indx', np.int32),
+                      ('modelname', np.str_, 16),
+                      ('take', np.str_, 16)]
+    fakelist = np.empty(nfake, dtype=fakelist_dtype)
+
+    for findx in np.arange(nfake, dtype=np.int32):
+        mindx = random.sample(np.arange(nmodel), 1)[0]
+        fakelist['fake_indx'][findx] = findx
+        fakelist['model_indx'][findx] = mindx
+        fakelist['modelname'][findx] = modelname
+        fakelist['take'][findx] = take
+        image_file = dpath.full('model-fits', take=take, model=modelname,
+                                index=mindx)
+        fake_file = dpath.full('fake-fits', take=take,
+                               version=version, index=findx)
+        if(not os.path.exists(fake_file) or clobber is True):
+            impose_file(image_file=image_file, conditions_file=conditions_file,
+                        new_file=fake_file)
+
+    fakelist_file = dpath.full('fake-params', take=take, version=version)
+    fitsio.write(fakelist_file, fakelist, clobber=True)
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

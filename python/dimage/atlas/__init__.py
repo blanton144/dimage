@@ -2,4 +2,4 @@
 Tools related to NSA
 """
 
-from match_versions import *
+from .match_versions import *

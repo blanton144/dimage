@@ -1,1 +1,1 @@
-from sersic import *
+from .sersic import *
