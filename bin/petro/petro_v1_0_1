@@ -86,6 +86,9 @@ def main(argv):
         kname= re.sub('(EPETRO_?)', '', name)
         new_nsa[name]= kpetro[kname]
 
+    # Correct phi
+    new_nsa['EPETRO_PHI'] = 180. - new_nsa['EPETRO_PHI']
+
     # Write out file
     fitsio.write(newfile, new_nsa, clobber=True)
 
