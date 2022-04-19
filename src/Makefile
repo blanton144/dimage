@@ -53,6 +53,7 @@ OBJECTS = \
 	dtemplates.o \
 	dresample.o \
 	dnonneg.o \
+	drefine.o \
 	dcholdc.o \
 	dcholsl.o \
 	dselip.o \
