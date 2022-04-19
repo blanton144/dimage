@@ -76,6 +76,9 @@ int dtemplates(float *image, int nx, int ny, int *ntemplates, int *xcen,
 int dsersic_params(float flux, float n, float r50, float *amp, float *r0);
 int dfloodfill(int *image, int nx, int ny, int x, int y, int xst, int xnd, 
 							 int yst, int ynd, int nv);
+int drefine(float *image, int nx, int ny, float *xrough, float *yrough, 
+						float *xrefined, float *yrefined, int ncen, int cutout, 
+						float smooth);
 
 
 void dshift(float *image,
